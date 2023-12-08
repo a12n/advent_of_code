@@ -23,13 +23,13 @@ let rec digits chars =
 let fist_and_last acc n =
   match acc with None -> Some (n, n) | Some (first, _) -> Some (first, n)
 
-let calibration chars =
+let calibration_value chars =
   let* first, last = List.fold_left fist_and_last None (digits chars) in
   Some ((first * 10) + last)
 
-let total_calibration lines =
+let total_calibration_value lines =
   Seq.map String.to_list lines
-  |> Seq.filter_map calibration
+  |> Seq.filter_map calibration_value
   |> Seq.fold_left ( + ) 0
 
 let () =
@@ -37,4 +37,4 @@ let () =
     Seq.of_dispenser (fun () ->
         match read_line () with l -> Some l | exception End_of_file -> None)
   in
-  print_endline (string_of_int (total_calibration lines))
+  print_endline (string_of_int (total_calibration_value lines))

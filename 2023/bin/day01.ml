@@ -1,12 +1,4 @@
-module String : sig
-  include module type of Stdlib.String
-
-  val to_list : string -> char list
-end = struct
-  include Stdlib.String
-
-  let to_list s = List.init (length s) (unsafe_get s)
-end
+open Advent
 
 let ( let* ) = Option.bind
 

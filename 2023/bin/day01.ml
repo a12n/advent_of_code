@@ -33,8 +33,4 @@ let total_calibration_value lines =
   |> Seq.fold_left ( + ) 0
 
 let () =
-  let lines =
-    Seq.of_dispenser (fun () ->
-        match read_line () with l -> Some l | exception End_of_file -> None)
-  in
-  print_endline (string_of_int (total_calibration_value lines))
+  print_endline (string_of_int (total_calibration_value (input_lines stdin)))

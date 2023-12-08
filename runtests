@@ -1,0 +1,48 @@
+#!/bin/sh
+
+if [ -z "$1" ]; then
+    echo "Usage: $0 program"
+    exit 1
+fi
+
+PROG=$(readlink -f $1)
+if [ ! -x $PROG ]; then
+    echo "No executable $PROG found"
+    exit 1
+fi
+
+PROG_ID=$2
+if [ -z "$PROG_ID" ]; then
+    PROG_ID=$(basename ${PROG%.*})
+fi
+
+cd $(dirname $0)
+
+case $(basename $0) in
+    run)
+        OUT_CMD="cat"
+        ;;
+    xrun)
+        OUT_CMD="hexdump -C"
+        ;;
+esac
+
+for IN_FILE in $PROG_ID/*.in; do
+    TEST_ID=${IN_FILE%.*}
+    OUT_FILE=$TEST_ID.out
+    if [ ! -f $OUT_FILE ]; then
+        continue
+    fi
+    PROG_OUT=$($PROG < $IN_FILE | $OUT_CMD)
+    EXPECT_OUT=$($OUT_CMD $OUT_FILE)
+    echo ==== $TEST_ID ====
+    if [ "$PROG_OUT" != "$EXPECT_OUT" ]; then
+        echo ---- Program Output ----
+        echo $PROG_OUT
+        echo ------------------------
+        echo ---- Expected Output ---
+        echo $EXPECT_OUT
+        echo ------------------------
+        exit 1
+    fi
+done

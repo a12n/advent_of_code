@@ -2,3 +2,8 @@
  (name day01)
  (modules day01)
  (libraries advent))
+
+(executable
+ (name day02)
+ (modules day02)
+ (libraries advent))

@@ -4,12 +4,21 @@ module Draw : sig
   type t = { red : int; green : int; blue : int }
 
   val geq : t -> t -> bool
+  val max_elts : t -> t -> t
   val of_string : string -> t
+  val power : t -> int
 end = struct
   type t = { red : int; green : int; blue : int }
 
   let zero = { red = 0; green = 0; blue = 0 }
   let geq a b = a.red >= b.red && a.green >= b.green && a.blue >= b.blue
+
+  let max_elts a b =
+    {
+      red = Int.max a.red b.red;
+      green = Int.max a.green b.green;
+      blue = Int.max a.blue b.blue;
+    }
 
   let of_string s =
     String.split_on_char ',' s |> List.map String.trim
@@ -21,6 +30,8 @@ end = struct
            | [ n; "blue" ] -> { ans with blue = int_of_string n }
            | _ -> invalid_arg __FUNCTION__)
          zero
+
+  let power { red; green; blue } = red * green * blue
 end
 
 module Game : sig

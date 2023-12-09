@@ -33,6 +33,8 @@ module Part = struct
 end
 
 module Symbol = struct
+  type t = Pos.t
+
   let to_string pos = "* " ^ Pos.to_string pos
 end
 
@@ -44,7 +46,7 @@ module State = struct
     pos : Pos.t;
     current : Part.t option;
     parts : Part.t list;
-    symbols : Pos.t list;
+    symbols : Symbol.t list;
   }
 
   let initial = { pos = Pos.zero; current = None; parts = []; symbols = [] }

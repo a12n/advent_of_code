@@ -33,8 +33,8 @@ module Part = struct
 
   let is_adjacent { min; max; _ } (_, pos) = Region.(contains { min; max } pos)
 
-  let start digit (row, column) =
-    { num = digit; min = (row - 1, column - 1); max = Pos.zero }
+  let make num (row, column) =
+    { num; min = (row - 1, column - 1); max = Pos.zero }
 
   let update ({ num; _ } as part) digit = { part with num = (num * 10) + digit }
   let finish part pos = { part with max = pos }
@@ -77,7 +77,7 @@ module State = struct
           pos = (row, column + 1);
           current =
             (match current with
-            | None -> Some (Part.start (int_of_digit ch) pos)
+            | None -> Some (Part.make (int_of_digit ch) pos)
             | Some p -> Some (Part.update p (int_of_digit ch)));
         }
     | ch ->

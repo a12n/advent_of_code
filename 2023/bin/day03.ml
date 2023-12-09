@@ -20,13 +20,7 @@ end
 module Part = struct
   type t = { num : int; min : Pos.t; max : Pos.t }
 
-  let is_adjacent { num; min; max } pos =
-    let ans = Region.(contains { min; max } pos) in
-    Printf.eprintf
-      "is_adjacent { num = %d; min = (%d, %d); max = (%d, %d) } (%d, %d) = %B\n\
-       %!"
-      num (fst min) (snd min) (fst max) (snd max) (fst pos) (snd pos) ans;
-    ans
+  let is_adjacent { min; max; _ } pos = Region.(contains { min; max } pos)
 
   let start digit (row, column) =
     { num = digit; min = (row - 1, column - 1); max = Pos.zero }

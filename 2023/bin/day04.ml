@@ -14,11 +14,11 @@ end = struct
 end
 
 module Card : sig
-  type t = int * Numbers.t * Numbers.t
+  type t = int * Numbers.t
 
   val of_string : string -> t
 end = struct
-  type t = int * Numbers.t * Numbers.t
+  type t = int * Numbers.t
 
   let of_string s =
     match String.split_on_char ':' s with
@@ -28,8 +28,7 @@ end = struct
             match String.split_on_char '|' numbers with
             | [ winning; have ] ->
                 ( int_of_string id,
-                  Numbers.of_string winning,
-                  Numbers.of_string have )
+                  Numbers.(inter (of_string winning) (of_string have)) )
             | _ -> invalid_arg __FUNCTION__)
         | _ -> invalid_arg __FUNCTION__)
     | _ -> invalid_arg __FUNCTION__
@@ -38,10 +37,8 @@ end
 let part1 () =
   let sum =
     input_lines stdin |> Seq.map Card.of_string
-    |> Seq.map (fun (_, winning, have) ->
-           match Numbers.(cardinal (inter winning have)) with
-           | 0 -> 0
-           | n -> 1 lsl (n - 1))
+    |> Seq.map (fun (_, matching) ->
+           match Numbers.cardinal matching with 0 -> 0 | n -> 1 lsl (n - 1))
     |> Seq.reduce ( + )
   in
   print_endline (string_of_int sum)

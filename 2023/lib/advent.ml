@@ -1,3 +1,4 @@
+module Int = Advent__Int
 module List = Advent__List
 module Seq = Advent__Seq
 module String = Advent__String

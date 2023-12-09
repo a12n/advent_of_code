@@ -4,6 +4,9 @@ module Pos = struct
   type t = int * int
   (** Row and column in the puzzle grid. *)
 
+  let to_string (row, column) =
+    "(" ^ string_of_int row ^ ", " ^ string_of_int column ^ ")"
+
   let zero = (0, 0)
 end
 
@@ -32,6 +35,13 @@ module Part = struct
 
   let update ({ num; _ } as part) digit = { part with num = (num * 10) + digit }
   let finish part pos = { part with max = pos }
+
+  let to_string { num; min; max } =
+    string_of_int num ^ " " ^ Pos.to_string min ^ " " ^ Pos.to_string max
+end
+
+module Symbol = struct
+  let to_string pos = "* " ^ Pos.to_string pos
 end
 
 let is_digit c = c >= '0' && c <= '9'
@@ -97,16 +107,10 @@ let () =
     |> Seq.fold_left State.update State.initial
     |> State.finish
   in
+  List.iter prerr_endline (List.map Part.to_string parts);
+  List.iter prerr_endline (List.map Symbol.to_string symbols);
   let parts =
     List.filter (fun part -> List.exists (Part.is_adjacent part) symbols) parts
   in
-  let sum = List.map (fun Part.{num;_} -> num) parts |> List.reduce (+) in
-  List.iter
-    (fun Part.{ num; min = min_row, min_column; max = max_row, max_column } ->
-      Printf.eprintf "part %d from (%d, %d) to (%d, %d)\n" num min_row min_column
-        max_row max_column)
-    parts;
-  List.iter
-    (fun (row, column) -> Printf.eprintf "symbol at (%d, %d)\n" row column)
-    symbols;
+  let sum = List.map (fun Part.{ num; _ } -> num) parts |> List.reduce ( + ) in
   print_endline (string_of_int sum)

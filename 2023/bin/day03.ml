@@ -108,8 +108,8 @@ let part1 () =
     |> Seq.fold_left State.update State.initial
     |> State.finish
   in
-  (* List.iter prerr_endline (List.map Part.to_string parts); *)
-  (* List.iter prerr_endline (List.map Symbol.to_string symbols); *)
+  List.iter prerr_endline (List.map Part.to_string parts);
+  List.iter prerr_endline (List.map Symbol.to_string symbols);
   let sum =
     List.filter
       (fun part -> List.exists (Part.is_adjacent part) symbols)

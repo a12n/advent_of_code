@@ -46,7 +46,7 @@ end = struct
     | _ -> invalid_arg __FUNCTION__
 end
 
-let () =
+let part1 () =
   let total = Draw.{ red = 12; green = 13; blue = 14 } in
   let sum =
     input_lines stdin |> Seq.map Game.of_string
@@ -54,3 +54,5 @@ let () =
     |> Seq.fold_left (fun sum Game.{ id; _ } -> sum + id) 0
   in
   print_endline (string_of_int sum)
+
+let () = part1 ()

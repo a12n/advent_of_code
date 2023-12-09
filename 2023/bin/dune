@@ -7,3 +7,8 @@
  (name day02)
  (modules day02)
  (libraries advent))
+
+(executable
+ (name day03)
+ (modules day03)
+ (libraries advent))

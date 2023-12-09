@@ -13,10 +13,8 @@ end
 module Region = struct
   type t = { min : Pos.t; max : Pos.t }
 
-  let contains { min = min_row, min_column; max = max_row, max_column }
-      (row, column) =
-    row >= min_row && row <= max_row && column >= min_column
-    && column <= max_column
+  let contains { min = r_min, c_min; max = r_max, c_max } (r, c) =
+    r >= r_min && c >= c_min && r <= r_max && c <= c_max
 end
 
 module Part = struct

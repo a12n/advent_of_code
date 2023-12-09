@@ -132,4 +132,4 @@ let part2 () =
   in
   print_endline (string_of_int sum)
 
-let () = part1 ()
+let () = (parse_args Sys.argv [| part1; part2 |]) ()

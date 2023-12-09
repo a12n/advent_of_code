@@ -34,7 +34,7 @@ module Part = struct
   let is_adjacent { min; max; _ } (_, pos) = Region.(contains { min; max } pos)
 
   let make num (row, column) =
-    { num; min = (row - 1, column - 1); max = Pos.zero }
+    { num; min = (row - 1, column - 1); max = (row + 1, column + 1) }
 
   let update ({ num; _ } as part) digit = { part with num = (num * 10) + digit }
   let finish part pos = { part with max = pos }

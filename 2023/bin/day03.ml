@@ -24,8 +24,6 @@ module Symbol = struct
 
   let to_string (gear, pos) =
     (if gear then "*" else "#") ^ " " ^ Pos.to_string pos
-
-  let _ = to_string
 end
 
 module Part = struct
@@ -41,7 +39,6 @@ module Part = struct
 
   let to_string { num; min; max } =
     string_of_int num ^ " " ^ Pos.to_string min ^ " " ^ Pos.to_string max
-
 end
 
 let is_digit c = c >= '0' && c <= '9'

@@ -74,4 +74,11 @@ let part2 () =
   in
   print_endline (string_of_int sum)
 
-let () = part1 ()
+let () =
+  (if Array.length Sys.argv > 1 then
+     match Sys.argv.(1) with
+     | "1" -> part1
+     | "2" -> part2
+     | _ -> invalid_arg __FUNCTION__
+   else part1)
+    ()

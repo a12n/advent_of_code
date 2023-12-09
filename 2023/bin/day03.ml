@@ -17,10 +17,21 @@ module Region = struct
     r >= r_min && c >= c_min && r <= r_max && c <= c_max
 end
 
+module Symbol = struct
+  type t = bool * Pos.t
+
+  let make ch pos = (ch = '*', pos)
+
+  let to_string (gear, pos) =
+    (if gear then "*" else "#") ^ " " ^ Pos.to_string pos
+
+  let _ = to_string
+end
+
 module Part = struct
   type t = { num : int; min : Pos.t; max : Pos.t }
 
-  let is_adjacent { min; max; _ } pos = Region.(contains { min; max } pos)
+  let is_adjacent { min; max; _ } (_, pos) = Region.(contains { min; max } pos)
 
   let start digit (row, column) =
     { num = digit; min = (row - 1, column - 1); max = Pos.zero }
@@ -30,12 +41,7 @@ module Part = struct
 
   let to_string { num; min; max } =
     string_of_int num ^ " " ^ Pos.to_string min ^ " " ^ Pos.to_string max
-end
 
-module Symbol = struct
-  type t = Pos.t
-
-  let to_string pos = "* " ^ Pos.to_string pos
 end
 
 let is_digit c = c >= '0' && c <= '9'
@@ -82,7 +88,8 @@ module State = struct
             (match current with
             | Some p -> Part.finish p (row + 1, column) :: parts
             | None -> parts);
-          symbols = (if ch = '.' then symbols else pos :: symbols);
+          symbols =
+            (if ch = '.' then symbols else Symbol.make ch pos :: symbols);
         }
 
   let finish = function

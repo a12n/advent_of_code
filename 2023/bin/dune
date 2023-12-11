@@ -20,7 +20,10 @@
  (modules day_05 day_05_1 day_05_2)
  (libraries advent))
 
-(executable (name day_06) (modules day_06) (libraries advent))
+(executables
+ (names day_06_1 day_06_2)
+ (modules day_06 day_06_1 day_06_2)
+ (libraries advent))
 
 (executables
  (names day_07_1 day_07_2)

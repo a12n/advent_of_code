@@ -1,3 +1,5 @@
+open Advent
+
 module Card : sig
   type t =
     | Two
@@ -92,6 +94,7 @@ module Hand : sig
     val to_kind : t -> Kind.t
   end
 
+  val compare : t -> t -> int
   val of_string : string -> t
   val to_freq : t -> Freq.t
   val to_string : t -> string
@@ -121,6 +124,13 @@ end = struct
       | [ (_, 1); (_, 1); (_, 1); (_, 2) ] -> Kind.One_Pair
       | _ -> Kind.High_Card
   end
+
+  let compare (a0, a1, a2, a3, a4) (b0, b1, b2, b3, b4) =
+    let= _ = Card.compare a0 b0 in
+    let= _ = Card.compare a1 b1 in
+    let= _ = Card.compare a2 b2 in
+    let= _ = Card.compare a3 b3 in
+    Card.compare a4 b4
 
   let to_freq (h0, h1, h2, h3, h4) =
     List.fold_left

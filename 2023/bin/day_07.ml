@@ -72,6 +72,19 @@ end
 module Hand : sig
   type t = Card.t * Card.t * Card.t * Card.t * Card.t
 
+  module Freq : sig
+    type t = private (Card.t * int) list
+    (** Frequency list of cards in a hand. *)
+
+    val five_of_a_kind : t -> bool
+    val four_of_a_kind : t -> bool
+    val full_house : t -> bool
+    val three_of_a_kind : t -> bool
+    val two_pair : t -> bool
+    val one_pair : t -> bool
+    val high_card : t -> bool
+  end
+
   val of_string : string -> t
   val to_string : t -> string
 end = struct
@@ -80,39 +93,25 @@ end = struct
   let to_list (h0, h1, h2, h3, h4) = (h0, [ h1; h2; h3; h4 ])
 
   module Freq = struct
-    let of_hand (h0, h1, h2, h3, h4) =
-      let freq = Array.make 13 0 in
-      List.iter
-        (fun c ->
-          let i = Card.to_int c in
-          Array.(unsafe_set freq i (unsafe_get freq i + 1)))
-        [ h0; h1; h2; h3; h4 ];
-      freq
-  end
+    type t = (Card.t * int) list
 
-  module Kind = struct
-    let five_of_a_kind h = Array.exists (( = ) 5) (Freq.of_hand h)
-    let four_of_a_kind h = Array.exists (( = ) 4) (Freq.of_hand h)
+    let five_of_a_kind = function [ (_, 5) ] -> true | _ -> false
+    let four_of_a_kind = function [ (_, 4); (_, 1) ] -> true | _ -> false
+    let full_house = function [ (_, 3); (_, 2) ] -> true | _ -> true
 
-    let full_house h =
-      let freq = Freq.of_hand h in
-      Array.exists (( = ) 3) freq && Array.exists (( = ) 2) freq
+    let three_of_a_kind = function
+      | [ (_, 3); (_, 1); (_, 1) ] -> true
+      | _ -> false
 
-    let three_of_a_kind _ =
-      (* TODO *)
-      false
+    let two_pair = function [ (_, 2); (_, 2); (_, 1) ] -> true | _ -> false
 
-    let two_pair _ =
-      (* TODO *)
-      false
+    let one_pair = function
+      | [ (_, 2); (_, 1); (_, 1); (_, 1) ] -> true
+      | _ -> false
 
-    let one_pair _ =
-      (* TODO *)
-      false
-
-    let high_card _ =
-      (* TODO *)
-      false
+    let high_card = function
+      | [ (_, 1); (_, 1); (_, 1); (_, 1); (_, 1) ] -> true
+      | _ -> false
   end
 
   let of_string s =

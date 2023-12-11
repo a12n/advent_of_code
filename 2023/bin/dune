@@ -4,4 +4,8 @@
 (executable (name day_04) (modules day_04) (libraries advent))
 (executable (name day_05) (modules day_05) (libraries advent))
 (executable (name day_06) (modules day_06) (libraries advent))
-(executable (name day_07) (modules day_07) (libraries advent))
+
+(executables
+ (names day_07_1 day_07_2)
+ (modules day_07 day_07_1 day_07_2)
+ (libraries advent))

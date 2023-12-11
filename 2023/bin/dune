@@ -3,3 +3,4 @@
 (executable (name day03) (modules day03) (libraries advent))
 (executable (name day04) (modules day04) (libraries advent))
 (executable (name day05) (modules day05) (libraries advent))
+(executable (name day06) (modules day06) (libraries advent))

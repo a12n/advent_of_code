@@ -1,38 +1,37 @@
 open Advent
 
 module Mapping : sig
-  type t = private (int * (int * int)) list
+  type t = private (int * int * int) list
 
   val empty : t
   val find : t -> int -> int
   val of_lines : string Seq.t -> t
 end = struct
-  type t = (int * (int * int)) list
+  type t = (int * int * int) list
 
   (* TODO: Replace. *)
-  let add assoc ?(len = 1) key value = (key, (value, len)) :: assoc
+  let add assoc ?(len = 1) src dest = (src, dest, len) :: assoc
   let empty = []
 
   let find_last_opt assoc pred =
     List.fold_left
-      (fun acc (k, v) ->
-        match (pred k, acc) with
-        | true, None -> Some (k, v)
-        | true, Some (k', _) when k > k' -> Some (k, v)
+      (fun acc (src, dest, len) ->
+        match (pred src, acc) with
+        | true, None -> Some (src, dest, len)
+        | true, Some (src', _, _) when src > src' -> Some (src, dest, len)
         | _, acc -> acc)
       None assoc
 
-  let find assoc k =
-    (* Find greatest key less than or equal to [k]. *)
-    match find_last_opt assoc (( >= ) k) with
-    | Some (k', (v, len)) when k < k' + len ->
-        (* If the requested key is withing the range, map to destination
-           value. *)
-        v + (k - k')
+  let find assoc src =
+    (* Find greatest src less than or equal to [src]. *)
+    match find_last_opt assoc (( >= ) src) with
+    | Some (src', dest, len) when src < src' + len ->
+        (* If the requested source is withing the range, map to destination. *)
+        dest + (src - src')
     | Some _ | None ->
         (* Any source numbers that aren't mapped correspond to the same
            destination number. *)
-        k
+        src
 
   let of_lines lines =
     let parse_line assoc line =
@@ -41,7 +40,7 @@ end = struct
         |> List.filter (( <> ) "")
         |> List.map int_of_string
       with
-      | [ dest; source; len ] -> add assoc ~len source dest
+      | [ dest; src; len ] -> add assoc ~len src dest
       | _ -> invalid_arg __FUNCTION__
     in
     Seq.take_while (( <> ) "") lines |> Seq.fold_left parse_line empty

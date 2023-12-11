@@ -60,6 +60,7 @@ module Almanac : sig
   }
 
   val of_lines : string Seq.t -> t
+  val seed_to_location : t -> int -> int
 end = struct
   type t = {
     seeds : int list;
@@ -137,6 +138,15 @@ end = struct
       | None -> almanac
     in
     parse empty
+
+  let seed_to_location almanac seed =
+    Mapping.find almanac.seed_to_soil seed
+    |> Mapping.find almanac.soil_to_fertilizer
+    |> Mapping.find almanac.fertilizer_to_water
+    |> Mapping.find almanac.water_to_light
+    |> Mapping.find almanac.light_to_temperature
+    |> Mapping.find almanac.temperature_to_humidity
+    |> Mapping.find almanac.humidity_to_location
 end
 
 let part1 () =

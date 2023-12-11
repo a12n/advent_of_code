@@ -8,22 +8,22 @@ end = struct
   type t = int
 
   let of_char = function
-    | '2' -> 2
-    | '3' -> 3
-    | '4' -> 4
-    | '5' -> 5
-    | '6' -> 6
-    | '7' -> 7
-    | '8' -> 8
-    | '9' -> 9
-    | 'T' | 't' -> 10
-    | 'J' | 'j' -> 11
-    | 'Q' | 'q' -> 12
-    | 'K' | 'k' -> 13
-    | 'A' | 'a' -> 14
+    | '2' -> 0
+    | '3' -> 1
+    | '4' -> 2
+    | '5' -> 3
+    | '6' -> 4
+    | '7' -> 5
+    | '8' -> 6
+    | '9' -> 7
+    | 'T' | 't' -> 8
+    | 'J' | 'j' -> 9
+    | 'Q' | 'q' -> 10
+    | 'K' | 'k' -> 11
+    | 'A' | 'a' -> 12
     | _ -> invalid_arg __FUNCTION__
 
-  let to_char c = String.unsafe_get "23456789TJQKA" (c - 2)
+  let to_char = String.unsafe_get "23456789TJQKA"
   let pp fmt c = Format.pp_print_char fmt (to_char c)
 end
 

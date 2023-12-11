@@ -15,7 +15,11 @@
  (modules day_04 day_04_1 day_04_2)
  (libraries advent))
 
-(executable (name day_05) (modules day_05) (libraries advent))
+(executables
+ (names day_05_1 day_05_2)
+ (modules day_05 day_05_1 day_05_2)
+ (libraries advent))
+
 (executable (name day_06) (modules day_06) (libraries advent))
 
 (executables

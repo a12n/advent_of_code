@@ -147,17 +147,3 @@ end = struct
     |> Mapping.find almanac.temperature_to_humidity
     |> Mapping.find almanac.humidity_to_location
 end
-
-let part1 () =
-  let (Almanac.{ seeds; _ } as almanac) =
-    Almanac.of_lines (input_lines stdin)
-  in
-  let min_location, _seed =
-    List.unpair seeds
-    |> List.map (fun seed -> (Almanac.seed_to_location almanac seed, seed))
-    |> List.fold_left min (max_int, 0)
-  in
-  print_endline (string_of_int min_location)
-
-let part2 () = ()
-let () = (parse_args Sys.argv [| part1; part2 |]) ()

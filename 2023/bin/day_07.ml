@@ -1,4 +1,23 @@
-module Card = struct
+module Card : sig
+  type t =
+    | Two
+    | Three
+    | Four
+    | Five
+    | Six
+    | Seven
+    | Eight
+    | Nine
+    | Ten
+    | Jack
+    | Queen
+    | King
+    | Ace
+
+  val of_char : char -> t
+  val to_char : t -> char
+  val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
+end = struct
   type t =
     | Two
     | Three

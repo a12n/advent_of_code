@@ -123,6 +123,7 @@ end = struct
 
     let rec to_kind ?(joker = false) =
       if joker then function
+        | [ (_, 1); (Card.Jack, 4) ] -> Kind.Five_Of_A_Kind
         | [ (Card.Jack, 1); (_, 4) ] -> Kind.Five_Of_A_Kind
         | [ (_, 2); (Card.Jack, 3) ] -> Kind.Five_Of_A_Kind
         | [ (Card.Jack, 2); (_, 3) ] -> Kind.Five_Of_A_Kind

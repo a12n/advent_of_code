@@ -56,22 +56,3 @@ end = struct
         }
     | _ -> invalid_arg __FUNCTION__
 end
-
-let part1 () =
-  let total = Draw.{ red = 12; green = 13; blue = 14 } in
-  let sum =
-    input_lines stdin |> Seq.map Game.of_string
-    |> Seq.filter ((Fun.flip Game.is_possible) total)
-    |> Seq.fold_left (fun sum Game.{ id; _ } -> sum + id) 0
-  in
-  print_endline (string_of_int sum)
-
-let part2 () =
-  let sum =
-    input_lines stdin |> Seq.map Game.of_string
-    |> Seq.map (fun Game.{ draws; _ } -> List.reduce Draw.max_elts draws)
-    |> Seq.map Draw.power |> Seq.reduce ( + )
-  in
-  print_endline (string_of_int sum)
-
-let () = (parse_args Sys.argv [| part1; part2 |]) ()

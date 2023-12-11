@@ -3,7 +3,6 @@ open Advent
 module Mapping : sig
   type t = private (int * (int * int)) list
 
-  val add : t -> ?len:int -> int -> int -> t
   val empty : t
   val find : t -> int -> int
   val of_lines : string Seq.t -> t

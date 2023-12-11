@@ -14,6 +14,7 @@ module Card : sig
     | King
     | Ace
 
+  val compare : t -> t -> int
   val of_char : char -> t
   val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
   val to_char : t -> char
@@ -34,6 +35,7 @@ end = struct
     | King
     | Ace
 
+  let compare a b = Stdlib.compare a b
   let of_char = function
     | '2' -> Two
     | '3' -> Three

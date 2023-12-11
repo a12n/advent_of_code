@@ -121,17 +121,23 @@ end = struct
   module Freq = struct
     type t = (Card.t * int) list
 
-    let to_kind ?(joker = false) =
-      ignore joker;
-      (* TODO *)
-      function
-      | [ (_, 5) ] -> Kind.Five_Of_A_Kind
-      | [ (_, 1); (_, 4) ] -> Kind.Four_Of_A_Kind
-      | [ (_, 2); (_, 3) ] -> Kind.Full_House
-      | [ (_, 1); (_, 1); (_, 3) ] -> Kind.Three_Of_A_Kind
-      | [ (_, 1); (_, 2); (_, 2) ] -> Kind.Two_Pair
-      | [ (_, 1); (_, 1); (_, 1); (_, 2) ] -> Kind.One_Pair
-      | _ -> Kind.High_Card
+    let rec to_kind ?(joker = false) =
+      if joker then function
+        | [ (Card.Jack, 1); (_, 4) ] | [ (Card.Jack, 2); (_, 3) ] ->
+            Kind.Five_Of_A_Kind
+        | [ (Card.Jack, 1); (_, 1); (_, 3) ]
+        | [ (_, 1); (Card.Jack, 2); (_, 2) ] ->
+            Kind.Four_Of_A_Kind
+        (* TODO *)
+        | h -> to_kind ~joker:false h
+      else function
+        | [ (_, 5) ] -> Kind.Five_Of_A_Kind
+        | [ (_, 1); (_, 4) ] -> Kind.Four_Of_A_Kind
+        | [ (_, 2); (_, 3) ] -> Kind.Full_House
+        | [ (_, 1); (_, 1); (_, 3) ] -> Kind.Three_Of_A_Kind
+        | [ (_, 1); (_, 2); (_, 2) ] -> Kind.Two_Pair
+        | [ (_, 1); (_, 1); (_, 1); (_, 2) ] -> Kind.One_Pair
+        | _ -> Kind.High_Card
   end
 
   let compare ?(joker = false) (a0, a1, a2, a3, a4) (b0, b1, b2, b3, b4) =

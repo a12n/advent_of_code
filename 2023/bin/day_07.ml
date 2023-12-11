@@ -72,7 +72,7 @@ end
 module Hand : sig
   type t = Card.t * Card.t * Card.t * Card.t * Card.t
 
-  module Rank : sig
+  module Kind : sig
     type t =
       | High_Card
       | One_Pair
@@ -87,7 +87,7 @@ module Hand : sig
     type t = private (Card.t * int) list
     (** Frequency list of cards in a hand. *)
 
-    val to_rank : t -> Rank.t
+    val to_kind : t -> Kind.t
   end
 
   val of_string : string -> t
@@ -96,7 +96,7 @@ module Hand : sig
 end = struct
   type t = Card.t * Card.t * Card.t * Card.t * Card.t
 
-  module Rank = struct
+  module Kind = struct
     type t =
       | High_Card
       | One_Pair
@@ -110,14 +110,14 @@ end = struct
   module Freq = struct
     type t = (Card.t * int) list
 
-    let to_rank = function
-      | [ (_, 5) ] -> Rank.Five_Of_A_Kind
-      | [ (_, 4); (_, 1) ] -> Rank.Four_Of_A_Kind
-      | [ (_, 3); (_, 2) ] -> Rank.Full_House
-      | [ (_, 3); (_, 1); (_, 1) ] -> Rank.Three_Of_A_Kind
-      | [ (_, 2); (_, 2); (_, 1) ] -> Rank.Two_Pair
-      | [ (_, 2); (_, 1); (_, 1); (_, 1) ] -> Rank.One_Pair
-      | _ -> Rank.High_Card
+    let to_kind = function
+      | [ (_, 5) ] -> Kind.Five_Of_A_Kind
+      | [ (_, 1); (_, 4) ] -> Kind.Four_Of_A_Kind
+      | [ (_, 2); (_, 3) ] -> Kind.Full_House
+      | [ (_, 1); (_, 1); (_, 3) ] -> Kind.Three_Of_A_Kind
+      | [ (_, 1); (_, 2); (_, 2) ] -> Kind.Two_Pair
+      | [ (_, 1); (_, 1); (_, 1); (_, 2) ] -> Kind.One_Pair
+      | _ -> Kind.High_Card
   end
 
   let to_freq (h0, h1, h2, h3, h4) =
@@ -129,7 +129,7 @@ end = struct
       [ (h0, 1) ]
       [ h1; h2; h3; h4 ]
     |> List.sort (fun (card1, n1) (card2, n2) ->
-           match Int.compare n2 n1 with 0 -> compare card2 card1 | ord -> ord)
+           match Int.compare n1 n2 with 0 -> compare card1 card2 | ord -> ord)
 
   let of_string s =
     let open Card in

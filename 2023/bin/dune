@@ -1,4 +1,7 @@
-(executable (name day_01) (modules day_01) (libraries advent))
+(executable
+ (name day_01)
+ (modules day_01)
+ (libraries advent))
 
 (executables
  (names day_02_1 day_02_2)

@@ -16,7 +16,7 @@ module Card : sig
     | King
     | Ace
 
-  val compare : t -> t -> int
+  val compare : ?joker:bool -> t -> t -> int
   val of_char : char -> t
   val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
   val to_char : t -> char
@@ -37,7 +37,13 @@ end = struct
     | King
     | Ace
 
-  let compare a b = Stdlib.compare a b
+  let compare ?(joker = false) a b =
+    match (joker, a, b) with
+    | true, Jack, Jack -> 0
+    | true, Jack, _ -> -1
+    | true, _, Jack -> 1
+    | _, _, _ -> Stdlib.compare a b
+
   let of_char = function
     | '2' -> Two
     | '3' -> Three
@@ -94,9 +100,9 @@ module Hand : sig
     val to_kind : t -> Kind.t
   end
 
-  val compare : t -> t -> int
+  val compare : ?joker:bool -> t -> t -> int
   val of_string : string -> t
-  val to_freq : t -> Freq.t
+  val to_freq : ?joker:bool -> t -> Freq.t
   val to_string : t -> string
 end = struct
   type t = Card.t * Card.t * Card.t * Card.t * Card.t
@@ -125,14 +131,14 @@ end = struct
       | _ -> Kind.High_Card
   end
 
-  let compare (a0, a1, a2, a3, a4) (b0, b1, b2, b3, b4) =
-    let= _ = Card.compare a0 b0 in
-    let= _ = Card.compare a1 b1 in
-    let= _ = Card.compare a2 b2 in
-    let= _ = Card.compare a3 b3 in
-    Card.compare a4 b4
+  let compare ?(joker = false) (a0, a1, a2, a3, a4) (b0, b1, b2, b3, b4) =
+    let= _ = Card.compare ~joker a0 b0 in
+    let= _ = Card.compare ~joker a1 b1 in
+    let= _ = Card.compare ~joker a2 b2 in
+    let= _ = Card.compare ~joker a3 b3 in
+    Card.compare ~joker a4 b4
 
-  let to_freq (h0, h1, h2, h3, h4) =
+  let to_freq ?(joker = false) (h0, h1, h2, h3, h4) =
     List.fold_left
       (fun freq card ->
         let n = Option.value ~default:0 (List.assoc_opt card freq) in
@@ -142,7 +148,7 @@ end = struct
       [ h1; h2; h3; h4 ]
     |> List.sort (fun (card1, n1) (card2, n2) ->
            match Int.compare n1 n2 with
-           | 0 -> Card.compare card1 card2
+           | 0 -> Card.compare ~joker card1 card2
            | ord -> ord)
 
   let of_string s =

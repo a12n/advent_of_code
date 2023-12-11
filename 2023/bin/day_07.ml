@@ -116,23 +116,25 @@ end = struct
   end
 
   let of_string s =
+    let open Card in
     let open String in
     if length s <> 5 then invalid_arg __FUNCTION__;
-    ( Card.of_char (unsafe_get s 0),
-      Card.of_char (unsafe_get s 1),
-      Card.of_char (unsafe_get s 2),
-      Card.of_char (unsafe_get s 3),
-      Card.of_char (unsafe_get s 4) )
+    ( of_char (unsafe_get s 0),
+      of_char (unsafe_get s 1),
+      of_char (unsafe_get s 2),
+      of_char (unsafe_get s 3),
+      of_char (unsafe_get s 4) )
 
   let to_string (c0, c1, c2, c3, c4) =
     let open Bytes in
-    let buf = create 5 in
-    unsafe_set buf 0 (Card.to_char c0);
-    unsafe_set buf 1 (Card.to_char c1);
-    unsafe_set buf 2 (Card.to_char c2);
-    unsafe_set buf 3 (Card.to_char c3);
-    unsafe_set buf 4 (Card.to_char c4);
-    unsafe_to_string buf
+    let open Card in
+    let b = create 5 in
+    unsafe_set b 0 (to_char c0);
+    unsafe_set b 1 (to_char c1);
+    unsafe_set b 2 (to_char c2);
+    unsafe_set b 3 (to_char c3);
+    unsafe_set b 4 (to_char c4);
+    unsafe_to_string b
 end
 
 let input chan =

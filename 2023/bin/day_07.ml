@@ -1,5 +1,3 @@
-open Advent
-
 module Card : sig
   type t = private int
 
@@ -57,6 +55,10 @@ end = struct
     unsafe_to_string buf
 end
 
-let part1 () = print_endline (string_of_int 0)
-let part2 () = print_endline (string_of_int 0)
-let () = (parse_args Sys.argv [| part1; part2 |]) ()
+let input chan =
+  Seq.map
+    (fun line ->
+      match String.split_on_char ' ' line |> List.map String.trim with
+      | [ hand; bid ] -> (Hand.of_string hand, int_of_string bid)
+      | _ -> invalid_arg (__FUNCTION__ ^ ": invalid line \"" ^ line ^ "\""))
+    (Advent.input_lines chan)

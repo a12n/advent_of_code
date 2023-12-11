@@ -91,8 +91,6 @@ module Hand : sig
 end = struct
   type t = Card.t * Card.t * Card.t * Card.t * Card.t
 
-  let to_list (h0, h1, h2, h3, h4) = (h0, [ h1; h2; h3; h4 ])
-
   module Freq = struct
     type t = (Card.t * int) list
 

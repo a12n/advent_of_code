@@ -8,3 +8,5 @@ let rec pairs = function
 let reduce f = function
   | x0 :: xs -> fold_left f x0 xs
   | [] -> invalid_arg __FUNCTION__
+
+let rec unpair = function [] -> [] | (x0, x1) :: xs -> x0 :: x1 :: unpair xs

@@ -86,6 +86,7 @@ module Hand : sig
   end
 
   val of_string : string -> t
+  val to_freq : t -> Freq.t
   val to_string : t -> string
 end = struct
   type t = Card.t * Card.t * Card.t * Card.t * Card.t
@@ -113,6 +114,17 @@ end = struct
       | [ (_, 1); (_, 1); (_, 1); (_, 1); (_, 1) ] -> true
       | _ -> false
   end
+
+  let to_freq (h0, h1, h2, h3, h4) =
+    List.fold_left
+      (fun freq card ->
+        let n = Option.value ~default:0 (List.assoc_opt card freq) in
+        let freq' = List.remove_assoc card freq in
+        (card, n + 1) :: freq')
+      [ (h0, 1) ]
+      [ h1; h2; h3; h4 ]
+    |> List.sort (fun (card1, n1) (card2, n2) ->
+           match Int.compare n2 n1 with 0 -> compare card2 card1 | ord -> ord)
 
   let of_string s =
     let open Card in

@@ -97,7 +97,7 @@ module Hand : sig
     type t = private (Card.t * int) list
     (** Frequency list of cards in a hand. *)
 
-    val to_kind : t -> Kind.t
+    val to_kind : ?joker:bool -> t -> Kind.t
   end
 
   val compare : ?joker:bool -> t -> t -> int
@@ -121,7 +121,10 @@ end = struct
   module Freq = struct
     type t = (Card.t * int) list
 
-    let to_kind = function
+    let to_kind ?(joker = false) =
+      ignore joker;
+      (* TODO *)
+      function
       | [ (_, 5) ] -> Kind.Five_Of_A_Kind
       | [ (_, 1); (_, 4) ] -> Kind.Four_Of_A_Kind
       | [ (_, 2); (_, 3) ] -> Kind.Full_House

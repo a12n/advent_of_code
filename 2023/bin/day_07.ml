@@ -72,17 +72,22 @@ end
 module Hand : sig
   type t = Card.t * Card.t * Card.t * Card.t * Card.t
 
+  module Rank : sig
+    type t =
+      | High_Card
+      | One_Pair
+      | Two_Pair
+      | Three_Of_A_Kind
+      | Full_House
+      | Four_Of_A_Kind
+      | Five_Of_A_Kind
+  end
+
   module Freq : sig
     type t = private (Card.t * int) list
     (** Frequency list of cards in a hand. *)
 
-    val five_of_a_kind : t -> bool
-    val four_of_a_kind : t -> bool
-    val full_house : t -> bool
-    val three_of_a_kind : t -> bool
-    val two_pair : t -> bool
-    val one_pair : t -> bool
-    val high_card : t -> bool
+    val to_rank : t -> Rank.t
   end
 
   val of_string : string -> t
@@ -91,26 +96,28 @@ module Hand : sig
 end = struct
   type t = Card.t * Card.t * Card.t * Card.t * Card.t
 
+  module Rank = struct
+    type t =
+      | High_Card
+      | One_Pair
+      | Two_Pair
+      | Three_Of_A_Kind
+      | Full_House
+      | Four_Of_A_Kind
+      | Five_Of_A_Kind
+  end
+
   module Freq = struct
     type t = (Card.t * int) list
 
-    let five_of_a_kind = function [ (_, 5) ] -> true | _ -> false
-    let four_of_a_kind = function [ (_, 4); (_, 1) ] -> true | _ -> false
-    let full_house = function [ (_, 3); (_, 2) ] -> true | _ -> true
-
-    let three_of_a_kind = function
-      | [ (_, 3); (_, 1); (_, 1) ] -> true
-      | _ -> false
-
-    let two_pair = function [ (_, 2); (_, 2); (_, 1) ] -> true | _ -> false
-
-    let one_pair = function
-      | [ (_, 2); (_, 1); (_, 1); (_, 1) ] -> true
-      | _ -> false
-
-    let high_card = function
-      | [ (_, 1); (_, 1); (_, 1); (_, 1); (_, 1) ] -> true
-      | _ -> false
+    let to_rank = function
+      | [ (_, 5) ] -> Rank.Five_Of_A_Kind
+      | [ (_, 4); (_, 1) ] -> Rank.Four_Of_A_Kind
+      | [ (_, 3); (_, 2) ] -> Rank.Full_House
+      | [ (_, 3); (_, 1); (_, 1) ] -> Rank.Three_Of_A_Kind
+      | [ (_, 2); (_, 2); (_, 1) ] -> Rank.Two_Pair
+      | [ (_, 2); (_, 1); (_, 1); (_, 1) ] -> Rank.One_Pair
+      | _ -> Rank.High_Card
   end
 
   let to_freq (h0, h1, h2, h3, h4) =

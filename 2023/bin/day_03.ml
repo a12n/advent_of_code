@@ -1,5 +1,3 @@
-open Advent
-
 module Pos = struct
   type t = int * int
   (** Row and column in the puzzle grid. *)
@@ -98,38 +96,3 @@ module State = struct
           parts = Part.finish p (row + 1, column + 1) :: parts;
         }
 end
-
-let part1 () =
-  let State.{ parts; symbols; _ } =
-    input_chars stdin
-    |> Seq.fold_left State.update State.initial
-    |> State.finish
-  in
-  List.iter prerr_endline (List.map Part.to_string parts);
-  List.iter prerr_endline (List.map Symbol.to_string symbols);
-  let sum =
-    List.filter
-      (fun part -> List.exists (Part.is_adjacent part) symbols)
-      parts (* All parts adjacent to at least one symbol. *)
-    |> List.map (fun Part.{ num; _ } -> num) (* Extract the part numbers. *)
-    |> List.reduce ( + ) (* Sum the part numbers. *)
-  in
-  print_endline (string_of_int sum)
-
-let part2 () =
-  let State.{ parts; symbols; _ } =
-    input_chars stdin
-    |> Seq.fold_left State.update State.initial
-    |> State.finish
-  in
-  let sum =
-    List.filter (fun (gear, _) -> gear) symbols
-    |> List.filter_map (fun sym ->
-           match List.filter ((Fun.flip Part.is_adjacent) sym) parts with
-           | Part.[ { num = a; _ }; { num = b; _ } ] -> Some (a * b)
-           | _ -> None)
-    |> List.reduce ( + )
-  in
-  print_endline (string_of_int sum)
-
-let () = (parse_args Sys.argv [| part1; part2 |]) ()

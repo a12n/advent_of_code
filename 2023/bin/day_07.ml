@@ -75,6 +75,38 @@ module Hand : sig
 end = struct
   type t = Card.t * Card.t * Card.t * Card.t * Card.t
 
+  let to_list (h0, h1, h2, h3, h4) = (h0, [ h1; h2; h3; h4 ])
+
+  module Kind = struct
+    let five_of_a_kind h =
+      let h0, hs = to_list h in
+      List.for_all (( = ) h0) hs
+
+    let four_of_a_kind _ =
+      (* TODO *)
+      false
+
+    let full_house _ =
+      (* TODO *)
+      false
+
+    let three_of_a_kind _ =
+      (* TODO *)
+      false
+
+    let two_pair _ =
+      (* TODO *)
+      false
+
+    let one_pair _ =
+      (* TODO *)
+      false
+
+    let high_card _ =
+      (* TODO *)
+      false
+  end
+
   let of_string s =
     let open String in
     if length s <> 5 then invalid_arg __FUNCTION__;

@@ -1,30 +1,51 @@
-module Card : sig
-  type t = private int
-
-  val of_char : char -> t
-  val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
-  val to_char : t -> char
-end = struct
-  type t = int
+module Card = struct
+  type t =
+    | Two
+    | Three
+    | Four
+    | Five
+    | Six
+    | Seven
+    | Eight
+    | Nine
+    | Ten
+    | Jack
+    | Queen
+    | King
+    | Ace
 
   let of_char = function
-    | '2' -> 0
-    | '3' -> 1
-    | '4' -> 2
-    | '5' -> 3
-    | '6' -> 4
-    | '7' -> 5
-    | '8' -> 6
-    | '9' -> 7
-    | 'T' | 't' -> 8
-    | 'J' | 'j' -> 9
-    | 'Q' | 'q' -> 10
-    | 'K' | 'k' -> 11
-    | 'A' | 'a' -> 12
+    | '2' -> Two
+    | '3' -> Three
+    | '4' -> Four
+    | '5' -> Five
+    | '6' -> Six
+    | '7' -> Seven
+    | '8' -> Eight
+    | '9' -> Nine
+    | 'T' | 't' -> Ten
+    | 'J' | 'j' -> Jack
+    | 'Q' | 'q' -> Queen
+    | 'K' | 'k' -> King
+    | 'A' | 'a' -> Ace
     | _ -> invalid_arg __FUNCTION__
 
-  let to_char = String.unsafe_get "23456789TJQKA"
-  let pp fmt c = Format.pp_print_char fmt (to_char c)
+  let to_char = function
+    | Two -> '2'
+    | Three -> '3'
+    | Four -> '4'
+    | Five -> '5'
+    | Six -> '6'
+    | Seven -> '7'
+    | Eight -> '8'
+    | Nine -> '9'
+    | Ten -> 'T'
+    | Jack -> 'J'
+    | Queen -> 'Q'
+    | King -> 'K'
+    | Ace -> 'A'
+
+  let pp fmt c = Format.pp_print_char fmt (to_char c) [@@ocaml.toplevel_printer]
 end
 
 module Hand : sig

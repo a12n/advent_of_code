@@ -131,7 +131,9 @@ end = struct
       [ (h0, 1) ]
       [ h1; h2; h3; h4 ]
     |> List.sort (fun (card1, n1) (card2, n2) ->
-           match Int.compare n1 n2 with 0 -> compare card1 card2 | ord -> ord)
+           match Int.compare n1 n2 with
+           | 0 -> Card.compare card1 card2
+           | ord -> ord)
 
   let of_string s =
     let open Card in

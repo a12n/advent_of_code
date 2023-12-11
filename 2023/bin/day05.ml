@@ -48,7 +48,7 @@ end
 
 module Almanac : sig
   type t = private {
-    seeds : int list;
+    seeds : (int * int) list;
     seed_to_soil : Mapping.t;
     soil_to_fertilizer : Mapping.t;
     fertilizer_to_water : Mapping.t;
@@ -62,7 +62,7 @@ module Almanac : sig
   val seed_to_location : t -> int -> int
 end = struct
   type t = {
-    seeds : int list;
+    seeds : (int * int) list;
     seed_to_soil : Mapping.t;
     soil_to_fertilizer : Mapping.t;
     fertilizer_to_water : Mapping.t;
@@ -90,7 +90,7 @@ end = struct
         match
           String.split_on_char ' ' s
           |> List.filter (( <> ) "")
-          |> List.map int_of_string
+          |> List.map int_of_string |> List.pairs
         with
         | [] -> invalid_arg (__FUNCTION__ ^ ": empty seeds")
         | l -> l
@@ -153,7 +153,8 @@ let part1 () =
     Almanac.of_lines (input_lines stdin)
   in
   let min_location, _seed =
-    List.map (fun seed -> (Almanac.seed_to_location almanac seed, seed)) seeds
+    List.unpair seeds
+    |> List.map (fun seed -> (Almanac.seed_to_location almanac seed, seed))
     |> List.fold_left min (max_int, 0)
   in
   print_endline (string_of_int min_location)

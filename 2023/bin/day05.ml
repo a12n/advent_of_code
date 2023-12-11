@@ -6,6 +6,7 @@ module Mapping : sig
   val add : t -> ?len:int -> int -> int -> t
   val empty : t
   val find : t -> int -> int
+  val of_lines : string Seq.t -> t
 end = struct
   type t = (int * (int * int)) list
 
@@ -33,10 +34,31 @@ end = struct
         (* Any source numbers that aren't mapped correspond to the same
            destination number. *)
         k
+
+  let of_lines lines =
+    let parse_line assoc line =
+      match
+        String.split_on_char ' ' line
+        |> List.filter (( <> ) "")
+        |> List.map int_of_string
+      with
+      | [ dest; source; len ] -> add assoc ~len source dest
+      | _ -> invalid_arg __FUNCTION__
+    in
+    Seq.take_while (( <> ) "") lines |> Seq.fold_left parse_line empty
 end
 
 module Almanac : sig
-  type t
+  type t = private {
+    seeds : int list;
+    seed_to_soil : Mapping.t;
+    soil_to_fertilizer : Mapping.t;
+    fertilizer_to_water : Mapping.t;
+    water_to_light : Mapping.t;
+    light_to_temperature : Mapping.t;
+    temperature_to_humidity : Mapping.t;
+    humidity_to_location : Mapping.t;
+  }
 
   val of_lines : string Seq.t -> t
 end = struct
@@ -63,7 +85,59 @@ end = struct
       humidity_to_location = Mapping.empty;
     }
 
-  let of_lines _lines = empty
+  let of_lines =
+    let rec parse almanac lines =
+      let parse_seeds s =
+        match
+          String.split_on_char ' ' s
+          |> List.filter (( <> ) "")
+          |> List.map int_of_string
+        with
+        | [] -> invalid_arg (__FUNCTION__ ^ ": empty seeds")
+        | l -> l
+      in
+      match Seq.uncons lines with
+      | Some (line, lines') -> (
+          Printf.eprintf "line \"%s\"\n%!" line;
+          match String.split_on_char ':' line with
+          | [ "seeds"; seeds ] ->
+              parse { almanac with seeds = parse_seeds seeds } lines'
+          | [ "seed-to-soil map"; "" ] ->
+              parse
+                { almanac with seed_to_soil = Mapping.of_lines lines' }
+                lines'
+          | [ "soil-to-fertilizer map"; "" ] ->
+              parse
+                { almanac with soil_to_fertilizer = Mapping.of_lines lines' }
+                lines'
+          | [ "fertilizer-to-water map"; "" ] ->
+              parse
+                { almanac with fertilizer_to_water = Mapping.of_lines lines' }
+                lines'
+          | [ "water-to-light map"; "" ] ->
+              parse
+                { almanac with water_to_light = Mapping.of_lines lines' }
+                lines'
+          | [ "light-to-temperature map"; "" ] ->
+              parse
+                { almanac with light_to_temperature = Mapping.of_lines lines' }
+                lines'
+          | [ "temperature-to-humidity map"; "" ] ->
+              parse
+                {
+                  almanac with
+                  temperature_to_humidity = Mapping.of_lines lines';
+                }
+                lines'
+          | [ "humidity-to-location map"; "" ] ->
+              parse
+                { almanac with humidity_to_location = Mapping.of_lines lines' }
+                lines'
+          | [ "" ] -> parse almanac lines'
+          | _ -> invalid_arg (__FUNCTION__ ^ ": invalid line \"" ^ line ^ "\""))
+      | None -> almanac
+    in
+    parse empty
 end
 
 let part1 () =

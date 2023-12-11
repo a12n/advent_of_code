@@ -13,6 +13,10 @@ let input_chars, input_lines =
   in
   (input_seq input_char, input_seq input_line)
 
+(** Binding operator to short-circuit chains of [compare] calls for
+    tuples. *)
+let ( let= ) ord f = if ord <> 0 then ord else f ord
+
 (** Choose one of the elements based on the index in args. *)
 let parse_args args elts =
   let i = if Array.length args > 1 then int_of_string args.(1) - 1 else 0 in

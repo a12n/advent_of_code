@@ -79,18 +79,24 @@ end = struct
 
   let to_list (h0, h1, h2, h3, h4) = (h0, [ h1; h2; h3; h4 ])
 
+  module Freq = struct
+    let of_hand (h0, h1, h2, h3, h4) =
+      let freq = Array.make 13 0 in
+      List.iter
+        (fun c ->
+          let i = Card.to_int c in
+          Array.(unsafe_set freq i (unsafe_get freq i + 1)))
+        [ h0; h1; h2; h3; h4 ];
+      freq
+  end
+
   module Kind = struct
-    let five_of_a_kind h =
-      let h0, hs = to_list h in
-      List.for_all (( = ) h0) hs
+    let five_of_a_kind h = Array.exists (( = ) 5) (Freq.of_hand h)
+    let four_of_a_kind h = Array.exists (( = ) 4) (Freq.of_hand h)
 
-    let four_of_a_kind _ =
-      (* TODO *)
-      false
-
-    let full_house _ =
-      (* TODO *)
-      false
+    let full_house h =
+      let freq = Freq.of_hand h in
+      Array.exists (( = ) 3) freq && Array.exists (( = ) 2) freq
 
     let three_of_a_kind _ =
       (* TODO *)

@@ -7,11 +7,7 @@ let () =
       (fun network (src, dest) -> Network.add network src dest)
       (Network.make ()) nodes
   in
-  let dest = ID.of_string "ZZZ" in
-  let rec loop node i =
-    if node <> dest then
-      loop (Network.next network dirs.(i mod Array.length dirs) node) (i + 1)
-    else i
+  let num_steps, _ =
+    Network.path network ID.is_dest dirs 0 (ID.of_string "AAA")
   in
-  let num_steps = loop (ID.of_string "AAA") 0 in
   print_endline (string_of_int num_steps)

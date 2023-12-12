@@ -1,5 +1,20 @@
 open Advent
 
+module Segment : sig
+  type t = private int * int
+
+  val inter : t -> t -> t option
+  val make : int -> int -> t
+end = struct
+  type t = int * int
+
+  let inter (a1, b1) (a2, b2) =
+    let ((a, b) as i) = Int.(max a1 a2, min b1 b2) in
+    if a > b then None else Some i
+
+  let make a b = if a > b then invalid_arg __FUNCTION__ else (a, b)
+end
+
 module Mapping : sig
   type t = private (int * int * int) list
 

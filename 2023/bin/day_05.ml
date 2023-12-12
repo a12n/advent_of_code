@@ -3,16 +3,21 @@ open Advent
 module Segment : sig
   type t = private int * int
 
-  val inter : t -> t -> t option
   val make : int -> int -> t
+  val inter : t -> t -> t option
+  val union : t -> t -> t option
 end = struct
   type t = int * int
+
+  let make a b = if a > b then invalid_arg __FUNCTION__ else (a, b)
+  let disjoint (a1, b1) (a2, b2) = a2 > b1 || a1 > b2
 
   let inter (a1, b1) (a2, b2) =
     let ((a, b) as i) = Int.(max a1 a2, min b1 b2) in
     if a > b then None else Some i
 
-  let make a b = if a > b then invalid_arg __FUNCTION__ else (a, b)
+  let union ((a1, b1) as i1) ((a2, b2) as i2) =
+    if disjoint i1 i2 then None else Some Int.(min a1 a2, max b1 b2)
 end
 
 module Mapping : sig

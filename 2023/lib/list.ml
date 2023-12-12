@@ -1,5 +1,10 @@
 include Stdlib.List
 
+let rec diffs sub = function
+  | [ x0; x1 ] -> [ sub x1 x0 ]
+  | x0 :: (x1 :: _ as xs) -> sub x1 x0 :: diffs sub xs
+  | [ _ ] | [] -> invalid_arg __FUNCTION__
+
 let rec pairs = function
   | [] -> []
   | x0 :: x1 :: xs -> (x0, x1) :: pairs xs

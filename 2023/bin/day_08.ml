@@ -68,6 +68,7 @@ module Network : sig
   val make : unit -> t
   val next : t -> Dir.t -> ID.t -> ID.t
   val next_opt : t -> Dir.t -> ID.t -> ID.t option
+  val path : t -> (ID.t -> bool) -> Dir.t array -> int -> ID.t -> int * ID.t
 end = struct
   type t = (ID.t, ID.t * ID.t) Hashtbl.t
 
@@ -84,6 +85,12 @@ end = struct
     | None, _ -> None
 
   let next tbl dir src = Option.get (next_opt tbl dir src)
+
+  let rec path tbl pred dirs i src =
+    if pred src then (i, src)
+    else
+      let dir = dirs.(i mod Array.length dirs) in
+      path tbl pred dirs (i + 1) (next tbl dir src)
 end
 
 let input chan =

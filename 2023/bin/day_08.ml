@@ -12,6 +12,7 @@ end
 module ID : sig
   type t = private char * char * char
 
+  val compare : t -> t -> int
   val min_value : t
   val max_value : t
   val is_dest : t -> bool
@@ -23,6 +24,7 @@ module ID : sig
 end = struct
   type t = char * char * char
 
+  let compare = Stdlib.compare
   let min_value, max_value = (('A', 'A', 'A'), ('Z', 'Z', 'Z'))
   let is_dest (_, _, c2) = c2 = 'Z'
   let is_source (_, _, c2) = c2 = 'A'

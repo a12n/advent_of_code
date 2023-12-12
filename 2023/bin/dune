@@ -40,5 +40,5 @@
 
 (executables
  (names day_09_1 day_09_2)
- (modules day_09_1 day_09_2)
+ (modules day_09 day_09_1 day_09_2)
  (libraries advent))

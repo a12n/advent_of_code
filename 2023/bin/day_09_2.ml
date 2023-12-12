@@ -7,10 +7,7 @@ let rec extrapolate l =
 
 let () =
   let sum =
-    input_lines stdin
-    |> Seq.map (String.split_on_char ' ')
-    |> Seq.map (List.filter (( <> ) ""))
-    |> Seq.map (List.map int_of_string)
-    |> Seq.map extrapolate |> Seq.reduce ( + )
-  in
+    Day_09.input stdin
+    |> Seq.map extrapolate
+    |> Seq.reduce ( + ) in
   print_endline (string_of_int sum)

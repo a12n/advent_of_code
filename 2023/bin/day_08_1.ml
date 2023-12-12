@@ -10,7 +10,7 @@ let () =
   let dest = ID.of_string "ZZZ" in
   let rec loop node i =
     if node <> dest then
-      loop (Network.next network node dirs.(i mod Array.length dirs)) (i + 1)
+      loop (Network.next network dirs.(i mod Array.length dirs) node) (i + 1)
     else i
   in
   let num_steps = loop (ID.of_string "AAA") 0 in

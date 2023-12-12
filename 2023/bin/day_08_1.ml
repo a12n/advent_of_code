@@ -1,8 +1,12 @@
 open Day_08
 
 let () =
-  let dirs, network = input stdin in
-  Printf.eprintf "dirs %d\n%!" (Array.length dirs);
+  let dirs, nodes = input stdin in
+  let network =
+    Seq.fold_left
+      (fun network (src, dest) -> Network.add network src dest)
+      (Network.make ()) nodes
+  in
   let dest = ID.of_string "ZZZ" in
   let rec loop node i =
     if node <> dest then

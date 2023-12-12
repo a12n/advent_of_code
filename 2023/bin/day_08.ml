@@ -80,7 +80,4 @@ let input chan =
     Advent.input_lines chan
     |> Seq.map (fun line ->
            Scanf.sscanf line " %3s = ( %3s , %3s ) " (fun from left right ->
-               (ID.of_string from, (ID.of_string left, ID.of_string right))))
-    |> Seq.fold_left
-         (fun network (src, dest) -> Network.add network src dest)
-         (Network.make ()) )
+               (ID.of_string from, (ID.of_string left, ID.of_string right)))) )

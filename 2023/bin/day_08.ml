@@ -10,64 +10,74 @@ module Dir = struct
 end
 
 module ID : sig
-  type t = private int
+  type t = private char * char * char
 
+  val min_value : t
   val max_value : t
-  val of_int : int -> t
+  val is_dest : t -> bool
+  val is_source : t -> bool
   val of_string : string -> t
+  val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
+  val to_int : t -> int
   val to_string : t -> string
-  val zero : t
 end = struct
-  type t = int
+  type t = char * char * char
 
-  let base, offset = (26, int_of_char 'A')
+  let min_value, max_value = (('A', 'A', 'A'), ('Z', 'Z', 'Z'))
+  let is_dest (_, _, c2) = c2 = 'Z'
+  let is_source (_, _, c2) = c2 = 'A'
+
+  let to_int =
+    let a = int_of_char 'A' in
+    let n = int_of_char 'Z' - a + 1 in
+    fun (c0, c1, c2) ->
+      ((int_of_char c0 - a) * n * n)
+      + ((int_of_char c1 - a) * n)
+      + (int_of_char c2 - a)
 
   let of_string s =
-    if String.length s <> 3 then invalid_arg __FUNCTION__;
-    String.fold_left
-      (fun id c ->
-        if c < 'A' || c > 'Z' then invalid_arg __FUNCTION__;
-        (id * base) + int_of_char c - offset)
-      0 s
+    let open String in
+    if length s <> 3 then invalid_arg __FUNCTION__;
+    (unsafe_get s 0, unsafe_get s 1, unsafe_get s 2)
 
-  let zero, max_value = (0, of_string "ZZZ")
-  let of_int n = if n < 0 || n > max_value then invalid_arg __FUNCTION__ else n
-
-  let to_string id =
+  let to_string (c0, c1, c2) =
     let open Bytes in
     let b = create 3 in
-    unsafe_set b 2 (char_of_int ((id mod base) + offset));
-    unsafe_set b 1 (char_of_int ((id / base mod base) + offset));
-    unsafe_set b 0 (char_of_int ((id / base / base) + offset));
+    unsafe_set b 0 c0;
+    unsafe_set b 1 c1;
+    unsafe_set b 2 c2;
     unsafe_to_string b
+
+  let pp fmt (c0, c1, c2) =
+    Format.(
+      pp_print_char fmt c0;
+      pp_print_char fmt c1;
+      pp_print_char fmt c2)
 end
 
 module Network : sig
   type t
 
-  val make : unit -> t
   val add : t -> ID.t -> ID.t * ID.t -> t
-  val left : t -> ID.t -> ID.t
-  val right : t -> ID.t -> ID.t
+  val make : unit -> t
   val next : t -> ID.t -> Dir.t -> ID.t
+  val next_opt : t -> ID.t -> Dir.t -> ID.t option
 end = struct
-  type t = ID.t array * ID.t array
+  type t = (ID.t, ID.t * ID.t) Hashtbl.t
 
-  let make () =
-    let n = (ID.max_value :> int) + 1 in
-    (Array.init n ID.of_int, Array.init n ID.of_int)
+  let make () = Hashtbl.create 1024
 
-  let add (l, r) src (left, right) =
-    l.((src : ID.t :> int)) <- left;
-    r.((src : ID.t :> int)) <- right;
-    (l, r)
+  let add tbl src dest =
+    Hashtbl.add tbl src dest;
+    tbl
 
-  let left (l, _) src = l.((src : ID.t :> int))
-  let right (_, r) src = r.((src : ID.t :> int))
+  let next_opt tbl src dir =
+    match (Hashtbl.find_opt tbl src, dir) with
+    | Some (left, _), Dir.Left -> Some left
+    | Some (_, right), Dir.Right -> Some right
+    | None, _ -> None
 
-  let next net src = function
-    | Dir.Left -> left net src
-    | Dir.Right -> right net src
+  let next tbl src dir = Option.get (next_opt tbl src dir)
 end
 
 let input chan =

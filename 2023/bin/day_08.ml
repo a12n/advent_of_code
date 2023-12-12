@@ -62,8 +62,8 @@ module Network : sig
 
   val add : t -> ID.t -> ID.t * ID.t -> t
   val make : unit -> t
-  val next : t -> ID.t -> Dir.t -> ID.t
-  val next_opt : t -> ID.t -> Dir.t -> ID.t option
+  val next : t -> Dir.t -> ID.t -> ID.t
+  val next_opt : t -> Dir.t -> ID.t -> ID.t option
 end = struct
   type t = (ID.t, ID.t * ID.t) Hashtbl.t
 
@@ -73,13 +73,13 @@ end = struct
     Hashtbl.add tbl src dest;
     tbl
 
-  let next_opt tbl src dir =
+  let next_opt tbl dir src =
     match (Hashtbl.find_opt tbl src, dir) with
     | Some (left, _), Dir.Left -> Some left
     | Some (_, right), Dir.Right -> Some right
     | None, _ -> None
 
-  let next tbl src dir = Option.get (next_opt tbl src dir)
+  let next tbl dir src = Option.get (next_opt tbl dir src)
 end
 
 let input chan =

@@ -32,3 +32,8 @@
  (names day_07_1 day_07_2)
  (modules day_07 day_07_1 day_07_2)
  (libraries advent))
+
+(executables
+ (names day_08_1 day_08_2)
+ (modules day_08 day_08_1 day_08_2)
+ (libraries advent))

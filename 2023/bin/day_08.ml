@@ -12,22 +12,26 @@ end
 module ID : sig
   type t = private char * char * char
 
-  val compare : t -> t -> int
   val min_value : t
   val max_value : t
+  val compare : t -> t -> int
+  val is_part_dest : t -> bool
+  val is_part_source : t -> bool
   val is_dest : t -> bool
   val is_source : t -> bool
   val of_string : string -> t
-  val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
   val to_int : t -> int
   val to_string : t -> string
+  val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
 end = struct
   type t = char * char * char
 
-  let compare = Stdlib.compare
   let min_value, max_value = (('A', 'A', 'A'), ('Z', 'Z', 'Z'))
-  let is_dest (_, _, c2) = c2 = 'Z'
-  let is_source (_, _, c2) = c2 = 'A'
+  let compare = Stdlib.compare
+  let is_part_dest = function _, _, 'Z' -> true | _ -> false
+  let is_part_source = function _, _, 'A' -> true | _ -> false
+  let is_dest = function 'Z', 'Z', 'Z' -> true | _ -> false
+  let is_source = function 'A', 'A', 'A' -> true | _ -> false
 
   let to_int =
     let a = int_of_char 'A' in

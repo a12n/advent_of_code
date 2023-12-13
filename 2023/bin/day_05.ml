@@ -43,6 +43,7 @@ module Mapping : sig
   val empty : t
   val find : t -> int -> int
   val of_lines : string Seq.t -> t
+  val find_segment : t -> Segment.t -> Segment.t list
 end = struct
   type t = (int * int * int) list
 
@@ -83,6 +84,17 @@ end = struct
     Seq.take_while (( <> ) "") lines
     |> Seq.fold_left parse_line empty
     |> List.stable_sort Stdlib.compare
+
+  let rec find_segment assoc (Segment.{ max; _ } as src) =
+    match assoc with
+    | [] -> [ src ]
+    | (src_min, _, _) :: _ when src_min > max -> [ src ]
+    | (src_min, dest_min, n) :: assoc' -> (
+        match Segment.(inter src (make src_min (`Length n))) with
+        | Some part ->
+            Segment.make dest_min (`Length (Segment.length part))
+            :: Segment.diff src part
+        | None -> find_segment assoc' src)
 end
 
 module Almanac : sig

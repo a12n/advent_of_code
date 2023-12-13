@@ -80,7 +80,9 @@ end = struct
       | [ dest; src; len ] -> add assoc ~len src dest
       | _ -> invalid_arg __FUNCTION__
     in
-    Seq.take_while (( <> ) "") lines |> Seq.fold_left parse_line empty
+    Seq.take_while (( <> ) "") lines
+    |> Seq.fold_left parse_line empty
+    |> List.stable_sort Stdlib.compare
 end
 
 module Almanac : sig

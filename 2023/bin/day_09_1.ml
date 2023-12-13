@@ -7,10 +7,9 @@ let rec rev_extrapolate l =
   else List.hd l + rev_extrapolate (rev_diffs l)
 
 let () =
-  let sum =
-    Day_09.input stdin
-    |> Seq.map List.rev
-    |> Seq.map rev_extrapolate
-    |> Seq.reduce ( + )
-  in
-  print_endline (string_of_int sum)
+  Day_09.input stdin
+  |> Seq.map List.rev
+  |> Seq.map rev_extrapolate
+  |> Seq.reduce ( + )
+  |> string_of_int
+  |> print_endline

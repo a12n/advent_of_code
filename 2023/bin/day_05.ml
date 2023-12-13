@@ -6,6 +6,7 @@ module Segment : sig
   val make : int -> [ `End of int | `Length of int ] -> t
   val inter : t -> t -> t option
   val union : t -> t -> t option
+  val length : t -> int
 end = struct
   type t = { min : int; max : int }
 
@@ -24,6 +25,8 @@ end = struct
   let union i1 i2 =
     if disjoint i1 i2 then None
     else Some { min = Int.min i1.min i2.min; max = Int.max i1.max i2.max }
+
+  let length { min; max } = max - min + 1
 end
 
 module Mapping : sig

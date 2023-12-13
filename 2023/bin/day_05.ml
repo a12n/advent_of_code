@@ -202,15 +202,24 @@ end = struct
   let seed_to_location_segment almanac seeds =
     let log_list name segs =
       Printf.eprintf "%s: %s %d\n%!" __FUNCTION__ name (List.length segs);
-      segs in
+      segs
+    in
     let find_segments map segs =
-      List.flatten (List.map (Mapping.find_segment map) segs) in
+      List.flatten (List.map (Mapping.find_segment map) segs)
+    in
     log_list "seed" seeds
-    |> find_segments almanac.seed_to_soil |> log_list "soil"
-    |> find_segments almanac.soil_to_fertilizer |> log_list "fertilizer"
-    |> find_segments almanac.fertilizer_to_water |> log_list "water"
-    |> find_segments almanac.water_to_light |> log_list "light"
-    |> find_segments almanac.light_to_temperature |> log_list "temperature"
-    |> find_segments almanac.temperature_to_humidity |> log_list "humidity"
-    |> find_segments almanac.humidity_to_location |> log_list "location"
+    |> find_segments almanac.seed_to_soil
+    |> log_list "soil"
+    |> find_segments almanac.soil_to_fertilizer
+    |> log_list "fertilizer"
+    |> find_segments almanac.fertilizer_to_water
+    |> log_list "water"
+    |> find_segments almanac.water_to_light
+    |> log_list "light"
+    |> find_segments almanac.light_to_temperature
+    |> log_list "temperature"
+    |> find_segments almanac.temperature_to_humidity
+    |> log_list "humidity"
+    |> find_segments almanac.humidity_to_location
+    |> log_list "location"
 end

@@ -3,13 +3,17 @@ open Advent
 module Segment : sig
   type t = private { min : int; max : int }
 
-  val make : int -> int -> t
+  val make : int -> [ `End of int | `Length of int ] -> t
   val inter : t -> t -> t option
   val union : t -> t -> t option
 end = struct
   type t = { min : int; max : int }
 
-  let make min max = if min > max then invalid_arg __FUNCTION__ else { min; max }
+  let make min = function
+    | `End max when max >= min -> { min; max }
+    | `Length 0 -> { min; max = min }
+    | `Length n when n > 0 -> { min; max = min + n - 1 }
+    | _ -> invalid_arg __FUNCTION__
 
   let disjoint i1 i2 = i2.min > i1.max || i1.min > i2.max
 

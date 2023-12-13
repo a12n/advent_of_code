@@ -85,16 +85,18 @@ end = struct
     |> Seq.fold_left parse_line empty
     |> List.stable_sort Stdlib.compare
 
-  let rec find_segment assoc (Segment.{ max; _ } as src) =
+  let rec find_segment assoc (Segment.{ max; _ } as q) =
     match assoc with
-    | [] -> [ src ]
-    | (src_min, _, _) :: _ when src_min > max -> [ src ]
-    | (src_min, dest_min, n) :: assoc' -> (
-        match Segment.(inter src (make src_min (`Length n))) with
+    | [] -> [ q ]
+    | (src, _, _) :: _ when src > max -> [ q ]
+    | (src, dest, n) :: assoc' -> (
+        match Segment.(inter q (make src (`Length n))) with
         | Some part ->
-            Segment.make dest_min (`Length (Segment.length part))
-            :: Segment.diff src part
-        | None -> find_segment assoc' src)
+            Segment.make
+              (dest + part.Segment.min - src)
+              (`Length (Segment.length part))
+            :: (List.map (find_segment assoc') (Segment.diff q part) |> List.flatten)
+        | None -> find_segment assoc' q)
 end
 
 module Almanac : sig

@@ -4,9 +4,10 @@ module Segment : sig
   type t = private { min : int; max : int }
 
   val make : int -> [ `End of int | `Length of int ] -> t
+  val length : t -> int
   val inter : t -> t -> t option
   val union : t -> t -> t option
-  val length : t -> int
+  val diff : t -> t -> t list
 end = struct
   type t = { min : int; max : int }
 
@@ -25,6 +26,13 @@ end = struct
   let union i1 i2 =
     if disjoint i1 i2 then None
     else Some { min = Int.min i1.min i2.min; max = Int.max i1.max i2.max }
+
+  let diff i1 i2 =
+    match inter i1 i2 with
+    | Some { min; max } ->
+        (if min > i1.min then [ { min = i1.min; max = min - 1 } ] else [])
+        @ if max < i1.max then [ { min = max + 1; max = i1.max } ] else []
+    | None -> [ i1 ]
 
   let length { min; max } = max - min + 1
 end

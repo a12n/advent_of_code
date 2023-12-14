@@ -46,8 +46,8 @@ module Mapping : sig
   type t = private (Segment.t * int) list
 
   val empty : t
+  val find : t -> Segment.t -> Segment.t list
   val of_lines : string Seq.t -> t
-  val find_segment : t -> Segment.t -> Segment.t list
 end = struct
   type t = (Segment.t * int) list
 
@@ -67,7 +67,7 @@ end = struct
     |> Seq.fold_left parse_line empty
     |> List.stable_sort Stdlib.compare
 
-  let rec find_segment assoc q =
+  let rec find assoc q =
     match assoc with
     | [] ->
         (* No segments in the mapping intersects the queried
@@ -92,14 +92,14 @@ end = struct
             let rs =
               match Segment.diff q overlap with
               | [] -> []
-              | [ q' ] | [ _; q' ] -> find_segment assoc' q'
+              | [ q' ] | [ _; q' ] -> find assoc' q'
               | _ -> failwith "unreachable"
             in
             r0 :: rs
         | None ->
             (* The queried segment doesn't intersect with the current
                segment, but may intersect other segments in the list. *)
-            find_segment assoc' q)
+            find assoc' q)
 end
 
 module Almanac : sig
@@ -115,7 +115,7 @@ module Almanac : sig
   }
 
   val of_lines : string Seq.t -> t
-  val seed_to_location_segment : t -> Segment.t list -> Segment.t list
+  val seed_to_location : t -> Segment.t list -> Segment.t list
 end = struct
   type t = {
     seeds : (int * int) list;
@@ -193,9 +193,9 @@ end = struct
     in
     parse empty
 
-  let seed_to_location_segment almanac seeds =
+  let seed_to_location almanac seeds =
     let find_segments map segs =
-      List.flatten (List.map (Mapping.find_segment map) segs)
+      List.flatten (List.map (Mapping.find map) segs)
     in
     seeds
     |> find_segments almanac.seed_to_soil

@@ -17,22 +17,27 @@ end = struct
     | `Length n when n > 0 -> { min; max = min + n - 1 }
     | _ -> invalid_arg __FUNCTION__
 
-  let disjoint i1 i2 = i2.min > i1.max || i1.min > i2.max
+  let disjoint s t = t.min > s.max || s.min > t.max
 
-  let inter i1 i2 =
-    if disjoint i1 i2 then None
-    else Some { min = Int.max i1.min i2.min; max = Int.min i1.max i2.max }
+  let inter s t =
+    if disjoint s t then None
+    else Some { min = Int.max s.min t.min; max = Int.min s.max t.max }
 
-  let union i1 i2 =
-    if disjoint i1 i2 then None
-    else Some { min = Int.min i1.min i2.min; max = Int.max i1.max i2.max }
+  let union s t =
+    if disjoint s t then None
+    else Some { min = Int.min s.min t.min; max = Int.max s.max t.max }
 
-  let diff i1 i2 =
-    match inter i1 i2 with
+  let diff s t =
+    match inter s t with
     | Some { min; max } ->
-        (if min > i1.min then [ { min = i1.min; max = min - 1 } ] else [])
-        @ if max < i1.max then [ { min = max + 1; max = i1.max } ] else []
-    | None -> [ i1 ]
+        let left_of_t =
+          if min > s.min then [ { min = s.min; max = min - 1 } ] else []
+        in
+        let right_of_t =
+          if max < s.max then [ { min = max + 1; max = s.max } ] else []
+        in
+        left_of_t @ right_of_t
+    | None -> [ s ]
 
   let length { min; max } = max - min + 1
 end

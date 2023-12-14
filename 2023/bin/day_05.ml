@@ -156,7 +156,6 @@ end = struct
       in
       match Seq.uncons lines with
       | Some (line, lines') -> (
-          Printf.eprintf "line \"%s\"\n%!" line;
           match String.split_on_char ':' line with
           | [ "seeds"; seeds ] ->
               parse { almanac with seeds = parse_seeds seeds } lines'
@@ -207,26 +206,15 @@ end = struct
     |> Mapping.find almanac.humidity_to_location
 
   let seed_to_location_segment almanac seeds =
-    let log_list name segs =
-      Printf.eprintf "%s: %s %d\n%!" __FUNCTION__ name (List.length segs);
-      segs
-    in
     let find_segments map segs =
       List.flatten (List.map (Mapping.find_segment map) segs)
     in
-    log_list "seed" seeds
+    seeds
     |> find_segments almanac.seed_to_soil
-    |> log_list "soil"
     |> find_segments almanac.soil_to_fertilizer
-    |> log_list "fertilizer"
     |> find_segments almanac.fertilizer_to_water
-    |> log_list "water"
     |> find_segments almanac.water_to_light
-    |> log_list "light"
     |> find_segments almanac.light_to_temperature
-    |> log_list "temperature"
     |> find_segments almanac.temperature_to_humidity
-    |> log_list "humidity"
     |> find_segments almanac.humidity_to_location
-    |> log_list "location"
 end

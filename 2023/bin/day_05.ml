@@ -43,38 +43,15 @@ end = struct
 end
 
 module Mapping : sig
-  type t = private (int * int * int) list
+  type t = private (Segment.t * int) list
 
   val empty : t
-  val find : t -> int -> int
   val of_lines : string Seq.t -> t
   val find_segment : t -> Segment.t -> Segment.t list
 end = struct
-  type t = (int * int * int) list
+  type t = (Segment.t * int) list
 
-  (* TODO: Replace. *)
-  let add assoc ?(len = 1) src dest = (src, dest, len) :: assoc
   let empty = []
-
-  let find_last_opt assoc pred =
-    List.fold_left
-      (fun acc (src, dest, len) ->
-        match (pred src, acc) with
-        | true, None -> Some (src, dest, len)
-        | true, Some (src', _, _) when src > src' -> Some (src, dest, len)
-        | _, acc -> acc)
-      None assoc
-
-  let find assoc src =
-    (* Find greatest src less than or equal to [src]. *)
-    match find_last_opt assoc (( >= ) src) with
-    | Some (src', dest, len) when src < src' + len ->
-        (* If the requested source is withing the range, map to destination. *)
-        dest + (src - src')
-    | Some _ | None ->
-        (* Any source numbers that aren't mapped correspond to the same
-           destination number. *)
-        src
 
   let of_lines lines =
     let parse_line assoc line =
@@ -83,25 +60,46 @@ end = struct
         |> List.filter (( <> ) "")
         |> List.map int_of_string
       with
-      | [ dest; src; len ] -> add assoc ~len src dest
+      | [ dest; src; len ] -> (Segment.make src (`Length len), dest) :: assoc
       | _ -> invalid_arg __FUNCTION__
     in
     Seq.take_while (( <> ) "") lines
     |> Seq.fold_left parse_line empty
     |> List.stable_sort Stdlib.compare
 
-  let rec find_segment assoc (Segment.{ max; _ } as q) =
+  let rec find_segment assoc q =
     match assoc with
-    | [] -> [ q ]
-    | (src, _, _) :: _ when src > max -> [ q ]
-    | (src, dest, n) :: assoc' -> (
-        match Segment.(inter q (make src (`Length n))) with
-        | Some part ->
-            Segment.make
-              (dest + part.Segment.min - src)
-              (`Length (Segment.length part))
-            :: (List.map (find_segment assoc') (Segment.diff q part) |> List.flatten)
-        | None -> find_segment assoc' q)
+    | [] ->
+        (* No segments in the mapping intersects the queried
+           segment. Just return the query. *)
+        [ q ]
+    | (src, _) :: _ when Segment.(src.min > q.max) ->
+        (* The queried segment is entirely left to the first segment
+           in the mapping, no intersection possible. Just return the
+           query itself. *)
+        [ q ]
+    | (src, dest) :: assoc' -> (
+        match Segment.inter q src with
+        | Some overlap ->
+            (* Remap intersection as the destination segment. *)
+            let r0 =
+              Segment.make
+                (dest + overlap.min - src.min)
+                (`Length (Segment.length overlap))
+            in
+            (* Try to intersect non-overlaped parts of the query
+               segment to the other segments in the mapping. *)
+            let rs =
+              match Segment.diff q overlap with
+              | [] -> []
+              | [ q' ] | [ _; q' ] -> find_segment assoc' q'
+              | _ -> failwith "unreachable"
+            in
+            r0 :: rs
+        | None ->
+            (* The queried segment doesn't intersect with the current
+               segment, but may intersect other segments in the list. *)
+            find_segment assoc' q)
 end
 
 module Almanac : sig
@@ -117,7 +115,6 @@ module Almanac : sig
   }
 
   val of_lines : string Seq.t -> t
-  val seed_to_location : t -> int -> int
   val seed_to_location_segment : t -> Segment.t list -> Segment.t list
 end = struct
   type t = {
@@ -195,15 +192,6 @@ end = struct
       | None -> almanac
     in
     parse empty
-
-  let seed_to_location almanac seed =
-    Mapping.find almanac.seed_to_soil seed
-    |> Mapping.find almanac.soil_to_fertilizer
-    |> Mapping.find almanac.fertilizer_to_water
-    |> Mapping.find almanac.water_to_light
-    |> Mapping.find almanac.light_to_temperature
-    |> Mapping.find almanac.temperature_to_humidity
-    |> Mapping.find almanac.humidity_to_location
 
   let seed_to_location_segment almanac seeds =
     let find_segments map segs =

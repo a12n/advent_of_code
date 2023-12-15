@@ -1,5 +1,5 @@
 module Spring_row : sig
-  type t = private bool option list * int list
+  type t
 
   val arrangements : t -> int
   val of_string : string -> t

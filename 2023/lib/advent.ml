@@ -8,8 +8,7 @@ let input_chars, input_lines =
   let input_seq read ch =
     (* XXX: The module Seq is an alias for module Advent__Seq, which
        is missing. *)
-    Seq.of_dispenser (fun () ->
-        match read ch with x -> Some x | exception End_of_file -> None)
+    Seq.of_dispenser (fun () -> match read ch with x -> Some x | exception End_of_file -> None)
   in
   (input_seq input_char, input_seq input_line)
 

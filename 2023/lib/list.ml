@@ -6,6 +6,7 @@ let rec diffs sub = function
   | [ _ ] | [] -> invalid_arg __FUNCTION__
 
 let rec last = function [ x0 ] -> x0 | _ :: xs -> last xs | [] -> invalid_arg __FUNCTION__
+let rec combine_tl = function [] -> [] | x0 :: xs -> (x0, xs) :: combine_tl xs
 
 let rec take_pairs = function
   | [] -> []

@@ -4,6 +4,8 @@ module List = Advent__List
 module Seq = Advent__Seq
 module String = Advent__String
 
+let ( % ) f g x = f (g x)
+
 (** Binding operator to short-circuit chains of [compare] calls for
     tuples. *)
 let ( let= ) ord f = if ord <> 0 then ord else f ord

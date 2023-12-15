@@ -1,9 +1,12 @@
 module Spring_row : sig
   type t = private bool option list * int list
 
+  val arrangements : t -> int
   val of_string : string -> t
 end = struct
   type t = bool option list * int list
+
+  let arrangements _ = 0
 
   let of_string s =
     match String.split_on_char ' ' s |> List.map String.trim |> List.filter (( <> ) "") with

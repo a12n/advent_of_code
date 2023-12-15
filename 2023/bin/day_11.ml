@@ -7,7 +7,7 @@ module Image = struct
     let diff dim img =
       0
       :: (List.map dim img |> List.diffs ( - )
-         |> List.map (function 0 -> 0 | 1 -> 0 | d -> (d - 1) * factor)
+         |> List.map (function 0 -> 0 | d -> (d - 1) * factor) (* XXX *)
          |> List.fold_left_map (fun sum d -> (sum + d, sum + d)) 0
          |> snd)
     in

@@ -18,6 +18,8 @@ module Image = struct
     let img = List.map2 (fun (row, col) dy -> (row + dy, col)) img (diff fst img) in
     img
 
+  let dist (row1, col1) (row2, col2) = Int.(abs (row2 - row1) + abs (col2 - col1))
+
   let of_chars =
     List.rev % snd
     % Seq.fold_left

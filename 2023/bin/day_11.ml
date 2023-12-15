@@ -4,7 +4,7 @@ module Image = struct
   type t = (int * int) list
 
   let of_chars =
-    snd
+    List.rev % snd
     % Seq.fold_left
         (fun ((row, col), image) c ->
           match c with

@@ -5,6 +5,7 @@ module Seq = Advent__Seq
 module String = Advent__String
 
 let ( % ) f g x = f (g x)
+let ( let*? ) = Option.bind
 
 (** Binding operator to short-circuit chains of [compare] calls for
     tuples. *)

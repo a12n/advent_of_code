@@ -7,10 +7,10 @@ let rec diffs sub = function
 
 let rec last = function [ x0 ] -> x0 | _ :: xs -> last xs | [] -> invalid_arg __FUNCTION__
 
-let rec pairs = function
+let rec take_pairs = function
   | [] -> []
-  | x0 :: x1 :: xs -> (x0, x1) :: pairs xs
+  | x0 :: x1 :: xs -> (x0, x1) :: take_pairs xs
   | _ -> invalid_arg __FUNCTION__
 
 let reduce f = function x0 :: xs -> fold_left f x0 xs | [] -> invalid_arg __FUNCTION__
-let rec unpair = function [] -> [] | (x0, x1) :: xs -> x0 :: x1 :: unpair xs
+let rec untake_pairs = function [] -> [] | (x0, x1) :: xs -> x0 :: x1 :: untake_pairs xs

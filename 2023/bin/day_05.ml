@@ -146,7 +146,7 @@ end = struct
         match
           String.split_on_char ' ' s
           |> List.filter (( <> ) "")
-          |> List.map int_of_string |> List.pairs
+          |> List.map int_of_string |> List.take_pairs
         with
         | [] -> invalid_arg (__FUNCTION__ ^ ": empty seeds")
         | l -> l

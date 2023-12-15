@@ -3,11 +3,11 @@ open Advent
 module Image = struct
   type t = (int * int) list
 
-  let expand ?(factor = 1) img =
+  let expand ?(factor = 2) img =
     let diff dim img =
       0
       :: (List.map dim img |> List.diffs ( - )
-         |> List.map (function 0 -> 0 | d -> (d - 1) * factor) (* XXX *)
+         |> List.map (function 0 -> 0 | d -> (d - 1) * (factor - 1))
          |> List.fold_left_map (fun sum d -> (sum + d, sum + d)) 0
          |> snd)
     in

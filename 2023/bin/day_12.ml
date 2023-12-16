@@ -6,7 +6,7 @@ module Spring = struct
   type t = Bad | OK
 end
 
-module Spring_row : sig
+module Pattern : sig
   type t
 
   val arrangements : t -> int

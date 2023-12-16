@@ -5,6 +5,10 @@ let rec diffs sub = function
   | x0 :: (x1 :: _ as xs) -> sub x1 x0 :: diffs sub xs
   | [ _ ] | [] -> invalid_arg __FUNCTION__
 
+let intersperse sep =
+  let rec prepend = function [] -> [] | x0 :: xs -> sep :: x0 :: prepend xs in
+  function [] -> [] | x0 :: xs -> x0 :: prepend xs
+
 let rec last = function [ x0 ] -> x0 | _ :: xs -> last xs | [] -> invalid_arg __FUNCTION__
 let rec combine_tl = function [] -> [] | [ _ ] -> [] | x0 :: xs -> (x0, xs) :: combine_tl xs
 

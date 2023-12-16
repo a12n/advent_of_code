@@ -1,6 +1,7 @@
 include module type of Stdlib.List
 
 val diffs : ('a -> 'a -> 'b) -> 'a list -> 'b list
+val intersperse : 'a -> 'a list -> 'a list
 val last : 'a list -> 'a
 val reduce : ('a -> 'a -> 'a) -> 'a list -> 'a
 

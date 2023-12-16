@@ -6,6 +6,9 @@ end
 
 module Spring = struct
   type t = Bad | OK
+
+  let of_char = function '.' -> OK | '#' -> Bad | _ -> invalid_arg __FUNCTION__
+  let of_char_opt = function '?' -> None | c -> Some (of_char c)
 end
 
 module Pattern : sig
@@ -46,14 +49,7 @@ end = struct
   let of_string s =
     match String.split_on_char ' ' s |> List.map String.trim |> List.filter (( <> ) "") with
     | [ springs; numbers ] ->
-        let springs =
-          List.init (String.length springs) (fun i ->
-              match springs.[i] with
-              | '.' -> Some Spring.OK
-              | '#' -> Some Spring.Bad
-              | '?' -> None
-              | _ -> invalid_arg __FUNCTION__)
-        in
+        let springs = List.init (String.length springs) (fun i -> Spring.of_char_opt springs.[i]) in
         let num_bad = String.split_on_char ',' numbers |> List.map int_of_string in
         let match_bad = List.map (fun n -> Quant.N_Bad n) num_bad in
         let match_both = List.intersperse Quant.Some_OK match_bad in

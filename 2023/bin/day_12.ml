@@ -38,14 +38,8 @@ end = struct
     | None :: elts', Some_OK :: pattern' ->
         arrangements (elts', pattern') + arrangements (elts', Some_OK :: pattern')
     (* Match any good springs. *)
-    | None :: elts', Any_OK :: pattern' ->
-        arrangements (None :: elts', pattern')
-        + arrangements (elts', pattern')
-        + arrangements (elts', Some_OK :: pattern')
-    | Some Bad :: elts', Any_OK :: pattern' -> arrangements (Some Bad :: elts', pattern')
-    | Some OK :: elts', Any_OK :: pattern' ->
-        arrangements (elts', pattern') + arrangements (elts', Some_OK :: pattern')
-    | [], Any_OK :: pattern' -> arrangements ([], pattern')
+    | elts, Any_OK :: pattern' ->
+        arrangements (elts, pattern') + arrangements (elts, Some_OK :: pattern')
     (* Other arrangements are impossible. *)
     | _ -> 0
 

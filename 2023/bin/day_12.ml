@@ -9,6 +9,8 @@ module Spring = struct
 
   let of_char = function '.' -> OK | '#' -> Bad | _ -> invalid_arg __FUNCTION__
   let of_char_opt = function '?' -> None | c -> Some (of_char c)
+  let to_char = function OK -> '.' | Bad -> '#'
+  let opt_to_char = function None -> '?' | Some s -> to_char s
 end
 
 module Pattern : sig
@@ -16,6 +18,7 @@ module Pattern : sig
 
   val arrangements : t -> int
   val of_string : string -> t
+  val to_string : t -> string
   val unfold : t -> t
 end = struct
   type t = Spring.t option list * Quant.t list
@@ -56,6 +59,14 @@ end = struct
         let pattern = (Quant.Any_OK :: match_both) @ [ Quant.Any_OK ] in
         (springs, pattern)
     | _ -> invalid_arg __FUNCTION__
+
+  let to_string (springs, pattern) =
+    let springs' = List.to_seq springs |> Seq.map Spring.opt_to_char |> String.of_seq in
+    let pattern' =
+      List.filter_map (function Quant.N_Bad n -> Some (string_of_int n) | _ -> None) pattern
+      |> String.concat ","
+    in
+    springs' ^ " " ^ pattern'
 
   let unfold (springs, pattern) =
     let num_copies = 5 in

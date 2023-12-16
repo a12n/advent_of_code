@@ -68,7 +68,7 @@ end = struct
     let pattern' =
       let bad_only = function Quant.N_Bad _ -> true | _ -> false in
       Quant.Any_OK
-      :: List.(concat % intersperse [ Quant.Some_OK ] % make num_copies % filter bad_only) pattern
+      :: List.(intersperse Quant.Some_OK % concat % make num_copies % filter bad_only) pattern
       @ [ Quant.Any_OK ]
     in
     (springs', pattern')

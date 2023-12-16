@@ -57,7 +57,14 @@ end = struct
         (springs, pattern)
     | _ -> invalid_arg __FUNCTION__
 
-  let unfold p =
-    (* TODO *)
-    p
+  let unfold (springs, pattern) =
+    let num_copies = 5 in
+    let springs' = List.(concat % intersperse [ None ] % make num_copies) springs in
+    let pattern' =
+      let bad_only = function Quant.N_Bad _ -> true | _ -> false in
+      Quant.Any_OK
+      :: List.(concat % intersperse [ Quant.Some_OK ] % make num_copies % filter bad_only) pattern
+      @ [ Quant.Any_OK ]
+    in
+    (springs', pattern')
 end

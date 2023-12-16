@@ -13,6 +13,7 @@ module Pattern : sig
 
   val arrangements : t -> int
   val of_string : string -> t
+  val unfold : t -> t
 end = struct
   type t = Spring.t option list * Quant.t list
 
@@ -59,4 +60,8 @@ end = struct
         let pattern = (Quant.Any_OK :: match_both) @ [ Quant.Any_OK ] in
         (springs, pattern)
     | _ -> invalid_arg __FUNCTION__
+
+  let unfold p =
+    (* TODO *)
+    p
 end

@@ -12,14 +12,10 @@ module Pattern : sig
   val arrangements : t -> int
   val of_string : string -> t
 end = struct
-  type t = bool option list * int list
+  type t = Spring.t option list * Quant.t list
 
   let rec arrangements = function
     | [], [] -> 1
-    | Some true :: conds, 0 :: numbers -> arrangements (conds, numbers)
-    | Some true :: conds, numbers -> arrangements (conds, numbers)
-    | Some false :: _, 0 :: _ -> 0
-    | Some false :: conds, n :: numbers -> arrangements (conds, (n - 1) :: numbers)
     (* TODO *)
     | _ -> 0
 
@@ -29,12 +25,14 @@ end = struct
         let springs =
           List.init (String.length springs) (fun i ->
               match springs.[i] with
-              | '.' -> Some true
-              | '#' -> Some false
+              | '.' -> Some Spring.OK
+              | '#' -> Some Spring.Bad
               | '?' -> None
               | _ -> invalid_arg __FUNCTION__)
         in
-        let numbers = String.split_on_char ',' numbers |> List.map int_of_string in
-        (springs, numbers)
+        let num_bad = String.split_on_char ',' numbers |> List.map int_of_string in
+        let match_bad = List.map (fun n -> Quant.N_Bad n) num_bad in
+        let pattern = match_bad in
+        (springs, pattern)
     | _ -> invalid_arg __FUNCTION__
 end

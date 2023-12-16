@@ -1,3 +1,11 @@
+module Quant = struct
+  type t = N_Bad of int | Some_OK | Any_OK
+end
+
+module Spring = struct
+  type t = Bad | OK
+end
+
 module Spring_row : sig
   type t
 

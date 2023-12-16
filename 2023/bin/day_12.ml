@@ -16,9 +16,30 @@ module Pattern : sig
 end = struct
   type t = Spring.t option list * Quant.t list
 
-  let rec arrangements = function
+  let rec arrangements =
+    let open Quant in
+    let open Spring in
+    function
     | [], [] -> 1
-    (* TODO *)
+    (* Match bad springs. *)
+    | elts, N_Bad 0 :: pattern' -> arrangements (elts, pattern')
+    | None :: elts', N_Bad n :: pattern' -> arrangements (elts', N_Bad (n - 1) :: pattern')
+    | Some Bad :: elts', N_Bad n :: pattern' -> arrangements (elts', N_Bad (n - 1) :: pattern')
+    (* Match one good spring. *)
+    | Some OK :: elts', Some_OK :: pattern' ->
+        arrangements (elts', pattern') + arrangements (elts', Some_OK :: pattern')
+    | None :: elts', Some_OK :: pattern' ->
+        arrangements (elts', pattern') + arrangements (elts', Some_OK :: pattern')
+    (* Match any good springs. *)
+    | None :: elts', Any_OK :: pattern' ->
+        arrangements (None :: elts', pattern')
+        + arrangements (elts', pattern')
+        + arrangements (elts', Some_OK :: pattern')
+    | Some Bad :: elts', Any_OK :: pattern' -> arrangements (Some Bad :: elts', pattern')
+    | Some OK :: elts', Any_OK :: pattern' ->
+        arrangements (elts', pattern') + arrangements (elts', Some_OK :: pattern')
+    | [], Any_OK :: pattern' -> arrangements ([], pattern')
+    (* Other arrangements are impossible. *)
     | _ -> 0
 
   let of_string s =

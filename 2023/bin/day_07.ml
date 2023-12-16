@@ -20,7 +20,6 @@ module Card : sig
   val of_char : char -> t
   val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
   val to_char : t -> char
-  val to_int : t -> int
 end = struct
   type t =
     | Two
@@ -60,22 +59,21 @@ end = struct
     | 'A' | 'a' -> Ace
     | _ -> invalid_arg __FUNCTION__
 
-  let to_int = function
-    | Two -> 0
-    | Three -> 1
-    | Four -> 2
-    | Five -> 3
-    | Six -> 4
-    | Seven -> 5
-    | Eight -> 6
-    | Nine -> 7
-    | Ten -> 8
-    | Jack -> 9
-    | Queen -> 10
-    | King -> 11
-    | Ace -> 12
+  let to_char = function
+    | Two -> '2'
+    | Three -> '3'
+    | Four -> '4'
+    | Five -> '5'
+    | Six -> '6'
+    | Seven -> '7'
+    | Eight -> '8'
+    | Nine -> '9'
+    | Ten -> 'T'
+    | Jack -> 'J'
+    | Queen -> 'Q'
+    | King -> 'K'
+    | Ace -> 'A'
 
-  let to_char c = String.unsafe_get "23456789TJQKA" (to_int c)
   let pp fmt c = Format.pp_print_char fmt (to_char c) [@@ocaml.toplevel_printer]
 end
 

@@ -1,3 +1,5 @@
+open Advent
+
 module Quant = struct
   type t = N_Bad of int | Some_OK | Any_OK
 end
@@ -32,7 +34,8 @@ end = struct
         in
         let num_bad = String.split_on_char ',' numbers |> List.map int_of_string in
         let match_bad = List.map (fun n -> Quant.N_Bad n) num_bad in
-        let pattern = match_bad in
+        let match_both = List.intersperse Quant.Some_OK match_bad in
+        let pattern = (Quant.Any_OK :: match_both) @ [ Quant.Any_OK ] in
         (springs, pattern)
     | _ -> invalid_arg __FUNCTION__
 end

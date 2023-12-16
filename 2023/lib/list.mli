@@ -3,6 +3,7 @@ include module type of Stdlib.List
 val diffs : ('a -> 'a -> 'b) -> 'a list -> 'b list
 val intersperse : 'a -> 'a list -> 'a list
 val last : 'a list -> 'a
+val make : int -> 'a -> 'a list
 val reduce : ('a -> 'a -> 'a) -> 'a list -> 'a
 
 val combine_tl : 'a list -> ('a * 'a list) list

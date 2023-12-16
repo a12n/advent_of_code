@@ -9,7 +9,7 @@ module Spring = struct
 end
 
 module Pattern : sig
-  type t
+  type t = private Spring.t option list * Quant.t list
 
   val arrangements : t -> int
   val of_string : string -> t

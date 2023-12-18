@@ -10,7 +10,7 @@ module Grid : sig
   type t
 
   val of_lines : string Seq.t -> t
-  val reflection : t -> [`Horiz of int | `Vert of int] option
+  val reflection : t -> [ `Horiz of int | `Vert of int ] option
 end = struct
   type t = Note.t array array
 

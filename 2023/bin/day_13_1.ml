@@ -1,7 +1,7 @@
 open Advent
-open Day_13
 
 let () =
-  input stdin |> Seq.filter_map Grid.reflection
-  |> Seq.map (function `Horiz i -> i | `Vert i -> 100 * i)
+  Day_13.input stdin
+  |> Seq.filter_map Day_13.Grid.reflection
+  |> Seq.map (function `Horiz i -> 100 * i | `Vert i -> i)
   |> Seq.reduce ( + ) |> string_of_int |> print_endline

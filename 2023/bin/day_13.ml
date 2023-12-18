@@ -9,6 +9,11 @@ end
 module Grid = struct
   type t = Note.t array array
 
+  let size notes =
+    let rows = Array.length notes in
+    let cols = if rows > 0 then Array.(length (unsafe_get notes 0)) else 0 in
+    (rows, cols)
+
   let of_lines =
     Array.of_seq
     % Seq.map (Array.of_seq % Seq.map Note.of_char % String.to_seq)

@@ -14,35 +14,18 @@ module Grid : sig
 end = struct
   type t = Note.t array array
 
-  let size notes =
-    let rows = Array.length notes in
-    let cols = if rows > 0 then Array.(length (unsafe_get notes 0)) else 0 in
-    (rows, cols)
-
-  let equal n get i j =
-    try
-      for k = 0 to n - 1 do
-        if get i k <> get j k then raise Exit
-      done;
-      true
-    with Exit -> false
-
-  let rows_equal notes =
-    let _, n_cols = size notes in
-    equal n_cols (fun row col -> notes.(row).(col))
-
-  let cols_equal notes =
-    let n_rows, _ = size notes in
-    equal n_rows (fun col row -> notes.(row).(col))
-
   let of_lines =
     Array.of_seq
     % Seq.map (Array.of_seq % Seq.map Note.of_char % String.to_seq)
     % Seq.take_while (( <> ) "")
 
-  let reflection _notes =
-    (* TODO *)
-    None
+  let reflection notes =
+    match Array.symmetry (Array.equal ( = )) notes with
+    | Some k -> Some (`Horiz k)
+    | None -> (
+        match Array.symmetry (Array.equal ( = )) (Array.transpose notes) with
+        | Some k -> Some (`Vert k)
+        | None -> None)
 end
 
 let input chan =

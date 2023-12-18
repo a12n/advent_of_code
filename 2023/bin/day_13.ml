@@ -19,3 +19,11 @@ module Grid = struct
     % Seq.map (Array.of_seq % Seq.map Note.of_char % String.to_seq)
     % Seq.take_while (( <> ) "")
 end
+
+let input chan =
+  Seq.unfold
+    (fun lines ->
+      match Seq.uncons lines with
+      | Some (line, lines') -> Some (Grid.of_lines (Seq.cons line lines'), lines)
+      | None -> None)
+    (input_lines chan)

@@ -14,4 +14,4 @@ let reduce f a =
 let transpose a =
   let n_rows = length a in
   let n_cols = if n_rows > 0 then length (unsafe_get a 0) else 0 in
-  init n_cols (fun col -> init n_rows (fun row -> a.(row).(col)))
+  init n_cols (fun col -> init n_rows (fun row -> get (get a row) col))

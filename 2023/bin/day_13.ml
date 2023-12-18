@@ -6,7 +6,11 @@ module Note = struct
   let of_char = function '.' -> Ash | '#' -> Rock | _ -> invalid_arg __FUNCTION__
 end
 
-module Grid = struct
+module Grid : sig
+  type t
+
+  val of_lines : string Seq.t -> t
+end = struct
   type t = Note.t array array
 
   let size notes =

@@ -10,6 +10,7 @@ module Grid : sig
   type t
 
   val of_lines : string Seq.t -> t
+  val reflection : t -> [`Horiz of int | `Vert of int] option
 end = struct
   type t = Note.t array array
 
@@ -22,6 +23,10 @@ end = struct
     Array.of_seq
     % Seq.map (Array.of_seq % Seq.map Note.of_char % String.to_seq)
     % Seq.take_while (( <> ) "")
+
+  let reflection _notes =
+    (* TODO *)
+    None
 end
 
 let input chan =

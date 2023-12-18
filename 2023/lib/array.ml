@@ -11,6 +11,21 @@ let reduce f a =
   done;
   !r
 
+let symmetric eq a pos len =
+  Int.is_even len
+  &&
+  try
+    for i = 0 to (len / 2) - 1 do
+      let j = len - 1 - i in
+      if not (eq (get a (pos + i)) (get a (pos + j))) then raise Exit
+    done;
+    true
+  with Exit -> false
+
+let symmetry _eq _a =
+  (* TODO *)
+  None
+
 let transpose a =
   let n_rows = length a in
   let n_cols = if n_rows > 0 then length (unsafe_get a 0) else 0 in

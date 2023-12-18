@@ -1,5 +1,7 @@
 include Stdlib.Array
 
+let equal eq a b = length a = length b && for_all2 eq a b
+
 let reduce f a =
   let n = length a in
   if n < 1 then invalid_arg __FUNCTION__;

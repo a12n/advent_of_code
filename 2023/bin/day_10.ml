@@ -42,11 +42,8 @@ end
 module Grid : sig
   type t = Pipe.t option array array
 
-  val size : t -> int * int
-  val start : t -> (int * int) option
-  val get : t -> int * int -> Pipe.t option
+  val cycle : t -> (int * int) list option
   val of_lines : string Seq.t -> t
-  val cycles : t -> (int * int) list list
 end = struct
   type t = Pipe.t option array array
 
@@ -89,6 +86,12 @@ end = struct
         List.concat (List.map (dfs (pos :: path)) (conns pipes pos)))
     in
     dfs [] start
+
+  let cycle pipes =
+    match cycles pipes with
+    | [] -> None
+    | c0 :: cs ->
+        Some (List.fold_left (fun max c -> if List.compare_lengths c max > 0 then c else max) c0 cs)
 
   let of_lines = Array.of_seq % Seq.map (Array.of_seq % Seq.map Pipe.of_char_opt % String.to_seq)
 end

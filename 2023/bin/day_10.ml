@@ -62,11 +62,7 @@ end = struct
             pipes)
         pipes)
 
-  let get pipes (row, column) =
-    if row >= 0 && column >= 0 then
-      let n, m = size pipes in
-      if row < n && column < m then Array.(unsafe_get (unsafe_get pipes row) column) else None
-    else None
+  let get pipes (row, col) = Array.(value ~default:None (value ~default:[||] pipes row) col)
 
   let conns pipes pos =
     List.filter_map

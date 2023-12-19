@@ -18,6 +18,7 @@ end
 module Platform : sig
   type t
 
+  val copy : t -> t
   val equal : t -> t -> bool
   val hash : t -> int
   val load : t -> int
@@ -105,16 +106,17 @@ end = struct
         done
 
   let tilt_cycle_inplace rocks = List.iter (tilt_inplace rocks) Dir.[ North; West; South; East ]
+  let copy = Array.(map copy)
 
   let tilt_cycle rocks =
-    let copy = Array.(map copy rocks) in
-    tilt_cycle_inplace copy;
-    copy
+    let ans = copy rocks in
+    tilt_cycle_inplace ans;
+    ans
 
   let tilt rocks dir =
-    let copy = Array.(map copy rocks) in
-    tilt_inplace copy dir;
-    copy
+    let ans = copy rocks in
+    tilt_inplace ans dir;
+    ans
 
   let pp fmt rocks =
     let n_cols, n_rows = Array.matrix_size rocks in

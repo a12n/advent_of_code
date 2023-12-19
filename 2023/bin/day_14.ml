@@ -11,13 +11,18 @@ module Rock = struct
   let opt_to_char = function None -> '.' | Some r -> to_char r
 end
 
+module Dir = struct
+  type t = North | West | South | East
+end
+
 module Platform : sig
   type t
 
   val load : t -> int
   val of_lines : string Seq.t -> t
   val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
-  val tilt : t -> t
+  val tilt : t -> Dir.t -> t
+  val tilt_inplace : t -> Dir.t -> unit
 end = struct
   type t = Rock.t option array array
 
@@ -34,26 +39,67 @@ end = struct
     Array.transpose % Array.of_seq
     % Seq.map (Array.of_seq % Seq.map Rock.opt_of_char % String.to_seq)
 
-  let tilt_inplace =
-    Array.iteri (fun _col rocks ->
-        let pos, len =
-          Array.fold_lefti
-            (fun (pos, len) row rock ->
-              match rock with
-              | None -> (pos, len)
-              | Some Rock.Round ->
-                  Array.unsafe_set rocks row None;
-                  (pos, len + 1)
-              | Some Rock.Cube ->
-                  Array.fill rocks pos len (Some Rock.Round);
-                  (row + 1, 0))
-            (0, 0) rocks
-        in
-        Array.fill rocks pos len (Some Rock.Round))
+  let tilt_inplace rocks =
+    let open Dir in
+    let open Rock in
+    let n_cols, n_rows = Array.matrix_size rocks in
+    function
+    | North ->
+        for col = 0 to n_cols - 1 do
+          let pos = ref 0 in
+          for row = 0 to n_rows - 1 do
+            match rocks.(col).(row) with
+            | None -> ()
+            | Some Round ->
+                rocks.(col).(row) <- None;
+                rocks.(col).(!pos) <- Some Round;
+                pos := !pos + 1
+            | Some Cube -> pos := row + 1
+          done
+        done
+    | South ->
+        for col = 0 to n_cols - 1 do
+          let pos = ref (n_rows - 1) in
+          for row = n_rows - 1 downto 0 do
+            match rocks.(col).(row) with
+            | None -> ()
+            | Some Round ->
+                rocks.(col).(row) <- None;
+                rocks.(col).(!pos) <- Some Round;
+                pos := !pos - 1
+            | Some Cube -> pos := row - 1
+          done
+        done
+    | West ->
+        for row = 0 to n_rows - 1 do
+          let pos = ref 0 in
+          for col = 0 to n_cols - 1 do
+            match rocks.(col).(row) with
+            | None -> ()
+            | Some Round ->
+                rocks.(col).(row) <- None;
+                rocks.(!pos).(row) <- Some Round;
+                pos := !pos + 1
+            | Some Cube -> pos := col + 1
+          done
+        done
+    | East ->
+        for row = 0 to n_rows - 1 do
+          let pos = ref (n_cols - 1) in
+          for col = n_cols - 1 downto 0 do
+            match rocks.(col).(row) with
+            | None -> ()
+            | Some Round ->
+                rocks.(col).(row) <- None;
+                rocks.(!pos).(row) <- Some Round;
+                pos := !pos - 1
+            | Some Cube -> pos := col - 1
+          done
+        done
 
-  let tilt rocks =
+  let tilt rocks dir =
     let ans = Array.(map copy rocks) in
-    tilt_inplace ans;
+    tilt_inplace ans dir;
     ans
 
   let pp fmt rocks =

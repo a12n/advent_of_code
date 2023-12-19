@@ -63,13 +63,19 @@ end = struct
   let get pipes (row, col) = Array.(value ~default:None (value ~default:[||] pipes row) col)
 
   let conns pipes pos =
-    List.filter_map
-      (fun dir ->
-        let*? pipe = get pipes pos in
-        let pos' = Dir.add_pos dir pos in
-        let*? pipe' = get pipes pos' in
-        if Pipe.(has_conn pipe dir && has_conn pipe' (Dir.neg dir)) then Some pos' else None)
-      Dir.[ North; East; South; West ]
+    match get pipes pos with
+    | Some pipe ->
+        List.filter_map
+          (fun dir ->
+            let next_pos = Dir.add_pos dir pos in
+            match get pipes next_pos with
+            | Some next_pipe ->
+                if Pipe.has_conn pipe dir && Pipe.has_conn next_pipe (Dir.neg dir) then
+                  Some next_pos
+                else None
+            | None -> None)
+          Dir.[ North; East; South; West ]
+    | None -> []
 
   (* TODO *)
   let cycles pipes =

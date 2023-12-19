@@ -18,6 +18,8 @@ end
 module Platform : sig
   type t
 
+  val equal : t -> t -> bool
+  val hash : t -> int
   val load : t -> int
   val of_lines : string Seq.t -> t
   val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
@@ -27,6 +29,9 @@ module Platform : sig
   val tilt_inplace : t -> Dir.t -> unit
 end = struct
   type t = Rock.t option array array
+
+  let equal = Array.equal (Array.equal Stdlib.( = ))
+  let hash = Array.fold_left (Array.fold_left Hashtbl.seeded_hash) 0
 
   let load =
     Array.fold_lefti

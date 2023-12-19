@@ -26,5 +26,13 @@ end = struct
       0 rocks
 
   let of_lines = Array.of_seq % Seq.map (Array.of_seq % Seq.map Rock.opt_of_char % String.to_seq)
-  let tilt = Array.(map copy)
+
+  let tilt_inplace rocks =
+    (* TODO *)
+    ignore rocks
+
+  let tilt rocks =
+    let ans = Array.(map copy rocks) in
+    tilt_inplace ans;
+    ans
 end

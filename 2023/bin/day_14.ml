@@ -4,9 +4,11 @@ module Rock = struct
   type t = Cube | Round
 
   let of_char = function '#' -> Cube | 'O' -> Round | _ -> invalid_arg __FUNCTION__
+  let to_char = function Cube -> '#' | Round -> 'O'
   let load = function Cube -> 0 | Round -> 1
   let opt_load = function Some r -> load r | None -> 0
   let opt_of_char = function '.' -> None | c -> Some (of_char c)
+  let opt_to_char = function None -> '.' | Some r -> to_char r
 end
 
 module Platform : sig

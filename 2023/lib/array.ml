@@ -2,6 +2,13 @@ include Stdlib.Array
 
 let equal eq a b = length a = length b && for_all2 eq a b
 
+let fold_lefti f acc a =
+  let r = ref acc in
+  for i = 0 to length a - 1 do
+    r := f !r i (unsafe_get a i)
+  done;
+  !r
+
 let matrix_size a =
   let n_rows = length a in
   let n_cols = if n_rows > 0 then length (unsafe_get a 0) else 0 in

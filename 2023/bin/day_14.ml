@@ -22,6 +22,8 @@ module Platform : sig
   val of_lines : string Seq.t -> t
   val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
   val tilt : t -> Dir.t -> t
+  val tilt_cycle : t -> t
+  val tilt_cycle_inplace : t -> unit
   val tilt_inplace : t -> Dir.t -> unit
 end = struct
   type t = Rock.t option array array
@@ -97,10 +99,17 @@ end = struct
           done
         done
 
+  let tilt_cycle_inplace rocks = List.iter (tilt_inplace rocks) Dir.[ North; West; South; East ]
+
+  let tilt_cycle rocks =
+    let copy = Array.(map copy rocks) in
+    tilt_cycle_inplace copy;
+    copy
+
   let tilt rocks dir =
-    let ans = Array.(map copy rocks) in
-    tilt_inplace ans dir;
-    ans
+    let copy = Array.(map copy rocks) in
+    tilt_inplace copy dir;
+    copy
 
   let pp fmt rocks =
     let n_cols, n_rows = Array.matrix_size rocks in

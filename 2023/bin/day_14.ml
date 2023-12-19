@@ -34,9 +34,22 @@ end = struct
     Array.transpose % Array.of_seq
     % Seq.map (Array.of_seq % Seq.map Rock.opt_of_char % String.to_seq)
 
-  let tilt_inplace rocks =
-    (* TODO *)
-    ignore rocks
+  let tilt_inplace =
+    Array.iteri (fun _col rocks ->
+        let pos, len =
+          Array.fold_lefti
+            (fun (pos, len) row rock ->
+              match rock with
+              | None -> (pos, len)
+              | Some Rock.Round ->
+                  Array.unsafe_set rocks row None;
+                  (pos, len + 1)
+              | Some Rock.Cube ->
+                  Array.fill rocks pos len (Some Rock.Round);
+                  (row + 1, 0))
+            (0, 0) rocks
+        in
+        Array.fill rocks pos len (Some Rock.Round))
 
   let tilt rocks =
     let ans = Array.(map copy rocks) in

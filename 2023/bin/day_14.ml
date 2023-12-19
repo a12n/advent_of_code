@@ -18,7 +18,13 @@ module Platform : sig
 end = struct
   type t = Rock.t option array array
 
-  let load _ = 0
+  let load rocks =
+    let n = Array.length rocks in
+    Array.fold_lefti
+      (fun total row rocks ->
+        Array.fold_left (fun total rock -> total + ((n - row) * Rock.opt_load rock)) total rocks)
+      0 rocks
+
   let of_lines = Array.of_seq % Seq.map (Array.of_seq % Seq.map Rock.opt_of_char % String.to_seq)
   let tilt = Array.copy
 end

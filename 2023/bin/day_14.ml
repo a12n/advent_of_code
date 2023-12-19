@@ -16,6 +16,7 @@ module Platform : sig
 
   val load : t -> int
   val of_lines : string Seq.t -> t
+  val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
   val tilt : t -> t
 end = struct
   type t = Rock.t option array array
@@ -41,4 +42,14 @@ end = struct
     let ans = Array.(map copy rocks) in
     tilt_inplace ans;
     ans
+
+  let pp fmt rocks =
+    let n_cols, n_rows = Array.matrix_size rocks in
+    Format.pp_print_newline fmt ();
+    for row = 0 to n_rows - 1 do
+      for col = 0 to n_cols - 1 do
+        Format.pp_print_char fmt (Rock.opt_to_char rocks.(col).(row))
+      done;
+      Format.pp_print_newline fmt ()
+    done
 end

@@ -51,3 +51,5 @@ let transpose a =
   let n_rows = length a in
   let n_cols = if n_rows > 0 then length (unsafe_get a 0) else 0 in
   init n_cols (fun col -> init n_rows (fun row -> get (get a row) col))
+
+let value a ~default i = if i >= 0 && i < length a then unsafe_get a i else default

@@ -3,8 +3,8 @@ open Advent
 module Rock = struct
   type t = Cube | Round
 
-  let load = function Cube -> 0 | Round -> 1
   let of_char = function '#' -> Cube | 'O' -> Round | _ -> invalid_arg __FUNCTION__
+  let load = function Cube -> 0 | Round -> 1
   let opt_load = function Some r -> load r | None -> 0
   let opt_of_char = function '.' -> None | c -> Some (of_char c)
 end

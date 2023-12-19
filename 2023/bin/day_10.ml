@@ -57,9 +57,7 @@ end = struct
     Array.(
       find_mapi
         (fun row pipes ->
-          find_mapi
-            (fun column pipe -> if pipe = Some Pipe.Start then Some (row, column) else None)
-            pipes)
+          find_mapi (fun col pipe -> if pipe = Some Pipe.Start then Some (row, col) else None) pipes)
         pipes)
 
   let get pipes (row, col) = Array.(value ~default:None (value ~default:[||] pipes row) col)

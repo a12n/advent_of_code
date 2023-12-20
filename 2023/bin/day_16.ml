@@ -107,25 +107,27 @@ end = struct
   let trace grid dir pos =
     let n_rows, n_cols = Array.matrix_size grid in
     let energized = Energized_Map.create (n_rows * n_cols) in
-    let rec do_trace dir_beam ((row, col) as pos) =
-      Printf.eprintf "do_trace (%d, %d) (%s, %d)\n%!" row col
-        (Dir.to_string (fst dir_beam))
-        (snd dir_beam : Beam.t :> int);
-      let seen =
-        match Energized_Map.find_opt energized pos with
-        | Some s ->
-            (* The position have already seen some beams. *)
-            s
-        | None ->
-            (* No beams were in the position yet. *)
-            Beam_Set.empty
-      in
-      if not (Beam_Set.mem dir_beam seen) then (
-        Energized_Map.replace energized pos Beam_Set.(add dir_beam seen);
-        List.iter
-          (fun ((next_dir, _) as next_dir_beam) ->
-            do_trace next_dir_beam Dir.(add_pos next_dir pos))
-          (grid.(row).(col) dir_beam))
+    let rec do_trace ((dir, beam) as dir_beam) = function
+      | row, col when row < 0 || row = n_rows || col < 0 || col = n_cols ->
+          (* Beam left the grid. *)
+          ()
+      | (row, col) as pos ->
+          let seen =
+            match Energized_Map.find_opt energized pos with
+            | Some s ->
+                (* The position have already seen some beams. *)
+                s
+            | None ->
+                (* No beams were in the position yet. *)
+                Beam_Set.empty
+          in
+          if not (Beam_Set.mem dir_beam seen) then (
+            Energized_Map.replace energized pos Beam_Set.(add dir_beam seen);
+            List.iter
+              (fun ((next_dir, _) as next_dir_beam) ->
+                do_trace next_dir_beam Dir.(add_pos next_dir pos))
+              (grid.(row).(col) dir_beam))
+          else ()
     in
     do_trace (dir, Beam.init) pos;
     energized

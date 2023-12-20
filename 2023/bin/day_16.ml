@@ -11,6 +11,21 @@ module Dir = struct
     | Down -> (row + 1, col)
 end
 
+module Beam : sig
+  type t = private int
+  (** Beam identifier. *)
+
+  val compare : t -> t -> int
+  val init : t
+  val split : t -> t
+end = struct
+  type t = int
+
+  let compare = Int.compare
+  let init = 0
+  let split = ( + ) 1
+end
+
 module Mirror = struct
   type t = Upward | Downward
 
@@ -35,21 +50,6 @@ module Splitter = struct
 
   let of_char = function '-' -> Horiz | '|' -> Vert | _ -> invalid_arg __FUNCTION__
   let to_char = function Horiz -> '-' | Vert -> '|'
-end
-
-module Beam : sig
-  type t = private int
-  (** Beam identifier. *)
-
-  val compare : t -> t -> int
-  val init : t
-  val split : t -> t
-end = struct
-  type t = int
-
-  let compare = Int.compare
-  let init = 0
-  let split = ( + ) 1
 end
 
 module Beam_Set = Set.Make (struct

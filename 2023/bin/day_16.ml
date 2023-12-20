@@ -54,7 +54,7 @@ module Splitter = struct
       | Left, Horiz | Right, Horiz -> `Pass (to_dir, beam)
       | Up, Vert | Down, Vert -> `Pass (to_dir, beam)
       | Up, Horiz -> `Split ((Left, beam), (Right, Beam.split beam))
-      | Down, Horiz -> `Split ((Left, Beam.split beam), (Right, beam))
+      | Down, Horiz -> `Split ((Right, beam), (Left, Beam.split beam))
       | Left, Vert -> `Split ((Down, beam), (Up, Beam.split beam))
       | Right, Vert -> `Split ((Up, beam), (Down, Beam.split beam)))
 

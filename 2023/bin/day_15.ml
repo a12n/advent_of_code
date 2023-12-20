@@ -35,10 +35,15 @@ end
 module Boxes : sig
   type t
 
+  val focus_power : t -> int
   val make : unit -> t
   val perform : t -> Step.t -> unit
 end = struct
   type t = Lens_System.t array
+
+  let focus_power _boxes =
+    (* TODO *)
+    0
 
   let make () = Array.make 256 Lens_System.empty
 

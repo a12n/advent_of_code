@@ -9,8 +9,6 @@ module Dir = struct
     | Left -> (row, col - 1)
     | Right -> (row, col + 1)
     | Down -> (row + 1, col)
-
-  let to_string = function Up -> "Up" | Left -> "Left" | Right -> "Right" | Down -> "Down"
 end
 
 module Beam : sig
@@ -51,7 +49,6 @@ module Mirror = struct
       | Down, Downward -> [ (Right, beam) ])
 
   let of_char = function '/' -> Upward | '\\' -> Downward | _ -> invalid_arg __FUNCTION__
-  let to_char = function Upward -> '/' | Downward -> '\\'
 end
 
 module Splitter = struct
@@ -68,7 +65,6 @@ module Splitter = struct
       | Right, Vert -> [ (Up, beam); (Down, Beam.split beam) ])
 
   let of_char = function '-' -> Horiz | '|' -> Vert | _ -> invalid_arg __FUNCTION__
-  let to_char = function Horiz -> '-' | Vert -> '|'
 end
 
 module Energized_Map = Hashtbl.Make (struct

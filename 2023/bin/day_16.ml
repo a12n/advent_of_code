@@ -71,16 +71,12 @@ module Splitter = struct
   let to_char = function Horiz -> '-' | Vert -> '|'
 end
 
-module Energized_Map = struct
-  include Hashtbl.Make (struct
-    type t = int * int
+module Energized_Map = Hashtbl.Make (struct
+  type t = int * int
 
-    let equal = Stdlib.( = )
-    let hash = Hashtbl.hash
-  end)
-
-  (* TODO *)
-end
+  let equal = Stdlib.( = )
+  let hash = Hashtbl.hash
+end)
 
 module Grid : sig
   type t

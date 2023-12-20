@@ -88,23 +88,28 @@ module Grid : sig
   type t
 
   val of_lines : string Seq.t -> t
-  val trace : t -> int * int -> Dir.t -> Beam_Set.t Energized_Map.t
+
+  (* val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer] *)
+  val trace : t -> Dir.t -> int * int -> Beam_Set.t Energized_Map.t
 end = struct
-  type t = [ `Reflect of Mirror.t | `Split of Splitter.t ] option array array
+  type t = Device.t array array
 
-  let opt_of_char = function
-    | '.' -> None
-    | c -> (
-        try Some (`Reflect (Mirror.of_char c))
-        with Invalid_argument _ -> Some (`Split (Splitter.of_char c)))
+  let of_lines =
+    let device_of_char = function
+      | '.' -> Device.pass
+      | c -> (
+          try Mirror.(reflect (of_char c)) with Invalid_argument _ -> Splitter.(split (of_char c)))
+    in
+    Array.of_seq % Seq.map (Array.of_seq % Seq.map device_of_char % String.to_seq)
 
-  let of_lines = Array.of_seq % Seq.map (Array.of_seq % Seq.map opt_of_char % String.to_seq)
-
-  let trace grid pos dir =
+  let trace grid dir pos =
     let n_rows, n_cols = Array.matrix_size grid in
     let energized = Energized_Map.create (n_rows * n_cols) in
-    let rec do_trace ((row, col) as pos) dir_beam =
-      let beams =
+    let rec do_trace dir_beam ((row, col) as pos) =
+      Printf.eprintf "do_trace (%d, %d) (%s, %d)\n%!" row col
+        (Dir.to_string (fst dir_beam))
+        (snd dir_beam : Beam.t :> int);
+      let seen =
         match Energized_Map.find_opt energized pos with
         | Some s ->
             (* The position have already seen some beams. *)
@@ -113,15 +118,13 @@ end = struct
             (* No beams were in the position yet. *)
             Beam_Set.empty
       in
-      if not (Beam_Set.mem dir_beam beams) then (
-        let beams' = Beam_Set.add dir_beam beams in
-        Energized_Map.replace energized pos beams';
-        match grid.(fst pos).(snd pos) with
-        | None -> do_trace Dir.(add_pos pos dir) (dir, beam)
-        | _ ->
-            (* TODO *)
-            ())
+      if not (Beam_Set.mem dir_beam seen) then (
+        Energized_Map.replace energized pos Beam_Set.(add dir_beam seen);
+        List.iter
+          (fun ((next_dir, _) as next_dir_beam) ->
+            do_trace next_dir_beam Dir.(add_pos next_dir pos))
+          (grid.(row).(col) dir_beam))
     in
-    do_trace pos (dir, Beam.init);
+    do_trace (dir, Beam.init) pos;
     energized
 end

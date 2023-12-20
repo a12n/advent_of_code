@@ -54,9 +54,9 @@ end = struct
 
   let perform boxes = function
     | Step.{ label; op = `Remove } ->
-        let h = hash label in
-        boxes.(h) <- Lens_System.remove boxes.(h) label
+        let i = hash label in
+        boxes.(i) <- Lens_System.remove boxes.(i) label
     | Step.{ label; op = `Insert fd } ->
-        let h = hash label in
-        boxes.(h) <- Lens_System.insert boxes.(h) label fd
+        let i = hash label in
+        boxes.(i) <- Lens_System.insert boxes.(i) label fd
 end

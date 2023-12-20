@@ -26,6 +26,15 @@ end = struct
   let split = ( + ) 1
 end
 
+module Device = struct
+  type t = Dir.t -> Beam.t -> (Dir.t * Beam.t) list
+  (** Beam device transforms a beam travelling in some direction into
+      a set of other beams. *)
+
+  (** A no-op beam device. *)
+  let pass to_dir beam = [ (to_dir, beam) ]
+end
+
 module Mirror = struct
   type t = Upward | Downward
 

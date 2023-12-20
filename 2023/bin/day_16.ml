@@ -114,8 +114,7 @@ end = struct
       | (row, col) as pos ->
           Printf.eprintf "do_trace (%d, %d) (%s, %d)\n%!" row col (Dir.to_string dir)
             (beam : Beam.t :> int);
-          let seen = List.mem dir (Energized_Map.find_all energized pos) in
-          if not seen then (
+          if not (List.mem dir (Energized_Map.find_all energized pos)) then (
             Energized_Map.add energized pos dir;
             List.iter
               (fun ((next_dir, _) as next_dir_beam) ->

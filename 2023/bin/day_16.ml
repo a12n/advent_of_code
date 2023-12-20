@@ -105,8 +105,6 @@ end = struct
           (* Beam left the grid. *)
           ()
       | (row, col) as pos ->
-          Printf.eprintf "do_trace (%d, %d) (%s, %d)\n%!" row col (Dir.to_string dir)
-            (beam : Beam.t :> int);
           let seen =
             match Energized_Map.find_opt energized pos with Some seen -> seen | None -> []
           in

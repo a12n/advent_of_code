@@ -100,7 +100,7 @@ end = struct
   let trace grid dir pos =
     let n_rows, n_cols = Array.matrix_size grid in
     let energized = Energized_Map.create (n_rows * n_cols) in
-    let rec do_trace ((dir, beam) as dir_beam) = function
+    let rec do_trace ((dir, _) as dir_beam) = function
       | row, col when row < 0 || row = n_rows || col < 0 || col = n_cols ->
           (* Beam left the grid. *)
           ()
@@ -114,10 +114,6 @@ end = struct
               (fun ((next_dir, _) as next_dir_beam) ->
                 do_trace next_dir_beam Dir.(add_pos next_dir pos))
               (grid.(row).(col) dir_beam))
-          else
-            Printf.eprintf "already seen (%s, %d) @ (%d, %d)\n%!" (Dir.to_string dir)
-              (beam : Beam.t :> int)
-              row col
     in
     do_trace (dir, Beam.init) pos;
     energized

@@ -48,6 +48,16 @@ end
 module Splitter = struct
   type t = Horiz | Vert
 
+  let split s to_dir beam =
+    Dir.(
+      match (to_dir, s) with
+      | Left, Horiz | Right, Horiz -> `Pass (to_dir, beam)
+      | Up, Vert | Down, Vert -> `Pass (to_dir, beam)
+      | Up, Horiz -> `Split ((Left, beam), (Right, Beam.split beam))
+      | Down, Horiz -> `Split ((Left, Beam.split beam), (Right, beam))
+      | Left, Vert -> `Split ((Down, beam), (Up, Beam.split beam))
+      | Right, Vert -> `Split ((Up, beam), (Down, Beam.split beam)))
+
   let of_char = function '-' -> Horiz | '|' -> Vert | _ -> invalid_arg __FUNCTION__
   let to_char = function Horiz -> '-' | Vert -> '|'
 end

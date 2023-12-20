@@ -97,7 +97,29 @@ end = struct
       Format.pp_print_newline fmt ()
     done
 
-  let trace _grid _pos _dir =
-    (* TODO *)
-    Energized_Map.create 0
+  let trace grid pos dir =
+    let n_rows, n_cols = Array.matrix_size grid in
+    let energized = Energized_Map.create (n_rows * n_cols) in
+    let rec do_trace beam pos dir =
+      let next_pos = Dir.add_pos dir pos in
+      let beams =
+        match Energized_Map.find_opt energized next_pos with
+        | Some s ->
+            (* Next position have already seen some beams. *)
+            s
+        | None ->
+            (* No beams were in next position yet. *)
+            Beam_Set.empty
+      in
+      if not (Beam_Set.mem (dir, beam) beams) then (
+        let beams' = Beam_Set.add (dir, beam) beams in
+        Energized_Map.replace energized next_pos beams';
+        match grid.(fst next_pos).(snd next_pos) with
+        | None -> do_trace beam next_pos dir
+        | _ ->
+            (* TODO *)
+            ())
+    in
+    do_trace Beam.init pos dir;
+    energized
 end

@@ -27,18 +27,18 @@ end = struct
 end
 
 module Device = struct
-  type t = Dir.t -> Beam.t -> (Dir.t * Beam.t) list
+  type t = Dir.t * Beam.t -> (Dir.t * Beam.t) list
   (** Beam device transforms a beam travelling in some direction into
       a set of other beams. *)
 
   (** A no-op beam device. *)
-  let pass to_dir beam = [ (to_dir, beam) ]
+  let pass (to_dir, beam) = [ (to_dir, beam) ]
 end
 
 module Mirror = struct
   type t = Upward | Downward
 
-  let reflect m to_dir beam =
+  let reflect m (to_dir, beam) =
     Dir.(
       match (to_dir, m) with
       | Up, Upward -> [ (Right, beam) ]
@@ -57,7 +57,7 @@ end
 module Splitter = struct
   type t = Horiz | Vert
 
-  let split s to_dir beam =
+  let split s (to_dir, beam) =
     Dir.(
       match (to_dir, s) with
       | Left, Horiz | Right, Horiz -> [ (to_dir, beam) ]

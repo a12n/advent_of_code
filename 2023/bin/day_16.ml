@@ -97,7 +97,7 @@ end = struct
 
   let size = Array.matrix_size
 
-  let trace grid dir pos =
+  let trace grid start_dir start_pos =
     let n_rows, n_cols = Array.matrix_size grid in
     let energized = Energized_Map.create (n_rows * n_cols) in
     let rec do_trace ((dir, _) as dir_beam) = function
@@ -115,6 +115,6 @@ end = struct
                 do_trace next_dir_beam Dir.(add_pos next_dir pos))
               (grid.(row).(col) dir_beam))
     in
-    do_trace (dir, Beam.init) pos;
+    do_trace (start_dir, Beam.init) start_pos;
     energized
 end

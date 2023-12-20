@@ -92,7 +92,7 @@ module Grid : sig
   type t
 
   val of_lines : string Seq.t -> t
-  val trace : t -> Dir.t -> int * int -> Dir.t Energized_Map.t
+  val trace : t -> Dir.t -> int * int -> Dir.t list Energized_Map.t
 end = struct
   type t = Device.t array array
 
@@ -114,8 +114,11 @@ end = struct
       | (row, col) as pos ->
           Printf.eprintf "do_trace (%d, %d) (%s, %d)\n%!" row col (Dir.to_string dir)
             (beam : Beam.t :> int);
-          if not (List.mem dir (Energized_Map.find_all energized pos)) then (
-            Energized_Map.add energized pos dir;
+          let seen =
+            match Energized_Map.find_opt energized pos with Some seen -> seen | None -> []
+          in
+          if not (List.mem dir seen) then (
+            Energized_Map.replace energized pos (dir :: seen);
             List.iter
               (fun ((next_dir, _) as next_dir_beam) ->
                 do_trace next_dir_beam Dir.(add_pos next_dir pos))

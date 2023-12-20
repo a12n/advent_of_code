@@ -17,13 +17,11 @@ module Beam : sig
   type t = private int
   (** Beam identifier. *)
 
-  val compare : t -> t -> int
   val init : t
   val split : t -> t
 end = struct
   type t = int
 
-  let compare = Int.compare
   let init = 0
   let split = ( + ) 1
 end

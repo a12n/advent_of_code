@@ -112,6 +112,8 @@ end = struct
           (* Beam left the grid. *)
           ()
       | (row, col) as pos ->
+          Printf.eprintf "do_trace (%d, %d) (%s, %d)\n%!" row col (Dir.to_string dir)
+            (beam : Beam.t :> int);
           let seen =
             match Energized_Map.find_opt energized pos with
             | Some s ->
@@ -127,7 +129,10 @@ end = struct
               (fun ((next_dir, _) as next_dir_beam) ->
                 do_trace next_dir_beam Dir.(add_pos next_dir pos))
               (grid.(row).(col) dir_beam))
-          else ()
+          else
+            Printf.eprintf "already seen (%s, %d) @ (%d, %d)\n%!" (Dir.to_string dir)
+              (beam : Beam.t :> int)
+              row col
     in
     do_trace (dir, Beam.init) pos;
     energized

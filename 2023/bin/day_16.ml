@@ -25,11 +25,40 @@ module Splitter = struct
   let to_char = function Horiz -> '-' | Vert -> '|'
 end
 
+module Beam : sig
+  type t = private int
+  (** Beam identifier. *)
+
+  val compare : t -> t -> int
+  val init : t
+  val split : t -> t
+end = struct
+  type t = int
+
+  let compare = Int.compare
+  let init = 0
+  let split = ( + ) 1
+end
+
+module Beam_Set = Set.Make (struct
+  type t = Dir.t * Beam.t
+
+  let compare = Stdlib.compare
+end)
+
+module Energized_Map = Hashtbl.Make (struct
+  type t = int * int
+
+  let equal = Stdlib.( = )
+  let hash = Hashtbl.hash
+end)
+
 module Grid : sig
   type t
 
   val of_lines : string Seq.t -> t
   val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
+  val trace : t -> Beam.t -> int * int -> Beam_Set.t Energized_Map.t
 end = struct
   type t = [ `Reflect of Mirror.t | `Split of Splitter.t ] option array array
 
@@ -55,28 +84,8 @@ end = struct
       done;
       Format.pp_print_newline fmt ()
     done
+
+  let trace _grid _beam _pos =
+    (* TODO *)
+    Energized_Map.create 0
 end
-
-module Beam : sig
-  type t = private int
-  (** Beam identifier. *)
-
-  val compare : t -> t -> int
-  val init : t
-  val split : t -> t
-end = struct
-  type t = int
-
-  let compare = Int.compare
-  let init = 0
-  let split = ( + ) 1
-end
-
-module Beam_Set = Set.Make (Beam)
-
-module Energized_Map = Hashtbl.Make (struct
-  type t = int * int * Dir.t
-
-  let equal = Stdlib.( = )
-  let hash = Hashtbl.hash
-end)

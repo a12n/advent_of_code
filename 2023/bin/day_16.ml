@@ -58,7 +58,7 @@ module Grid : sig
 
   val of_lines : string Seq.t -> t
   val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
-  val trace : t -> Beam.t -> int * int -> Beam_Set.t Energized_Map.t
+  val trace : t -> Beam.t -> int * int -> Dir.t -> Beam_Set.t Energized_Map.t
 end = struct
   type t = [ `Reflect of Mirror.t | `Split of Splitter.t ] option array array
 
@@ -85,7 +85,7 @@ end = struct
       Format.pp_print_newline fmt ()
     done
 
-  let trace _grid _beam _pos =
+  let trace _grid _beam _pos _dir =
     (* TODO *)
     Energized_Map.create 0
 end

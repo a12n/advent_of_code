@@ -41,9 +41,14 @@ module Boxes : sig
 end = struct
   type t = Lens_System.t array
 
-  let focus_power _boxes =
-    (* TODO *)
-    0
+  let focus_power =
+    Array.fold_lefti
+      (fun total i lens ->
+        total
+        + (List.rev (lens : Lens_System.t :> (string * int) list)
+          |> List.mapi (fun j (_, fd) -> (i + 1) * (j + 1) * fd)
+          |> List.fold_left ( + ) 0))
+      0
 
   let make () = Array.make 256 Lens_System.empty
 

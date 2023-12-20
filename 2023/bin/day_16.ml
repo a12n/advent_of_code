@@ -79,11 +79,11 @@ end)
 
 module Energized_Map = struct
   include Hashtbl.Make (struct
-      type t = int * int
+    type t = int * int
 
-      let equal = Stdlib.( = )
-      let hash = Hashtbl.hash
-    end)
+    let equal = Stdlib.( = )
+    let hash = Hashtbl.hash
+  end)
 
   (* TODO *)
 end

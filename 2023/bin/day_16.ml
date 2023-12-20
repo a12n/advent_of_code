@@ -9,6 +9,8 @@ module Dir = struct
     | Left -> (row, col - 1)
     | Right -> (row, col + 1)
     | Down -> (row + 1, col)
+
+  let to_string = function Up -> "Up" | Left -> "Left" | Right -> "Right" | Down -> "Down"
 end
 
 module Beam : sig

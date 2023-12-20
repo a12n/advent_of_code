@@ -71,12 +71,6 @@ module Splitter = struct
   let to_char = function Horiz -> '-' | Vert -> '|'
 end
 
-module Beam_Set = Set.Make (struct
-  type t = Dir.t * Beam.t
-
-  let compare = Stdlib.compare
-end)
-
 module Energized_Map = struct
   include Hashtbl.Make (struct
     type t = int * int

@@ -3,7 +3,7 @@ open Advent
 module Grid : sig
   type t
 
-  val min_path : t -> int * int -> int * int -> ((int * int) list * int) option
+  val min_path : t -> (int * int) list * int
   val of_lines : string Seq.t -> t
   val size : t -> int * int
 end = struct
@@ -15,8 +15,8 @@ end = struct
 
   let size = Array.matrix_size
 
-  let min_path grid start_pos stop_pos =
+  let min_path grid =
     (* TODO *)
-    ignore (grid, start_pos, stop_pos);
-    None
+    ignore grid;
+    ([], 0)
 end

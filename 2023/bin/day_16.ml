@@ -2,6 +2,13 @@ open Advent
 
 module Dir = struct
   type t = Up | Left | Right | Down
+
+  let add_pos dir (row, col) =
+    match dir with
+    | Up -> (row - 1, col)
+    | Left -> (row, col - 1)
+    | Right -> (row, col + 1)
+    | Down -> (row + 1, col)
 end
 
 module Mirror = struct

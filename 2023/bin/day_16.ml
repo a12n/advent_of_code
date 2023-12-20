@@ -82,6 +82,7 @@ module Grid : sig
   type t
 
   val of_lines : string Seq.t -> t
+  val size : t -> int * int
   val trace : t -> Dir.t -> int * int -> Dir.t list Energized_Map.t
 end = struct
   type t = Device.t array array
@@ -93,6 +94,8 @@ end = struct
           try Mirror.(reflect (of_char c)) with Invalid_argument _ -> Splitter.(split (of_char c)))
     in
     Array.of_seq % Seq.map (Array.of_seq % Seq.map device_of_char % String.to_seq)
+
+  let size = Array.matrix_size
 
   let trace grid dir pos =
     let n_rows, n_cols = Array.matrix_size grid in

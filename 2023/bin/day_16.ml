@@ -88,8 +88,6 @@ module Grid : sig
   type t
 
   val of_lines : string Seq.t -> t
-
-  (* val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer] *)
   val trace : t -> Dir.t -> int * int -> Beam_Set.t Energized_Map.t
 end = struct
   type t = Device.t array array

@@ -88,7 +88,6 @@ module Grid : sig
   type t
 
   val of_lines : string Seq.t -> t
-  val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
   val trace : t -> int * int -> Dir.t -> Beam_Set.t Energized_Map.t
 end = struct
   type t = [ `Reflect of Mirror.t | `Split of Splitter.t ] option array array
@@ -99,22 +98,7 @@ end = struct
         try Some (`Reflect (Mirror.of_char c))
         with Invalid_argument _ -> Some (`Split (Splitter.of_char c)))
 
-  let opt_to_char = function
-    | None -> '.'
-    | Some (`Reflect m) -> Mirror.to_char m
-    | Some (`Split s) -> Splitter.to_char s
-
   let of_lines = Array.of_seq % Seq.map (Array.of_seq % Seq.map opt_of_char % String.to_seq)
-
-  let pp fmt grid =
-    let n_rows, n_cols = Array.matrix_size grid in
-    Format.pp_print_newline fmt ();
-    for row = 0 to n_rows - 1 do
-      for col = 0 to n_cols - 1 do
-        Format.pp_print_char fmt (opt_to_char grid.(row).(col))
-      done;
-      Format.pp_print_newline fmt ()
-    done
 
   let trace grid pos dir =
     let n_rows, n_cols = Array.matrix_size grid in

@@ -49,3 +49,27 @@ end = struct
       Format.pp_print_newline fmt ()
     done
 end
+
+module Beam : sig
+  type t = private int
+  (** Beam identifier. *)
+
+  val compare : t -> t -> int
+  val init : t
+  val split : t -> t
+end = struct
+  type t = int
+
+  let compare = Int.compare
+  let init = 0
+  let split = ( + ) 1
+end
+
+module Beam_Set = Set.Make (Beam)
+
+module Energized_Map = Hashtbl.Make (struct
+  type t = int * int * Dir.t
+
+  let equal = Stdlib.( = )
+  let hash = Hashtbl.hash
+end)

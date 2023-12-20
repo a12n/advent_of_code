@@ -103,26 +103,25 @@ end = struct
   let trace grid pos dir =
     let n_rows, n_cols = Array.matrix_size grid in
     let energized = Energized_Map.create (n_rows * n_cols) in
-    let rec do_trace beam pos dir =
-      let next_pos = Dir.add_pos dir pos in
+    let rec do_trace ((row, col) as pos) dir_beam =
       let beams =
-        match Energized_Map.find_opt energized next_pos with
+        match Energized_Map.find_opt energized pos with
         | Some s ->
-            (* Next position have already seen some beams. *)
+            (* The position have already seen some beams. *)
             s
         | None ->
-            (* No beams were in next position yet. *)
+            (* No beams were in the position yet. *)
             Beam_Set.empty
       in
-      if not (Beam_Set.mem (dir, beam) beams) then (
-        let beams' = Beam_Set.add (dir, beam) beams in
-        Energized_Map.replace energized next_pos beams';
-        match grid.(fst next_pos).(snd next_pos) with
-        | None -> do_trace beam next_pos dir
+      if not (Beam_Set.mem dir_beam beams) then (
+        let beams' = Beam_Set.add dir_beam beams in
+        Energized_Map.replace energized pos beams';
+        match grid.(fst pos).(snd pos) with
+        | None -> do_trace Dir.(add_pos pos dir) (dir, beam)
         | _ ->
             (* TODO *)
             ())
     in
-    do_trace Beam.init pos dir;
+    do_trace pos (dir, Beam.init);
     energized
 end

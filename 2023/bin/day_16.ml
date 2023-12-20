@@ -77,12 +77,16 @@ module Beam_Set = Set.Make (struct
   let compare = Stdlib.compare
 end)
 
-module Energized_Map = Hashtbl.Make (struct
-  type t = int * int
+module Energized_Map = struct
+  include Hashtbl.Make (struct
+      type t = int * int
 
-  let equal = Stdlib.( = )
-  let hash = Hashtbl.hash
-end)
+      let equal = Stdlib.( = )
+      let hash = Hashtbl.hash
+    end)
+
+  (* TODO *)
+end
 
 module Grid : sig
   type t

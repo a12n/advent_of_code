@@ -44,10 +44,9 @@ end = struct
   let focus_power =
     Array.fold_lefti
       (fun total i lens ->
-        total
-        + (List.rev (lens : Lens_System.t :> (string * int) list)
-          |> List.mapi (fun j (_, fd) -> (i + 1) * (j + 1) * fd)
-          |> List.fold_left ( + ) 0))
+        List.rev (lens : Lens_System.t :> (string * int) list)
+        |> List.mapi (fun j (_, fd) -> (i + 1) * (j + 1) * fd)
+        |> List.fold_left ( + ) total)
       0
 
   let make () = Array.make 256 Lens_System.empty

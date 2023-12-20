@@ -29,17 +29,17 @@ end
 module Mirror = struct
   type t = Upward | Downward
 
-  let reflect m from_dir beam =
+  let reflect m to_dir beam =
     Dir.(
-      match (from_dir, m) with
-      | Up, Upward -> (Left, beam)
-      | Left, Upward -> (Up, beam)
-      | Right, Upward -> (Down, beam)
-      | Down, Upward -> (Right, beam)
-      | Up, Downward -> (Right, beam)
-      | Left, Downward -> (Down, beam)
-      | Right, Downward -> (Up, beam)
-      | Down, Downward -> (Left, beam))
+      match (to_dir, m) with
+      | Up, Upward -> (Right, beam)
+      | Left, Upward -> (Down, beam)
+      | Right, Upward -> (Up, beam)
+      | Down, Upward -> (Left, beam)
+      | Up, Downward -> (Left, beam)
+      | Left, Downward -> (Up, beam)
+      | Right, Downward -> (Down, beam)
+      | Down, Downward -> (Right, beam))
 
   let of_char = function '/' -> Upward | '\\' -> Downward | _ -> invalid_arg __FUNCTION__
   let to_char = function Upward -> '/' | Downward -> '\\'

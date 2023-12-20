@@ -77,3 +77,8 @@
  (names day_16_1 day_16_2)
  (modules day_16 day_16_1 day_16_2)
  (libraries advent))
+
+(executables
+ (names day_17_1 day_17_2)
+ (modules day_17 day_17_1 day_17_2)
+ (libraries advent))

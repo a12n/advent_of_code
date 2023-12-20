@@ -15,6 +15,15 @@ let intersperse sep =
 let rec last = function [ x0 ] -> x0 | _ :: xs -> last xs | [] -> invalid_arg __FUNCTION__
 let rec combine_tl = function [] -> [] | [ _ ] -> [] | x0 :: xs -> (x0, xs) :: combine_tl xs
 
+let replace_assoc k v assoc =
+  match
+    fold_left_map
+      (fun ok (ki, vi) -> if ki = k then (true, (ki, v)) else (ok, (ki, vi)))
+      false assoc
+  with
+  | true, assoc -> assoc
+  | false, assoc -> (k, v) :: assoc
+
 let rec take_pairs = function
   | [] -> []
   | x0 :: x1 :: xs -> (x0, x1) :: take_pairs xs

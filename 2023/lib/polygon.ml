@@ -14,23 +14,25 @@ let area =
       (* TODO: adjust for excessive area. Compute area in 1/100's,
          take into account 1/2 (on sides), 1/4 and 3/4 (external and
          internal angles). *)
+      (* 1. Iterate over pairs of points, compute are with shoelace.
+         2. Iterate over pairs of lines (triples of points), adjust area (exterior and inside angles). *)
       let rec do_area total i = function
-        | [] -> total
         | pi :: pj :: ps ->
             check_aligned pi pj;
-            let part = 100 * shoelace pi pj in
+            let part = shoelace pi pj in
             Printf.eprintf "p%d (%d, %d) × p%d (%d, %d) = %d\n%!" i (fst pi) (snd pi) (i + 1)
               (fst pj) (snd pj) part;
             do_area (total + part) (i + 1) (pj :: ps)
         | [ pi ] ->
             check_aligned pi p0;
-            let part = 100 * shoelace pi p0 in
+            let part = shoelace pi p0 in
             Printf.eprintf "p%d (%d, %d) × p%d (%d, %d) = %d\n%!" i (fst pi) (snd pi) 0 (fst p0)
               (snd p0) part;
             total + part
+        | [] -> assert false
       in
       let total = do_area 0 0 (p0 :: p1 :: ps) in
-      Int.abs total / (2 * 100)
+      Int.abs total / 2
   | [ _ ] | [] -> 0
 
 let test1 =

@@ -1,23 +1,5 @@
 open Advent
 
-module Dir = struct
-  type t = Up | Left | Right | Down
-
-  let add_pos dir (row, col) =
-    match dir with
-    | Up -> (row - 1, col)
-    | Left -> (row, col - 1)
-    | Right -> (row, col + 1)
-    | Down -> (row + 1, col)
-end
-
-module Pos = struct
-  type t = int * int
-
-  let add (row1, col1) (row2, col2) = (row1 + row2, col1 + col2)
-  let add_dir (row, col) dir = Dir.add_pos dir (row, col)
-end
-
 module Grid : sig
   type t
 

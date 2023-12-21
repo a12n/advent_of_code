@@ -97,7 +97,7 @@ end = struct
             Energized_Map.replace energized pos (dir :: seen);
             List.iter
               (fun ((next_dir, _) as next_dir_beam) ->
-                do_trace next_dir_beam Dir.(add_pos next_dir pos))
+                do_trace next_dir_beam (Pos.add pos (Dir.to_pos next_dir)))
               (grid.(row).(col) dir_beam))
     in
     do_trace (start_dir, Beam.init) start_pos;

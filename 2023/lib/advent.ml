@@ -1,8 +1,13 @@
+(* Stdlib extensions *)
 module Array = Advent__Array
 module Int = Advent__Int
 module List = Advent__List
 module Seq = Advent__Seq
 module String = Advent__String
+
+(* Shared modules *)
+module Dir = Advent__Dir
+module Pos = Advent__Pos
 
 let ( % ) f g x = f (g x)
 

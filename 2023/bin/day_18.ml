@@ -42,7 +42,7 @@ module Grid = struct
   let of_plan plan =
     let (min_row, min_col), (max_row, max_col) = Plan.min_max_pos plan in
     Printf.eprintf "(%d, %d) ~ (%d, %d)\n%!" min_row min_col max_row max_col;
-    let n_rows, n_cols = max_row - min_row + 1, max_col - min_col + 1 in
+    let n_rows, n_cols = (max_row - min_row + 1, max_col - min_col + 1) in
     Printf.eprintf "n_rows %d, n_cols %d\n%!" n_rows n_cols;
     let grid = Array.make_matrix n_rows n_cols None in
     let rec do_dig ((row, col) as pos) = function

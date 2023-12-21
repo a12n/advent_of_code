@@ -87,6 +87,20 @@ module Grid = struct
       done
     done
 
+  let trench_volume grid =
+    Array.fold_left
+      (fun total line ->
+        Array.fold_left
+          (fun total elt ->
+            match elt with
+            | Some `Trench -> total + 1
+            | Some `Ground -> total
+            | None ->
+                Printf.eprintf "%s: undecied point" __FUNCTION__;
+                total)
+          total line)
+      0 grid
+
   let pp fmt =
     Array.iter (fun line ->
         Array.iter

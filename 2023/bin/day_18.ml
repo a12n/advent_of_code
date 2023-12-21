@@ -50,8 +50,7 @@ module Grid = struct
       | Dig.{ length = 0; _ } :: plan -> do_dig pos plan
       | (Dig.{ dir; length; _ } as dig) :: plan ->
           Printf.eprintf "dir %c, length %d\n%!" (Dir.to_char dir) length;
-          (* FIXME: pos translation *)
-          let row', col' = Pos.add (Pos.sub (row, col) (min_row, min_col)) (max_row, max_col) in
+          let row', col' = Pos.sub (row, col) (min_row, min_col) in
           Printf.eprintf "trench @ (%d, %d) -> (%d, %d)\n%!" row col row' col';
           grid.(row').(col') <- Some `Trench;
           do_dig (Pos.add pos (Dir.to_pos dir)) (Dig.{ dig with length = length - 1 } :: plan)

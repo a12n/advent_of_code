@@ -7,6 +7,7 @@ module String = Advent__String
 
 (* Shared modules *)
 module Dir = Advent__Dir
+module Polygon = Advent__Polygon
 module Pos = Advent__Pos
 
 let ( % ) f g x = f (g x)

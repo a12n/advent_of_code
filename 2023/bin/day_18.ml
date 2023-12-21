@@ -55,6 +55,7 @@ module Grid = struct
   let dig_interior grid =
     let ((n_rows, n_cols) as size) = Array.matrix_size grid in
     let queue = Queue.create () in
+    (* Start from grid borders. *)
     for col = 0 to n_cols - 1 do
       Queue.add (0, col) queue;
       Queue.add (n_rows - 1, col) queue
@@ -63,20 +64,27 @@ module Grid = struct
       Queue.add (row, 0) queue;
       Queue.add (row, n_cols - 1) queue
     done;
+    (* Fill ground from any non-trench position. *)
     while not (Queue.is_empty queue) do
       let ((row, col) as pos) = Queue.take queue in
       match grid.(row).(col) with
       | None | Some `Ground ->
-          (* Dig the trench. *)
-          grid.(row).(col) <- Some `Trench;
+          (* It's not a trench position, mark as level ground. *)
+          grid.(row).(col) <- Some `Ground;
           (* Add valid neighbour positions to the fill queue. *)
           Dir.[ Up; Left; Right; Down ]
           |> List.map (Pos.add pos % Dir.to_pos)
           |> List.filter (Pos.is_valid size)
           |> List.iter ((Fun.flip Queue.add) queue)
       | Some `Trench ->
-          (* Already a trench. *)
+          (* Don't fill trenches. *)
           ()
+    done;
+    (* Mark all non-ground as trenches. *)
+    for row = 0 to n_rows - 1 do
+      for col = 0 to n_cols - 1 do
+        if grid.(row).(col) = None then grid.(row).(col) <- Some `Trench
+      done
     done
 
   let pp fmt =

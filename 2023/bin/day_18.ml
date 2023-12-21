@@ -38,6 +38,7 @@ module Plan = struct
   type t = Dig.t list
 
   let of_lines = List.of_seq % Seq.map Dig.of_string
+  let of_lines2 = List.of_seq % Seq.map Dig.(decode % of_string)
 
   let min_max_pos plan =
     let _, min, max =

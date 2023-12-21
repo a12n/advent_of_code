@@ -16,6 +16,22 @@ module Dig = struct
           length = (if length > 0 then length else invalid_arg __FUNCTION__);
           color;
         })
+
+  let decode { color; _ } =
+    {
+      dir =
+        (match color land 0xF with
+        | 0 -> Dir.Right
+        | 1 -> Dir.Down
+        | 2 -> Dir.Left
+        | 3 -> Dir.Up
+        | _ -> invalid_arg __FUNCTION__);
+      length =
+        (match (color lsr 4) land 0xFFFFF with
+        | length when length > 0 -> length
+        | _ -> invalid_arg __FUNCTION__);
+      color = 0;
+    }
 end
 
 module Plan = struct

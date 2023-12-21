@@ -12,4 +12,5 @@ let () =
   Format.(
     pp_print_string Format.err_formatter "After:\n";
     Grid.pp err_formatter grid;
-  )
+  );
+  print_endline (string_of_int (Grid.trench_volume grid))

@@ -60,7 +60,7 @@ module Grid = struct
       Queue.add (0, col) queue;
       Queue.add (n_rows - 1, col) queue
     done;
-    for row = 0 to n_rows - 1 do
+    for row = 1 to n_rows - 2 do
       Queue.add (row, 0) queue;
       Queue.add (row, n_cols - 1) queue
     done;

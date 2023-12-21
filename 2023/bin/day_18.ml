@@ -26,10 +26,10 @@ module Plan = struct
   let min_max_pos plan =
     let _, min, max =
       List.fold_left
-        (fun (pos, min, max) Dig.{ dir; length; _ } ->
+        (fun (((row, col) as pos), (min_row, min_col), (max_row, max_col)) Dig.{ dir; length; _ } ->
           let v = Dir.to_pos dir in
           let pos = Pos.(add pos (mul_int v length)) in
-          (pos, Stdlib.min min pos, Stdlib.max max pos))
+          (pos, Int.(min min_row row, min min_col col), Int.(max max_row row, max max_col col)))
         ((0, 0), (max_int, max_int), (min_int, min_int))
         plan
     in

@@ -19,10 +19,14 @@ let area =
         | pi :: pj :: ps ->
             check_aligned pi pj;
             let part = 100 * shoelace pi pj in
+            Printf.eprintf "p%d (%d, %d) × p%d (%d, %d) = %d\n%!" i (fst pi) (snd pi) (i + 1)
+              (fst pj) (snd pj) part;
             do_area (total + part) (i + 1) (pj :: ps)
         | [ pi ] ->
             check_aligned pi p0;
             let part = 100 * shoelace pi p0 in
+            Printf.eprintf "p%d (%d, %d) × p%d (%d, %d) = %d\n%!" i (fst pi) (snd pi) 0 (fst p0)
+              (snd p0) part;
             total + part
       in
       let total = do_area 0 0 (p0 :: p1 :: ps) in

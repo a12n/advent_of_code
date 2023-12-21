@@ -35,6 +35,42 @@ let area =
       Int.abs total / 2
   | [ _ ] | [] -> 0
 
+let straight_joint (r0, c0) (r1, c1) (r2, c2) = (r0 = r1 && r1 = r2) || (c0 = c1 && c1 = c2)
+
+let right_turn_joint (r0, c0) (r1, c1) (r2, c2) =
+  (r0 = r1 && c1 = c2 && r1 < r2) || (c0 = c1 && r1 = r2 && c1 < c2)
+
+let left_turn_joint (r0, c0) (r1, c1) (r2, c2) =
+  (r0 = r1 && c1 = c2 && r1 > r2) || (c0 = c1 && r1 = r2 && c1 > c2)
+
+let excessive_area =
+  let print_joint i pi j pj k pk =
+    Printf.eprintf "p%d (%d, %d) - p%d (%d, %d) - p%d (%d, %d) = %c%c%c\n%!" i (fst pi) (snd pi) j
+      (fst pj) (snd pj) k (fst pk) (snd pk)
+      (if left_turn_joint pi pj pk then '<' else '.')
+      (if straight_joint pi pj pk then '|' else '.')
+      (if right_turn_joint pi pj pk then '>' else '.')
+  in
+  function
+  | p0 :: p1 :: p2 :: ps ->
+      let rec do_area (total1, total2) i = function
+        | pi :: pj :: pk :: ps ->
+            (* pi pj pk *)
+            print_joint i pi (i + 1) pj (i + 2) pk;
+            do_area (total1, total2) (i + 1) (pj :: pk :: ps)
+        | [ pi; pj ] ->
+            (* pi pj p0 *)
+            print_joint i pi (i + 1) pj 0 p0;
+            do_area (total1,total2) (i + 1) [ pj ]
+        | [ pi ] ->
+            (* pi p0 p1 *)
+            print_joint i pi 0 p0 1 p1;
+            (total1, total2)
+        | [] -> assert false
+      in
+      do_area (0,0) 0 (p0 :: p1 :: p2 :: ps)
+  | _ -> (0,0)
+
 let test1 =
   (* 4 *)
   [ (1, 1); (4, 1); (4, 4); (1, 4) ]

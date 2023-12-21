@@ -64,20 +64,20 @@ module Grid = struct
       Queue.add (row, 0) queue;
       Queue.add (row, n_cols - 1) queue
     done;
-    (* Fill ground from any non-trench position. *)
+    (* Fill ground from any undecied position. *)
     while not (Queue.is_empty queue) do
       let ((row, col) as pos) = Queue.take queue in
       match grid.(row).(col) with
-      | None | Some `Ground ->
-          (* It's not a trench position, mark as level ground. *)
+      | None ->
+          (* Undecied position, mark as ground *)
           grid.(row).(col) <- Some `Ground;
-          (* Add valid neighbour positions to the fill queue. *)
+          (* Add valid neighbours to the queue. *)
           Dir.[ Up; Left; Right; Down ]
           |> List.map (Pos.add pos % Dir.to_pos)
           |> List.filter (Pos.is_valid size)
           |> List.iter ((Fun.flip Queue.add) queue)
-      | Some `Trench ->
-          (* Don't fill trenches. *)
+      | Some _ ->
+          (* Already marked as either ground or trench. *)
           ()
     done;
     (* Mark all non-ground as trenches. *)

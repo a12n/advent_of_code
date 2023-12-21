@@ -23,30 +23,37 @@ module Plan = struct
 
   let of_lines = List.of_seq % Seq.map Dig.of_string
 
-  let size plan =
-    let _, (max_row, max_col) =
+  let min_max_pos plan =
+    let _, min, max =
       List.fold_left
-        (fun (pos, max) Dig.{ dir; length; _ } ->
+        (fun (pos, min, max) Dig.{ dir; length; _ } ->
           let v = Dir.to_pos dir in
           let pos = Pos.(add pos (mul_int v length)) in
-          (pos, Stdlib.max max pos))
-        ((0, 0), (0, 0))
+          (pos, Stdlib.min min pos, Stdlib.max max pos))
+        ((0, 0), (max_int, max_int), (min_int, min_int))
         plan
     in
-    (max_row + 1, max_col + 1)
+    (min, max)
 end
 
 module Grid = struct
   type t = [ `Ground | `Trench ] option array array
 
   let of_plan plan =
-    let n_rows, n_cols = Plan.size plan in
+    let (min_row, min_col), (max_row, max_col) = Plan.min_max_pos plan in
+    Printf.eprintf "(%d, %d) ~ (%d, %d)\n%!" min_row min_col max_row max_col;
+    let n_rows, n_cols = max_row - min_row + 1, max_col - min_col + 1 in
+    Printf.eprintf "n_rows %d, n_cols %d\n%!" n_rows n_cols;
     let grid = Array.make_matrix n_rows n_cols None in
     let rec do_dig ((row, col) as pos) = function
       | [] -> ()
       | Dig.{ length = 0; _ } :: plan -> do_dig pos plan
       | (Dig.{ dir; length; _ } as dig) :: plan ->
-          grid.(row).(col) <- Some `Trench;
+          Printf.eprintf "dir %c, length %d\n%!" (Dir.to_char dir) length;
+          (* FIXME: pos translation *)
+          let row', col' = Pos.add (Pos.sub (row, col) (min_row, min_col)) (max_row, max_col) in
+          Printf.eprintf "trench @ (%d, %d) -> (%d, %d)\n%!" row col row' col';
+          grid.(row').(col') <- Some `Trench;
           do_dig (Pos.add pos (Dir.to_pos dir)) (Dig.{ dig with length = length - 1 } :: plan)
     in
     do_dig (0, 0) plan;

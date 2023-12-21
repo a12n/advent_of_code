@@ -24,8 +24,43 @@ module Grid : sig
   val min_path : t -> int
   val of_lines : string Seq.t -> t
   val size : t -> int * int
+  val distances : t -> int * int -> (int * (int * int)) array array
 end = struct
   type t = int array array
+
+  let get a (row, col) = a.(row).(col)
+  let set a (row, col) value = a.(row).(col) <- value
+
+  let distances grid start =
+    let ( let* ) = Option.bind in
+    let n_rows, n_cols = Array.matrix_size grid in
+    let max_row, max_col = (n_rows - 1, n_cols - 1) in
+    let validate = function
+      | row, col when row < 0 || col < 0 -> None
+      | row, col when row > max_row || col > max_col -> None
+      | row, col -> Some (row, col)
+    in
+    let cells = Array.make_matrix n_rows n_cols (max_int, (0, 0)) in
+    let queue = Queue.create () in
+    set cells start (0, (0,0));
+    Queue.add start queue;
+    while not (Queue.is_empty queue) do
+      let pos = Queue.take queue in
+      [ (-1, 0); (0, -1); (1, 0); (0, 1) ]
+      |> List.filter_map (fun off ->
+             let* pos' = validate (Pos.add pos off) in
+             Some (pos', off))
+      |> List.filter_map (fun (pos', off) ->
+          Queue.add pos' queue;
+          let ((dist, _) as cell') = get cells pos' in
+          if dist < max_int then Some (cell', pos', off) else None
+        )
+      |> List.iter (fun (cell', pos', off) ->
+          let (dist', off') = get cells pos' in
+          (* TODO *)
+          ignore (off, (row', col')))
+    done;
+    cells
 
   let of_lines =
     let digit c = int_of_char c - int_of_char '0' in

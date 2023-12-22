@@ -17,4 +17,4 @@ let () =
     pp_print_list ~pp_sep Pos.pp Format.err_formatter cycle;
     pp_print_newline err_formatter ()
   );
-  Polygon.area cycle |> string_of_int |> print_endline
+  Polygon.interior_area cycle |> string_of_int |> print_endline

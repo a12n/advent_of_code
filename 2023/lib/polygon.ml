@@ -100,7 +100,7 @@ let rec compact = function
   | p0 :: ps -> p0 :: compact ps
   | [] -> []
 
-let border_area ps =
+let boundary_area ps =
   let ls = Line.list_of_polygon ps in
   if not (List.for_all Line.is_aligned ls) then invalid_arg __FUNCTION__;
   (List.map Line.part_area ls |> List.map (( * ) 2) |> List.map (( + ) 100) |> List.reduce ( + ))
@@ -108,7 +108,7 @@ let border_area ps =
 
 (** Gauss's area formula adjusted for integer 2D grids. Polygon is a
     list of points on a grid (the input) connected with implicit lines. *)
-let area ps =
+let interior_area ps =
   let ls = Line.list_of_polygon ps in
   if not (List.for_all Line.is_aligned ls) then
     invalid_arg (__FUNCTION__ ^ ": all lines must be axis-aligned");

@@ -74,10 +74,6 @@ module Joint = struct
   let is_forward j = is_horiz_forward j || is_vert_forward j
   let is_backward j = is_horiz_backward j || is_vert_backward j
 
-  let is_left_turn (p1, ((x2, y2) as p2), ((x3, y3) as p3)) =
-    Line.(is_horiz_aligned (p1, p2) && is_vert_aligned (p2, p3) && y3 > y2)
-    || Line.(is_vert_aligned (p1, p2) && is_horiz_aligned (p2, p3) && x3 < x2)
-
   (* CCW *)
   (* TODO: Looks like day 18 is CW. *)
   let is_internal_angle ((x1, y1), (x2, y2), (x3, y3)) =

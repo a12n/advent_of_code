@@ -62,10 +62,10 @@ module Joint = struct
 
   (* CCW *)
   let is_internal_angle ((x1, y1), (x2, y2), (x3, y3)) =
-    (x1 < x2 && y1 = y2 && x2 = x3 && y2 < y3)
-    || (x1 = x2 && y1 < y2 && x2 > x3 && y2 = y3)
-    || (x1 > x2 && y1 > y2 && x2 = x3 && y2 > y3)
+    (x1 = x2 && y1 < y2 && x2 > x3 && y2 = y3)
+    || (x1 > x2 && y1 = y2 && x2 = x3 && y2 > y3)
     || (x1 = x2 && y1 > y2 && x2 < x3 && y2 = y3)
+    || (x1 < x2 && y1 = y2 && x2 = x3 && y2 < y3)
 
   (* CCW *)
   let is_external_angle ((x1, y1), (x2, y2), (x3, y3)) =

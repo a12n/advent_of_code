@@ -21,7 +21,7 @@ end = struct
     let dist = Array.make_matrix n_rows n_cols max_int in
     let prev = Array.make_matrix n_rows n_cols None in
     let rec straight_line pos dir n =
-      if n > 0 then
+      if n > 1 then
         match prev.@[pos] with
         | None -> false
         | Some dir' when dir' <> dir -> false
@@ -44,7 +44,7 @@ end = struct
                  let dir = Pos.sub cur next in
                  Printf.printf "next (%d, %d), dist %d, alt %d\n%!" (fst next) (snd next)
                    dist.@[next] alt;
-                 if alt < dist.@[next] && not (straight_line cur dir 2) then (
+                 if alt < dist.@[next] && not (straight_line cur dir 3) then (
                    dist.@[next] <- alt;
                    prev.@[next] <- Some dir;
                    Queue.add next queue));

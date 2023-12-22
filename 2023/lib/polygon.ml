@@ -1,4 +1,6 @@
 module Line = struct
+  type t = (int * int) * (int * int)
+
   let pp ?(i = 0) fmt (p1, p2) =
     Format.fprintf fmt "p%d " i;
     Pos.pp fmt p1;
@@ -33,6 +35,8 @@ module Line = struct
 end
 
 module Joint = struct
+  type t = (int * int) * (int * int) * (int * int)
+
   let pp ?(i = 0) fmt (p1, p2, p3) =
     Format.fprintf fmt "p%d " i;
     Pos.pp fmt p1;

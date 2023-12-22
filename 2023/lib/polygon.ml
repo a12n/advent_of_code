@@ -61,6 +61,7 @@ module Joint = struct
     || Line.(is_vert_aligned (p1, p2) && is_horiz_aligned (p2, p3) && x3 < x2)
 
   (* CCW *)
+  (* TODO: Looks like day 18 is CW. *)
   let is_internal_angle ((x1, y1), (x2, y2), (x3, y3)) =
     (x1 = x2 && y1 < y2 && x2 > x3 && y2 = y3)
     || (x1 > x2 && y1 = y2 && x2 = x3 && y2 > y3)
@@ -68,6 +69,7 @@ module Joint = struct
     || (x1 < x2 && y1 = y2 && x2 = x3 && y2 < y3)
 
   (* CCW *)
+  (* TODO: Looks like day 18 is CW. *)
   let is_external_angle ((x1, y1), (x2, y2), (x3, y3)) =
     (x1 = x2 && y1 < y2 && x2 < x3 && y2 = y3)
     || (x1 > x2 && y1 = y2 && x2 = x3 && y2 < y3)

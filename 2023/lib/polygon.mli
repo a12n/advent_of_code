@@ -16,6 +16,10 @@ module Line : sig
 
   val shoelace : t -> int
   val part_area : t -> int
+
+  (** {2 Pretty-printing} *)
+
+  val pp : ?i:int -> Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
 end
 
 module Joint : sig
@@ -45,6 +49,10 @@ module Joint : sig
   (** {2 Area} *)
 
   val part_area : t -> int
+
+  (** {2 Pretty-printing} *)
+
+  val pp : ?i:int -> Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
 end
 
 val compact : (int * int) list -> (int * int) list

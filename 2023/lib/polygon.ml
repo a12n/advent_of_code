@@ -14,8 +14,8 @@ module Line = struct
   let is_aligned l = is_horiz_aligned l || is_vert_aligned l
 
   let shoelace ((x1, y1), (x2, y2)) =
-    (* Triangle formula, for a point and the next point. *)
-    (x1 * y2) - (x2 * y1)
+    (* Trapezoid formula. *)
+    (y1 + y2) * (x1 - x2)
 
   let part_area (((x1, y1), (x2, y2)) as l) =
     let length =
@@ -56,9 +56,26 @@ module Joint = struct
   let is_forward j = is_horiz_forward j || is_vert_forward j
   let is_backward j = is_horiz_backward j || is_vert_backward j
 
+  let is_left_turn (p1, ((x2, y2) as p2), ((x3, y3) as p3)) =
+    Line.(is_horiz_aligned (p1, p2) && is_vert_aligned (p2, p3) && y3 > y2)
+    || Line.(is_vert_aligned (p1, p2) && is_horiz_aligned (p2, p3) && x3 < x2)
+
+  (* CCW *)
+  let is_internal_angle ((x1, y1), (x2, y2), (x3, y3)) =
+    (x1 < x2 && y1 = y2 && x2 = x3 && y2 < y3)
+    || (x1 = x2 && y1 < y2 && x2 > x3 && y2 = y3)
+    || (x1 > x2 && y1 > y2 && x2 = x3 && y2 > y3)
+    || (x1 = x2 && y1 > y2 && x2 < x3 && y2 = y3)
+
+  (* CCW *)
+  let is_external_angle ((x1, y1), (x2, y2), (x3, y3)) =
+    (x1 = x2 && y1 < y2 && x2 < x3 && y2 = y3)
+    || (x1 > x2 && y1 = y2 && x2 = x3 && y2 < y3)
+    || (x1 = x2 && y1 > y2 && x2 > x3 && y2 = y3)
+    || (x1 < x2 && y1 = y2 && x2 = x3 && y2 > y3)
+
   let part_area j =
-    (* TODO *)
-    if is_forward j then 50 else if is_backward j then 0 else invalid_arg __FUNCTION__
+    if is_internal_angle j then 25 else if is_external_angle j then 75 else invalid_arg __FUNCTION__
 end
 
 (** Gauss's area formula adjusted for integer 2D grids. Polygon is a

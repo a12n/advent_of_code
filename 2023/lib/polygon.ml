@@ -118,14 +118,3 @@ let interior_area points =
      CW. Add instead of subtract to get the full area including border
      points. *)
   ((100 * area) + joints_area + lines_area) / 100
-
-let test_1_1 = [ (1, 1); (4, 1); (4, 4); (1, 4) ]
-let test_1_2 = [ (1, 1); (1, 4); (4, 4); (4, 1) ]
-
-let test2 =
-  (* 8 *)
-  [ (1, 1); (1, 6); (6, 6); (6, 4); (3, 4); (3, 1) ]
-
-let test3 =
-  (* 13 *)
-  [ (1, 1); (1, 2); (4, 2); (4, 5); (1, 5); (1, 7); (7, 7); (7, 1) ]

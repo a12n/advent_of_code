@@ -1,4 +1,10 @@
 module Line = struct
+  let pp ?(i = 0) fmt (p1, p2) =
+    Format.fprintf fmt "p%d " i;
+    Pos.pp fmt p1;
+    Format.fprintf fmt " - p%d " (i + 1);
+    Pos.pp fmt p2
+
   let list_of_polygon = function
     | p0 :: p1 :: ps ->
         let rec loop = function
@@ -27,6 +33,14 @@ module Line = struct
 end
 
 module Joint = struct
+  let pp ?(i = 0) fmt (p1, p2, p3) =
+    Format.fprintf fmt "p%d " i;
+    Pos.pp fmt p1;
+    Format.fprintf fmt " - p%d " (i + 1);
+    Pos.pp fmt p2;
+    Format.fprintf fmt " - p%d " (i + 2);
+    Pos.pp fmt p3
+
   let list_of_polygon = function
     | p0 :: p1 :: p2 :: ps ->
         let rec loop = function

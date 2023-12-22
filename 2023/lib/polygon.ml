@@ -16,6 +16,14 @@ module Line = struct
   let shoelace ((x1, y1), (x2, y2)) =
     (* Triangle formula, for a point and the next point. *)
     (x1 * y2) - (x2 * y1)
+
+  let part_area (((x1, y1), (x2, y2)) as l) =
+    let length =
+      if is_horiz_aligned l then x2 - x1
+      else if is_vert_aligned l then y2 - y1
+      else invalid_arg __FUNCTION__
+    in
+    50 * (Int.abs length - 1)
 end
 
 module Joint = struct
@@ -93,19 +101,14 @@ let joint_area =
 
 (* Excessive area in straight parts of the lines connecting points. *)
 let lines_area =
-  let part_area (ri, ci) (rj, cj) =
-    if ri = rj then 50 * (Int.abs (cj - ci) - 1)
-    else if ci = cj then 50 * (Int.abs (rj - ri) - 1)
-    else assert false
-  in
   function
   | p0 :: ps ->
       let rec do_area total = function
         | pi :: pj :: ps ->
-            let part = part_area pi pj in
+            let part = Line.part_area (pi, pj) in
             do_area (total + part) (pj :: ps)
         | [ pi ] ->
-            let part = part_area pi p0 in
+            let part = Line.part_area (pi, p0) in
             total + part
         | [] -> assert false
       in

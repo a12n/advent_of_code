@@ -9,9 +9,9 @@ module Line = struct
         loop (p0 :: p1 :: ps)
     | [ _ ] | [] -> []
 
-  let shoelace ((xi, yi), (xj, yj)) =
+  let shoelace ((x1, y1), (x2, y2)) =
     (* Triangle formula, for a point and the next point. *)
-    (xi * yj) - (xj * yi)
+    (x1 * y2) - (x2 * y1)
 end
 
 module Joint = struct

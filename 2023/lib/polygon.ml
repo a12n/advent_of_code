@@ -85,7 +85,10 @@ let area ps =
   if not (List.for_all Line.is_aligned ls) then
     invalid_arg (__FUNCTION__ ^ ": all lines must be axis-aligned");
   (* TODO: Compensate for excesive area in lines and joints. *)
-  Int.abs List.(fold_left ( + ) 0 (map Line.shoelace ls)) / 2
+  let a = Int.abs List.(fold_left ( + ) 0 (map Line.shoelace ls)) / 2 in
+  let a_js = Joint.list_of_polygon ps |> List.map Joint.part_area |> List.reduce ( + ) in
+  let a_ls = ls |> List.map Line.part_area |> List.reduce ( + ) in
+  ((100 * a) - (a_js + a_ls)) / 100
 
 let straight_joint (r0, c0) (r1, c1) (r2, c2) = (r0 = r1 && r1 = r2) || (c0 = c1 && c1 = c2)
 

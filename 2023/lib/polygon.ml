@@ -29,8 +29,8 @@ let area ps =
   let ls = lines ps in
   List.iter
     (fun (pi, pj) ->
-      (* All lines in a polygon must be axis-aligned. *)
-      if not Pos.(is_horiz_aligned pi pj || is_vert_aligned pi pj) then invalid_arg __FUNCTION__)
+      if not Pos.(is_horiz_aligned pi pj || is_vert_aligned pi pj) then
+        invalid_arg (__FUNCTION__ ^ ": all lines must be axis-aligned"))
     ls;
   (* TODO: Compensate for excesive area in lines and joints. *)
   Int.abs List.(fold_left ( + ) 0 (map shoelace ls)) / 2

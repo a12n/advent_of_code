@@ -42,7 +42,7 @@ end = struct
           |> List.iter (fun next ->
                  let alt = dist.@[cur] + grid.@[next] in
                  let dir = Pos.sub cur next in
-                 Printf.printf "next (%d, %d), dist %d, alt %d\n%!" (fst next) (snd next)
+                 Printf.eprintf "next (%d, %d), dist %d, alt %d\n%!" (fst next) (snd next)
                    dist.@[next] alt;
                  if alt < dist.@[next] && not (straight_line cur dir 3) then (
                    dist.@[next] <- alt;

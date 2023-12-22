@@ -37,11 +37,10 @@ module Joint : sig
   val is_vert_backward : t -> bool
   val is_backward : t -> bool
 
-  val is_internal_angle : t -> bool
-  (** CCW. *)
-
-  val is_external_angle : t -> bool
-  (** CCW *)
+  module CCW : sig
+    val is_internal_angle : t -> bool
+    val is_external_angle : t -> bool
+  end
 
   (** {2 Area} *)
 

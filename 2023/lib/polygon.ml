@@ -74,25 +74,27 @@ module Joint = struct
   let is_forward j = is_horiz_forward j || is_vert_forward j
   let is_backward j = is_horiz_backward j || is_vert_backward j
 
-  (* CCW *)
-  (* TODO: Looks like day 18 is CW. *)
-  let is_internal_angle ((x1, y1), (x2, y2), (x3, y3)) =
-    (x1 = x2 && y1 < y2 && x2 > x3 && y2 = y3)
-    || (x1 > x2 && y1 = y2 && x2 = x3 && y2 > y3)
-    || (x1 = x2 && y1 > y2 && x2 < x3 && y2 = y3)
-    || (x1 < x2 && y1 = y2 && x2 = x3 && y2 < y3)
+  module CCW = struct
+    (* TODO: Looks like day 18 is CW. *)
+    let is_internal_angle ((x1, y1), (x2, y2), (x3, y3)) =
+      (x1 = x2 && y1 < y2 && x2 > x3 && y2 = y3)
+      || (x1 > x2 && y1 = y2 && x2 = x3 && y2 > y3)
+      || (x1 = x2 && y1 > y2 && x2 < x3 && y2 = y3)
+      || (x1 < x2 && y1 = y2 && x2 = x3 && y2 < y3)
 
-  (* CCW *)
-  (* TODO: Looks like day 18 is CW. *)
-  let is_external_angle ((x1, y1), (x2, y2), (x3, y3)) =
-    (x1 = x2 && y1 < y2 && x2 < x3 && y2 = y3)
-    || (x1 > x2 && y1 = y2 && x2 = x3 && y2 < y3)
-    || (x1 = x2 && y1 > y2 && x2 > x3 && y2 = y3)
-    || (x1 < x2 && y1 = y2 && x2 = x3 && y2 > y3)
+    (* TODO: Looks like day 18 is CW. *)
+    let is_external_angle ((x1, y1), (x2, y2), (x3, y3)) =
+      (x1 = x2 && y1 < y2 && x2 < x3 && y2 = y3)
+      || (x1 > x2 && y1 = y2 && x2 = x3 && y2 < y3)
+      || (x1 = x2 && y1 > y2 && x2 > x3 && y2 = y3)
+      || (x1 < x2 && y1 = y2 && x2 = x3 && y2 > y3)
+  end
 
   let part_area j =
     (* TODO: is_forward, is_backward *)
-    if is_internal_angle j then 25 else if is_external_angle j then 75 else invalid_arg __FUNCTION__
+    if CCW.is_internal_angle j then 25
+    else if CCW.is_external_angle j then 75
+    else invalid_arg __FUNCTION__
 end
 
 let rec compact = function

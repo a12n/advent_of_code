@@ -57,7 +57,7 @@ end = struct
         | None -> path
         | Some dir -> backtrack (cur :: path) Pos.(add cur dir)
       in
-      Some (dist.@[dest], backtrack [] dest)
+      Some (dist.@[dest], src :: backtrack [] dest)
     else None
 
   let of_lines =

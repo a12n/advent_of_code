@@ -97,7 +97,10 @@ let area ps =
   let a = Int.abs List.(fold_left ( + ) 0 (map Line.shoelace ls)) / 2 in
   let a_js = Joint.list_of_polygon ps |> List.map Joint.part_area |> List.reduce ( + ) in
   let a_ls = ls |> List.map Line.part_area |> List.reduce ( + ) in
-  ((100 * a) - (a_js + a_ls)) / 100
+  (* XXX: Joint.part_area and Line.part_area are for CCW. Puzzle is in
+     CW. Add instead of subtract to get the full area including border
+     points. *)
+  ((100 * a) + a_js + a_ls) / 100
 
 let test_1_1 = [ (1, 1); (4, 1); (4, 4); (1, 4) ]
 let test_1_2 = [ (1, 1); (1, 4); (4, 4); (4, 1) ]

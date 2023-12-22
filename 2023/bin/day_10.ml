@@ -13,6 +13,15 @@ module Pipe = struct
     | 'F' -> Down_Right
     | _ -> invalid_arg __FUNCTION__
 
+  let to_string = function
+    | Start -> "S"
+    | Up_Down -> "║"
+    | Right_Left -> "═"
+    | Up_Right -> "╚"
+    | Up_Left -> "╝"
+    | Down_Left -> "╗"
+    | Down_Right -> "╚"
+
   let has_conn pipe dir =
     match pipe with
     | Start -> true
@@ -24,6 +33,7 @@ module Pipe = struct
     | Down_Right -> Dir.(dir = Down || dir = Right)
 
   let opt_of_char = function '.' -> None | c -> Some (of_char c)
+  let opt_to_string = function None -> "." | Some p -> to_string p
 end
 
 module Grid : sig

@@ -39,9 +39,26 @@ module Joint = struct
     | [ _; _ ] | [ _ ] | [] -> []
 
   let is_horiz_aligned ((_, y1), (_, y2), (_, y3)) = y1 = y2 && y2 = y3
+  let is_vert_aligned ((x1, _), (x2, _), (x3, _)) = x1 = x2 && x2 = x3
 
   let is_horiz_forward (((x1, _), (x2, _), (x3, _)) as j) =
     is_horiz_aligned j && ((x1 < x2 && x2 < x3) || (x1 > x2 && x2 > x3))
+
+  let is_horiz_backward (((x1, _), (x2, _), (x3, _)) as j) =
+    is_horiz_aligned j && ((x1 < x2 && x3 < x2) || (x1 > x2 && x3 > x2))
+
+  let is_vert_forward ((x1, y1), (x2, y2), (x3, y3)) =
+    is_horiz_forward ((y1, x1), (y2, x2), (y3, x3))
+
+  let is_vert_backward ((x1, y1), (x2, y2), (x3, y3)) =
+    is_horiz_backward ((y1, x1), (y2, x2), (y3, x3))
+
+  let is_forward j = is_horiz_forward j || is_vert_forward j
+  let is_backward j = is_horiz_backward j || is_vert_backward j
+
+  let part_area j =
+    (* TODO *)
+    if is_forward j then 50 else if is_backward j then 0 else invalid_arg __FUNCTION__
 end
 
 (** Gauss's area formula adjusted for integer 2D grids. Polygon is a

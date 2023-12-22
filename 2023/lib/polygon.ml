@@ -90,68 +90,6 @@ let area ps =
   let a_ls = ls |> List.map Line.part_area |> List.reduce ( + ) in
   ((100 * a) - (a_js + a_ls)) / 100
 
-let straight_joint (r0, c0) (r1, c1) (r2, c2) = (r0 = r1 && r1 = r2) || (c0 = c1 && c1 = c2)
-
-let right_turn_joint (r0, c0) (r1, c1) (r2, c2) =
-  (r0 = r1 && c1 = c2 && r1 > r2) || (c0 = c1 && r1 = r2 && c1 < c2)
-
-let left_turn_joint (r0, c0) (r1, c1) (r2, c2) =
-  (r0 = r1 && c1 = c2 && r1 < r2) || (c0 = c1 && r1 = r2 && c1 > c2)
-
-(* Excessive area in line joints. *)
-let joint_area =
-  let print_joint i pi j pj k pk =
-    Printf.eprintf "p%d (%d, %d) - p%d (%d, %d) - p%d (%d, %d) = %c%c%c\n%!" i (fst pi) (snd pi) j
-      (fst pj) (snd pj) k (fst pk) (snd pk)
-      (if left_turn_joint pi pj pk then '<' else '.')
-      (if straight_joint pi pj pk then '|' else '.')
-      (if right_turn_joint pi pj pk then '>' else '.')
-  in
-  let part_area pi pj pk =
-    if straight_joint pi pj pk then (50, 50)
-    else if left_turn_joint pi pj pk then (25, 75)
-    else if right_turn_joint pi pj pk then (75, 25)
-    else assert false
-  in
-  function
-  | p0 :: p1 :: p2 :: ps ->
-      let rec do_area (total1, total2) i = function
-        | pi :: pj :: pk :: ps ->
-            (* pi pj pk *)
-            print_joint i pi (i + 1) pj (i + 2) pk;
-            let part1, part2 = part_area pi pj pk in
-            do_area (total1 + part1, total2 + part2) (i + 1) (pj :: pk :: ps)
-        | [ pi; pj ] ->
-            (* pi pj p0 *)
-            print_joint i pi (i + 1) pj 0 p0;
-            let part1, part2 = part_area pi pj p0 in
-            do_area (total1 + part1, total2 + part2) (i + 1) [ pj ]
-        | [ pi ] ->
-            (* pi p0 p1 *)
-            print_joint i pi 0 p0 1 p1;
-            let part1, part2 = part_area pi p0 p1 in
-            (total1 + part1, total2 + part2)
-        | [] -> assert false
-      in
-      do_area (0, 0) 0 (p0 :: p1 :: p2 :: ps)
-  | _ -> (0, 0)
-
-(* Excessive area in straight parts of the lines connecting points. *)
-let lines_area =
-  function
-  | p0 :: ps ->
-      let rec do_area total = function
-        | pi :: pj :: ps ->
-            let part = Line.part_area (pi, pj) in
-            do_area (total + part) (pj :: ps)
-        | [ pi ] ->
-            let part = Line.part_area (pi, p0) in
-            total + part
-        | [] -> assert false
-      in
-      do_area 0 (p0 :: ps)
-  | [] -> 0
-
 let test_1_1 = [ (1, 1); (4, 1); (4, 4); (1, 4) ]
 let test_1_2 = [ (1, 1); (1, 4); (4, 4); (4, 1) ]
 

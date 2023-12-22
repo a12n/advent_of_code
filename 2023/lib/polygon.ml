@@ -80,6 +80,13 @@ module Joint = struct
     if is_internal_angle j then 25 else if is_external_angle j then 75 else invalid_arg __FUNCTION__
 end
 
+let rec compact = function
+  | (x0, y0) :: (x1, y1) :: (x2, y2) :: ps ->
+      (* TODO: If aligned, remove the middle point. *)
+      []
+  | p0 :: ps -> p0 :: compact ps
+  | [] -> []
+
 (** Gauss's area formula adjusted for integer 2D grids. Polygon is a
     list of points on a grid (the input) connected with implicit lines. *)
 let area ps =

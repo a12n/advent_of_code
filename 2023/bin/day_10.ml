@@ -41,6 +41,7 @@ module Grid : sig
 
   val cycle : t -> (int * int) list option
   val of_lines : string Seq.t -> t
+  val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
 end = struct
   type t = Pipe.t option array array
 
@@ -90,4 +91,9 @@ end = struct
         Some (List.fold_left (fun max c -> if List.compare_lengths c max > 0 then c else max) c0 cs)
 
   let of_lines = Array.of_seq % Seq.map (Array.of_seq % Seq.map Pipe.opt_of_char % String.to_seq)
+
+  let pp fmt =
+    Array.iter (fun line ->
+        Array.iter (Format.pp_print_string fmt % Pipe.opt_to_string) line;
+        Format.pp_print_newline fmt ())
 end

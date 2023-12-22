@@ -20,7 +20,7 @@ module Pipe = struct
     | Up_Right -> "╚"
     | Up_Left -> "╝"
     | Down_Left -> "╗"
-    | Down_Right -> "╚"
+    | Down_Right -> "╔"
 
   let has_conn pipe dir =
     match pipe with

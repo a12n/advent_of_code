@@ -1,40 +1,27 @@
 open Advent
 
-module Dir = struct
-  type t = North | East | South | West
-
-  let neg = function North -> South | East -> West | South -> North | West -> East
-
-  let add_pos dir (row, column) =
-    match dir with
-    | North -> (row - 1, column)
-    | East -> (row, column + 1)
-    | South -> (row + 1, column)
-    | West -> (row, column - 1)
-end
-
 module Pipe = struct
-  type t = Start | North_south | East_west | North_east | North_west | South_west | South_east
+  type t = Start | Up_Down | Right_Left | Up_Right | Up_Left | Down_Left | Down_Right
 
   let of_char = function
     | 'S' -> Start
-    | '|' -> North_south
-    | '-' -> East_west
-    | 'L' -> North_east
-    | 'J' -> North_west
-    | '7' -> South_west
-    | 'F' -> South_east
+    | '|' -> Up_Down
+    | '-' -> Right_Left
+    | 'L' -> Up_Right
+    | 'J' -> Up_Left
+    | '7' -> Down_Left
+    | 'F' -> Down_Right
     | _ -> invalid_arg __FUNCTION__
 
   let has_conn pipe dir =
     match pipe with
     | Start -> true
-    | North_south -> Dir.(dir = North || dir = South)
-    | East_west -> Dir.(dir = East || dir = West)
-    | North_east -> Dir.(dir = North || dir = East)
-    | North_west -> Dir.(dir = North || dir = West)
-    | South_west -> Dir.(dir = South || dir = West)
-    | South_east -> Dir.(dir = South || dir = East)
+    | Up_Down -> Dir.(dir = Up || dir = Down)
+    | Right_Left -> Dir.(dir = Right || dir = Left)
+    | Up_Right -> Dir.(dir = Up || dir = Right)
+    | Up_Left -> Dir.(dir = Up || dir = Left)
+    | Down_Left -> Dir.(dir = Down || dir = Left)
+    | Down_Right -> Dir.(dir = Down || dir = Right)
 
   let of_char_opt = function '.' -> None | c -> Some (of_char c)
 end
@@ -63,14 +50,14 @@ end = struct
     | Some pipe ->
         List.filter_map
           (fun dir ->
-            let next_pos = Dir.add_pos dir pos in
+            let next_pos = Pos.add pos Dir.(to_pos dir) in
             match get pipes next_pos with
             | Some next_pipe ->
                 if Pipe.has_conn pipe dir && Pipe.has_conn next_pipe (Dir.neg dir) then
                   Some next_pos
                 else None
             | None -> None)
-          Dir.[ North; East; South; West ]
+          Dir.[ Up; Right; Down; Left ]
     | None -> []
 
   (* TODO *)

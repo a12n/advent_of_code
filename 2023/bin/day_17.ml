@@ -3,71 +3,70 @@ open Advent
 module Grid : sig
   type t
 
-  val min_path : t -> int
   val of_lines : string Seq.t -> t
+  val path : t -> Pos.t -> Pos.t -> (int * Pos.t list) option
+  val pp : ?path:Pos.t list -> Format.formatter -> t -> unit
   val size : t -> int * int
-  val distances : t -> int * int -> (int * (int * int)) array array
 end = struct
   type t = int array array
 
-  let get a (row, col) = a.(row).(col)
-  let set a (row, col) value = a.(row).(col) <- value
+  let size = Array.matrix_size
+  let ( .@[] ) a (row, col) = a.(row).(col)
+  let ( .@[]<- ) a (row, col) value = a.(row).(col) <- value
 
-  let distances grid start =
-    let ( let* ) = Option.bind in
-    let n_rows, n_cols = Array.matrix_size grid in
-    let max_row, max_col = (n_rows - 1, n_cols - 1) in
-    let validate = function
-      | row, col when row < 0 || col < 0 -> None
-      | row, col when row > max_row || col > max_col -> None
-      | row, col -> Some (row, col)
-    in
-    let cells = Array.make_matrix n_rows n_cols (max_int, (0, 0)) in
+  let path grid src dest =
+    let ((n_rows, n_cols) as size) = Array.matrix_size grid in
+    if not Pos.(is_valid size src && is_valid size dest) then
+      invalid_arg (__FUNCTION__ ^ ": invalid src or dest");
+    let dist = Array.make_matrix n_rows n_cols max_int in
+    let prev = Array.make_matrix n_rows n_cols None in
     let queue = Queue.create () in
-    set cells start (0, (0,0));
-    Queue.add start queue;
-    while not (Queue.is_empty queue) do
-      let pos = Queue.take queue in
-      [ (-1, 0); (0, -1); (1, 0); (0, 1) ]
-      |> List.filter_map (fun off ->
-             let* pos' = validate (Pos.add pos off) in
-             Some (pos', off))
-      |> List.filter_map (fun (pos', off) ->
-          Queue.add pos' queue;
-          let ((dist, _) as cell') = get cells pos' in
-          if dist < max_int then Some (cell', pos', off) else None
-        )
-      |> List.iter (fun (cell', pos', off) ->
-          let (dist', off') = get cells pos' in
-          (* TODO *)
-          ignore (off, (row', col')))
-    done;
-    cells
+    dist.@[src] <- 0;
+    Queue.add src queue;
+    let rec loop () =
+      match Queue.take_opt queue with
+      | None -> ()
+      | Some cur when cur = dest -> ()
+      | Some cur ->
+          Printf.eprintf "cur (%d, %d)\n%!" (fst cur) (snd cur);
+          List.map (Pos.add cur) [ (-1, 0); (0, -1); (1, 0); (0, 1) ]
+          |> List.filter (Pos.is_valid size)
+          |> List.iter (fun next ->
+                 let alt = dist.@[cur] + grid.@[next] in
+                 Printf.printf "next (%d, %d), dist %d, alt %d\n%!" (fst next) (snd next)
+                   dist.@[next] alt;
+                 if alt < dist.@[next] then (
+                   dist.@[next] <- alt;
+                   prev.@[next] <- Some (Pos.sub cur next);
+                   Queue.add next queue));
+          loop ()
+    in
+    loop ();
+    if dist.@[dest] <> max_int then
+      let rec backtrack path cur =
+        match prev.@[cur] with
+        | None -> path
+        | Some offset -> backtrack (cur :: path) Pos.(add cur offset)
+      in
+      Some (dist.@[dest], backtrack [] dest)
+    else None
 
   let of_lines =
     let digit c = int_of_char c - int_of_char '0' in
     Array.of_seq % Seq.map (Array.of_seq % Seq.map digit % String.to_seq)
 
-  let size = Array.matrix_size
-
-  let min_path grid =
-    let n_rows, n_cols = size grid in
-    (* let valid (row, col) = row >= 0 && row < n_rows && col >= 0 && col < n_cols in *)
-    let cells = Array.make_matrix n_rows n_cols None in
-    cells.(0).(0) <- Some (0, (0, 0));
-    for row = 0 to n_rows - 1 do
-      for col = 0 to n_cols - 1 do
-        List.iter
-          (fun off ->
-            (* Get other position. *)
-            (* Is it inside the grid? *)
-            (* Is there some state in other position? *)
-            (* Is not (offset = other offset = other other offset = other other other offset)? *)
-            (* Is this none or other is better? Then update this distance. *)
-            (* TODO *)
-            ignore off)
-          [ (0, -1); (-1, 0); (1, 0); (0, 1) ]
-      done
-    done;
-    Option.(get (map fst cells.(n_rows - 1).(n_cols - 1)))
+  let pp ?(path = []) fmt grid =
+    Array.iteri
+      (fun row line ->
+        Array.iteri
+          (fun col heat ->
+            if List.mem (row, col) path then (
+              Format.(
+                pp_print_string fmt "\x1b[32m";
+                pp_print_int fmt heat;
+                pp_print_string fmt "\x1b[0m"))
+            else Format.(pp_print_int fmt heat))
+          line;
+        Format.pp_print_newline fmt ())
+      grid
 end

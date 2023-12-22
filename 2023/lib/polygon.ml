@@ -107,18 +107,17 @@ let boundary_area points =
 
 (** Gauss's area formula adjusted for integer 2D grids. Polygon is a
     list of points on a grid (the input) connected with implicit lines. *)
-let interior_area ps =
-  let ls = Line.list_of_polygon ps in
-  if not (List.for_all Line.is_aligned ls) then
+let interior_area points =
+  let lines = Line.list_of_polygon points in
+  if not (List.for_all Line.is_aligned lines) then
     invalid_arg (__FUNCTION__ ^ ": all lines must be axis-aligned");
-  (* TODO: Compensate for excesive area in lines and joints. *)
-  let a = Int.abs List.(fold_left ( + ) 0 (map Line.shoelace ls)) / 2 in
-  let a_js = Joint.list_of_polygon ps |> List.map Joint.part_area |> List.reduce ( + ) in
-  let a_ls = ls |> List.map Line.part_area |> List.reduce ( + ) in
+  let area = Int.abs List.(fold_left ( + ) 0 (map Line.shoelace lines)) / 2 in
+  let joints_area = Joint.list_of_polygon points |> List.map Joint.part_area |> List.reduce ( + ) in
+  let lines_area = lines |> List.map Line.part_area |> List.reduce ( + ) in
   (* XXX: Joint.part_area and Line.part_area are for CCW. Puzzle is in
      CW. Add instead of subtract to get the full area including border
      points. *)
-  ((100 * a) + a_js + a_ls) / 100
+  ((100 * area) + joints_area + lines_area) / 100
 
 let test_1_1 = [ (1, 1); (4, 1); (4, 4); (1, 4) ]
 let test_1_2 = [ (1, 1); (1, 4); (4, 4); (4, 1) ]

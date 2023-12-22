@@ -47,8 +47,7 @@ module Grid : sig
 end = struct
   type t = Pipe.t option array array
 
-  let size pipes =
-    Array.(match length pipes with 0 -> (0, 0) | n -> (n, length (unsafe_get pipes 0)))
+  let size = Array.matrix_size
 
   let start pipes =
     Array.(

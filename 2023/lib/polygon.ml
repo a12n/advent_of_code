@@ -9,6 +9,10 @@ module Line = struct
         loop (p0 :: p1 :: ps)
     | [ _ ] | [] -> []
 
+  let is_horiz_aligned ((_, y1), (_, y2)) = y1 = y2
+  let is_vert_aligned ((x1, _), (x2, _)) = x1 = x2
+  let is_aligned l = is_horiz_aligned l || is_vert_aligned l
+
   let shoelace ((x1, y1), (x2, y2)) =
     (* Triangle formula, for a point and the next point. *)
     (x1 * y2) - (x2 * y1)
@@ -36,11 +40,8 @@ end
     list of points on a grid (the input) connected with implicit lines. *)
 let area ps =
   let ls = Line.list_of_polygon ps in
-  List.iter
-    (fun (pi, pj) ->
-      if not Pos.(is_horiz_aligned pi pj || is_vert_aligned pi pj) then
-        invalid_arg (__FUNCTION__ ^ ": all lines must be axis-aligned"))
-    ls;
+  if not (List.for_all Line.is_aligned ls) then
+    invalid_arg (__FUNCTION__ ^ ": all lines must be axis-aligned");
   (* TODO: Compensate for excesive area in lines and joints. *)
   Int.abs List.(fold_left ( + ) 0 (map Line.shoelace ls)) / 2
 

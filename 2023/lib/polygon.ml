@@ -19,42 +19,21 @@ let joints = function
       loop (p0 :: p1 :: p2 :: ps)
   | [ _; _ ] | [ _ ] | [] -> []
 
+let shoelace ((xi, yi), (xj, yj)) =
+  (* Triangle formula, for a point and the next point. *)
+  (xi * yj) - (xj * yi)
+
 (** Gauss's area formula adjusted for integer 2D grids. Polygon is a
     list of points on a grid (the input) connected with implicit lines. *)
-let area =
-  let check_aligned p0 p1 =
-    (* All lines in a polygon must be axis-aligned. *)
-    if not (Pos.is_aligned p0 p1) then invalid_arg __FUNCTION__
-  in
-  let shoelace (ri, ci) (rj, cj) =
-    (* Triangle formula, for a point and the next point. *)
-    (ci * rj) - (cj * ri)
-  in
-  function
-  | p0 :: p1 :: ps ->
-      (* TODO: adjust for excessive area. Compute area in 1/100's,
-         take into account 1/2 (on sides), 1/4 and 3/4 (external and
-         internal angles). *)
-      (* 1. Iterate over pairs of points, compute are with shoelace.
-         2. Iterate over pairs of lines (triples of points), adjust area (exterior and inside angles). *)
-      let rec do_area total i = function
-        | pi :: pj :: ps ->
-            check_aligned pi pj;
-            let part = shoelace pi pj in
-            Printf.eprintf "p%d (%d, %d) × p%d (%d, %d) = %d\n%!" i (fst pi) (snd pi) (i + 1)
-              (fst pj) (snd pj) part;
-            do_area (total + part) (i + 1) (pj :: ps)
-        | [ pi ] ->
-            check_aligned pi p0;
-            let part = shoelace pi p0 in
-            Printf.eprintf "p%d (%d, %d) × p%d (%d, %d) = %d\n%!" i (fst pi) (snd pi) 0 (fst p0)
-              (snd p0) part;
-            total + part
-        | [] -> assert false
-      in
-      let total = do_area 0 0 (p0 :: p1 :: ps) in
-      Int.abs total / 2
-  | [ _ ] | [] -> 0
+let area ps =
+  let ls = lines ps in
+  List.iter
+    (fun (pi, pj) ->
+      (* All lines in a polygon must be axis-aligned. *)
+      if not Pos.(is_horiz_aligned pi pj || is_vert_aligned pi pj) then invalid_arg __FUNCTION__)
+    ls;
+  (* TODO: Compensate for excesive area in lines and joints. *)
+  Int.abs List.(fold_left ( + ) 0 (map shoelace ls)) / 2
 
 let straight_joint (r0, c0) (r1, c1) (r2, c2) = (r0 = r1 && r1 = r2) || (c0 = c1 && c1 = c2)
 

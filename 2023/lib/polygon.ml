@@ -95,10 +95,7 @@ module Joint = struct
 end
 
 let rec compact = function
-  | (x0, y0) :: (x1, y1) :: (x2, y2) :: ps ->
-      (* TODO: If aligned, remove the middle point. *)
-      ignore ((x0, y0), (x1, y1), (x2, y2), ps);
-      []
+  | p0 :: p1 :: p2 :: ps when Joint.is_forward (p0, p1, p2) -> compact (p0 :: p2 :: ps)
   | p0 :: ps -> p0 :: compact ps
   | [] -> []
 

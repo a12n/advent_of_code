@@ -56,6 +56,15 @@ module Joint = struct
         loop (p0 :: p1 :: p2 :: ps)
     | [ _; _ ] | [ _ ] | [] -> []
 
+  let rec list_to_polygon = function
+    (*
+       [p0,p1,p2; p1,p2,p3; p2,p3,p0; p3,p0,p1]
+*)
+    (* TODO *)
+    | [ (pi, pj, _); (_, _, _) ] -> [ pi; pj ]
+    | (pi, _, _) :: ts -> pi :: list_to_polygon ts
+    | [] -> []
+
   let is_horiz_aligned ((_, y1), (_, y2), (_, y3)) = y1 = y2 && y2 = y3
   let is_vert_aligned ((x1, _), (x2, _), (x3, _)) = x1 = x2 && x2 = x3
 
@@ -97,10 +106,11 @@ module Joint = struct
     else invalid_arg __FUNCTION__
 end
 
-let rec compact = function
-  | p0 :: p1 :: p2 :: ps when Joint.is_forward (p0, p1, p2) -> compact (p0 :: p2 :: ps)
-  | p0 :: ps -> p0 :: compact ps
-  | [] -> []
+let compact points =
+  (* TODO *)
+  Joint.list_of_polygon points
+  |> List.filter (fun t -> not (Joint.is_forward t))
+  |> Joint.list_to_polygon
 
 let boundary_area points =
   let lines = Line.list_of_polygon points in

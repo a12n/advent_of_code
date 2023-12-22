@@ -55,6 +55,7 @@ module Joint : sig
   val pp : ?i:int -> Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
 end
 
+(* TODO: rename *)
 val compact : (int * int) list -> (int * int) list
 
 val boundary_area : (int * int) list -> int

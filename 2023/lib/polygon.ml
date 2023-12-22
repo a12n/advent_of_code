@@ -91,6 +91,7 @@ module Joint = struct
     || (x1 < x2 && y1 = y2 && x2 = x3 && y2 > y3)
 
   let part_area j =
+    (* TODO: is_forward, is_backward *)
     if is_internal_angle j then 25 else if is_external_angle j then 75 else invalid_arg __FUNCTION__
 end
 

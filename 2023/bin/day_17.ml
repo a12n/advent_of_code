@@ -51,6 +51,11 @@ end = struct
           loop ()
     in
     loop ();
+    Array.iter
+      (fun line ->
+        Array.iter (Format.fprintf Format.err_formatter " %3d") line;
+        Format.pp_print_newline Format.err_formatter ())
+      dist;
     if dist.@[dest] <> max_int then
       let rec backtrack path cur =
         match prev.@[cur] with

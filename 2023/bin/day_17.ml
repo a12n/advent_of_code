@@ -33,11 +33,12 @@ end = struct
           |> List.filter (Pos.is_valid size)
           |> List.iter (fun next ->
                  let alt = dist.@[cur] + grid.@[next] in
+                 let dir = Pos.sub cur next in
                  Printf.printf "next (%d, %d), dist %d, alt %d\n%!" (fst next) (snd next)
                    dist.@[next] alt;
                  if alt < dist.@[next] then (
                    dist.@[next] <- alt;
-                   prev.@[next] <- Some (Pos.sub cur next);
+                   prev.@[next] <- Some dir;
                    Queue.add next queue));
           loop ()
     in
@@ -46,7 +47,7 @@ end = struct
       let rec backtrack path cur =
         match prev.@[cur] with
         | None -> path
-        | Some offset -> backtrack (cur :: path) Pos.(add cur offset)
+        | Some dir -> backtrack (cur :: path) Pos.(add cur dir)
       in
       Some (dist.@[dest], backtrack [] dest)
     else None

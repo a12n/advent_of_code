@@ -8,6 +8,10 @@ module Line = struct
         in
         loop (p0 :: p1 :: ps)
     | [ _ ] | [] -> []
+
+  let shoelace ((xi, yi), (xj, yj)) =
+    (* Triangle formula, for a point and the next point. *)
+    (xi * yj) - (xj * yi)
 end
 
 module Joint = struct
@@ -28,10 +32,6 @@ module Joint = struct
     is_horiz_aligned j && ((x1 < x2 && x2 < x3) || (x1 > x2 && x2 > x3))
 end
 
-let shoelace ((xi, yi), (xj, yj)) =
-  (* Triangle formula, for a point and the next point. *)
-  (xi * yj) - (xj * yi)
-
 (** Gauss's area formula adjusted for integer 2D grids. Polygon is a
     list of points on a grid (the input) connected with implicit lines. *)
 let area ps =
@@ -42,7 +42,7 @@ let area ps =
         invalid_arg (__FUNCTION__ ^ ": all lines must be axis-aligned"))
     ls;
   (* TODO: Compensate for excesive area in lines and joints. *)
-  Int.abs List.(fold_left ( + ) 0 (map shoelace ls)) / 2
+  Int.abs List.(fold_left ( + ) 0 (map Line.shoelace ls)) / 2
 
 let straight_joint (r0, c0) (r1, c1) (r2, c2) = (r0 = r1 && r1 = r2) || (c0 = c1 && c1 = c2)
 

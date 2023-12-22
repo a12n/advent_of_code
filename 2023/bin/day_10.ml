@@ -23,7 +23,7 @@ module Pipe = struct
     | Down_Left -> Dir.(dir = Down || dir = Left)
     | Down_Right -> Dir.(dir = Down || dir = Right)
 
-  let of_char_opt = function '.' -> None | c -> Some (of_char c)
+  let opt_of_char = function '.' -> None | c -> Some (of_char c)
 end
 
 module Grid : sig
@@ -79,5 +79,5 @@ end = struct
     | c0 :: cs ->
         Some (List.fold_left (fun max c -> if List.compare_lengths c max > 0 then c else max) c0 cs)
 
-  let of_lines = Array.of_seq % Seq.map (Array.of_seq % Seq.map Pipe.of_char_opt % String.to_seq)
+  let of_lines = Array.of_seq % Seq.map (Array.of_seq % Seq.map Pipe.opt_of_char % String.to_seq)
 end

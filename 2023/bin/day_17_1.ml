@@ -3,5 +3,7 @@ open Day_17
 
 let () =
   let grid = Grid.of_lines (input_lines stdin) in
-  let heat_loss = Grid.min_path grid in
-  print_endline (string_of_int heat_loss)
+  let n_rows, n_cols = Grid.size grid in
+  let loss, path = Option.get (Grid.path grid (0, 0) (n_rows - 1, n_cols - 1)) in
+  Grid.pp ~path Format.err_formatter grid;
+  print_endline (string_of_int loss)

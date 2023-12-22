@@ -1,23 +1,32 @@
-let lines = function
-  | p0 :: p1 :: ps ->
-      let rec loop = function
-        | pi :: pj :: ps -> (pi, pj) :: loop (pj :: ps)
-        | [ pi ] -> [ (pi, p0) ]
-        | [] -> failwith __FUNCTION__
-      in
-      loop (p0 :: p1 :: ps)
-  | [ _ ] | [] -> []
+module Line = struct
+  let list_of_polygon = function
+    | p0 :: p1 :: ps ->
+        let rec loop = function
+          | pi :: pj :: ps -> (pi, pj) :: loop (pj :: ps)
+          | [ pi ] -> [ (pi, p0) ]
+          | [] -> failwith __FUNCTION__
+        in
+        loop (p0 :: p1 :: ps)
+    | [ _ ] | [] -> []
+end
 
-let joints = function
-  | p0 :: p1 :: p2 :: ps ->
-      let rec loop = function
-        | pi :: pj :: pk :: ps -> (pi, pj, pk) :: loop (pj :: pk :: ps)
-        | [ pi; pj ] -> (pi, pj, p0) :: loop [ pj ]
-        | [ pi ] -> [ (pi, p0, p1) ]
-        | [] -> failwith __FUNCTION__
-      in
-      loop (p0 :: p1 :: p2 :: ps)
-  | [ _; _ ] | [ _ ] | [] -> []
+module Joint = struct
+  let list_of_polygon = function
+    | p0 :: p1 :: p2 :: ps ->
+        let rec loop = function
+          | pi :: pj :: pk :: ps -> (pi, pj, pk) :: loop (pj :: pk :: ps)
+          | [ pi; pj ] -> (pi, pj, p0) :: loop [ pj ]
+          | [ pi ] -> [ (pi, p0, p1) ]
+          | [] -> failwith __FUNCTION__
+        in
+        loop (p0 :: p1 :: p2 :: ps)
+    | [ _; _ ] | [ _ ] | [] -> []
+
+  let is_horiz_aligned ((_, y1), (_, y2), (_, y3)) = y1 = y2 && y2 = y3
+
+  let is_horiz_forward (((x1, _), (x2, _), (x3, _)) as j) =
+    is_horiz_aligned j && ((x1 < x2 && x2 < x3) || (x1 > x2 && x2 > x3))
+end
 
 let shoelace ((xi, yi), (xj, yj)) =
   (* Triangle formula, for a point and the next point. *)
@@ -26,7 +35,7 @@ let shoelace ((xi, yi), (xj, yj)) =
 (** Gauss's area formula adjusted for integer 2D grids. Polygon is a
     list of points on a grid (the input) connected with implicit lines. *)
 let area ps =
-  let ls = lines ps in
+  let ls = Line.list_of_polygon ps in
   List.iter
     (fun (pi, pj) ->
       if not Pos.(is_horiz_aligned pi pj || is_vert_aligned pi pj) then

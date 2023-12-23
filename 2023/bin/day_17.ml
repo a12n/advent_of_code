@@ -56,12 +56,8 @@ end = struct
         for col = 0 to n_cols - 1 do
           let dir =
             match prev.(row).(col) with
-            | Some (-1, 0) -> "↑"
-            | Some (0, -1) -> "←"
-            | Some (1, 0) -> "↓"
-            | Some (0, 1) -> "→"
             | Some (0, 0) | None -> "."
-            | _ -> "X"
+            | Some v -> Dir.(to_string (of_pos v))
           in
           fprintf err_formatter " [%s %1d %3d]" dir grid.(row).(col) dist.(row).(col)
         done;

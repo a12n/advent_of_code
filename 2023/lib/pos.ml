@@ -1,4 +1,6 @@
 type t = int * int
+(** Position in a 2D grid. [(0, 0)] is the top-left corner and
+    [(n_rows - 1, n_cols - 1)] is the bottom-right corner. *)
 
 let add (row1, col1) (row2, col2) = (row1 + row2, col1 + col2)
 let mul_int (row, col) n = (row * n, col * n)

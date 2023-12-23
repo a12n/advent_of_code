@@ -18,33 +18,21 @@ module Rule = struct
   type t = Part.t -> (string, bool) result option
 
   let of_string s =
+    let action_of_string = function "A" -> Error true | "R" -> Error false | name -> Ok name in
+    let pred_of_char = function
+      | '<' -> Stdlib.( < )
+      | '>' -> Stdlib.( > )
+      | _ -> invalid_arg __FUNCTION__
+    in
     match String.split_on_char ':' s |> List.filter (( <> ) "") with
-    | [ "A" ] -> fun _ -> Some (Error true)
-    | [ "R" ] -> fun _ -> Some (Error false)
-    | [ action ] -> fun _ -> Some (Ok action)
-    | [ cond; action ] -> (
-        let pred, prop, value =
-          match String.split_on_char '<' cond with
-          | [ prop; value ] -> (Stdlib.( < ), prop, value)
-          | [ cond ] -> (
-              match String.split_on_char '>' cond with
-              | [ prop; value ] -> (Stdlib.( > ), prop, value)
-              | _ -> invalid_arg (__FUNCTION__ ^ ": \"" ^ cond ^ "\""))
-          | _ -> invalid_arg __FUNCTION__
-        in
-        let prop =
-          match prop with
-          | "x" -> fun Part.{ x; _ } -> x
-          | "m" -> fun Part.{ m; _ } -> m
-          | "a" -> fun Part.{ a; _ } -> a
-          | "s" -> fun Part.{ s; _ } -> s
-          | _ -> invalid_arg __FUNCTION__
-        in
-        let value = int_of_string value in
-        let pred p = pred (prop p) value in
-        match action with
-        | "A" -> fun p -> if pred p then Some (Error true) else None
-        | "R" -> fun p -> if pred p then Some (Error false) else None
-        | name -> fun p -> if pred p then Some (Ok name) else None)
+    | [ action ] ->
+        let action = action_of_string action in
+        fun _ -> Some action
+    | [ cond; action ] ->
+        let get = Part.get cond.[0] in
+        let pred = pred_of_char cond.[1] in
+        let value = int_of_string String.(sub cond 2 (length cond - 2)) in
+        let action = action_of_string action in
+        fun p -> if pred (get p) value then Some action else None
     | _ -> invalid_arg __FUNCTION__
 end

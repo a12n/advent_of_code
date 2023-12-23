@@ -36,3 +36,36 @@ module Rule = struct
         fun p -> if pred (get p) value then Some action else None
     | _ -> invalid_arg __FUNCTION__
 end
+
+module Workflow = struct
+  type t = Rule.t list
+
+  let eval wf p = List.find_map (fun r -> r p) wf
+  let of_string = List.map Rule.of_string % String.split_on_char ','
+end
+
+module System = struct
+  type t = (string, Workflow.t) Hashtbl.t
+
+  let eval sys =
+    let rec loop id p =
+      match Workflow.eval (Hashtbl.find sys id) p with
+      | Some (Ok id') -> loop id' p
+      | Some (Error rejected) -> rejected
+      | _ -> failwith __FUNCTION__
+    in
+    loop "in"
+
+  let of_lines =
+    Seq.fold_left
+      (fun sys line ->
+        (match String.split_on_char '{' line with
+        | [ id; workflow' ] -> (
+            match String.split_on_char '}' workflow' with
+            | [ workflow; "" ] -> Hashtbl.replace sys id (Workflow.of_string workflow)
+            | _ -> invalid_arg __FUNCTION__)
+        | _ -> invalid_arg __FUNCTION__);
+        sys)
+      (Hashtbl.create 100)
+    % Seq.take_while (( <> ) "")
+end

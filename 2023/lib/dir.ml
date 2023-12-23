@@ -8,6 +8,6 @@ let to_string = function Up -> "↑" | Left -> "←" | Down -> "↓" | Right -> 
 let of_pos = function
   | 0, n when n < 0 -> Left
   | 0, n when n > 0 -> Right
-  | n, 0 when n < 0 -> Down
-  | n, 0 when n > 0 -> Up
+  | n, 0 when n < 0 -> Up
+  | n, 0 when n > 0 -> Down
   | _, _ -> invalid_arg __FUNCTION__

@@ -51,11 +51,22 @@ end = struct
           loop ()
     in
     loop ();
-    Array.iter
-      (fun line ->
-        Array.iter (Format.fprintf Format.err_formatter " %3d") line;
-        Format.pp_print_newline Format.err_formatter ())
-      dist;
+    Format.(
+      for row = 0 to n_rows - 1 do
+        for col = 0 to n_cols - 1 do
+          let dir =
+            match prev.(row).(col) with
+            | Some (-1, 0) -> "↑"
+            | Some (0, -1) -> "←"
+            | Some (1, 0) -> "↓"
+            | Some (0, 1) -> "→"
+            | Some (0, 0) | None -> "."
+            | _ -> "X"
+          in
+          fprintf err_formatter " [%s %1d %3d]" dir grid.(row).(col) dist.(row).(col)
+        done;
+        pp_print_newline err_formatter ()
+      done);
     if dist.@[dest] <> max_int then
       let rec backtrack path cur =
         match prev.@[cur] with

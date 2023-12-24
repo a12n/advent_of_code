@@ -1,5 +1,6 @@
 module Part = struct
   type t = { x : int; m : int; a : int; s : int }
+  and part = t
 
   let get = function
     | 'x' -> fun { x; _ } -> x
@@ -12,6 +13,8 @@ module Part = struct
   let of_string s = Scanf.sscanf s "{x=%d,m=%d,a=%d,s=%d}" (fun x m a s -> { x; m; a; s })
 
   module Range = struct
+    type t = part * part
+
     let full = ({ x = 1; m = 1; a = 1; s = 1 }, { x = 4000; m = 4000; a = 4000; s = 4000 })
 
     let merge (min1, max1) (min2, max2) =

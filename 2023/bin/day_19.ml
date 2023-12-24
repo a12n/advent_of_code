@@ -9,6 +9,13 @@ module Part = struct
     | 's' -> fun { s; _ } -> s
     | _ -> invalid_arg __FUNCTION__
 
+  let set = function
+    | 'x' -> fun p x -> { p with x }
+    | 'm' -> fun p m -> { p with m }
+    | 'a' -> fun p a -> { p with a }
+    | 's' -> fun p s -> { p with s }
+    | _ -> invalid_arg __FUNCTION__
+
   let rating { x; m; a; s } = x + m + a + s
   let of_string s = Scanf.sscanf s "{x=%d,m=%d,a=%d,s=%d}" (fun x m a s -> { x; m; a; s })
 

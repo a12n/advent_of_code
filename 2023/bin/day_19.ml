@@ -67,6 +67,42 @@ module Part = struct
       }
 
     let cardinal { x; m; a; s } = Int_Set.(cardinal x * cardinal m * cardinal a * cardinal s)
+
+    let pp_set fmt set =
+      Format.pp_print_char fmt '{';
+      let prev =
+        Int_Set.fold
+          (fun elt prev ->
+            match (prev, elt) with
+            | 0, elt ->
+                Format.(
+                  pp_print_space fmt ();
+                  pp_print_int fmt elt);
+                elt
+            | prev, elt when elt = prev + 1 -> elt
+            | _, elt ->
+                Format.(
+                  pp_print_string fmt "…";
+                  pp_print_int fmt elt);
+                0)
+          set 0
+      in
+      if prev <> 0 then (
+        Format.(
+          pp_print_string fmt "…";
+          pp_print_int fmt prev));
+      Format.pp_print_string fmt " }"
+
+    let pp fmt { x; m; a; s } =
+      Format.(
+        pp_print_string fmt "x ";
+        pp_set fmt x;
+        pp_print_string fmt " m ";
+        pp_set fmt m;
+        pp_print_string fmt " a ";
+        pp_set fmt a;
+        pp_print_string fmt " s ";
+        pp_set fmt s)
   end
 
   module Range = struct
@@ -74,7 +110,6 @@ module Part = struct
 
     let empty = ({ x = 1; m = 1; a = 1; s = 1 }, { x = 0; m = 0; a = 0; s = 0 })
     let full = ({ x = 1; m = 1; a = 1; s = 1 }, { x = 4000; m = 4000; a = 4000; s = 4000 })
-
     let inter (min1, max1) (min2, max2) = (map2_max min1 min2, map2_min max1 max2)
   end
 end

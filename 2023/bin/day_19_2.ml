@@ -107,13 +107,20 @@ end = struct
   type t = (string, Workflow.t2) Hashtbl.t
 
   let eval sys =
+    ignore Workflow.eval;
     let rec loop id parts =
       let send, accept = Workflow.eval2 (Hashtbl.find sys id) parts in
+      Format.(
+        fprintf err_formatter "eval \"%s\" " id;
+        Part.Set.pp err_formatter parts;
+        pp_print_newline err_formatter ()
+      );
       List.fold_left (fun accept (id, parts) ->
           Part.Set.union accept (loop id parts)) accept send in
     loop "in" Part.Set.full
 
   let of_lines =
+    ignore Workflow.of_string;
     Seq.fold_left
       (fun sys line ->
         (match String.split_on_char '{' line with

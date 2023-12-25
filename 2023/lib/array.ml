@@ -9,7 +9,11 @@ let fold_left2 f acc a b =
   done;
   !r
 
-let equal eq a b = length a = length b && for_all2 eq a b
+let equal ?(dist = 0) eq a b =
+  if dist = 0 then length a = length b && for_all2 eq a b
+  else if dist > 0 then
+    fold_left2 (fun dist ai bi -> if eq ai bi then dist else dist - 1) dist a b >= 0
+  else invalid_arg __FUNCTION__
 
 let fold_lefti f acc a =
   let r = ref acc in

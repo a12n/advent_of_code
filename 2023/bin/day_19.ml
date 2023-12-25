@@ -103,14 +103,16 @@ module Part = struct
 
     let pp fmt { x; m; a; s } =
       Format.(
-        pp_print_string fmt "x ";
+        pp_print_string fmt "{";
         pp_set fmt x;
-        pp_print_string fmt " m ";
+        pp_print_string fmt "; ";
         pp_set fmt m;
-        pp_print_string fmt " a ";
+        pp_print_string fmt "; ";
         pp_set fmt a;
-        pp_print_string fmt " s ";
-        pp_set fmt s)
+        pp_print_string fmt "; ";
+        pp_set fmt s;
+        pp_print_string fmt "} ";
+        pp_print_int fmt (cardinal { x; m; a; s }))
   end
 
   module Range = struct

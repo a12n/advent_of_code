@@ -4,7 +4,6 @@ let find_index ?(pos = 0) ?len s pred =
   let n = length s in
   if pos < 0 || pos >= n then invalid_arg __FUNCTION__;
   let len = match len with Some len -> len | None -> n - pos in
-  if len < 0 || len - pos > n then invalid_arg __FUNCTION__;
   let rec loop pos len =
     if len = 0 then None else if pred (get s pos) then Some pos else loop (pos + 1) (len - 1)
   in

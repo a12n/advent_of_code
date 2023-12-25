@@ -17,9 +17,24 @@ end = struct
   type t = bool option list * int list
 
   let arrangements (springs, numbers) =
-    let rec loop = function (* TODO *)
-      | _, _, _ -> 0 in
-    loop (springs, None, numbers)
+    let h = Hashtbl.create 1000 in
+    let rec lookup key =
+      try Hashtbl.find h key
+      with Not_found ->
+        let value = loop key in
+        Hashtbl.replace h key value;
+        value
+    and loop = function
+      | [], None, [] -> 1
+      | [], Some 0, [] -> 1
+      | Some false :: ss, None, n :: ns -> lookup (Some false :: ss, Some n, ns)
+      | Some false :: ss, Some n, ns when n > 0 -> lookup (ss, Some (n - 1), ns)
+      | Some true :: ss, Some 0, ns -> lookup (ss, None, ns)
+      | Some true :: ss, None, ns -> lookup (ss, None, ns)
+      | None :: ss, n, ns -> lookup (Some false :: ss, n, ns) + lookup (Some true :: ss, n, ns)
+      | _, _, _ -> 0
+    in
+    lookup (springs, None, numbers)
 
   let of_string s =
     match String.split_on_char ' ' s |> List.map String.trim |> List.filter (( <> ) "") with

@@ -84,7 +84,7 @@ module Part = struct
             match (prev, elt) with
             | 0, elt ->
                 Format.(
-                  pp_print_space fmt ();
+                  pp_print_char fmt ' ';
                   pp_print_int fmt elt);
                 elt
             | prev, elt when elt = prev + 1 -> elt

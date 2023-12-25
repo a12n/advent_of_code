@@ -124,4 +124,6 @@ let interior_area points =
   let area = Int.abs List.(fold_left ( + ) 0 (map Line.shoelace lines)) / 2 in
   let joints_area = Joint.list_of_polygon points |> List.map Joint.part_area |> List.reduce ( + ) in
   let lines_area = lines |> List.map Line.part_area |> List.reduce ( + ) in
+  (* FIXME: invalid joints_area, invalid is_internal_angle/is_external_angle. *)
+  Printf.eprintf "area %d, joints_area %d, lines_area %d\n%!" (100 * area) joints_area lines_area;
   ((100 * area) - joints_area - lines_area) / 100

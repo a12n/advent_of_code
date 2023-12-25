@@ -1,6 +1,7 @@
 include module type of Stdlib.Array
 
 val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+val fold_left2 : ('acc -> 'a -> 'b -> 'acc) -> 'acc -> 'a t -> 'b t -> 'acc
 val fold_lefti : ('acc -> int -> 'a -> 'acc) -> 'acc -> 'a t -> 'acc
 val matrix_size : 'a t t -> int * int
 val reduce : ('a -> 'a -> 'a) -> 'a t -> 'a

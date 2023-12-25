@@ -1,5 +1,14 @@
 include Stdlib.Array
 
+let fold_left2 f acc a b =
+  let n = length a in
+  if length b <> n then invalid_arg __FUNCTION__;
+  let r = ref acc in
+  for i = 0 to n - 1 do
+    r := f !r (unsafe_get a i) (unsafe_get b i)
+  done;
+  !r
+
 let equal eq a b = length a = length b && for_all2 eq a b
 
 let fold_lefti f acc a =

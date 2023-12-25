@@ -132,7 +132,6 @@ end = struct
         (fun accept (id, parts) -> Part.Set.union accept (eval sys id parts))
         accept send
     in
-    let accept = Part.Set.diff accept reject in
     Format.(
       fprintf err_formatter "accept after \"%s\": " id;
       Part.Set.pp err_formatter accept;

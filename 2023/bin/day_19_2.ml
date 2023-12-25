@@ -111,9 +111,28 @@ end = struct
   let rec eval sys id parts =
     ignore Workflow.eval;
     let send, accept = Workflow.eval2 (Hashtbl.find sys id) parts in
-    List.fold_left
-      (fun accept (id, parts) -> Part.Set.union accept (eval sys id parts))
-      accept send
+    Format.(
+      fprintf err_formatter "eval \"%s\": " id;
+      Part.Set.pp err_formatter parts;
+      pp_print_string err_formatter " ->\n";
+      List.iter (fun (id, parts) ->
+          fprintf err_formatter "- send \"%s\" " id;
+          Part.Set.pp err_formatter parts;
+          pp_print_newline err_formatter ()
+        ) send;
+      pp_print_string err_formatter "- accept ";
+      Part.Set.pp err_formatter accept;
+      pp_print_newline err_formatter ());
+    let ans =
+      List.fold_left
+        (fun accept (id, parts) -> Part.Set.union accept (eval sys id parts))
+        accept send
+    in
+    Format.(
+      fprintf err_formatter "accept after \"%s\": " id;
+      Part.Set.pp err_formatter ans;
+      pp_print_newline err_formatter ());
+    ans
 
   let of_lines =
     ignore Workflow.of_string;

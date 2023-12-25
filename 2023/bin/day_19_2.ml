@@ -103,7 +103,7 @@ module System : sig
   type t
 
   (* Returns accepted part range. *)
-  val eval : t -> string -> Part.Set.t -> Part.Set.t
+  val eval : t -> string -> Part.Set.t -> int
   val of_lines : string Seq.t -> t
 end = struct
   type t = (string, Workflow.t2) Hashtbl.t
@@ -127,14 +127,15 @@ end = struct
       Part.Set.pp err_formatter reject;
       pp_print_newline err_formatter ()
     );
+    let accept = Part.Set.cardinal accept in
     let accept =
       List.fold_left
-        (fun accept (id, parts) -> Part.Set.union accept (eval sys id parts))
+        (fun accept (id, parts) -> accept + (eval sys id parts))
         accept send
     in
     Format.(
       fprintf err_formatter "accept after \"%s\": " id;
-      Part.Set.pp err_formatter accept;
+      pp_print_int err_formatter accept;
       pp_print_newline err_formatter ());
     accept
 
@@ -157,4 +158,4 @@ let () =
   let lines = input_lines stdin in
   let sys = System.of_lines lines in
   let accept = System.eval sys "in" Part.Set.full in
-  print_endline (string_of_int (Part.Set.cardinal accept))
+  print_endline (string_of_int accept)

@@ -66,6 +66,14 @@ module Part = struct
         s = Int_Set.union s1.s s2.s;
       }
 
+    let diff s1 s2 =
+      {
+        x = Int_Set.diff s1.x s2.x;
+        m = Int_Set.diff s1.m s2.m;
+        a = Int_Set.diff s1.a s2.a;
+        s = Int_Set.diff s1.s s2.s;
+      }
+
     let cardinal { x; m; a; s } = Int_Set.(cardinal x * cardinal m * cardinal a * cardinal s)
 
     let pp_set fmt set =

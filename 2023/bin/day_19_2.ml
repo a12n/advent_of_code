@@ -64,7 +64,7 @@ module Workflow : sig
   type t2 = Rule.t2 list
 
   val eval : t -> Part.Range.t -> (string * Part.Range.t) list * Part.Range.t list
-  val eval2 : t2 -> Part.Set.t -> (string * Part.Set.t) list * Part.Set.t
+  val eval2 : t2 -> Part.Set.t -> (string * Part.Set.t) list * Part.Set.t * Part.Set.t
   val of_string : string -> t
   val of_string2 : string -> t2
 end = struct
@@ -84,16 +84,16 @@ end = struct
     (sent, accepted)
 
   let eval2 wf parts =
-    let send, accept, _ =
+    let send, accept, reject, _ =
       List.fold_left
-        (fun (send, accept, parts) rule ->
+        (fun (send, accept, reject, parts) rule ->
           match rule parts with
-          | (`Accept, a), pass -> (send, Part.Set.union accept a, pass)
-          | (`Reject, _), pass -> (send, accept, pass)
-          | (`Send id, s), pass -> ((id, s) :: send, accept, pass))
-        ([], Part.Set.empty, parts) wf
+          | (`Accept, a), pass -> (send, Part.Set.union accept a, reject, pass)
+          | (`Reject, r), pass -> (send, accept, Part.Set.union reject r, pass)
+          | (`Send id, s), pass -> ((id, s) :: send, accept, reject, pass))
+        ([], Part.Set.empty, Part.Set.empty, parts) wf
     in
-    (send, accept)
+    (send, accept, reject)
 
   let of_string = List.map Rule.of_string % String.split_on_char ','
   let of_string2 = List.map Rule.of_string2 % String.split_on_char ','
@@ -110,7 +110,7 @@ end = struct
 
   let rec eval sys id parts =
     ignore Workflow.eval;
-    let send, accept = Workflow.eval2 (Hashtbl.find sys id) parts in
+    let send, accept, reject = Workflow.eval2 (Hashtbl.find sys id) parts in
     Format.(
       fprintf err_formatter "eval \"%s\": " id;
       Part.Set.pp err_formatter parts;
@@ -122,17 +122,22 @@ end = struct
         ) send;
       pp_print_string err_formatter "- accept ";
       Part.Set.pp err_formatter accept;
-      pp_print_newline err_formatter ());
-    let ans =
+      pp_print_newline err_formatter ();
+      pp_print_string err_formatter "- reject ";
+      Part.Set.pp err_formatter reject;
+      pp_print_newline err_formatter ()
+    );
+    let accept =
       List.fold_left
         (fun accept (id, parts) -> Part.Set.union accept (eval sys id parts))
         accept send
     in
+    let accept = Part.Set.diff accept reject in
     Format.(
       fprintf err_formatter "accept after \"%s\": " id;
-      Part.Set.pp err_formatter ans;
+      Part.Set.pp err_formatter accept;
       pp_print_newline err_formatter ());
-    ans
+    accept
 
   let of_lines =
     ignore Workflow.of_string;

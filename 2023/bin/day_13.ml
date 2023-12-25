@@ -11,6 +11,7 @@ module Grid : sig
 
   val of_lines : string Seq.t -> t
   val reflection : t -> [ `Horiz of int | `Vert of int ] option
+  val reflection2 : t -> [ `Horiz of int | `Vert of int ] option
 end = struct
   type t = Note.t array array
 
@@ -25,6 +26,19 @@ end = struct
     | None -> (
         match Array.symmetry (Array.equal ( = )) (Array.transpose notes) with
         | Some k -> Some (`Vert k)
+        | None -> None)
+
+  let reflection2 notes =
+    match Array.symmetry (Array.equal ( = )) notes with
+    | Some _ -> (
+        (* TODO: Allow one mismatch in equal *)
+        match Array.symmetry (Array.equal ( = )) (Array.transpose notes) with
+        | Some k -> Some (`Vert k)
+        | None -> None)
+    | None -> (
+        (* TODO: Allow one mismatch in equal *)
+        match Array.symmetry (Array.equal ( = )) notes with
+        | Some k -> Some (`Horiz k)
         | None -> None)
 end
 

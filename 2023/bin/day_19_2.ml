@@ -93,7 +93,7 @@ end = struct
           | (`Send id, s), pass -> ((id, s) :: send, accept, reject, pass))
         ([], Part.Set.empty, Part.Set.empty, parts) wf
     in
-    (send, accept, reject)
+    (List.rev send, accept, reject)
 
   let of_string = List.map Rule.of_string % String.split_on_char ','
   let of_string2 = List.map Rule.of_string2 % String.split_on_char ','

@@ -97,10 +97,18 @@ module Joint = struct
     else invalid_arg __FUNCTION__
 end
 
-let rec compact = function
-  | p0 :: p1 :: p2 :: ps when Joint.is_forward (p0, p1, p2) -> compact (p0 :: p2 :: ps)
-  | p0 :: ps -> p0 :: compact ps
+let compact = function
   | [] -> []
+  | [ _ ] as points -> points
+  | [ _; _ ] as points -> points
+  | p0 :: p1 :: ps ->
+      let rec loop = function
+        | pi :: pj :: pk :: ps when Joint.is_forward (pi, pj, pk) -> loop (pi :: pk :: ps)
+        | [ pi; pj ] when Joint.is_forward (pi, pj, p0) -> [ pi ]
+        | pi :: ps -> pi :: loop ps
+        | [] -> []
+      in
+      if Joint.is_forward (List.last ps, p0, p1) then loop (p1 :: ps) else loop (p0 :: p1 :: ps)
 
 let boundary_area points =
   let lines = Line.list_of_polygon points in

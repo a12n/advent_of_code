@@ -16,11 +16,10 @@ module Pattern : sig
 end = struct
   type t = bool option list * int list
 
-  let arrangements (springs, pattern) =
-    let rec loop = function
-      (* TODO *)
-      |_,_,_ -> 0 in
-    loop (springs, None, pattern)
+  let arrangements (springs, numbers) =
+    let rec loop = function (* TODO *)
+      | _, _, _ -> 0 in
+    loop (springs, None, numbers)
 
   let of_string s =
     match String.split_on_char ' ' s |> List.map String.trim |> List.filter (( <> ) "") with

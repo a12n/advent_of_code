@@ -1,16 +1,14 @@
 include Stdlib.String
 
-let find_index_from s i pred =
+let find_index ?(pos = 0) ?len s pred =
   let n = length s in
-  let rec loop i = if i = n then raise Not_found else if pred (get s i) then i else loop (i + 1) in
-  loop i
-
-let rfind_index_from s i pred =
-  let rec loop i = if i = -1 then raise Not_found else if pred (get s i) then i else loop (i - 1) in
-  loop i
-
-let find_index s = find_index_from s 0
-let rfind_index s = rfind_index_from s (length s - 1)
+  if pos < 0 || pos >= n then invalid_arg __FUNCTION__;
+  let len = match len with Some len -> len | None -> n - pos in
+  if len < 0 || len - pos > n then invalid_arg __FUNCTION__;
+  let rec loop pos len =
+    if len = 0 then None else if pred (get s pos) then Some pos else loop (pos + 1) (len - 1)
+  in
+  loop pos len
 
 let rec split_on_chars sep s =
   match sep with

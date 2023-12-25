@@ -42,20 +42,20 @@ end = struct
     | [ action ] ->
         let action = action_of_string action in
         fun parts -> ((action, parts), Part.Set.empty)
-    | [ cond; action ] -> (
+    | [ cond; action ] ->
         let get = Part.Set.get cond.[0] in
         let set = Part.Set.set cond.[0] in
         let value = int_of_string String.(sub cond 2 (length cond - 2)) in
         let action = action_of_string action in
         let pred =
           match cond.[1] with
-          | '>' -> (fun n -> n > value)
-          | '<' -> (fun n -> n < value)
-          | _ -> invalid_arg __FUNCTION__ in
+          | '>' -> fun n -> n > value
+          | '<' -> fun n -> n < value
+          | _ -> invalid_arg __FUNCTION__
+        in
         fun parts ->
           let send, pass = Part.Set.Int_Set.partition pred (get parts) in
           ((action, set parts send), set parts pass)
-      )
     | _ -> invalid_arg __FUNCTION__
 end
 
@@ -87,10 +87,12 @@ end = struct
     let send, accept, _ =
       List.fold_left
         (fun (send, accept, parts) rule ->
-           match rule parts with
-           | (`Accept, a), pass -> (send, Part.Set.union accept a, pass)
-           | (`Reject, _), pass -> (send, accept, pass)
-           | (`Send id, s), pass -> ((id,s)::send, accept, pass)) ([], Part.Set.empty, parts) wf in
+          match rule parts with
+          | (`Accept, a), pass -> (send, Part.Set.union accept a, pass)
+          | (`Reject, _), pass -> (send, accept, pass)
+          | (`Send id, s), pass -> ((id, s) :: send, accept, pass))
+        ([], Part.Set.empty, parts) wf
+    in
     (send, accept)
 
   let of_string = List.map Rule.of_string % String.split_on_char ','

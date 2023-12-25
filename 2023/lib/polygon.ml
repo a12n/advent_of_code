@@ -124,7 +124,4 @@ let interior_area points =
   let area = Int.abs List.(fold_left ( + ) 0 (map Line.shoelace lines)) / 2 in
   let joints_area = Joint.list_of_polygon points |> List.map Joint.part_area |> List.reduce ( + ) in
   let lines_area = lines |> List.map Line.part_area |> List.reduce ( + ) in
-  (* XXX: Joint.part_area and Line.part_area are for CCW. Puzzle is in
-     CW. Add instead of subtract to get the full area including border
-     points. *)
-  ((100 * area) + joints_area + lines_area) / 100
+  ((100 * area) - joints_area - lines_area) / 100

@@ -5,10 +5,10 @@ module Quant = struct
 end
 
 module Spring = struct
-  type t = Bad | OK
+  type t = bool
 
-  let of_char = function '.' -> OK | '#' -> Bad | _ -> invalid_arg __FUNCTION__
-  let to_char = function OK -> '.' | Bad -> '#'
+  let of_char = function '.' -> true | '#' -> false | _ -> invalid_arg __FUNCTION__
+  let to_char = function true -> '.' | false -> '#'
   let opt_of_char = function '?' -> None | c -> Some (of_char c)
   let opt_to_char = function None -> '?' | Some s -> to_char s
 end
@@ -25,15 +25,14 @@ end = struct
 
   let rec arrangements =
     let open Quant in
-    let open Spring in
     function
     | [], [] -> 1
     (* Match bad springs. *)
     | elts, N_Bad 0 :: pattern' -> arrangements (elts, pattern')
     | None :: elts', N_Bad n :: pattern' -> arrangements (elts', N_Bad (n - 1) :: pattern')
-    | Some Bad :: elts', N_Bad n :: pattern' -> arrangements (elts', N_Bad (n - 1) :: pattern')
+    | Some false :: elts', N_Bad n :: pattern' -> arrangements (elts', N_Bad (n - 1) :: pattern')
     (* Match one good spring. *)
-    | Some OK :: elts', Some_OK :: pattern' ->
+    | Some true :: elts', Some_OK :: pattern' ->
         arrangements (elts', pattern') + arrangements (elts', Some_OK :: pattern')
     | None :: elts', Some_OK :: pattern' ->
         arrangements (elts', pattern') + arrangements (elts', Some_OK :: pattern')

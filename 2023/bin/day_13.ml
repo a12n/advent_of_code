@@ -22,10 +22,10 @@ end = struct
 
   let reflection notes =
     match Array.symmetry (Array.equal ( = )) notes with
-    | Some k -> Some (`Horiz k)
+    | Some row -> Some (`Horiz row)
     | None -> (
         match Array.symmetry (Array.equal ( = )) (Array.transpose notes) with
-        | Some k -> Some (`Vert k)
+        | Some col -> Some (`Vert col)
         | None -> None)
 
   let reflection2 notes =

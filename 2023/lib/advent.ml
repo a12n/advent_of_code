@@ -6,6 +6,7 @@ module Seq = Advent__Seq
 module String = Advent__String
 
 (* Shared modules *)
+module Algorithm = Advent__Algorithm
 module Dir = Advent__Dir
 module Polygon = Advent__Polygon
 module Pos = Advent__Pos

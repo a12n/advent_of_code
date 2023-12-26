@@ -51,28 +51,8 @@ let is_palindrome ?(dist = 0) ?(pos = 0) ?len eq a =
   in
   loop (dist, 0)
 
-(* FIXME: Complicated? *)
-let symmetry_seq n =
-  if n < 0 then invalid_arg __FUNCTION__;
-  (* Skip [m] last/first items from the array. Are remaining elements
-     symmetrical around the middle? *)
-  Seq.unfold
-    (function
-      | `No_Last, m when m >= n ->
-          (* Skipped all the elements. *)
-          None
-      | `No_Last, m ->
-          (* Skip last [m] elements, elements from 0 up to (n - m) is the part for symmetry check. *)
-          let part = (0, n - m) in
-          Some (part, (`No_First, m))
-      | `No_First, m ->
-          (* Skip first [m] elements, emit part. Then skip from the end again, but this time skip more elements. *)
-          let part = (m, n - m) in
-          Some (part, (`No_Last, m + 2)))
-    (`No_Last, if Int.is_even n then 0 else 1)
-
 let symmetry eq a =
-  symmetry_seq (length a)
+  Algorithm.symmetry_seq (length a)
   |> Seq.find (fun (pos, len) -> is_palindrome ~pos ~len eq a)
   |> Option.map (fun (pos, len) -> pos + (len / 2))
 

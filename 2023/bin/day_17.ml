@@ -48,6 +48,14 @@ end = struct
   let ( .@[] ) a (row, col) = a.(row).(col)
   let ( .@[]<- ) a (row, col) value = a.(row).(col) <- value
 
+  module Priority_Queue = struct
+    include Set.Make (struct
+      type t = int * (int * int)
+
+      let compare = Stdlib.compare
+    end)
+  end
+
   let path grid src dest =
     let ((n_rows, n_cols) as size) = Array.matrix_size grid in
     if not Pos.(is_valid size src && is_valid size dest) then
@@ -62,18 +70,17 @@ end = struct
         | Some _ -> straight_line (Pos.add pos dir) dir (n - 1)
       else true
     in
-    let queue = Queue.create () in
     dist.@[src] <- 0;
-    Queue.add src queue;
-    let rec loop () =
-      match Queue.take_opt queue with
+    let rec loop queue =
+      match Priority_Queue.min_elt_opt queue with
       | None -> ()
-      | Some cur when cur = dest -> ()
-      | Some cur ->
+      | Some ((_, cur) as cur_elt) ->
+          let queue = Priority_Queue.remove cur_elt queue in
           Printf.eprintf "cur (%d, %d)\n%!" (fst cur) (snd cur);
           List.map (Pos.add cur) [ (-1, 0); (0, -1); (1, 0); (0, 1) ]
           |> List.filter (Pos.is_valid size)
-          |> List.iter (fun next ->
+          |> List.fold_left
+               (fun queue next ->
                  let alt = dist.@[cur] + grid.@[next] in
                  let dir = Pos.sub cur next in
                  Printf.eprintf "next (%d, %d), dist %d, alt %d\n%!" (fst next) (snd next)
@@ -81,11 +88,13 @@ end = struct
                  if alt < dist.@[next] && not (straight_line cur dir 3) then (
                    dist.@[next] <- alt;
                    prev.@[next] <- Some dir;
-                   Queue.add next queue));
-          loop ()
+                   Priority_Queue.add (alt, next) queue)
+                 else queue)
+               queue
+          |> loop
     in
-    loop ();
-    if dist.@[dest] <> max_int then
+    loop (Priority_Queue.singleton (0, src));
+    if dist.@[dest] <> max_int then (
       let rec backtrack path cur =
         match prev.@[cur] with
         | None -> path
@@ -93,7 +102,7 @@ end = struct
       in
       let path = src :: backtrack [] dest in
       pp_dist ~path Format.err_formatter grid dist prev;
-      Some (dist.@[dest], path)
+      Some (dist.@[dest], path))
     else None
 
   let of_lines =

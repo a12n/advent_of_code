@@ -79,19 +79,17 @@ end = struct
           Printf.eprintf "cur (%d, %d)\n%!" (fst cur) (snd cur);
           List.map (Pos.add cur) [ (-1, 0); (0, -1); (1, 0); (0, 1) ]
           |> List.filter (Pos.is_valid size)
-          |> List.fold_left
-               (fun queue next ->
-                 let alt = dist.@[cur] + grid.@[next] in
-                 let dir = Pos.sub cur next in
-                 Printf.eprintf "next (%d, %d), dist %d, alt %d\n%!" (fst next) (snd next)
-                   dist.@[next] alt;
-                 if alt < dist.@[next] && not (straight_line cur dir 3) then (
-                   dist.@[next] <- alt;
-                   prev.@[next] <- Some dir;
-                   Priority_Queue.add (alt, next) queue)
-                 else queue)
-               queue
+          |> List.fold_left (update_next cur) queue
           |> loop
+    and update_next cur queue next =
+      let alt = dist.@[cur] + grid.@[next] in
+      let dir = Pos.sub cur next in
+      Printf.eprintf "next (%d, %d), dist %d, alt %d\n%!" (fst next) (snd next) dist.@[next] alt;
+      if alt < dist.@[next] && not (straight_line cur dir 4) then (
+        dist.@[next] <- alt;
+        prev.@[next] <- Some dir;
+        Priority_Queue.add (alt, next) queue)
+      else queue
     in
     loop (Priority_Queue.singleton (0, src));
     if dist.@[dest] <> max_int then (

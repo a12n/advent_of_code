@@ -20,11 +20,26 @@ end = struct
     % Seq.map (Array.of_seq % Seq.map Note.of_char % String.to_seq)
     % Seq.take_while (( <> ) "")
 
+  let find_reflection ?(dist = 0) ?(skip = []) notes =
+    let n_rows = Array.length notes in
+    Seq.find_map
+      (fun (row, len) ->
+        let mid = row + (len / 2) in
+        if List.mem mid skip then None
+        else
+          let total_dist =
+            Seq.Symmetric.ints row len
+            |> Seq.map (fun (i, j) -> Array.hamming_dist Stdlib.( = ) notes.(i) notes.(j))
+            |> Seq.reduce ( + )
+          in
+          if total_dist > dist then None else Some mid)
+      (Seq.Symmetric.windows n_rows)
+
   let reflection notes =
-    match Array.symmetry (Array.equal ( = )) notes with
+    match find_reflection notes with
     | Some row -> Some (`Horiz row)
     | None -> (
-        match Array.symmetry (Array.equal ( = )) (Array.transpose notes) with
+        match find_reflection (Array.transpose notes) with
         | Some col -> Some (`Vert col)
         | None -> None)
 

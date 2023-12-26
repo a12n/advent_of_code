@@ -36,6 +36,21 @@ let reduce f a =
   done;
   !r
 
+let is_palindrome ?(dist = 0) ?(pos = 0) ?len eq a =
+  let n = length a in
+  let len = match len with None -> n - pos | Some len -> len in
+  if (pos < 0 || pos >= n) || len < 0 || pos + len > n then invalid_arg __FUNCTION__;
+  let mid = len / 2 in
+  let rec loop = function
+    | dist, _ when dist < 0 -> false
+    | dist, i when i < mid ->
+        let ai = get a (pos + i) in
+        let aj = get a (pos + len - 1 - i) in
+        loop ((if eq ai aj then dist else dist - 1), i + 1)
+    | _, _ -> true
+  in
+  loop (dist, 0)
+
 (* FIXME: Complicated. *)
 let symmetry eq a =
   let n = length a in

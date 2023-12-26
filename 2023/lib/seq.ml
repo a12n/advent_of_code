@@ -5,8 +5,7 @@ let reduce f s =
 
 module Symmetric = struct
   let ints pos len =
-    if len < 0 then invalid_arg __FUNCTION__;
-    if pos < 0 || pos >= len then invalid_arg __FUNCTION__;
+    if len < 0 || pos < 0 then invalid_arg __FUNCTION__;
     let mid = len / 2 in
     unfold (fun i -> if i < mid then Some ((pos + i, pos + len - 1 - i), i + 1) else None) 0
 

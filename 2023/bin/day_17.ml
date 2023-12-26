@@ -10,6 +10,40 @@ module Grid : sig
 end = struct
   type t = int array array
 
+  let cell_color path pos = if List.mem pos path then ("\x1b[32m", "\x1b[0m") else ("", "")
+
+  let pp ?(path = []) fmt grid =
+    Array.iteri
+      (fun row line ->
+        Array.iteri
+          (fun col heat ->
+            let color_on, color_off = cell_color path (row, col) in
+            Format.(
+              pp_print_string fmt color_on;
+              pp_print_int fmt heat;
+              pp_print_string fmt color_off))
+          line;
+        Format.pp_print_newline fmt ())
+      grid
+
+  let pp_dist ?(path = []) fmt grid dist prev =
+    let n_rows, n_cols = Array.matrix_size grid in
+    for row = 0 to n_rows - 1 do
+      for col = 0 to n_cols - 1 do
+        let dir =
+          match prev.(row).(col) with
+          | Some (0, 0) | None -> "."
+          | Some v -> Dir.(to_string (of_pos v))
+        in
+        let color_on, color_off = cell_color path (row, col) in
+        Format.fprintf fmt " %s[%s %1d %3d]%s" color_on dir
+          grid.(row).(col)
+          dist.(row).(col)
+          color_off
+      done;
+      Format.pp_print_newline fmt ()
+    done
+
   let size = Array.matrix_size
   let ( .@[] ) a (row, col) = a.(row).(col)
   let ( .@[]<- ) a (row, col) value = a.(row).(col) <- value
@@ -51,43 +85,18 @@ end = struct
           loop ()
     in
     loop ();
-    Format.(
-      for row = 0 to n_rows - 1 do
-        for col = 0 to n_cols - 1 do
-          let dir =
-            match prev.(row).(col) with
-            | Some (0, 0) | None -> "."
-            | Some v -> Dir.(to_string (of_pos v))
-          in
-          fprintf err_formatter " [%s %1d %3d]" dir grid.(row).(col) dist.(row).(col)
-        done;
-        pp_print_newline err_formatter ()
-      done);
     if dist.@[dest] <> max_int then
       let rec backtrack path cur =
         match prev.@[cur] with
         | None -> path
         | Some dir -> backtrack (cur :: path) Pos.(add cur dir)
       in
-      Some (dist.@[dest], src :: backtrack [] dest)
+      let path = src :: backtrack [] dest in
+      pp_dist ~path Format.err_formatter grid dist prev;
+      Some (dist.@[dest], path)
     else None
 
   let of_lines =
     let digit c = int_of_char c - int_of_char '0' in
     Array.of_seq % Seq.map (Array.of_seq % Seq.map digit % String.to_seq)
-
-  let pp ?(path = []) fmt grid =
-    Array.iteri
-      (fun row line ->
-        Array.iteri
-          (fun col heat ->
-            if List.mem (row, col) path then (
-              Format.(
-                pp_print_string fmt "\x1b[32m";
-                pp_print_int fmt heat;
-                pp_print_string fmt "\x1b[0m"))
-            else Format.(pp_print_int fmt heat))
-          line;
-        Format.pp_print_newline fmt ())
-      grid
 end

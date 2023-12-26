@@ -60,20 +60,14 @@ let palindrome_hamming_dist ?(pos = 0) ?len eq a =
   let n = length a in
   let len = match len with None -> n - pos | Some len -> len in
   if (pos < 0 || pos >= n) || len < 0 || pos + len > n then invalid_arg __FUNCTION__;
-  let mid = len / 2 in
-  let rec loop = function
-    | dist, i when i < mid ->
-        let ai = get a (pos + i) in
-        let aj = get a (pos + len - 1 - i) in
-        loop ((if eq ai aj then dist else dist + 1), i + 1)
-    | dist, _ -> dist
-  in
-  loop (0, 0)
+  Seq.fold_left
+    (fun dist (i, j) -> if eq (get a i) (get a j) then dist else dist + 1)
+    0 (Seq.Symmetric.ints pos len)
 
 let is_palindrome ?(dist = 0) ?pos ?len eq a = palindrome_hamming_dist ?pos ?len eq a <= dist
 
 let symmetry eq a =
-  Algorithm.symmetry_seq (length a)
+  Seq.Symmetric.windows (length a)
   |> Seq.find (fun (pos, len) -> is_palindrome ~pos ~len eq a)
   |> Option.map (fun (pos, len) -> pos + (len / 2))
 

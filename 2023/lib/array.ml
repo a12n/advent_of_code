@@ -36,6 +36,26 @@ let reduce f a =
   done;
   !r
 
+let hamming_dist ?(pos = 0) ?len eq a b =
+  let n, m = (length a, length b) in
+  let len =
+    match len with
+    | None ->
+        if n <> m then invalid_arg (__FUNCTION__ ^ ": lengths mismatch");
+        n - pos
+    | Some len -> len
+  in
+  if pos < 0 || pos >= n || pos >= m then invalid_arg (__FUNCTION__ ^ ": invalid pos");
+  if len < 0 || pos + len > n || pos + len > m then invalid_arg (__FUNCTION__ ^ ": invalid len");
+  let rec loop dist = function
+    | i when i < len ->
+        let ai = get a (pos + i) in
+        let bi = get b (pos + i) in
+        loop (if eq ai bi then dist else dist + 1) (i + 1)
+    | _i -> dist
+  in
+  loop 0 0
+
 let palindrome_hamming_dist ?(pos = 0) ?len eq a =
   let n = length a in
   let len = match len with None -> n - pos | Some len -> len in

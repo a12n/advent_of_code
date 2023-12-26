@@ -51,33 +51,30 @@ let is_palindrome ?(dist = 0) ?(pos = 0) ?len eq a =
   in
   loop (dist, 0)
 
-(* FIXME: Complicated. *)
+(* FIXME: Complicated? *)
+let symmetry_seq n =
+  if n < 0 then invalid_arg __FUNCTION__;
+  (* Skip [m] last/first items from the array. Are remaining elements
+     symmetrical around the middle? *)
+  Seq.unfold
+    (function
+      | `No_Last, m when m >= n ->
+          (* Skipped all the elements. *)
+          None
+      | `No_Last, m ->
+          (* Skip last [m] elements, elements from 0 up to (n - m) is the part for symmetry check. *)
+          let part = (0, n - m) in
+          Some (part, (`No_First, m))
+      | `No_First, m ->
+          (* Skip first [m] elements, emit part. Then skip from the end again, but this time skip more elements. *)
+          let part = (m, n - m) in
+          Some (part, (`No_Last, m + 2)))
+    (`No_Last, if Int.is_even n then 0 else 1)
+
 let symmetry eq a =
-  let n = length a in
-  let rec loop = function
-    (* Skip [m] last/first items from the array. Are remaining
-       elements symmetrical around the middle? *)
-    | `No_Last, m when m >= n ->
-        (* Skipped all the elements, no line of symmetry found. *)
-        None
-    | `No_Last, m when is_palindrome ~pos:0 ~len:(n - m) eq a ->
-        (* Skipped last [m] elements and elements from 0 up to (n - m)
-           are symmetrical. *)
-        Some ((n - m) / 2)
-    | `No_Last, m ->
-        (* Skipped last [m], no symmetry. Try to skip from the
-           beginning. *)
-        loop (`No_First, m)
-    | `No_First, m when is_palindrome ~pos:m ~len:(n - m) eq a ->
-        (* No first [m] elements and elements from m up to n are
-           symmetrical. *)
-        Some (m + ((n - m) / 2))
-    | `No_First, m ->
-        (* Skipped first [m] elements, no symmetry. Skip from the end
-           again, but this time skip more elements. *)
-        loop (`No_Last, m + 2)
-  in
-  if Int.is_even n then loop (`No_Last, 0) else loop (`No_Last, 1)
+  symmetry_seq (length a)
+  |> Seq.find (fun (pos, len) -> is_palindrome ~pos ~len eq a)
+  |> Option.map (fun (pos, len) -> pos + (len / 2))
 
 let transpose a =
   let n_rows, n_cols = matrix_size a in

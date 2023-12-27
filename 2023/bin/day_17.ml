@@ -1,4 +1,6 @@
 open Advent
+open Grid.Ops
+module Pos = Grid.Pos
 
 module Heat_Grid : sig
   type t
@@ -85,7 +87,6 @@ end = struct
     loop (Min_Queue.singleton (0, src, None, 0))
 
   let path grid src dest =
-    let open Grid.Ops in
     let ((n_rows, n_cols) as size) = Array.matrix_size grid in
     if not Pos.(is_valid size src && is_valid size dest) then
       invalid_arg (__FUNCTION__ ^ ": invalid src or dest");

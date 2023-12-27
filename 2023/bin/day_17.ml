@@ -47,8 +47,8 @@ end = struct
   end)
 
   let heat_loss grid src dest =
-    let size = Array.matrix_size grid in
-    if not Pos.(is_valid size src && is_valid size dest) then invalid_arg __FUNCTION__;
+    let size = Grid.size grid in
+    if not Grid.Pos.(is_valid size src && is_valid size dest) then invalid_arg __FUNCTION__;
     let seen = Hashtbl.create (fst size * snd size) in
     let rec loop queue =
       let ((loss, pos, dir, straight) as elt) = Min_Queue.min_elt queue in
@@ -70,12 +70,12 @@ end = struct
                ignore dir;
                straight <= 3)
         |> List.filter_map (fun (dir, straight) ->
-               let pos' = Pos.add pos (Dir.to_pos dir) in
+               let pos' = Grid.Pos.add pos (Dir.to_pos dir) in
                (* Printf.eprintf "next: pos' (%d, %d), ok %B\n%!" (fst pos') (snd pos') *)
                (*   (Pos.is_valid size pos'); *)
-               if Pos.is_valid size pos' then Some (pos', dir, straight) else None)
+               if Grid.Pos.is_valid size pos' then Some (pos', dir, straight) else None)
         |> List.map (fun (pos', dir, straight) ->
-               let loss' = loss + grid.@[pos'] in
+               let loss' = loss + grid.@(pos') in
                (* Printf.eprintf "next: loss' %d, pos' (%d, %d), dir %s, straight %d\n%!" loss' *)
                (*   (fst pos') (snd pos') (Dir.to_string dir) straight; *)
                (loss', pos', Some dir, straight))

@@ -49,6 +49,7 @@ module Config = struct
     }
 
   let push_button cfg =
+    let stats = ref Stats.zero in
     let queue = Queue.create () in
     Queue.add (Pulse.Low, "button", ("broadcaster", 0)) queue;
     (* Propagate pulses. *)
@@ -71,7 +72,8 @@ module Config = struct
       else if Hashtbl.mem cfg.outputs name then
         List.iter (fun output -> Queue.add (pulse, name, output) queue) cfg.outputs.%{name}
       else ()
-    done
+    done;
+    !stats
 
   let of_lines lines =
     let ({ outputs; flip_flops; conjunctions; _ } as cfg) = make () in

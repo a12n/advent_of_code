@@ -23,6 +23,10 @@ end
 module Brick = struct
   type t = Point.t * Point.t
 
+  let size (min, max) =
+    let Point.{ x; y; z } = Point.sub max min in
+    (x + 1, y + 1, z + 1)
+
   let of_string s =
     match String.split_on_char '~' s with
     | [ min; max ] -> (Point.of_string min, Point.of_string max)
@@ -46,6 +50,8 @@ module Snapshot = struct
     let min = List.reduce (Point.map2 Int.min) (List.map fst bricks) in
     let max = List.reduce (Point.map2 Int.max) (List.map snd bricks) in
     (min, max)
+
+  let grid_size bricks = Brick.size (grid_span bricks)
 
   let sort bricks =
     List.sort

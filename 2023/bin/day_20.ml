@@ -1,5 +1,9 @@
 open Advent
 
+let ( .%{} ) = Hashtbl.find
+let ( .%?{} ) = Hashtbl.find_opt
+let ( .%{}<- ) = Hashtbl.replace
+
 module Pulse = struct
   type t = Low | High
 

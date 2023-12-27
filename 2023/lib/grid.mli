@@ -13,6 +13,7 @@ end
 type 'a t = 'a array array
 
 val size : 'a t -> int * int
+val find_pos : ('a -> bool) -> 'a t -> Pos.t option
 val get_pos : 'a t -> Pos.t -> 'a
 val set_pos : 'a t -> Pos.t -> 'a -> unit
 val ( .@() ) : 'a t -> Pos.t -> 'a

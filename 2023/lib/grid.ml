@@ -13,6 +13,14 @@ end
 type 'a t = 'a array array
 
 let size = Array.matrix_size
+
+let find_pos pred grid =
+  Array.(
+    find_mapi
+      (fun row line ->
+        find_mapi (fun col value -> if pred value then Some (row, col) else None) line)
+      grid)
+
 let get_pos grid (row, col) = grid.(row).(col)
 let set_pos grid (row, col) value = grid.(row).(col) <- value
 let ( .@() ) = get_pos

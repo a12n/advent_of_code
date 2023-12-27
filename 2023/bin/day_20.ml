@@ -7,7 +7,7 @@ let ( .%{}<- ) = Hashtbl.replace
 module Pulse = struct
   type t = Low | High
 
-  let to_string = function Low -> "L" | High -> "H"
+  let to_string = function Low -> "low" | High -> "high"
 end
 
 module Config = struct

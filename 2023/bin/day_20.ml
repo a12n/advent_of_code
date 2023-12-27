@@ -45,6 +45,25 @@ module Config = struct
           pp_print_newline fmt ())
         conjunctions)
 
+  let pp_state fmt { flip_flops; conjunctions; _ } =
+    Format.(
+      Hashtbl.iter
+        (fun name state ->
+          pp_print_space fmt ();
+          pp_print_string fmt name;
+          pp_print_char fmt '=';
+          pp_print_int fmt (if state then 1 else 0))
+        flip_flops;
+      pp_print_newline fmt ();
+      Hashtbl.iter
+        (fun name state ->
+          pp_print_space fmt ();
+          pp_print_string fmt name;
+          pp_print_char fmt '=';
+          Array.iter (fun state -> pp_print_int fmt (if state = Pulse.Low then 0 else 1)) state)
+        conjunctions;
+      pp_print_newline fmt ())
+
   let make () =
     {
       outputs = Hashtbl.create 100;

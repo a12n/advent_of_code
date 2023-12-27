@@ -36,6 +36,11 @@ module Snapshot = struct
 
   let of_lines = List.of_seq % Seq.map Brick.of_string
 
+  let grid_span bricks =
+    let min = List.reduce (Point.map2 Int.min) (List.map fst bricks) in
+    let max = List.reduce (Point.map2 Int.max) (List.map snd bricks) in
+    (min, max)
+
   let sort bricks =
     List.sort
       (fun (min1, max1) (min2, max2) ->

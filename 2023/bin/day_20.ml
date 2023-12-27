@@ -49,29 +49,23 @@ module Config = struct
       let pulse, src, (name, input) = Queue.take queue in
       Printf.eprintf "%s -%s-> %s %d\n%!" src (Pulse.to_string pulse) name input;
       (* Flip-flops. *)
-      (match cfg.flip_flops.%%{name} with
-      | Some on -> (
-          match pulse with
-          | Pulse.Low ->
-              (* On low pulse, flip state and send to outputs. *)
-              cfg.flip_flops.%{name} <- not on;
-              let pulse' = if on then Pulse.Low else Pulse.High in
-              List.iter (fun output -> Queue.add (pulse', name, output) queue) cfg.outputs.%{name}
-          | Pulse.High ->
-              (* On high pulse, do nothing. *)
-              ())
-      | None ->
-          (* Not a flip-flop. *)
-          ());
-      (* Conjunctions. *)
-      (match cfg.conjunctions.%%{name} with
-      | Some state ->
-          state.(input) <- pulse;
-          let pulse' = if Array.for_all (( = ) Pulse.High) state then Pulse.Low else Pulse.High in
+      if Hashtbl.mem cfg.flip_flops name then
+        let state = cfg.flip_flops.%{name} in
+        (match pulse with
+        | Pulse.Low ->
+          (* On low pulse, flip state and send to outputs. *)
+          cfg.flip_flops.%{name} <- not state;
+          let pulse' = if state then Pulse.Low else Pulse.High in
           List.iter (fun output -> Queue.add (pulse', name, output) queue) cfg.outputs.%{name}
-      | None ->
-          (* Not a conjunction. *)
-          ());
+        | Pulse.High ->
+          (* On high pulse, do nothing. *)
+          ())
+      (* Conjunctions. *)
+      else if Hashtbl.mem cfg.conjunctions name then
+        let state = cfg.conjunctions.%{name} in
+        (state.(input) <- pulse;
+        let pulse' = if Array.for_all (( = ) Pulse.High) state then Pulse.Low else Pulse.High in
+        List.iter (fun output -> Queue.add (pulse', name, output) queue) cfg.outputs.%{name})
       (* Broadcasters. *)
       else
       List.iter (fun output -> Queue.add (pulse, name, output) queue) cfg.outputs.%{name}

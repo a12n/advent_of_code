@@ -41,6 +41,41 @@ module Config = struct
       conjunctions = Hashtbl.create 100;
     }
 
+  let run cfg src pulse =
+    let queue = Queue.create () in
+    Queue.add (pulse, src, 0) queue;
+    while not (Queue.is_empty queue) do
+      let pulse, name, input = Queue.take queue in
+      (* Flip-flops. *)
+      (match cfg.flip_flops.%?{name} with
+      | Some on -> (
+          match pulse with
+          | Pulse.Low ->
+              (* On low pulse, flip state and send to outputs. *)
+              cfg.flip_flops.%{name} <- not on;
+              let pulse' = if on then Pulse.Low else Pulse.High in
+              List.iter
+                (fun (dest, input) -> Queue.add (pulse', dest, input) queue)
+                cfg.outputs.%{name}
+          | Pulse.High ->
+              (* On high pulse, do nothing. *)
+              ())
+      | None ->
+          (* Not a flip-flop. *)
+          ());
+      (* Conjunctions. *)
+      (match cfg.conjunctions.%?{name} with
+      | Some state ->
+          state.(input) <- pulse;
+          let pulse' = if Array.for_all (( = ) Pulse.High) state then Pulse.Low else Pulse.High in
+          List.iter (fun (dest, input) -> Queue.add (pulse', dest, input) queue) cfg.outputs.%{name}
+      | None ->
+          (* Not a conjunction. *)
+          ());
+      (* Broadcasters. *)
+      List.iter (fun (dest, input) -> Queue.add (pulse, dest, input) queue) cfg.outputs.%{name}
+    done
+
   let of_lines lines =
     let ({ outputs; flip_flops; conjunctions; _ } as cfg) = make () in
     let num_inputs = Hashtbl.create 100 in

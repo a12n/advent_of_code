@@ -43,20 +43,12 @@ module Garden = struct
         done
       done
     done;
-    Format.(
-      Array.iteri
-        (fun row line ->
-          Array.iteri
-            (fun col nums ->
-              let color_on, color_off =
-                if List.mem n nums then ("\x1b[42m", "\x1b[0m") else ("", "")
-              in
-              pp_print_string err_formatter
-                (color_on ^ Plot.to_string garden.(row).(col) ^ color_off))
-            line;
-          pp_print_newline err_formatter ())
-        state);
-    state
+    Array.fold_lefti
+      (fun reachable row line ->
+        Array.fold_lefti
+          (fun reachable col nums -> if List.mem n nums then (row, col) :: reachable else reachable)
+          reachable line)
+      [] state
 
   let of_lines = Array.of_seq % Seq.map (Array.of_seq % Seq.map Plot.of_char % String.to_seq)
 

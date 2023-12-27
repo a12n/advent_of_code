@@ -64,23 +64,38 @@ end = struct
   let heat_loss grid src dest =
     let size = Array.matrix_size grid in
     if not Pos.(is_valid size src && is_valid size dest) then invalid_arg __FUNCTION__;
+    let seen = Hashtbl.create (fst size * snd size) in
     let rec loop queue =
       let ((loss, pos, dir, straight) as elt) = Min_Queue.min_elt queue in
+      (* Printf.eprintf "loss %d, pos (%d, %d), dir %s, straight %d\n%!" loss (fst pos) (snd pos) *)
+      (*   (Option.fold ~none:"_" ~some:Dir.to_string dir) *)
+      (*   straight; *)
       let queue' = Min_Queue.remove elt queue in
-      if pos = dest then loss
-      else
+      if pos = dest then (* Printf.eprintf "reached (%d, %d)\n%!" (fst dest) (snd dest); *)
+        loss
+      else if Hashtbl.mem seen (pos, dir, straight) then loop queue'
+      else (
+        Hashtbl.replace seen (pos, dir, straight) ();
         (match dir with
         | Some dir -> Dir.[ (dir, straight + 1); (turn_left dir, 1); (turn_right dir, 1) ]
         | None -> Dir.[ (Down, 1); (Right, 1); (Left, 1); (Up, 1) ])
-        |> List.filter (fun (_, straight) -> straight < 3)
+        |> List.filter (fun (dir, straight) ->
+               (* Printf.eprintf "next: dir %s, straight %d, ok %B\n%!" (Dir.to_string dir) straight *)
+               (*   (straight <= 3); *)
+               ignore dir;
+               straight <= 3)
         |> List.filter_map (fun (dir, straight) ->
                let pos' = Pos.add pos (Dir.to_pos dir) in
+               (* Printf.eprintf "next: pos' (%d, %d), ok %B\n%!" (fst pos') (snd pos') *)
+               (*   (Pos.is_valid size pos'); *)
                if Pos.is_valid size pos' then Some (pos', dir, straight) else None)
         |> List.map (fun (pos', dir, straight) ->
                let loss' = loss + grid.@[pos'] in
+               (* Printf.eprintf "next: loss' %d, pos' (%d, %d), dir %s, straight %d\n%!" loss' *)
+               (*   (fst pos') (snd pos') (Dir.to_string dir) straight; *)
                (loss', pos', Some dir, straight))
         |> List.fold_left (Fun.flip Min_Queue.add) queue'
-        |> loop
+        |> loop)
     in
     loop (Min_Queue.singleton (0, src, None, 0))
 

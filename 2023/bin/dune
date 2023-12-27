@@ -97,3 +97,8 @@
  (names day_20_1 day_20_2)
  (modules day_20 day_20_1 day_20_2)
  (libraries advent str))
+
+(executables
+ (names day_21_1 day_21_2)
+ (modules day_21 day_21_1 day_21_2)
+ (libraries advent str))

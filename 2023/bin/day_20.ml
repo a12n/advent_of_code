@@ -58,8 +58,7 @@ module Config = struct
     Queue.add (Pulse.Low, "button", ("broadcaster", 0)) queue;
     (* Propagate pulses. *)
     while not (Queue.is_empty queue) do
-      let pulse, src, (name, input) = Queue.take queue in
-      Printf.eprintf "%s -%s-> %s %d\n%!" src (Pulse.to_string pulse) name input;
+      let pulse, _src, (name, input) = Queue.take queue in
       stats := Stats.add_pulse !stats pulse;
       (* Flip-flops. *)
       if Hashtbl.mem cfg.flip_flops name then (

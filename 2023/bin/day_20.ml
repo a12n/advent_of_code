@@ -93,21 +93,21 @@ module Config = struct
               List.map
                 (fun dest ->
                   let i =
-                    match Hashtbl.find_opt num_inputs dest with
+                    match num_inputs.%?{dest} with
                     | Some i ->
-                        Hashtbl.replace num_inputs dest (i + 1);
+                        num_inputs.%{dest} <- i + 1;
                         i
                     | None ->
-                        Hashtbl.replace num_inputs dest 1;
+                        num_inputs.%{dest} <- 1;
                         0
                   in
                   (dest, i))
                 Str.(split (regexp "[ ]*,[ ]*") dests)
             in
-            Hashtbl.replace outputs mod_name dests;
+            outputs.%{mod_name} <- dests;
             match mod_type with
-            | '%' -> Hashtbl.replace flip_flops mod_name false
-            | '&' -> Hashtbl.replace conjunctions mod_name [||]
+            | '%' -> flip_flops.%{mod_name} <- false
+            | '&' -> conjunctions.%{mod_name} <- [||]
             | '>' -> ()
             | _ -> failwith __FUNCTION__)
         | _ -> invalid_arg __FUNCTION__)
@@ -121,12 +121,11 @@ module Config = struct
               if Hashtbl.mem conjunctions dest then (dest, input) else (dest, 0))
             dests
         in
-        Hashtbl.replace outputs name dests)
+        outputs.%{name} <- dests)
       outputs;
     (* Allocate conjunctions inputs. *)
     Hashtbl.iter
-      (fun name _ ->
-        Hashtbl.replace conjunctions name (Array.make (Hashtbl.find num_inputs name) Pulse.Low))
+      (fun name _ -> conjunctions.%{name} <- Array.make num_inputs.%{name} Pulse.Low)
       conjunctions;
     (* Done. *)
     cfg

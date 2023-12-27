@@ -14,7 +14,11 @@ module Stats = struct
   type t = { low : int; high : int }
 
   let zero = { low = 0; high = 0 }
-  let add a b = { low = a.low + b.low; high = a.high + b.high }
+  let add s1 s2 = { low = s1.low + s2.low; high = s1.high + s2.high }
+
+  let add_pulse s = function
+    | Pulse.Low -> { s with low = s.low + 1 }
+    | Pulse.High -> { s with high = s.high + 1 }
 end
 
 module Config = struct

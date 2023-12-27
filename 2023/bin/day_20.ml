@@ -1,7 +1,7 @@
 open Advent
 
 let ( .%{} ) = Hashtbl.find
-let ( .%?{} ) = Hashtbl.find_opt
+let ( .%%{} ) = Hashtbl.find_opt
 let ( .%{}<- ) = Hashtbl.replace
 
 module Pulse = struct
@@ -53,7 +53,7 @@ module Config = struct
       let pulse, (name, input) = Queue.take queue in
       prerr_signal pulse "" name input;
       (* Flip-flops. *)
-      (match cfg.flip_flops.%?{name} with
+      (match cfg.flip_flops.%%{name} with
       | Some on -> (
           match pulse with
           | Pulse.Low ->
@@ -68,7 +68,7 @@ module Config = struct
           (* Not a flip-flop. *)
           ());
       (* Conjunctions. *)
-      (match cfg.conjunctions.%?{name} with
+      (match cfg.conjunctions.%%{name} with
       | Some state ->
           state.(input) <- pulse;
           let pulse' = if Array.for_all (( = ) Pulse.High) state then Pulse.Low else Pulse.High in
@@ -97,7 +97,7 @@ module Config = struct
               List.map
                 (fun dest ->
                   let i =
-                    match num_inputs.%?{dest} with
+                    match num_inputs.%%{dest} with
                     | Some i ->
                         num_inputs.%{dest} <- i + 1;
                         i

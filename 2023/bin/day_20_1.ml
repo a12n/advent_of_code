@@ -7,6 +7,10 @@ let () =
   let Stats.{ low; high } =
     Seq.(ints 1)
     |> Seq.take 1000
-    |> Seq.fold_left (fun stats _i -> Stats.add stats (Config.push_button cfg)) Stats.zero
+    |> Seq.fold_left
+         (fun total _i ->
+           let _, stats = Config.push_button cfg in
+           Stats.add total stats)
+         Stats.zero
   in
   print_endline (string_of_int (low * high))

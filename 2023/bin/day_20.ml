@@ -53,12 +53,14 @@ module Config = struct
     }
 
   let push_button cfg =
+    let found = ref false in
     let stats = ref Stats.zero in
     let queue = Queue.create () in
     Queue.add (Pulse.Low, "button", ("broadcaster", 0)) queue;
     (* Propagate pulses. *)
     while not (Queue.is_empty queue) do
       let pulse, _src, (name, input) = Queue.take queue in
+      found := !found || (name = "rx" && pulse = Pulse.Low);
       stats := Stats.add_pulse !stats pulse;
       (* Flip-flops. *)
       if Hashtbl.mem cfg.flip_flops name then (
@@ -77,7 +79,7 @@ module Config = struct
         List.iter (fun output -> Queue.add (pulse, name, output) queue) cfg.outputs.%{name}
       else ()
     done;
-    !stats
+    (!found, !stats)
 
   let of_lines lines =
     let ({ outputs; flip_flops; conjunctions; _ } as cfg) = make () in

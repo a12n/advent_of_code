@@ -26,3 +26,21 @@ module Propagator = struct
     Queue.add (Pulse.Low, "button", [ "broadcaster" ]) queue;
     queue
 end
+
+module Config = struct
+  type t = unit
+
+  let make () = ()
+
+  let of_lines =
+    (* String right of "->" creates numbered and named connection nodes. E.g.,
+       broadcaster -> a, b, c
+
+       Creates nodes a-0, b-0, c-0.
+    *)
+    Seq.fold_left (fun cfg line ->
+        (* TODO *)
+        ignore line;
+        cfg
+      ) (make ())
+end

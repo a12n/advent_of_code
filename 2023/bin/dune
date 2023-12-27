@@ -96,4 +96,4 @@
 (executables
  (names day_20_1 day_20_2)
  (modules day_20 day_20_1 day_20_2)
- (libraries advent))
+ (libraries advent str))

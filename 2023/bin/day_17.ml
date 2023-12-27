@@ -48,13 +48,9 @@ end = struct
   let ( .@[] ) a (row, col) = a.(row).(col)
   let ( .@[]<- ) a (row, col) value = a.(row).(col) <- value
 
-  module Priority_Queue = struct
-    include Set.Make (struct
-      type t = int * (int * int)
+  module Priority_Queue = Set.Make (struct
+    type t = int * Pos.t * Dir.t option * int
 
-      let compare = Stdlib.compare
-    end)
-  end
 
   let path grid src dest =
     let ((n_rows, n_cols) as size) = Array.matrix_size grid in

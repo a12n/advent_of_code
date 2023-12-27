@@ -41,10 +41,10 @@ module Config = struct
       conjunctions = Hashtbl.create 100;
     }
 
-  let run cfg name pulse =
+  let run cfg pulse name input =
     let queue = Queue.create () in
     (* Send pulse to input 0 of the module [name]. *)
-    Queue.add (pulse, (name, 0)) queue;
+    Queue.add (pulse, (name, input)) queue;
     (* Propagate pulses. *)
     while not (Queue.is_empty queue) do
       let pulse, (name, input) = Queue.take queue in

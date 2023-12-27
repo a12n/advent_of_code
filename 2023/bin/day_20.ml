@@ -41,13 +41,12 @@ module Config = struct
       conjunctions = Hashtbl.create 100;
     }
 
-  let run cfg pulse name input =
+  let push_button cfg =
     let prerr_signal pulse src dest input =
       Printf.eprintf "%s -%s-> %s %d\n%!" src (Pulse.to_string pulse) dest input
     in
     let queue = Queue.create () in
-    (* Send pulse to input 0 of the module [name]. *)
-    Queue.add (pulse, (name, input)) queue;
+    Queue.add (Pulse.Low, ("broadcaster", 0)) queue;
     (* Propagate pulses. *)
     while not (Queue.is_empty queue) do
       let pulse, (name, input) = Queue.take queue in

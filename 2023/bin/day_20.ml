@@ -10,6 +10,13 @@ module Pulse = struct
   let to_string = function Low -> "low" | High -> "high"
 end
 
+module Stats = struct
+  type t = { low : int; high : int }
+
+  let zero = { low = 0; high = 0 }
+  let add a b = { low = a.low + b.low; high = a.high + b.high }
+end
+
 module Config = struct
   type t = {
     outputs : (string, (string * int) list) Hashtbl.t;

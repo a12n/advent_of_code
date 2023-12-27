@@ -1,3 +1,5 @@
+open Advent
+
 module Pulse = struct
   type t = Low | High
 end

@@ -35,9 +35,9 @@ module Snapshot = struct
 
   let of_lines = List.of_seq % Seq.map Brick.of_string
 
-  let sort =
+  let sort bricks =
     List.sort (fun ((_, _, min1), (_, _, max1)) ((_, _, min2), (_, _, max2)) ->
-        Stdlib.compare (min1, max1) (min2, max2))
+        Stdlib.compare (min1, max1) (min2, max2)) bricks
 
   let settle =
     (* TODO *)

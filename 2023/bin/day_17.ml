@@ -23,7 +23,7 @@ end = struct
         let dir =
           match prev.(row).(col) with
           | Some (0, 0) | None -> "."
-          | Some v -> Dir.(to_string (of_pos v))
+          | Some v -> Dir.to_string (Pos.to_dir v)
         in
         let color_on, color_off = cell_color path (row, col) in
         Format.fprintf fmt " %s[%s %1d %3d]%s" color_on dir
@@ -73,7 +73,7 @@ end = struct
               ]
         | None -> Dir.[ (Down, 1); (Right, 1); (Left, 1); (Up, 1) ])
         |> List.filter_map (fun (dir, straight) ->
-               let pos' = Grid.Pos.add pos (Dir.to_pos dir) in
+               let pos' = Grid.Pos.(add pos (of_dir dir)) in
                (* Printf.eprintf "next: pos' (%d, %d), ok %B\n%!" (fst pos') (snd pos') *)
                (*   (Pos.is_valid size pos'); *)
                if Grid.Pos.is_valid size pos' then Some (pos', dir, straight) else None)

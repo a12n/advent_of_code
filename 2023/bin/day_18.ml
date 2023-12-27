@@ -44,7 +44,7 @@ module Plan = struct
     let _, list =
       List.fold_left_map
         (fun pos Dig.{ dir; length; _ } ->
-          let pos = Pos.(add pos (mul_int Dir.(to_pos dir) length)) in
+          let pos = Pos.(add pos (mul_int (of_dir dir) length)) in
           (pos, pos))
         (0, 0) plan
     in
@@ -54,8 +54,7 @@ module Plan = struct
     let _, min, max =
       List.fold_left
         (fun (((row, col) as pos), (min_row, min_col), (max_row, max_col)) Dig.{ dir; length; _ } ->
-          let v = Dir.to_pos dir in
-          let pos = Pos.(add pos (mul_int v length)) in
+          let pos = Pos.(add pos (mul_int (of_dir dir) length)) in
           (pos, Int.(min min_row row, min min_col col), Int.(max max_row row, max max_col col)))
         ((0, 0), (max_int, max_int), (min_int, min_int))
         plan
@@ -78,7 +77,7 @@ module Grid = struct
       | (Dig.{ dir; length; _ } as dig) :: plan ->
           let row', col' = Pos.sub (row, col) (min_row, min_col) in
           grid.(row').(col') <- Some `Trench;
-          do_dig (Pos.add pos (Dir.to_pos dir)) (Dig.{ dig with length = length - 1 } :: plan)
+          do_dig Pos.(add pos (of_dir dir)) (Dig.{ dig with length = length - 1 } :: plan)
     in
     do_dig (0, 0) plan;
     grid
@@ -104,7 +103,7 @@ module Grid = struct
           grid.(row).(col) <- Some `Ground;
           (* Add valid neighbours to the queue. *)
           Dir.[ Up; Left; Right; Down ]
-          |> List.map (Pos.add pos % Dir.to_pos)
+          |> List.map (Pos.add pos % Pos.of_dir)
           |> List.filter (Pos.is_valid size)
           |> List.iter ((Fun.flip Queue.add) queue)
       | Some _ ->

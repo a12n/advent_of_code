@@ -61,7 +61,7 @@ end = struct
     | Some pipe ->
         List.filter_map
           (fun dir ->
-            let next_pos = Pos.add pos Dir.(to_pos dir) in
+            let next_pos = Pos.(add pos (of_dir dir)) in
             match get pipes next_pos with
             | Some next_pipe ->
                 if Pipe.has_conn pipe dir && Pipe.has_conn next_pipe (Dir.neg dir) then

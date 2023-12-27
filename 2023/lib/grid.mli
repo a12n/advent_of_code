@@ -7,6 +7,8 @@ module Pos : sig
   val mul_int : t -> int -> t
   val sub : t -> t -> t
   val is_valid : int * int -> t -> bool
+  val of_dir : Dir.t -> t
+  val to_dir : t -> Dir.t
   val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]
 end
 

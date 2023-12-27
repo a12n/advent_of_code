@@ -28,7 +28,7 @@ module Garden = struct
         for col = 0 to n_cols - 1 do
           if garden.(row).(col) <> Plot.Rock && List.mem i state.(row).(col) then
             Dir.[ Up; Left; Right; Down ]
-            |> List.map (Grid.Pos.add (row, col) % Dir.to_pos)
+            |> List.map (Grid.Pos.add (row, col) % Grid.Pos.of_dir)
             |> List.filter (Grid.Pos.is_valid size)
             |> List.filter (fun pos -> garden.@(pos) <> Plot.Rock)
             |> List.iter (fun pos -> state.@(pos) <- (i + 1) :: state.@(pos))

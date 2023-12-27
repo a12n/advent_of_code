@@ -28,11 +28,23 @@ module Brick = struct
       pp_print_string fmt ", ";
       Point.pp fmt max;
       pp_print_char fmt ')')
-
-  let pp_list fmt bricks =
-    Format.(
-      pp_print_list ~pp_sep:pp_print_newline pp fmt bricks;
-      pp_print_newline err_formatter ())
 end
 
-let input chan = List.of_seq (Seq.map Brick.of_string (input_lines chan))
+module Snapshot = struct
+  type t = Brick.t list
+
+  let of_lines = List.of_seq % Seq.map Brick.of_string
+
+  let sort =
+    List.sort (fun ((_, _, min1), (_, _, max1)) ((_, _, min2), (_, _, max2)) ->
+        Stdlib.compare (min1, max1) (min2, max2))
+
+  let settle =
+    (* TODO *)
+    Fun.id
+
+  let pp fmt bricks =
+    Format.(
+      pp_print_list ~pp_sep:pp_print_newline Brick.pp fmt bricks;
+      pp_print_newline err_formatter ())
+end

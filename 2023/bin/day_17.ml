@@ -12,9 +12,7 @@ end = struct
   type t = int Grid.t
 
   let cell_color path pos = if List.mem pos path then ("\x1b[32m", "\x1b[0m") else ("", "")
-
-  let pp ?(path = []) =
-    Grid.pp ~highlight:path ~sgr:"\x1b[32m" Format.pp_print_int
+  let pp ?(path = []) = Grid.pp ~highlight:path ~sgr:"\x1b[32m" Format.pp_print_int
 
   let pp_dist ?(path = []) fmt grid dist prev =
     let n_rows, n_cols = Array.matrix_size grid in
@@ -134,7 +132,5 @@ end = struct
       Some (dist.@(dest), path))
     else None
 
-  let of_lines =
-    let digit c = int_of_char c - int_of_char '0' in
-    Array.of_seq % Seq.map (Array.of_seq % Seq.map digit % String.to_seq)
+  let of_lines = Grid.of_lines (fun c -> int_of_char c - int_of_char '0')
 end

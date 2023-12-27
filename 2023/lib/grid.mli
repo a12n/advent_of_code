@@ -30,3 +30,5 @@ module Ops : sig
   val ( .@() ) : 'a t -> Pos.t -> 'a
   val ( .@()<- ) : 'a t -> Pos.t -> 'a -> unit
 end
+
+(* TODO: module Planar, module Spatial *)

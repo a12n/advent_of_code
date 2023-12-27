@@ -52,9 +52,15 @@ module Garden = struct
 
   let of_lines = Array.of_seq % Seq.map (Array.of_seq % Seq.map Plot.of_char % String.to_seq)
 
-  let pp fmt =
+  let pp ?(highlight = []) fmt =
     Format.(
-      Array.iter (fun line ->
-          Array.iter (pp_print_string fmt % Plot.to_string) line;
+      Array.iteri (fun row line ->
+          Array.iteri
+            (fun col plot ->
+              let on, off =
+                if List.mem (row, col) highlight then ("\x1b[42m", "\x1b[0m") else ("", "")
+              in
+              pp_print_string fmt (on ^ Plot.to_string plot ^ off))
+            line;
           pp_print_newline fmt ()))
 end

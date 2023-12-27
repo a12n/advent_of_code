@@ -7,7 +7,7 @@ module Heat_Grid : sig
 
   val of_lines : string Seq.t -> t
   val path : t -> Pos.t -> Pos.t -> (int * Pos.t list) option
-  val heat_loss : t -> Pos.t -> Pos.t -> int
+  val heat_loss : ?min_straight:int -> ?max_straight:int -> t -> Pos.t -> Pos.t -> int
   val pp : ?path:Pos.t list -> Format.formatter -> t -> unit
   val size : t -> int * int
 end = struct
@@ -48,7 +48,7 @@ end = struct
     let compare = Stdlib.compare
   end)
 
-  let heat_loss grid src dest =
+  let heat_loss ?(min_straight = 0) ?(max_straight = max_int) grid src dest =
     let size = Grid.size grid in
     if not Grid.Pos.(is_valid size src && is_valid size dest) then invalid_arg __FUNCTION__;
     let seen = Hashtbl.create (fst size * snd size) in
@@ -64,13 +64,14 @@ end = struct
       else (
         Hashtbl.replace seen (pos, dir, straight) ();
         (match dir with
-        | Some dir -> Dir.[ (dir, straight + 1); (turn_left dir, 1); (turn_right dir, 1) ]
+        | Some dir ->
+            List.concat
+              [
+                (if straight < max_straight then [ (dir, straight + 1) ] else []);
+                (if straight >= min_straight then Dir.[ (turn_left dir, 1); (turn_right dir, 1) ]
+                 else []);
+              ]
         | None -> Dir.[ (Down, 1); (Right, 1); (Left, 1); (Up, 1) ])
-        |> List.filter (fun (dir, straight) ->
-               (* Printf.eprintf "next: dir %s, straight %d, ok %B\n%!" (Dir.to_string dir) straight *)
-               (*   (straight <= 3); *)
-               ignore dir;
-               straight <= 3)
         |> List.filter_map (fun (dir, straight) ->
                let pos' = Grid.Pos.add pos (Dir.to_pos dir) in
                (* Printf.eprintf "next: pos' (%d, %d), ok %B\n%!" (fst pos') (snd pos') *)

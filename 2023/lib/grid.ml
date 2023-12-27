@@ -23,8 +23,6 @@ let find_pos pred grid =
 
 let get_pos grid (row, col) = grid.(row).(col)
 let set_pos grid (row, col) value = grid.(row).(col) <- value
-let ( .@() ) = get_pos
-let ( .@()<- ) = set_pos
 
 let of_lines of_char lines =
   Array.of_seq (Seq.map (fun line -> Array.of_seq (Seq.map of_char (String.to_seq line))) lines)
@@ -43,3 +41,8 @@ let pp ?(highlight = []) ?(sgr = "\x1b[42m") f fmt grid =
         line;
       Format.pp_print_newline fmt ())
     grid
+
+module Ops = struct
+  let ( .@() ) = get_pos
+  let ( .@()<- ) = set_pos
+end

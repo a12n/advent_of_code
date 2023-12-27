@@ -42,15 +42,12 @@ module Config = struct
     }
 
   let push_button cfg =
-    let prerr_signal pulse src dest input =
-      Printf.eprintf "%s -%s-> %s %d\n%!" src (Pulse.to_string pulse) dest input
-    in
     let queue = Queue.create () in
     Queue.add (Pulse.Low, ("broadcaster", 0)) queue;
     (* Propagate pulses. *)
     while not (Queue.is_empty queue) do
       let pulse, (name, input) = Queue.take queue in
-      prerr_signal pulse "" name input;
+      Printf.eprintf "%s -%s-> %s %d\n%!" "???" (Pulse.to_string pulse) name input;
       (* Flip-flops. *)
       (match cfg.flip_flops.%%{name} with
       | Some on -> (

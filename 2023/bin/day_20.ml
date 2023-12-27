@@ -56,29 +56,23 @@ module Config = struct
       let pulse, src, (name, input) = Queue.take queue in
       Printf.eprintf "%s -%s-> %s %d\n%!" src (Pulse.to_string pulse) name input;
       (* Flip-flops. *)
-      if Hashtbl.mem cfg.flip_flops name then
-        let state = cfg.flip_flops.%{name} in
-        (match pulse with
-        | Pulse.Low ->
+      if Hashtbl.mem cfg.flip_flops name then (
+        if pulse = Pulse.Low then (
           (* On low pulse, flip state and send to outputs. *)
+          let state = cfg.flip_flops.%{name} in
           cfg.flip_flops.%{name} <- not state;
           let pulse' = if state then Pulse.Low else Pulse.High in
-          List.iter (fun output -> Queue.add (pulse', name, output) queue) cfg.outputs.%{name}
-        | Pulse.High ->
-          (* On high pulse, do nothing. *)
-          ())
-      (* Conjunctions. *)
-      else if Hashtbl.mem cfg.conjunctions name then
-        let state = cfg.conjunctions.%{name} in
-        (state.(input) <- pulse;
-        let pulse' = if Array.for_all (( = ) Pulse.High) state then Pulse.Low else Pulse.High in
+          List.iter (fun output -> Queue.add (pulse', name, output) queue) cfg.outputs.%{name}))
+      else if Hashtbl.mem cfg.conjunctions name then (
+        cfg.conjunctions.%{name}.(input) <- pulse;
+        let pulse' =
+          if Array.for_all (( = ) Pulse.High) cfg.conjunctions.%{name} then Pulse.Low
+          else Pulse.High
+        in
         List.iter (fun output -> Queue.add (pulse', name, output) queue) cfg.outputs.%{name})
-      (* Broadcasters. *)
       else if Hashtbl.mem cfg.outputs name then
         List.iter (fun output -> Queue.add (pulse, name, output) queue) cfg.outputs.%{name}
-      else
-        (* Untyped external module. *)
-        ()
+      else ()
     done
 
   let of_lines lines =

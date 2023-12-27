@@ -36,8 +36,10 @@ module Snapshot = struct
   let of_lines = List.of_seq % Seq.map Brick.of_string
 
   let sort bricks =
-    List.sort (fun ((_, _, min1), (_, _, max1)) ((_, _, min2), (_, _, max2)) ->
-        Stdlib.compare (min1, max1) (min2, max2)) bricks
+    List.sort
+      (fun (min1, max1) (min2, max2) ->
+        Stdlib.compare Point.(min1.z, max1.z) Point.(min2.z, max2.z))
+      bricks
 
   let settle =
     (* TODO *)

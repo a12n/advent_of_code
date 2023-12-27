@@ -49,18 +49,18 @@ module Config = struct
     Format.(
       Hashtbl.iter
         (fun name state ->
-          pp_print_space fmt ();
           pp_print_string fmt name;
           pp_print_char fmt '=';
-          pp_print_int fmt (if state then 1 else 0))
+          pp_print_int fmt (if state then 1 else 0);
+          pp_print_space fmt ())
         flip_flops;
       pp_print_newline fmt ();
       Hashtbl.iter
         (fun name state ->
-          pp_print_space fmt ();
           pp_print_string fmt name;
           pp_print_char fmt '=';
-          Array.iter (fun state -> pp_print_int fmt (if state = Pulse.Low then 0 else 1)) state)
+          Array.iter (fun state -> pp_print_int fmt (if state = Pulse.Low then 0 else 1)) state;
+          pp_print_space fmt ())
         conjunctions;
       pp_print_newline fmt ())
 

@@ -42,12 +42,16 @@ module Config = struct
     }
 
   let run cfg pulse name input =
+    let prerr_signal pulse src dest input =
+      Printf.eprintf "%s -%s-> %s %d\n%!" src (Pulse.to_string pulse) dest input
+    in
     let queue = Queue.create () in
     (* Send pulse to input 0 of the module [name]. *)
     Queue.add (pulse, (name, input)) queue;
     (* Propagate pulses. *)
     while not (Queue.is_empty queue) do
       let pulse, (name, input) = Queue.take queue in
+      prerr_signal pulse "" name input;
       (* Flip-flops. *)
       (match cfg.flip_flops.%?{name} with
       | Some on -> (

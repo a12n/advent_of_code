@@ -1,6 +1,6 @@
 open Advent
 
-module Grid = struct
+module Garden = struct
   type t = char array array
 
   let start =

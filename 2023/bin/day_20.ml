@@ -64,11 +64,9 @@ module Config = struct
           let pulse' = if state then Pulse.Low else Pulse.High in
           List.iter (fun output -> Queue.add (pulse', name, output) queue) cfg.outputs.%{name}))
       else if Hashtbl.mem cfg.conjunctions name then (
-        cfg.conjunctions.%{name}.(input) <- pulse;
-        let pulse' =
-          if Array.for_all (( = ) Pulse.High) cfg.conjunctions.%{name} then Pulse.Low
-          else Pulse.High
-        in
+        let state = cfg.conjunctions.%{name} in
+        state.(input) <- pulse;
+        let pulse' = if Array.for_all (( = ) Pulse.High) state then Pulse.Low else Pulse.High in
         List.iter (fun output -> Queue.add (pulse', name, output) queue) cfg.outputs.%{name})
       else if Hashtbl.mem cfg.outputs name then
         List.iter (fun output -> Queue.add (pulse, name, output) queue) cfg.outputs.%{name}

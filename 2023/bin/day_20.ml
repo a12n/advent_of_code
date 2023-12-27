@@ -67,8 +67,11 @@ module Config = struct
         let pulse' = if Array.for_all (( = ) Pulse.High) state then Pulse.Low else Pulse.High in
         List.iter (fun output -> Queue.add (pulse', name, output) queue) cfg.outputs.%{name})
       (* Broadcasters. *)
+      else if Hashtbl.mem cfg.outputs name then
+        List.iter (fun output -> Queue.add (pulse, name, output) queue) cfg.outputs.%{name}
       else
-      List.iter (fun output -> Queue.add (pulse, name, output) queue) cfg.outputs.%{name}
+        (* Untyped external module. *)
+        ()
     done
 
   let of_lines lines =

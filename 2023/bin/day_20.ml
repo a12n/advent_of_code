@@ -2,6 +2,8 @@ open Advent
 
 module Pulse = struct
   type t = Low | High
+
+  let to_string = function Low -> "L" | High -> "H"
 end
 
 module Flip_Flop = struct

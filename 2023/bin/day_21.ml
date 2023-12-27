@@ -37,9 +37,7 @@ module Garden = struct
             |> List.map (Pos.add (row, col) % Dir.to_pos)
             |> List.filter (Pos.is_valid size)
             |> List.filter (fun pos -> garden.@[pos] <> Plot.Rock)
-            |> List.iter (fun pos ->
-                   Printf.eprintf "%d (%d, %d)\n%!" i (fst pos) (snd pos);
-                   state.@[pos] <- (i + 1) :: state.@[pos])
+            |> List.iter (fun pos -> state.@[pos] <- (i + 1) :: state.@[pos])
         done
       done
     done;

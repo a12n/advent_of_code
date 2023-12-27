@@ -13,11 +13,13 @@ module Garden = struct
 
   let pp fmt =
     Format.(
-      Array.iter
-        (Array.iter
-           (pp_print_string fmt % function
-            | '.' -> "░"
-            | '#' -> "█"
-            | 'S' -> "╳"
-            | _ -> failwith __FUNCTION__)))
+      Array.iter (fun line ->
+          Array.iter
+            (pp_print_string fmt % function
+             | '.' -> "░"
+             | '#' -> "█"
+             | 'S' -> "╳"
+             | _ -> failwith __FUNCTION__)
+            line;
+          pp_print_newline fmt ()))
 end

@@ -1,5 +1,8 @@
 open Advent
 
+let ( .@[] ) grid (row, col) = grid.(row).(col)
+let ( .@[]<- ) grid (row, col) value = grid.(row).(col) <- value
+
 module Plot = struct
   type t = Garden | Rock | Start
 

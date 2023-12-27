@@ -5,6 +5,7 @@ module Grid : sig
 
   val of_lines : string Seq.t -> t
   val path : t -> Pos.t -> Pos.t -> (int * Pos.t list) option
+  val heat_loss : t -> Pos.t -> Pos.t -> int
   val pp : ?path:Pos.t list -> Format.formatter -> t -> unit
   val size : t -> int * int
 end = struct
@@ -51,6 +52,37 @@ end = struct
   module Priority_Queue = Set.Make (struct
     type t = int * Pos.t * Dir.t option * int
 
+    let compare = Stdlib.compare
+  end)
+
+  module Min_Queue = Set.Make (struct
+    type t = int * Pos.t * Dir.t option * int
+
+    let compare = Stdlib.compare
+  end)
+
+  let heat_loss grid src dest =
+    let size = Array.matrix_size grid in
+    if not Pos.(is_valid size src && is_valid size dest) then invalid_arg __FUNCTION__;
+    let rec loop queue =
+      let ((loss, pos, dir, straight) as elt) = Min_Queue.min_elt queue in
+      let queue' = Min_Queue.remove elt queue in
+      if pos = dest then loss
+      else
+        (match dir with
+        | Some dir -> Dir.[ (dir, straight + 1); (turn_left dir, 1); (turn_right dir, 1) ]
+        | None -> Dir.[ (Down, 1); (Right, 1); (Left, 1); (Up, 1) ])
+        |> List.filter (fun (_, straight) -> straight < 3)
+        |> List.filter_map (fun (dir, straight) ->
+               let pos' = Pos.add pos (Dir.to_pos dir) in
+               if Pos.is_valid size pos' then Some (pos', dir, straight) else None)
+        |> List.map (fun (pos', dir, straight) ->
+               let loss' = loss + grid.@[pos'] in
+               (loss', pos', Some dir, straight))
+        |> List.fold_left (Fun.flip Min_Queue.add) queue'
+        |> loop
+    in
+    loop (Min_Queue.singleton (0, src, None, 0))
 
   let path grid src dest =
     let ((n_rows, n_cols) as size) = Array.matrix_size grid in

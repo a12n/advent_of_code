@@ -16,9 +16,9 @@ module Garden = struct
       Array.iter (fun line ->
           Array.iter
             (pp_print_string fmt % function
-             | '.' -> "░"
-             | '#' -> "█"
-             | 'S' -> "╳"
+             | '.' -> "."
+             | '#' -> "▓"
+             | 'S' -> "@"
              | _ -> failwith __FUNCTION__)
             line;
           pp_print_newline fmt ()))

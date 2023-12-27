@@ -1,6 +1,6 @@
 open Advent
 
-module Grid : sig
+module Heat_Grid : sig
   type t
 
   val of_lines : string Seq.t -> t
@@ -9,23 +9,12 @@ module Grid : sig
   val pp : ?path:Pos.t list -> Format.formatter -> t -> unit
   val size : t -> int * int
 end = struct
-  type t = int array array
+  type t = int Grid.t
 
   let cell_color path pos = if List.mem pos path then ("\x1b[32m", "\x1b[0m") else ("", "")
 
-  let pp ?(path = []) fmt grid =
-    Array.iteri
-      (fun row line ->
-        Array.iteri
-          (fun col heat ->
-            let color_on, color_off = cell_color path (row, col) in
-            Format.(
-              pp_print_string fmt color_on;
-              pp_print_int fmt heat;
-              pp_print_string fmt color_off))
-          line;
-        Format.pp_print_newline fmt ())
-      grid
+  let pp ?(path = []) =
+    Grid.pp ~highlight:path ~sgr:"\x1b[32m" Format.pp_print_int
 
   let pp_dist ?(path = []) fmt grid dist prev =
     let n_rows, n_cols = Array.matrix_size grid in
@@ -45,9 +34,7 @@ end = struct
       Format.pp_print_newline fmt ()
     done
 
-  let size = Array.matrix_size
-  let ( .@[] ) a (row, col) = a.(row).(col)
-  let ( .@[]<- ) a (row, col) value = a.(row).(col) <- value
+  let size = Grid.size
 
   module Priority_Queue = Set.Make (struct
     type t = int * (int * int)
@@ -100,6 +87,7 @@ end = struct
     loop (Min_Queue.singleton (0, src, None, 0))
 
   let path grid src dest =
+    let open Grid.Ops in
     let ((n_rows, n_cols) as size) = Array.matrix_size grid in
     if not Pos.(is_valid size src && is_valid size dest) then
       invalid_arg (__FUNCTION__ ^ ": invalid src or dest");
@@ -107,13 +95,13 @@ end = struct
     let prev = Array.make_matrix n_rows n_cols None in
     let rec straight_line pos dir n =
       if n > 1 then
-        match prev.@[pos] with
+        match prev.@(pos) with
         | None -> false
         | Some dir' when dir' <> dir -> false
         | Some _ -> straight_line (Pos.add pos dir) dir (n - 1)
       else true
     in
-    dist.@[src] <- 0;
+    dist.@(src) <- 0;
     let rec loop queue =
       match Priority_Queue.min_elt_opt queue with
       | None -> ()
@@ -125,25 +113,25 @@ end = struct
           |> List.fold_left (update_next cur) queue
           |> loop
     and update_next cur queue next =
-      let alt = dist.@[cur] + grid.@[next] in
+      let alt = dist.@(cur) + grid.@(next) in
       let dir = Pos.sub cur next in
-      Printf.eprintf "next (%d, %d), dist %d, alt %d\n%!" (fst next) (snd next) dist.@[next] alt;
-      if alt < dist.@[next] && not (straight_line cur dir 4) then (
-        dist.@[next] <- alt;
-        prev.@[next] <- Some dir;
+      Printf.eprintf "next (%d, %d), dist %d, alt %d\n%!" (fst next) (snd next) dist.@(next) alt;
+      if alt < dist.@(next) && not (straight_line cur dir 4) then (
+        dist.@(next) <- alt;
+        prev.@(next) <- Some dir;
         Priority_Queue.add (alt, next) queue)
       else queue
     in
     loop (Priority_Queue.singleton (0, src));
-    if dist.@[dest] <> max_int then (
+    if dist.@(dest) <> max_int then (
       let rec backtrack path cur =
-        match prev.@[cur] with
+        match prev.@(cur) with
         | None -> path
         | Some dir -> backtrack (cur :: path) Pos.(add cur dir)
       in
       let path = src :: backtrack [] dest in
       pp_dist ~path Format.err_formatter grid dist prev;
-      Some (dist.@[dest], path))
+      Some (dist.@(dest), path))
     else None
 
   let of_lines =

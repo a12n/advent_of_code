@@ -10,6 +10,7 @@ module Point = struct
     | [ x; y; z ] -> { x; y; z }
     | _ -> invalid_arg __FUNCTION__
 
+  let map2 f p q = { x = f p.x q.x; y = f p.y q.y; z = f p.z q.z }
   let pp fmt { x; y; z } = Format.fprintf fmt "(%d, %d, %d)" x y z
 end
 

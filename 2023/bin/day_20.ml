@@ -43,11 +43,11 @@ module Config = struct
 
   let push_button cfg =
     let queue = Queue.create () in
-    Queue.add (Pulse.Low, ("broadcaster", 0)) queue;
+    Queue.add (Pulse.Low, "button", ("broadcaster", 0)) queue;
     (* Propagate pulses. *)
     while not (Queue.is_empty queue) do
-      let pulse, (name, input) = Queue.take queue in
-      Printf.eprintf "%s -%s-> %s %d\n%!" "???" (Pulse.to_string pulse) name input;
+      let pulse, src, (name, input) = Queue.take queue in
+      Printf.eprintf "%s -%s-> %s %d\n%!" src (Pulse.to_string pulse) name input;
       (* Flip-flops. *)
       (match cfg.flip_flops.%%{name} with
       | Some on -> (
@@ -56,7 +56,7 @@ module Config = struct
               (* On low pulse, flip state and send to outputs. *)
               cfg.flip_flops.%{name} <- not on;
               let pulse' = if on then Pulse.Low else Pulse.High in
-              List.iter (fun output -> Queue.add (pulse', output) queue) cfg.outputs.%{name}
+              List.iter (fun output -> Queue.add (pulse', name, output) queue) cfg.outputs.%{name}
           | Pulse.High ->
               (* On high pulse, do nothing. *)
               ())
@@ -68,12 +68,13 @@ module Config = struct
       | Some state ->
           state.(input) <- pulse;
           let pulse' = if Array.for_all (( = ) Pulse.High) state then Pulse.Low else Pulse.High in
-          List.iter (fun output -> Queue.add (pulse', output) queue) cfg.outputs.%{name}
+          List.iter (fun output -> Queue.add (pulse', name, output) queue) cfg.outputs.%{name}
       | None ->
           (* Not a conjunction. *)
           ());
       (* Broadcasters. *)
-      List.iter (fun output -> Queue.add (pulse, output) queue) cfg.outputs.%{name}
+      else
+      List.iter (fun output -> Queue.add (pulse, name, output) queue) cfg.outputs.%{name}
     done
 
   let of_lines lines =

@@ -60,6 +60,7 @@ module Config = struct
     while not (Queue.is_empty queue) do
       let pulse, src, (name, input) = Queue.take queue in
       Printf.eprintf "%s -%s-> %s %d\n%!" src (Pulse.to_string pulse) name input;
+      stats := Stats.add_pulse !stats pulse;
       (* Flip-flops. *)
       if Hashtbl.mem cfg.flip_flops name then (
         if pulse = Pulse.Low then (

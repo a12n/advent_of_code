@@ -50,7 +50,7 @@ end = struct
   let ( .@[]<- ) a (row, col) value = a.(row).(col) <- value
 
   module Priority_Queue = Set.Make (struct
-    type t = int * Pos.t * Dir.t option * int
+    type t = int * (int * int)
 
     let compare = Stdlib.compare
   end)

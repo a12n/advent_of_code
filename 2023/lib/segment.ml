@@ -12,17 +12,18 @@ let of_length min = function
   | _ -> invalid_arg __FUNCTION__
 
 let length { min; max } = Int.max 0 (max - min + 1)
-let is_disjoint s t = t.min > s.max || s.min > t.max
+let is_disjoint s1 s2 = s2.min > s1.max || s1.min > s2.max
 let is_empty { min; max } = min > max
 
-let inter_opt s t =
-  if is_disjoint s t then None else Some { min = Int.max s.min t.min; max = Int.min s.max t.max }
+let inter_opt s1 s2 =
+  if is_disjoint s1 s2 then None
+  else Some { min = Int.max s1.min s2.min; max = Int.min s1.max s2.max }
 
-let union_opt s t =
-  if is_empty s then Some t
-  else if is_empty t then Some s
-  else if is_disjoint s t then None
-  else Some { min = Int.min s.min t.min; max = Int.max s.max t.max }
+let union_opt s1 s2 =
+  if is_empty s1 then Some s2
+  else if is_empty s2 then Some s1
+  else if is_disjoint s1 s2 then None
+  else Some { min = Int.min s1.min s2.min; max = Int.max s1.max s2.max }
 
 let inter s1 s2 = match inter_opt s1 s2 with Some s -> s | None -> invalid_arg __FUNCTION__
 let union s1 s2 = match union_opt s1 s2 with Some s -> s | None -> invalid_arg __FUNCTION__

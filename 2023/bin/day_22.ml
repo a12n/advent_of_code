@@ -1,4 +1,5 @@
 open Advent
+open Hashtbl.Ops
 
 module Point = struct
   type t = { x : int; y : int; z : int }
@@ -67,20 +68,24 @@ module Snapshot = struct
     let nx, ny, _ = grid_size bricks in
     let h = Array.make_matrix nx ny 0 in
     let id = Array.make_matrix nx ny None in
-    List.mapi
-      (fun i ((min, max) as brick) ->
-        let bottom = Brick.bottom brick in
-        let max_h, _ =
-          List.map (fun pos -> (Grid.get_pos h pos, pos)) bottom |> List.reduce Stdlib.max
-        in
-        List.iter
-          (fun pos ->
-            Grid.set_pos h pos (max_h + 1);
-            Grid.set_pos id pos (Some i))
-          bottom;
-        let dpos = Point.{ zero with z = min.z - (max_h + 1) } in
-        Point.(sub min dpos, sub max dpos))
-      bricks
+    let supports = Hashtbl.create (nx * ny * 2) in
+    ( List.mapi
+        (fun i ((min, max) as brick) ->
+          let bottom = Brick.bottom brick in
+          let max_z, _ =
+            List.map (fun pos -> (Grid.get_pos h pos, pos)) bottom |> List.reduce Stdlib.max
+          in
+          List.iter
+            (fun pos ->
+              if Grid.get_pos h pos = max_z then
+                Option.iter (fun j -> supports.%%{j} <- i) (Grid.get_pos id pos);
+              Grid.set_pos h pos (max_z + 1);
+              Grid.set_pos id pos (Some i))
+            bottom;
+          let dpos = Point.{ zero with z = min.z - (max_z + 1) } in
+          Point.(sub min dpos, sub max dpos))
+        bricks,
+      supports )
 
   let pp fmt bricks =
     Format.(

@@ -1,5 +1,6 @@
 include module type of Stdlib.Seq
 
+val ints : ?until:int -> int -> int t
 val reduce : ('a -> 'a -> 'a) -> 'a t -> 'a
 
 module Symmetric : sig

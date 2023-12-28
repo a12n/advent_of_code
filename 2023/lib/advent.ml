@@ -11,6 +11,7 @@ module Dir = Advent__Dir
 module Grid = Advent__Grid
 module Polygon = Advent__Polygon
 module Pos = Advent__Pos
+module Segment = Advent__Segment
 
 let ( % ) f g x = f (g x)
 

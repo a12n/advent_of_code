@@ -3,13 +3,10 @@ open Day_22
 
 let () =
   let bricks = Snapshot.of_lines (input_lines stdin) in
-  Format.(
-    pp_print_string err_formatter "Input:\n";
-    Snapshot.pp err_formatter bricks;
-    pp_print_string err_formatter "Grid Span:\n";
-    Point.pp err_formatter (Point.of_tuple (Brick.size (Snapshot.grid_span bricks)));
-    pp_print_newline err_formatter ());
+  let nx, ny, nz = Snapshot.grid_size bricks in
+  Printf.printf "%d %d %d\n" nx ny nz;
   let bricks = Snapshot.sort bricks in
-  Format.(
-    pp_print_string err_formatter "Sorted:\n";
-    Snapshot.pp err_formatter bricks)
+  List.iter
+    (fun (Point.{ x = x1; y = y1; z = z1 }, Point.{ x = x2; y = y2; z = z2 }) ->
+      Printf.printf "%d %d %d %d %d %d\n" x1 y1 z1 x2 y2 z2)
+    bricks

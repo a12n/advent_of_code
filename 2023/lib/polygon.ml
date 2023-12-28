@@ -125,10 +125,5 @@ let interior_area points =
   let joints_area = Joint.list_of_polygon points |> List.map Joint.part_area |> List.reduce ( + ) in
   let lines_area = lines |> List.map Line.part_area |> List.reduce ( + ) in
   (* FIXME: invalid joints_area, invalid is_internal_angle/is_external_angle. *)
-  (*
-    Determine the area of the overall polygon, using Shoelace.
-    Determine the number of perimeter boundary points, which is also the perimeter volume. (Since our perimeter is made up of 1x1 squares.)
-    Rearrange Pick's Theorem to make use of this area and the number of boundary points, to determine the number of internal integer coordinates, i.e.
-*)
   Printf.eprintf "area %d, joints_area %d, lines_area %d\n%!" (100 * area) joints_area lines_area;
   ((100 * area) - joints_area - lines_area) / 100

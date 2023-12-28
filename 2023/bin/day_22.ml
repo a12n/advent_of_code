@@ -78,7 +78,12 @@ module Snapshot = struct
           in
           List.iter
             (fun pos ->
-              if height.@(pos) = max_z then Option.iter (fun j -> supports.%%{j} <- i) id.@(pos);
+              if height.@(pos) = max_z then
+                Option.iter
+                  (fun j ->
+                    (* Brick [j] supports [i]. *)
+                    supports.%%{j} <- i)
+                  id.@(pos);
               id.@(pos) <- Some i;
               height.@(pos) <- max_z + 1)
             bottom;

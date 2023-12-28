@@ -22,7 +22,10 @@ let inter_opt s1 s2 =
 let union_opt s1 s2 =
   if is_empty s1 then Some s2
   else if is_empty s2 then Some s1
-  else if is_disjoint s1 s2 then None
+  else if is_disjoint s1 s2 then
+    if s1.max + 1 = s2.min then Some { min = s1.min; max = s2.max }
+    else if s2.max + 1 = s1.min then Some { min = s2.min; max = s1.max }
+    else None
   else Some { min = Int.min s1.min s2.min; max = Int.max s1.max s2.max }
 
 let inter s1 s2 = match inter_opt s1 s2 with Some s -> s | None -> invalid_arg __FUNCTION__

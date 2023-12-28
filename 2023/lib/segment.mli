@@ -14,3 +14,5 @@ val diff : t -> t -> t list
 
 val partition : int -> t -> t * t
 (** Partitions segment [a, b] to segments [a, k - 1] and [k, b]. *)
+
+val pp : Format.formatter -> t -> unit [@@ocaml.toplevel_printer]

@@ -33,3 +33,8 @@ let diff s t =
   | None -> [ s ]
 
 let partition k { min; max } = ({ min; max = Int.min (k - 1) max }, { min = Int.max k min; max })
+
+let pp fmt s =
+  if is_empty s then Format.pp_print_string fmt "∅"
+  else if s.min = s.max then Format.pp_print_int fmt s.min
+  else Format.fprintf fmt "[%d, %d]" s.min s.max

@@ -62,9 +62,7 @@ module Part = struct
           (fun elt prev ->
             match (prev, elt) with
             | 0, elt ->
-                Format.(
-                  pp_print_char fmt ' ';
-                  pp_print_int fmt elt);
+                Format.pp_print_int fmt elt;
                 elt
             | prev, elt when elt = prev + 1 -> elt
             | _, elt ->
@@ -78,7 +76,7 @@ module Part = struct
         Format.(
           pp_print_string fmt "…";
           pp_print_int fmt prev));
-      Format.pp_print_string fmt " }"
+      Format.pp_print_string fmt "}"
 
     let pp fmt ({ x; m; a; s } as set) =
       Format.(

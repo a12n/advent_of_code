@@ -69,7 +69,7 @@ module Snapshot = struct
     let nx, ny, _ = grid_size bricks in
     let height = Array.make_matrix nx ny 0 in
     let id = Array.make_matrix nx ny None in
-    let supports = Hashtbl.create (nx * ny * 2) in
+    let support = Hashtbl.create (nx * ny * 2) in
     ( List.mapi
         (fun i ((min, max) as brick) ->
           let bottom = Brick.bottom brick in
@@ -82,7 +82,7 @@ module Snapshot = struct
                 Option.iter
                   (fun j ->
                     (* Brick [j] supports [i]. *)
-                    supports.%%{j} <- i)
+                    support.%%{j} <- i)
                   id.@(pos);
               id.@(pos) <- Some i;
               height.@(pos) <- max_z + 1)
@@ -90,7 +90,7 @@ module Snapshot = struct
           let dpos = Point.{ zero with z = min.z - (max_z + 1) } in
           Point.(sub min dpos, sub max dpos))
         bricks,
-      supports )
+      support )
 
   let pp fmt bricks =
     Format.(

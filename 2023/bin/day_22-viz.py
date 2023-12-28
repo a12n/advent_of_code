@@ -8,14 +8,21 @@ import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy
 
-dimensions = tuple(map(int, sys.stdin.readline().split()))
-x, y, z = numpy.indices(dimensions)
-
-bricks = []
+brick_spans = []
+dimensions = (0, 0, 0)
 for line in sys.stdin:
-    x1, y1, z1, x2, y2, z2 = tuple(map(int, line.split()))
-    bricks.append((x >= x1) & (x <= x2) & (y >= y1) &
-                  (y <= y2) & (z >= z1) & (z <= z2))
+    if line.strip().startswith('#'):
+        continue
+    pmin, pmax = tuple(line.split('~'))
+    pmin = tuple(map(int, pmin.split(',')))
+    pmax = tuple(map(int, pmax.split(',')))
+    brick_spans.append((pmin, pmax))
+    dimensions = numpy.maximum(dimensions, pmax)
+
+x, y, z = numpy.indices(dimensions + 1)
+bricks = [(x >= x1) & (x <= x2) & (y >= y1) &
+          (y <= y2) & (z >= z1) & (z <= z2) \
+          for ((x1, y1, z1), (x2, y2, z2)) in brick_spans]
 
 # Combine bricks into a single boolean array.
 voxels = functools.reduce(operator.or_, bricks)

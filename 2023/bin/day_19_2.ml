@@ -22,7 +22,7 @@ end = struct
         match cond.[1] with
         | '>' ->
             fun parts ->
-              let accept, pass = Segment.partition (value + 1) (get parts) in
+              let pass, accept = Segment.partition (value + 1) (get parts) in
               ((action, set parts accept), set parts pass)
         | '<' ->
             fun parts ->

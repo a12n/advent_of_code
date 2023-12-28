@@ -16,23 +16,21 @@ end = struct
     match String.split_on_char ':' s |> List.filter (( <> ) "") with
     | [ action ] ->
         let action = action_of_string action in
-        fun p -> ((action, p), Part.Range.empty)
+        fun parts -> ((action, parts), Part.Range.empty)
     | [ cond; action ] -> (
-        let get = Part.get cond.[0] in
-        let set = Part.set cond.[0] in
+        let get = Part.Range.get cond.[0] in
+        let set = Part.Range.set cond.[0] in
         let value = int_of_string String.(sub cond 2 (length cond - 2)) in
         let action = action_of_string action in
         match cond.[1] with
         | '>' ->
-            fun (min, max) ->
-              let min' = set min (Int.max (get min) (value + 1)) in
-              let max' = set max (Int.min (get max) value) in
-              ((action, (min', max)), (min, max'))
+            fun parts ->
+              let accept, pass = Segment.partition (value + 1) (get parts) in
+              ((action, set parts accept), set parts pass)
         | '<' ->
-            fun (min, max) ->
-              let max' = set max (Int.min (get max) (value - 1)) in
-              let min' = set min (Int.max (get min) value) in
-              ((action, (min, max')), (min', max))
+            fun parts ->
+              let accept, pass = Segment.partition value (get parts) in
+              ((action, set parts accept), set parts pass)
         | _ -> invalid_arg __FUNCTION__)
     | _ -> invalid_arg __FUNCTION__
 
@@ -63,37 +61,37 @@ module Workflow : sig
   type t = Rule.t list
   type t2 = Rule.t2 list
 
-  val eval : t -> Part.Range.t -> (string * Part.Range.t) list * Part.Range.t list
-  val eval2 : t2 -> Part.Set.t -> (string * Part.Set.t) list * Part.Set.t * Part.Set.t
+  val eval : t -> Part.Range.t -> (string * Part.Range.t) list * Part.Range.t
+  val eval2 : t2 -> Part.Set.t -> (string * Part.Set.t) list * Part.Set.t
   val of_string : string -> t
   val of_string2 : string -> t2
 end = struct
   type t = Rule.t list
   type t2 = Rule.t2 list
 
-  let eval wf p =
-    let sent, accepted, _ =
+  let eval wf parts =
+    let send, accept, _ =
       List.fold_left
-        (fun (sent, accepted, p) r ->
-          match r p with
-          | (`Accept, accept), pass -> (sent, accept :: accepted, pass)
-          | (`Reject, _), pass -> (sent, accepted, pass)
-          | (`Send id, send), pass -> ((id, send) :: sent, accepted, pass))
-        ([], [], p) wf
+        (fun (send, accept, parts) rule ->
+          match rule parts with
+          | (`Accept, a), pass -> (send, Part.Range.union a accept, pass)
+          | (`Reject, _), pass -> (send, accept, pass)
+          | (`Send id, s), pass -> ((id, s) :: send, accept, pass))
+        ([], Part.Range.empty, parts) wf
     in
-    (sent, accepted)
+    (List.rev send, accept)
 
   let eval2 wf parts =
-    let send, accept, reject, _ =
+    let send, accept, _ =
       List.fold_left
-        (fun (send, accept, reject, parts) rule ->
+        (fun (send, accept, parts) rule ->
           match rule parts with
-          | (`Accept, a), pass -> (send, Part.Set.union accept a, reject, pass)
-          | (`Reject, r), pass -> (send, accept, Part.Set.union reject r, pass)
-          | (`Send id, s), pass -> ((id, s) :: send, accept, reject, pass))
-        ([], Part.Set.empty, Part.Set.empty, parts) wf
+          | (`Accept, a), pass -> (send, Part.Set.union accept a, pass)
+          | (`Reject, _), pass -> (send, accept, pass)
+          | (`Send id, s), pass -> ((id, s) :: send, accept, pass))
+        ([], Part.Set.empty, parts) wf
     in
-    (List.rev send, accept, reject)
+    (List.rev send, accept)
 
   let of_string = List.map Rule.of_string % String.split_on_char ','
   let of_string2 = List.map Rule.of_string2 % String.split_on_char ','
@@ -101,37 +99,60 @@ end
 
 module System : sig
   type t
+  type t2
 
   (* Returns accepted part range. *)
-  val eval : t -> string -> Part.Set.t -> int
+  val eval : t -> string -> Part.Range.t -> int
+  val eval2 : t2 -> string -> Part.Set.t -> int
   val of_lines : string Seq.t -> t
+  val of_lines2 : string Seq.t -> t2
 end = struct
-  type t = (string, Workflow.t2) Hashtbl.t
+  type t = (string, Workflow.t) Hashtbl.t
+  type t2 = (string, Workflow.t2) Hashtbl.t
 
   let rec eval sys id parts =
-    ignore Workflow.eval;
-    let send, accept, reject = Workflow.eval2 (Hashtbl.find sys id) parts in
+    let send, accept = Workflow.eval (Hashtbl.find sys id) parts in
+    Format.(
+      fprintf err_formatter "eval \"%s\": " id;
+      Part.Range.pp err_formatter parts;
+      pp_print_string err_formatter " ->\n";
+      List.iter
+        (fun (id, parts) ->
+          fprintf err_formatter "- send \"%s\" " id;
+          Part.Range.pp err_formatter parts;
+          pp_print_newline err_formatter ())
+        send;
+      pp_print_string err_formatter "- accept ";
+      Part.Range.pp err_formatter accept;
+      pp_print_newline err_formatter ());
+    let accept = Part.Range.cardinal accept in
+    let accept =
+      List.fold_left (fun accept (id, parts) -> accept + eval sys id parts) accept send
+    in
+    Format.(
+      fprintf err_formatter "accept after \"%s\": " id;
+      pp_print_int err_formatter accept;
+      pp_print_newline err_formatter ());
+    accept
+
+  let rec eval2 sys id parts =
+    let send, accept = Workflow.eval2 (Hashtbl.find sys id) parts in
     Format.(
       fprintf err_formatter "eval \"%s\": " id;
       Part.Set.pp err_formatter parts;
       pp_print_string err_formatter " ->\n";
-      List.iter (fun (id, parts) ->
+      List.iter
+        (fun (id, parts) ->
           fprintf err_formatter "- send \"%s\" " id;
           Part.Set.pp err_formatter parts;
-          pp_print_newline err_formatter ()
-        ) send;
+          pp_print_newline err_formatter ())
+        send;
       pp_print_string err_formatter "- accept ";
       Part.Set.pp err_formatter accept;
-      pp_print_newline err_formatter ();
-      pp_print_string err_formatter "- reject ";
-      Part.Set.pp err_formatter reject;
-      pp_print_newline err_formatter ()
-    );
+      pp_print_newline err_formatter ());
     let accept = Part.Set.cardinal accept in
     let accept =
-      List.fold_left
-        (fun accept (id, parts) -> accept + (eval sys id parts))
-        accept send
+      List.fold_left (fun accept (id, parts) -> accept + eval2 sys id parts) accept send
     in
     Format.(
       fprintf err_formatter "accept after \"%s\": " id;
@@ -140,7 +161,19 @@ end = struct
     accept
 
   let of_lines =
-    ignore Workflow.of_string;
+    Seq.fold_left
+      (fun sys line ->
+        (match String.split_on_char '{' line with
+        | [ id; workflow' ] -> (
+            match String.split_on_char '}' workflow' with
+            | [ workflow; "" ] -> Hashtbl.replace sys id (Workflow.of_string workflow)
+            | _ -> invalid_arg __FUNCTION__)
+        | _ -> invalid_arg __FUNCTION__);
+        sys)
+      (Hashtbl.create 100)
+    % Seq.take_while (( <> ) "")
+
+  let of_lines2 =
     Seq.fold_left
       (fun sys line ->
         (match String.split_on_char '{' line with
@@ -155,7 +188,8 @@ end = struct
 end
 
 let () =
+  ignore (System.eval, System.of_lines);
   let lines = input_lines stdin in
-  let sys = System.of_lines lines in
-  let accept = System.eval sys "in" Part.Set.full in
+  let sys = System.of_lines2 lines in
+  let accept = System.eval2 sys "in" Part.Set.full in
   print_endline (string_of_int accept)

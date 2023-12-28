@@ -19,7 +19,10 @@ let inter_opt s t =
   if is_disjoint s t then None else Some { min = Int.max s.min t.min; max = Int.min s.max t.max }
 
 let union_opt s t =
-  if is_disjoint s t then None else Some { min = Int.min s.min t.min; max = Int.max s.max t.max }
+  if is_empty s then Some t
+  else if is_empty t then Some s
+  else if is_disjoint s t then None
+  else Some { min = Int.min s.min t.min; max = Int.max s.max t.max }
 
 let inter s1 s2 = match inter_opt s1 s2 with Some s -> s | None -> invalid_arg __FUNCTION__
 let union s1 s2 = match union_opt s1 s2 with Some s -> s | None -> invalid_arg __FUNCTION__

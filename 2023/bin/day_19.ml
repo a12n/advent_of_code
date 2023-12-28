@@ -2,13 +2,6 @@ open Advent
 
 module Part = struct
   type t = { x : int; m : int; a : int; s : int }
-  and part = t
-
-  let map2_min p1 p2 =
-    { x = Int.min p1.x p2.x; m = Int.min p1.m p2.m; a = Int.min p1.a p2.a; s = Int.min p1.s p2.s }
-
-  let map2_max p1 p2 =
-    { x = Int.max p1.x p2.x; m = Int.max p1.m p2.m; a = Int.max p1.a p2.a; s = Int.max p1.s p2.s }
 
   let get = function
     | 'x' -> fun { x; _ } -> x
@@ -52,28 +45,12 @@ module Part = struct
       let x = Int_Set.of_seq Seq.(take 4000 (ints 1)) in
       { x; m = x; a = x; s = x }
 
-    let inter s1 s2 =
-      {
-        x = Int_Set.inter s1.x s2.x;
-        m = Int_Set.inter s1.m s2.m;
-        a = Int_Set.inter s1.a s2.a;
-        s = Int_Set.inter s1.s s2.s;
-      }
-
     let union s1 s2 =
       {
         x = Int_Set.union s1.x s2.x;
         m = Int_Set.union s1.m s2.m;
         a = Int_Set.union s1.a s2.a;
         s = Int_Set.union s1.s s2.s;
-      }
-
-    let diff s1 s2 =
-      {
-        x = Int_Set.diff s1.x s2.x;
-        m = Int_Set.diff s1.m s2.m;
-        a = Int_Set.diff s1.a s2.a;
-        s = Int_Set.diff s1.s s2.s;
       }
 
     let cardinal { x; m; a; s } = Int_Set.(cardinal x * cardinal m * cardinal a * cardinal s)
@@ -141,14 +118,6 @@ module Part = struct
     let full =
       let s = Segment.of_endpoints 1 4000 in
       { x = s; m = s; a = s; s }
-
-    let inter p1 p2 =
-      {
-        x = Segment.inter p1.x p2.x;
-        m = Segment.inter p1.m p2.m;
-        a = Segment.inter p1.a p2.a;
-        s = Segment.inter p1.s p2.s;
-      }
 
     let union p1 p2 =
       {

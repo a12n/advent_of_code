@@ -1,6 +1,6 @@
 open Advent
 open Grid.Ops
-open Hashtbl.Ops
+module Int_Set = Set.Make (Int)
 
 module Point = struct
   type t = { x : int; y : int; z : int }
@@ -69,28 +69,28 @@ module Snapshot = struct
     let nx, ny, _ = grid_size bricks in
     let height = Array.make_matrix nx ny 0 in
     let id = Array.make_matrix nx ny None in
-    let support = Hashtbl.create (nx * ny * 2) in
-    ( List.mapi
-        (fun i ((min, max) as brick) ->
-          let bottom = Brick.bottom brick in
-          let max_z, _ =
-            List.map (fun pos -> (height.@(pos), pos)) bottom |> List.reduce Stdlib.max
-          in
-          List.iter
-            (fun pos ->
-              if height.@(pos) = max_z then
-                Option.iter
-                  (fun j ->
-                    (* Brick [j] supports [i]. *)
-                    support.%%{j} <- i)
-                  id.@(pos);
+    List.mapi
+      (fun i ((min, max) as brick) ->
+        let bottom = Brick.bottom brick in
+        let max_z, _ =
+          List.map (fun pos -> (height.@(pos), pos)) bottom |> List.reduce Stdlib.max
+        in
+        let support =
+          List.fold_left
+            (fun set pos ->
+              let set' =
+                if height.@(pos) = max_z then
+                  Option.fold ~none:set ~some:((Fun.flip Int_Set.add) set) id.@(pos)
+                else set
+              in
               id.@(pos) <- Some i;
-              height.@(pos) <- max_z + 1)
-            bottom;
-          let dpos = Point.{ zero with z = min.z - (max_z + 1) } in
-          Point.(sub min dpos, sub max dpos))
-        bricks,
-      support )
+              height.@(pos) <- max_z + 1;
+              set')
+            Int_Set.empty bottom
+        in
+        let drop = Point.{ zero with z = min.z - (max_z + 1) } in
+        (Point.(sub min drop, sub max drop), support))
+      bricks
 
   let pp fmt bricks =
     Format.(

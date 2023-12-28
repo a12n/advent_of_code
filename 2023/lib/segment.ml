@@ -32,3 +32,4 @@ let diff s t =
       left_of_t @ right_of_t
   | None -> [ s ]
 
+let partition k { min; max } = ({ min; max = Int.min (k - 1) max }, { min = Int.max k min; max })

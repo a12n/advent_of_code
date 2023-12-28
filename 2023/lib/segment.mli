@@ -11,3 +11,4 @@ val union : t -> t -> t
 val inter_opt : t -> t -> t option
 val union_opt : t -> t -> t option
 val diff : t -> t -> t list
+val partition : int -> t -> t * t

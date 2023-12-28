@@ -39,8 +39,8 @@ end = struct
     let send, _ =
       List.fold_left
         (fun (send, parts) rule ->
-          let (id, s), pass = rule parts in
-          ((id, s) :: send, pass))
+          let s, pass = rule parts in
+          (s :: send, pass))
         ([], parts) wf
     in
     List.rev send

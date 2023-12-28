@@ -131,15 +131,16 @@ module Part = struct
 
     let pp fmt ({ x; m; a; s } as r) =
       Format.(
-        pp_print_string fmt "|x ";
+        pp_print_string fmt "{x=";
         Segment.pp fmt x;
-        pp_print_string fmt " m ";
+        pp_print_string fmt "; m=";
         Segment.pp fmt m;
-        pp_print_string fmt " a ";
+        pp_print_string fmt "; a=";
         Segment.pp fmt a;
-        pp_print_string fmt " s ";
+        pp_print_string fmt "; s=";
         Segment.pp fmt s;
-        pp_print_string fmt "| = ";
-        pp_print_int fmt (cardinal r))
+        pp_print_string fmt "; n=";
+        pp_print_int fmt (cardinal r);
+        pp_print_string fmt "}")
   end
 end

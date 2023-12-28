@@ -32,6 +32,10 @@ module Brick = struct
     | [ min; max ] -> (Point.of_string min, Point.of_string max)
     | _ -> invalid_arg __FUNCTION__
 
+  (** Positions of the bottom face of the brick. *)
+  let bottom (Point.{ x = x1; y = y1; _ }, Point.{ x = x2; y = y2; _ }) =
+    Seq.(product (ints ~until:x2 x1) (ints ~until:y2 y1))
+
   let pp fmt (min, max) =
     Format.(
       pp_print_char fmt '(';
@@ -59,9 +63,13 @@ module Snapshot = struct
         Stdlib.compare Point.(min1.z, max1.z) Point.(min2.z, max2.z))
       bricks
 
-  let settle =
+  let settle bricks =
+    let nx, ny, _ = grid_size bricks in
+    let h = Array.make_matrix nx ny 0 in
+    let id = Array.make_matrix nx ny None in
+    List.iteri (fun i (min, max) -> ignore (i, min, max)) bricks;
     (* TODO *)
-    Fun.id
+    bricks
 
   let pp fmt bricks =
     Format.(

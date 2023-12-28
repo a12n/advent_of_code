@@ -1,5 +1,7 @@
+include Stdlib.Hashtbl
+
 module Ops = struct
-  let ( .%{} ) = Hashtbl.find
-  let ( .%%{} ) = Hashtbl.find_opt
-  let ( .%{}<- ) = Hashtbl.replace
+  let ( .%{} ) = find
+  let ( .%%{} ) = find_opt
+  let ( .%{}<- ) = replace
 end

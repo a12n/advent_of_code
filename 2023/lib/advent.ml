@@ -1,5 +1,6 @@
 (* Stdlib extensions *)
 module Array = Advent__Array
+module Hashtbl = Advent__Hashtbl
 module Int = Advent__Int
 module List = Advent__List
 module Seq = Advent__Seq

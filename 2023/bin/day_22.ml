@@ -34,7 +34,7 @@ module Brick = struct
 
   (** Positions of the bottom face of the brick. *)
   let bottom (Point.{ x = x1; y = y1; _ }, Point.{ x = x2; y = y2; _ }) =
-    Seq.(product (ints ~until:x2 x1) (ints ~until:y2 y1))
+    Seq.(product (ints ~until:x2 x1) (ints ~until:y2 y1)) |> List.of_seq
 
   let pp fmt (min, max) =
     Format.(

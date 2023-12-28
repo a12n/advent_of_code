@@ -2,13 +2,24 @@ open Advent
 open Day_22
 
 let () =
-  let bricks = Snapshot.of_lines (input_lines stdin) in
-  let _, Point.{ x = nx; y = ny; z = nz } = Snapshot.grid_span bricks in
-  Printf.printf "%d %d %d\n" (nx + 1) (ny + 1) (nz + 1);
-  let bricks = Snapshot.sort bricks in
-  let bricks, support = Snapshot.settle bricks in
-  List.iter
-    (fun (Point.{ x = x1; y = y1; z = z1 }, Point.{ x = x2; y = y2; z = z2 }) ->
-      Printf.printf "%d %d %d %d %d %d\n" x1 y1 z1 x2 y2 z2)
+  (* List of settled bricks along with a set of brick numbers
+     supporting each brick. *)
+  let bricks = Snapshot.(settle (sort (of_lines (input_lines stdin)))) in
+  List.iteri
+    (fun i ((Point.{ x = x1; y = y1; z = z1 }, Point.{ x = x2; y = y2; z = z2 }), support) ->
+      Printf.eprintf "%d,%d,%d~%d,%d,%d\n%!" x1 y1 z1 x2 y2 z2;
+      Printf.eprintf "# Brick %d supported by:" i;
+      Int_Set.iter (Printf.eprintf " %d") support;
+      Printf.eprintf "\n%!")
     bricks;
-  Hashtbl.iter (Printf.eprintf "Brick %d supports %d\n%!") support
+  let disintegrate =
+    List.fold_left
+      (fun candidates (_, support) ->
+        if Int_Set.cardinal support = 1 then Int_Set.diff candidates support else candidates)
+      (Int_Set.of_list List.(init (length bricks) Fun.id))
+      bricks
+  in
+  Printf.eprintf "# Disintegrate:";
+  Int_Set.iter (Printf.eprintf " %d") disintegrate;
+  Printf.eprintf "\n%!";
+  print_endline (string_of_int (Int_Set.cardinal disintegrate))

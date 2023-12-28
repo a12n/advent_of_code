@@ -1,18 +1,25 @@
 type t = { min : int; max : int }
 
-let make min = function
-  | `End max when max >= min -> { min; max }
-  | `Length 0 -> { min; max = min }
-  | `Length n when n > 0 -> { min; max = min + n - 1 }
+let empty = { min = 1; max = 0 }
+
+let of_endpoints min max =
+  if min > max then invalid_arg __FUNCTION__;
+  { min; max }
+
+let of_length min = function
+  | 0 -> { min; max = min }
+  | n when n > 0 -> { min; max = min + n - 1 }
   | _ -> invalid_arg __FUNCTION__
 
-let disjoint s t = t.min > s.max || s.min > t.max
+let length { min; max } = Int.max 0 (max - min + 1)
+let is_disjoint s t = t.min > s.max || s.min > t.max
+let is_empty { min; max } = min > max
 
 let inter_opt s t =
-  if disjoint s t then None else Some { min = Int.max s.min t.min; max = Int.min s.max t.max }
+  if is_disjoint s t then None else Some { min = Int.max s.min t.min; max = Int.min s.max t.max }
 
 let union_opt s t =
-  if disjoint s t then None else Some { min = Int.min s.min t.min; max = Int.max s.max t.max }
+  if is_disjoint s t then None else Some { min = Int.min s.min t.min; max = Int.max s.max t.max }
 
 let inter s t = Option.get (inter_opt s t)
 let union s t = Option.get (union_opt s t)
@@ -25,4 +32,3 @@ let diff s t =
       left_of_t @ right_of_t
   | None -> [ s ]
 
-let length { min; max } = max - min + 1

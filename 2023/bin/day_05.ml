@@ -13,17 +13,12 @@ end = struct
 
   let of_lines lines =
     let parse_line assoc line =
-      match
-        String.split_on_char ' ' line
-        |> List.filter (( <> ) "")
-        |> List.map int_of_string
-      with
-      | [ dest; src; len ] -> (Segment.make src (`Length len), dest) :: assoc
+      match String.split_on_char ' ' line |> List.filter (( <> ) "") |> List.map int_of_string with
+      | [ dest; src; len ] -> (Segment.of_length src len, dest) :: assoc
       | _ -> invalid_arg __FUNCTION__
     in
     Seq.take_while (( <> ) "") lines
-    |> Seq.fold_left parse_line empty
-    |> List.stable_sort Stdlib.compare
+    |> Seq.fold_left parse_line empty |> List.stable_sort Stdlib.compare
 
   let rec find assoc q =
     match assoc with
@@ -40,11 +35,7 @@ end = struct
         match Segment.inter_opt q src with
         | Some overlap ->
             (* Remap intersection as the destination segment. *)
-            let r0 =
-              Segment.make
-                (dest + overlap.min - src.min)
-                (`Length (Segment.length overlap))
-            in
+            let r0 = Segment.of_length (dest + overlap.min - src.min) (Segment.length overlap) in
             (* Try to intersect non-overlaped parts of the query
                segment to the other segments in the mapping. *)
             let rs =
@@ -112,39 +103,21 @@ end = struct
       match Seq.uncons lines with
       | Some (line, lines') -> (
           match String.split_on_char ':' line with
-          | [ "seeds"; seeds ] ->
-              parse { almanac with seeds = parse_seeds seeds } lines'
+          | [ "seeds"; seeds ] -> parse { almanac with seeds = parse_seeds seeds } lines'
           | [ "seed-to-soil map"; "" ] ->
-              parse
-                { almanac with seed_to_soil = Mapping.of_lines lines' }
-                lines'
+              parse { almanac with seed_to_soil = Mapping.of_lines lines' } lines'
           | [ "soil-to-fertilizer map"; "" ] ->
-              parse
-                { almanac with soil_to_fertilizer = Mapping.of_lines lines' }
-                lines'
+              parse { almanac with soil_to_fertilizer = Mapping.of_lines lines' } lines'
           | [ "fertilizer-to-water map"; "" ] ->
-              parse
-                { almanac with fertilizer_to_water = Mapping.of_lines lines' }
-                lines'
+              parse { almanac with fertilizer_to_water = Mapping.of_lines lines' } lines'
           | [ "water-to-light map"; "" ] ->
-              parse
-                { almanac with water_to_light = Mapping.of_lines lines' }
-                lines'
+              parse { almanac with water_to_light = Mapping.of_lines lines' } lines'
           | [ "light-to-temperature map"; "" ] ->
-              parse
-                { almanac with light_to_temperature = Mapping.of_lines lines' }
-                lines'
+              parse { almanac with light_to_temperature = Mapping.of_lines lines' } lines'
           | [ "temperature-to-humidity map"; "" ] ->
-              parse
-                {
-                  almanac with
-                  temperature_to_humidity = Mapping.of_lines lines';
-                }
-                lines'
+              parse { almanac with temperature_to_humidity = Mapping.of_lines lines' } lines'
           | [ "humidity-to-location map"; "" ] ->
-              parse
-                { almanac with humidity_to_location = Mapping.of_lines lines' }
-                lines'
+              parse { almanac with humidity_to_location = Mapping.of_lines lines' } lines'
           | [ "" ] -> parse almanac lines'
           | _ -> invalid_arg (__FUNCTION__ ^ ": invalid line \"" ^ line ^ "\""))
       | None -> almanac
@@ -152,9 +125,7 @@ end = struct
     parse empty
 
   let seed_to_location almanac seeds =
-    let find_segments map segs =
-      List.flatten (List.map (Mapping.find map) segs)
-    in
+    let find_segments map segs = List.flatten (List.map (Mapping.find map) segs) in
     seeds
     |> find_segments almanac.seed_to_soil
     |> find_segments almanac.soil_to_fertilizer

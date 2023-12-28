@@ -1,47 +1,5 @@
 open Advent
 
-module Segment : sig
-  type t = private { min : int; max : int }
-
-  val make : int -> [ `End of int | `Length of int ] -> t
-  val length : t -> int
-  val inter : t -> t -> t option
-  val union : t -> t -> t option
-  val diff : t -> t -> t list
-end = struct
-  type t = { min : int; max : int }
-
-  let make min = function
-    | `End max when max >= min -> { min; max }
-    | `Length 0 -> { min; max = min }
-    | `Length n when n > 0 -> { min; max = min + n - 1 }
-    | _ -> invalid_arg __FUNCTION__
-
-  let disjoint s t = t.min > s.max || s.min > t.max
-
-  let inter s t =
-    if disjoint s t then None
-    else Some { min = Int.max s.min t.min; max = Int.min s.max t.max }
-
-  let union s t =
-    if disjoint s t then None
-    else Some { min = Int.min s.min t.min; max = Int.max s.max t.max }
-
-  let diff s t =
-    match inter s t with
-    | Some { min; max } ->
-        let left_of_t =
-          if min > s.min then [ { min = s.min; max = min - 1 } ] else []
-        in
-        let right_of_t =
-          if max < s.max then [ { min = max + 1; max = s.max } ] else []
-        in
-        left_of_t @ right_of_t
-    | None -> [ s ]
-
-  let length { min; max } = max - min + 1
-end
-
 module Mapping : sig
   type t = private (Segment.t * int) list
 
@@ -79,7 +37,7 @@ end = struct
            query itself. *)
         [ q ]
     | (src, dest) :: assoc' -> (
-        match Segment.inter q src with
+        match Segment.inter_opt q src with
         | Some overlap ->
             (* Remap intersection as the destination segment. *)
             let r0 =

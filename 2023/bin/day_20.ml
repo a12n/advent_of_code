@@ -74,7 +74,7 @@ module Config = struct
     let queue = Queue.create () in
     Queue.add (Pulse.Low, "button", ("broadcaster", 0)) queue;
     (* Propagate pulses. *)
-    while not (Queue.is_empty queue) do
+    while not !found && not (Queue.is_empty queue) do
       let pulse, _src, (name, input) = Queue.take queue in
       found := !found || (name = "rx" && pulse = Pulse.Low);
       stats := Stats.add_pulse !stats pulse;

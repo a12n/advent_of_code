@@ -8,14 +8,20 @@ module Pulse = struct
 end
 
 module Stats = struct
-  type t = { low : int; high : int }
+  type t = { low : (string, int) Hashtbl.t; high : (string, int) Hashtbl.t }
 
-  let zero = { low = 0; high = 0 }
-  let add s1 s2 = { low = s1.low + s2.low; high = s1.high + s2.high }
+  let make () = { low = Hashtbl.create 100; high = Hashtbl.create 100 }
 
-  let add_pulse s = function
-    | Pulse.Low -> { s with low = s.low + 1 }
-    | Pulse.High -> { s with high = s.high + 1 }
+  let clear { low; high } =
+    Hashtbl.(
+      clear low;
+      clear high)
+
+  let add_pulse { low; high } key = function
+    | Pulse.Low -> Hashtbl.modify ~default:1 low Int.succ key
+    | Pulse.High -> Hashtbl.modify ~default:1 high Int.succ key
+
+  let total { low; high } = Hashtbl.(fold (fun _ -> ( + )) low 0, fold (fun _ -> ( + )) high 0)
 end
 
 module Config = struct
@@ -85,16 +91,13 @@ module Config = struct
       (fun name -> Array.fill conjunctions.%{name} Pulse.Low)
       (Hashtbl.to_seq_keys conjunctions)
 
-  let push_button cfg =
-    let found = ref false in
-    let stats = ref Stats.zero in
+  let push_button cfg stats =
     let queue = Queue.create () in
     Queue.add (Pulse.Low, "button", ("broadcaster", 0)) queue;
     (* Propagate pulses. *)
-    while not !found && not (Queue.is_empty queue) do
+    while not (Queue.is_empty queue) do
       let pulse, _src, (name, input) = Queue.take queue in
-      found := !found || (name = "rx" && pulse = Pulse.Low);
-      stats := Stats.add_pulse !stats pulse;
+      Stats.add_pulse stats name pulse;
       (* Flip-flops. *)
       if Hashtbl.mem cfg.flip_flops name then (
         if pulse = Pulse.Low then (
@@ -111,8 +114,7 @@ module Config = struct
       else if Hashtbl.mem cfg.outputs name then
         List.iter (fun output -> Queue.add (pulse, name, output) queue) cfg.outputs.%{name}
       else ()
-    done;
-    (!found, !stats)
+    done
 
   let of_lines lines =
     let ({ outputs; flip_flops; conjunctions; _ } as cfg) = make () in

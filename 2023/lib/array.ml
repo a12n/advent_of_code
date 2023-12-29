@@ -1,5 +1,12 @@
 include Stdlib.Array
 
+let fill ?(pos = 0) ?len a =
+  let n = length a in
+  let len = match len with None -> n - pos | Some len -> len in
+  if pos < 0 || pos >= n then invalid_arg (__FUNCTION__ ^ ": invalid pos");
+  if len < 0 || pos + len > n then invalid_arg (__FUNCTION__ ^ ": invalid len");
+  Stdlib.Array.fill a pos len
+
 let fold_left2 f acc a b =
   let n = length a in
   if length b <> n then invalid_arg __FUNCTION__;

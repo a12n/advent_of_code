@@ -42,6 +42,17 @@ module Config = struct
           pp_print_newline fmt ())
         conjunctions)
 
+  let pp_dot fmt { outputs; flip_flops; conjunctions } =
+    Format.(
+      pp_print_string fmt "digraph {\n";
+      fprintf fmt "\trx [color=green];\n";
+      Hashtbl.iter (fun name _ -> fprintf fmt "\t%s [label=\"%% %s\"];\n" name name) flip_flops;
+      Hashtbl.iter (fun name _ -> fprintf fmt "\t%s [label=\"& %s\"];\n" name name) conjunctions;
+      Hashtbl.iter
+        (fun name dests -> List.iter (fun (dest, _) -> fprintf fmt "\t%s -> %s;\n" name dest) dests)
+        outputs;
+      pp_print_string fmt "}\n")
+
   let pp_state fmt { flip_flops; conjunctions; _ } =
     Format.(
       Hashtbl.iter

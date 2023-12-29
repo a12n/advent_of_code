@@ -7,11 +7,23 @@ let () =
   Config.pp Format.err_formatter cfg;
   Seq.(ints 1)
   |> Seq.find (fun i ->
-         Format.(
-           pp_print_int err_formatter i;
-           pp_print_char err_formatter ':';
-           pp_print_newline err_formatter ();
-           Config.pp_state err_formatter cfg);
+         Stats.clear stats;
+
          Config.push_button cfg stats;
+
+         (* "rx" is low when all "&zh" inputs are high. "&zh" inputs
+            are wired to "&jt", "&kb", "&sx" and "&ks" outputs. All these
+            conjunctions (inverters) must see low pulse to set "&zh" to
+            high, and "rx" to low. *)
+         let check_low name =
+           match Hashtbl.find_opt low name with
+           | Some n -> Printf.eprintf "%d: %s %d\n%!" i name n
+           | None -> ()
+         in
+         check_low "jt";
+         check_low "kb";
+         check_low "sx";
+         check_low "ks";
+
          Hashtbl.mem low "rx")
   |> Option.get |> string_of_int |> print_endline

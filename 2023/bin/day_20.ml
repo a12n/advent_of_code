@@ -68,6 +68,12 @@ module Config = struct
       conjunctions = Hashtbl.create 100;
     }
 
+  let reset { flip_flops; conjunctions; _ } =
+    Seq.iter (fun name -> flip_flops.%{name} <- false) (Hashtbl.to_seq_keys flip_flops);
+    Seq.iter
+      (fun name -> Array.fill conjunctions.%{name} Pulse.Low)
+      (Hashtbl.to_seq_keys conjunctions)
+
   let push_button cfg =
     let found = ref false in
     let stats = ref Stats.zero in

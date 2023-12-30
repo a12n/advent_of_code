@@ -1,5 +1,6 @@
 (* Stdlib extensions *)
 module Array = Advent__Array
+module Fun = Advent__Fun
 module Hashtbl = Advent__Hashtbl
 module Int = Advent__Int
 module List = Advent__List
@@ -14,7 +15,7 @@ module Polygon = Advent__Polygon
 module Pos = Advent__Pos
 module Segment = Advent__Segment
 
-let ( % ) f g x = f (g x)
+include Fun.Ops
 
 (** Binding operator to short-circuit chains of [compare] calls for
     tuples. *)

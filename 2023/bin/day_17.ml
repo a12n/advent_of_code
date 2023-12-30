@@ -8,7 +8,6 @@ module Heat_Grid : sig
   val backtrack : Dir.t option Grid.t -> Pos.t -> Pos.t list
   val distance : t -> Pos.t -> int Grid.t * Dir.t option Grid.t
   val of_lines : string Seq.t -> t
-  val path : t -> Pos.t -> Pos.t -> (int * Pos.t list) option
   val heat_loss : ?min_straight:int -> ?max_straight:int -> t -> Pos.t -> Pos.t -> int
   val pp : ?path:Pos.t list -> Format.formatter -> t -> unit
   val pp_dist : ?path:Pos.t list -> Format.formatter -> t -> int Grid.t -> Pos.t option Grid.t -> unit
@@ -128,53 +127,6 @@ end = struct
         |> loop)
     in
     loop (Min_Queue.singleton (0, src, None, 0))
-
-  let path grid src dest =
-    let ((n_rows, n_cols) as size) = Array.matrix_size grid in
-    if not Pos.(is_valid size src && is_valid size dest) then
-      invalid_arg (__FUNCTION__ ^ ": invalid src or dest");
-    let dist = Array.make_matrix n_rows n_cols max_int in
-    let prev = Array.make_matrix n_rows n_cols None in
-    let rec straight_line pos dir n =
-      if n > 1 then
-        match prev.@(pos) with
-        | None -> false
-        | Some dir' when dir' <> dir -> false
-        | Some _ -> straight_line (Pos.add pos dir) dir (n - 1)
-      else true
-    in
-    dist.@(src) <- 0;
-    let rec loop queue =
-      match Priority_Queue.min_elt_opt queue with
-      | None -> ()
-      | Some ((_, cur) as cur_elt) ->
-          let queue = Priority_Queue.remove cur_elt queue in
-          Printf.eprintf "cur (%d, %d)\n%!" (fst cur) (snd cur);
-          List.map (Pos.add cur) [ (-1, 0); (0, -1); (1, 0); (0, 1) ]
-          |> List.filter (Pos.is_valid size)
-          |> List.fold_left (update_next cur) queue
-          |> loop
-    and update_next cur queue next =
-      let alt = dist.@(cur) + grid.@(next) in
-      let dir = Pos.sub cur next in
-      Printf.eprintf "next (%d, %d), dist %d, alt %d\n%!" (fst next) (snd next) dist.@(next) alt;
-      if alt < dist.@(next) && not (straight_line cur dir 4) then (
-        dist.@(next) <- alt;
-        prev.@(next) <- Some dir;
-        Priority_Queue.add (alt, next) queue)
-      else queue
-    in
-    loop (Priority_Queue.singleton (0, src));
-    if dist.@(dest) <> max_int then (
-      let rec backtrack path cur =
-        match prev.@(cur) with
-        | None -> path
-        | Some dir -> backtrack (cur :: path) Pos.(add cur dir)
-      in
-      let path = src :: backtrack [] dest in
-      pp_dist ~path Format.err_formatter grid dist prev;
-      Some (dist.@(dest), path))
-    else None
 
   let of_lines = Grid.of_lines (fun c -> int_of_char c - int_of_char '0')
 end

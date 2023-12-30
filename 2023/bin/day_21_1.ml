@@ -3,6 +3,9 @@ open Day_21
 
 let () =
   let garden = Garden.of_lines (input_lines stdin) in
-  let reachable = Garden.steps garden (Option.get (Garden.start garden)) 64 in
-  Garden.pp ~highlight:reachable Format.err_formatter garden;
+  let n = Option.(value ~default:64 (map int_of_string (Sys.getenv_opt "N"))) in
+  let reachable = Garden.steps garden (Option.get (Garden.start garden)) n in
+  Format.(
+    fprintf err_formatter "N = %d\n%!" n;
+    Garden.pp ~highlight:reachable err_formatter garden);
   print_endline (string_of_int (List.length reachable))

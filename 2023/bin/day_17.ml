@@ -5,6 +5,8 @@ module Pos = Grid.Pos
 module Heat_Grid : sig
   type t
 
+  val backtrack : Pos.t option Grid.t -> Pos.t -> Pos.t list
+  val distance : t -> Pos.t -> int Grid.t * Pos.t option Grid.t
   val of_lines : string Seq.t -> t
   val path : t -> Pos.t -> Pos.t -> (int * Pos.t list) option
   val heat_loss : ?min_straight:int -> ?max_straight:int -> t -> Pos.t -> Pos.t -> int
@@ -48,6 +50,44 @@ end = struct
 
     let compare = Stdlib.compare
   end)
+
+  let backtrack prev dest =
+    let rec loop path cur =
+      Printf.eprintf "path %d, cur (%d, %d)\n%!" (List.length path) (fst cur) (snd cur);
+      match prev.@(cur) with
+      | None -> cur :: path
+      | Some dir -> loop (cur :: path) Pos.(add cur dir)
+    in
+    loop [] dest
+
+  let distance grid src =
+    let ((n_rows, n_cols) as size) = Grid.size grid in
+    let prev = Array.make_matrix n_rows n_cols None in
+    let shortest = Array.make_matrix n_rows n_cols max_int in
+    let unfinished = Array.make_matrix n_rows n_cols true in
+    let rec loop queue =
+      let ((cost, cur) as elt) = Priority_Queue.min_elt queue in
+      Printf.eprintf "cost %d, cur (%d, %d), queue %d\n%!" cost (fst cur) (snd cur)
+        (Priority_Queue.cardinal queue);
+      let queue =
+        Dir.[ Up; Left; Right; Down ]
+        |> List.map Pos.(add cur % of_dir)
+        |> List.filter (fun pos -> Pos.is_valid size pos && unfinished.@(pos))
+        |> List.fold_left
+             (fun queue pos ->
+               let new_cost = cost + grid.@(pos) in
+               if new_cost < shortest.@(pos) then (
+                 shortest.@(pos) <- new_cost;
+                 prev.@(pos) <- Some (Pos.sub cur pos);
+                 Priority_Queue.add (new_cost, pos) queue)
+               else queue)
+             (Priority_Queue.remove elt queue)
+      in
+      unfinished.@(cur) <- false;
+      loop queue
+    in
+    (try loop (Priority_Queue.singleton (0, src)) with Not_found -> ());
+    (shortest, prev)
 
   let heat_loss ?(min_straight = 0) ?(max_straight = max_int) grid src dest =
     let size = Grid.size grid in

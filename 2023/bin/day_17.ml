@@ -9,6 +9,7 @@ module Heat_Grid : sig
   val path : t -> Pos.t -> Pos.t -> (int * Pos.t list) option
   val heat_loss : ?min_straight:int -> ?max_straight:int -> t -> Pos.t -> Pos.t -> int
   val pp : ?path:Pos.t list -> Format.formatter -> t -> unit
+  val pp_dist : ?path:Pos.t list -> Format.formatter -> t -> int Grid.t -> Pos.t option Grid.t -> unit
   val size : t -> int * int
 end = struct
   type t = int Grid.t

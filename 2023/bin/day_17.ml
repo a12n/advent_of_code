@@ -14,7 +14,7 @@ module Heat_Grid : sig
 end = struct
   type t = int Grid.t
 
-  let pp ?(path = []) = Grid.pp ~highlight:path ~sgr:"\x1b[32m" Format.pp_print_int
+  let pp ?(path = []) = Grid.pp ~highlight:path Format.pp_print_int
   let size = Grid.size
 
   module Priority_Queue = Set.Make (struct

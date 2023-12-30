@@ -26,9 +26,9 @@ end = struct
           | Some v -> Dir.to_string (Pos.to_dir v)
         in
         let color_on, color_off = cell_color path (row, col) in
-        Format.fprintf fmt " %s[%s %1d %3d]%s" color_on dir
+        Format.fprintf fmt " %s[%s %1d %s]%s" color_on dir
           grid.(row).(col)
-          dist.(row).(col)
+          (if dist.(row).(col) = max_int then "  ∞" else (Printf.sprintf "%3d" dist.(row).(col)))
           color_off
       done;
       Format.pp_print_newline fmt ()

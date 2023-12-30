@@ -78,6 +78,19 @@ let symmetry eq a =
   |> Seq.find (fun (pos, len) -> is_palindrome ~pos ~len eq a)
   |> Option.map (fun (pos, len) -> pos + (len / 2))
 
+let rev_inplace a =
+  let n = length a in
+  for i = 1 to n / 2 do
+    let x = unsafe_get a (i - 1) in
+    unsafe_set a (i - 1) (unsafe_get a (n - i));
+    unsafe_set a (n - i) x
+  done
+
+let rev a =
+  let b = copy a in
+  rev_inplace b;
+  b
+
 let transpose a =
   let n_rows, n_cols = matrix_size a in
   init n_cols (fun col -> init n_rows (fun row -> get (get a row) col))

@@ -10,7 +10,10 @@ module Heat_Grid : sig
   val of_lines : string Seq.t -> t
   val heat_loss : ?min_straight:int -> ?max_straight:int -> t -> Pos.t -> Pos.t -> int
   val pp : ?path:Pos.t list -> Format.formatter -> t -> unit
-  val pp_dist : ?path:Pos.t list -> Format.formatter -> t -> int Grid.t -> Pos.t option Grid.t -> unit
+
+  val pp_dist :
+    ?path:Pos.t list -> Format.formatter -> t -> int Grid.t -> Dir.t option Grid.t -> unit
+
   val size : t -> int * int
 end = struct
   type t = int Grid.t
@@ -18,19 +21,15 @@ end = struct
   let cell_color path pos = if List.mem pos path then ("\x1b[32m", "\x1b[0m") else ("", "")
   let pp ?(path = []) = Grid.pp ~highlight:path ~sgr:"\x1b[32m" Format.pp_print_int
 
-  let pp_dist ?(path = []) fmt grid dist prev =
+  let pp_dist ?(path = []) fmt grid dist dirs =
     let n_rows, n_cols = Array.matrix_size grid in
     for row = 0 to n_rows - 1 do
       for col = 0 to n_cols - 1 do
-        let dir =
-          match prev.(row).(col) with
-          | Some (0, 0) | None -> "."
-          | Some v -> Dir.to_string (Pos.to_dir v)
-        in
+        let dir = match dirs.(row).(col) with None -> "." | Some dir -> Dir.to_string dir in
         let color_on, color_off = cell_color path (row, col) in
         Format.fprintf fmt " %s[%s %1d %s]%s" color_on dir
           grid.(row).(col)
-          (if dist.(row).(col) = max_int then "  ∞" else (Printf.sprintf "%3d" dist.(row).(col)))
+          (if dist.(row).(col) = max_int then "inf" else Printf.sprintf "%3d" dist.(row).(col))
           color_off
       done;
       Format.pp_print_newline fmt ()

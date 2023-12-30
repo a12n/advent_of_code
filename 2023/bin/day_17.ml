@@ -6,7 +6,7 @@ module Heat_Grid : sig
   type t
 
   val backtrack : Dir.t option Grid.t -> Pos.t -> Pos.t list
-  val distance : t -> Pos.t -> int Grid.t * Dir.t option Grid.t
+  val distance : t -> Pos.t -> int Grid.t * Dir.t option Grid.t * int Grid.t
   val of_lines : string Seq.t -> t
   val heat_loss : ?min_straight:int -> ?max_straight:int -> t -> Pos.t -> Pos.t -> int
   val pp : ?path:Pos.t list -> Format.formatter -> t -> unit
@@ -43,6 +43,7 @@ end = struct
   let distance grid src =
     let ((n_rows, n_cols) as size) = Grid.size grid in
     let dirs = Array.make_matrix n_rows n_cols None in
+    let straight = Array.make_matrix n_rows n_cols 0 in
     let costs = Array.make_matrix n_rows n_cols max_int in
     let unfinished = Array.make_matrix n_rows n_cols true in
     let rec loop queue =
@@ -50,15 +51,18 @@ end = struct
       Printf.eprintf "cost %d, cur (%d, %d), queue %d\n%!" cost (fst cur) (snd cur)
         (Priority_Queue.cardinal queue);
       unfinished.@(cur) <- false;
-      Dir.[ Up; Left; Right; Down ]
-      |> List.map (fun dir -> (dir, Pos.(add cur (of_dir dir))))
-      |> List.filter (fun (_, pos) -> Pos.is_valid size pos && unfinished.@(pos))
+      (match dirs.@(cur) with
+      | None -> Dir.[ (Up, 1); (Left, 1); (Right, 1); (Down, 1) ]
+      | Some dir -> Dir.[ (dir, straight.@(cur) + 1); (turn_left dir, 1); (turn_right dir, 1) ])
+      |> List.map (fun (dir, steps) -> (dir, steps, Pos.(add cur (of_dir dir))))
+      |> List.filter (fun (_, _, pos) -> Pos.is_valid size pos && unfinished.@(pos))
       |> List.fold_left
-           (fun queue (dir, pos) ->
+           (fun queue (dir, steps, pos) ->
              let new_cost = cost + grid.@(pos) in
              if new_cost < costs.@(pos) then (
                costs.@(pos) <- new_cost;
                dirs.@(pos) <- Some dir;
+               straight.@(pos) <- steps;
                Priority_Queue.add (new_cost, pos) queue)
              else queue)
            (Priority_Queue.remove elt queue)
@@ -66,7 +70,7 @@ end = struct
     in
     costs.@(src) <- 0;
     (try loop (Priority_Queue.singleton (0, src)) with Not_found -> ());
-    (costs, dirs)
+    (costs, dirs, straight)
 
   let heat_loss ?(min_straight = 0) ?(max_straight = max_int) grid src dest =
     let size = Grid.size grid in

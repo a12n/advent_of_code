@@ -83,3 +83,6 @@ let transpose a =
   init n_cols (fun col -> init n_rows (fun row -> get (get a row) col))
 
 let value a ~default i = if i >= 0 && i < length a then unsafe_get a i else default
+let index_mod n i = if i < 0 then n - 1 + ((i + 1) mod n) else i mod n
+let get_mod a i = unsafe_get a (index_mod (length a) i)
+let set_mod a i = unsafe_set a (index_mod (length a) i)

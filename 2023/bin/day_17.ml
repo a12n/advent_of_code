@@ -74,38 +74,34 @@ end = struct
 
   let heat_loss ?(min_straight = 0) ?(max_straight = max_int) grid src dest =
     let size = Grid.size grid in
-    if not Grid.Pos.(is_valid size src && is_valid size dest) then invalid_arg __FUNCTION__;
     let seen = Hashtbl.create (fst size * snd size) in
     let rec loop queue =
-      let ((loss, pos, dir, straight) as elt) = Min_Queue.min_elt queue in
+      let ((loss, pos, dir, steps) as elt) = Min_Queue.min_elt queue in
       (* Printf.eprintf "loss %d, pos (%d, %d), dir %s, straight %d\n%!" loss (fst pos) (snd pos) *)
       (*   (Option.fold ~none:"_" ~some:Dir.to_string dir) *)
       (*   straight; *)
       let queue' = Min_Queue.remove elt queue in
-      if pos = dest && straight >= min_straight then (* Printf.eprintf "reached (%d, %d)\n%!" (fst dest) (snd dest); *)
+      if pos = dest && steps >= min_straight then
+        (* Printf.eprintf "reached (%d, %d)\n%!" (fst dest) (snd dest); *)
         loss
-      else if Hashtbl.mem seen (pos, dir, straight) then loop queue'
+      else if Hashtbl.mem seen (pos, dir, steps) then loop queue'
       else (
-        Hashtbl.replace seen (pos, dir, straight) ();
+        Hashtbl.replace seen (pos, dir, steps) ();
         (match dir with
         | Some dir ->
             List.concat
               [
-                (if straight < max_straight then [ (dir, straight + 1) ] else []);
-                (if straight >= min_straight then Dir.[ (turn_left dir, 1); (turn_right dir, 1) ]
+                (if steps < max_straight then [ (dir, steps + 1) ] else []);
+                (if steps >= min_straight then Dir.[ (turn_left dir, 1); (turn_right dir, 1) ]
                  else []);
               ]
         | None -> Dir.[ (Down, 1); (Right, 1); (Left, 1); (Up, 1) ])
-        |> List.filter_map (fun (dir, straight) ->
+        |> List.filter_map (fun (dir, steps) ->
                let pos' = Grid.Pos.(add pos (of_dir dir)) in
                (* Printf.eprintf "next: pos' (%d, %d), ok %B\n%!" (fst pos') (snd pos') *)
                (*   (Pos.is_valid size pos'); *)
-               if Grid.Pos.is_valid size pos' then Some (pos', dir, straight) else None)
-        |> List.map (fun (pos', dir, straight) ->
-               let loss' = loss + grid.@(pos') in
-               (* Printf.eprintf "next: loss' %d, pos' (%d, %d), dir %s, straight %d\n%!" loss' *)
-               (*   (fst pos') (snd pos') (Dir.to_string dir) straight; *)
-               (loss', pos', Some dir, straight))
+               if Grid.Pos.is_valid size pos' then Some (loss + grid.@(pos'), pos', Some dir, steps)
+               else None)
         |> List.fold_left (Fun.flip Min_Queue.add) queue'
         |> loop)
     in

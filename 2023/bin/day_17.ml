@@ -82,7 +82,7 @@ end = struct
       (*   (Option.fold ~none:"_" ~some:Dir.to_string dir) *)
       (*   straight; *)
       let queue' = Min_Queue.remove elt queue in
-      if pos = dest then (* Printf.eprintf "reached (%d, %d)\n%!" (fst dest) (snd dest); *)
+      if pos = dest && straight >= min_straight then (* Printf.eprintf "reached (%d, %d)\n%!" (fst dest) (snd dest); *)
         loss
       else if Hashtbl.mem seen (pos, dir, straight) then loop queue'
       else (

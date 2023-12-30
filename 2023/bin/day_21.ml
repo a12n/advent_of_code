@@ -42,7 +42,7 @@ module Garden = struct
           reachable line)
       [] state
 
-  let of_lines = Grid.of_lines Plot.of_char
+  let of_lines = Grid.of_lines (fun _ -> Plot.of_char)
 
   let pp ?highlight =
     Grid.pp ?highlight (fun fmt plot -> Format.pp_print_string fmt (Plot.to_string plot))

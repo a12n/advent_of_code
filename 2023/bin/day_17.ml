@@ -54,5 +54,5 @@ end = struct
     in
     loop (Min_Queue.singleton (0, src, None, 0))
 
-  let of_lines = Grid.of_lines (fun c -> int_of_char c - int_of_char '0')
+  let of_lines = Grid.of_lines (fun _ c -> int_of_char c - int_of_char '0')
 end

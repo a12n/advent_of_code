@@ -34,8 +34,8 @@ let find_pos pred grid =
         find_mapi (fun col value -> if pred value then Some (row, col) else None) line)
       grid)
 
-let get_pos grid (row, col) = grid.(row).(col)
-let set_pos grid (row, col) value = grid.(row).(col) <- value
+let get grid (row, col) = grid.(row).(col)
+let set grid (row, col) value = grid.(row).(col) <- value
 
 let of_lines of_char =
   Array.of_seq
@@ -57,6 +57,6 @@ let pp ?(highlight = []) ?(sgr = "\x1b[42m") f fmt grid =
     grid
 
 module Ops = struct
-  let ( .@() ) = get_pos
-  let ( .@()<- ) = set_pos
+  let ( .@() ) = get
+  let ( .@()<- ) = set
 end

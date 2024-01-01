@@ -18,7 +18,8 @@ module Garden = struct
 
   let start = Grid.find_pos (( = ) Plot.Start)
 
-  let steps garden pos n =
+  (** Positions reachable from the starting position in [n] steps. *)
+  let reachable garden pos n =
     let ((n_rows, n_cols) as size) = Grid.size garden in
     if not (Grid.Pos.is_valid size pos) then invalid_arg __FUNCTION__;
     let state = Array.make_matrix n_rows n_cols [] in
@@ -36,13 +37,13 @@ module Garden = struct
       done
     done;
     Array.fold_lefti
-      (fun reachable row line ->
+      (fun result row line ->
         Array.fold_lefti
-          (fun reachable col nums -> if List.mem n nums then (row, col) :: reachable else reachable)
-          reachable line)
+          (fun result col nums -> if List.mem n nums then (row, col) :: result else result)
+          result line)
       [] state
 
-  let num_row_steps garden (row0, col0) n =
+  let num_reachable_row garden (row0, col0) n =
     Printf.eprintf "pos (%d, %d), n %d\n%!" row0 col0 n;
     (*
        is_even n =
@@ -56,15 +57,16 @@ module Garden = struct
     ignore (garden, row0, col0, n);
     0
 
-  let num_steps garden (row0, col0) n =
+  (** Number of reachable positions in [n] steps from the start position. *)
+  let num_reachable garden (row0, col0) n =
     let upper =
       Seq.ints 0 ~until:n
-      |> Seq.map (fun i -> num_row_steps garden (row0 - i, col0) (n - i))
+      |> Seq.map (fun i -> num_reachable_row garden (row0 - i, col0) (n - i))
       |> Seq.reduce ( + )
     in
     let lower =
       Seq.ints 1 ~until:n
-      |> Seq.map (fun i -> num_row_steps garden (row0 + i, col0) (n - i))
+      |> Seq.map (fun i -> num_reachable_row garden (row0 + i, col0) (n - i))
       |> Seq.reduce ( + )
     in
     upper + lower

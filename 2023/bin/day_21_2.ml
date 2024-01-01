@@ -8,4 +8,4 @@ let () =
   Format.(
     fprintf err_formatter "N = %d\n%!" n;
     Garden.pp err_formatter garden);
-  print_endline (string_of_int (Garden.num_steps garden start n))
+  print_endline (string_of_int (Garden.num_reachable garden start n))

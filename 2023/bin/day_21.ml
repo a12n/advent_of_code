@@ -42,6 +42,33 @@ module Garden = struct
           reachable line)
       [] state
 
+  let num_row_steps garden (row0, col0) n =
+    Printf.eprintf "pos (%d, %d), n %d\n%!" row0 col0 n;
+    (*
+       is_even n =
+       ..#.....#|…|..#.....#|..#.@...#|..#.....#|…|..#.....#
+                | | ^ ^ ^ ^ |^ ^ ^ ^ ^| ^ ^ ^ ^ | |
+
+       is_odd n =
+       ..#.....#|…|..#.....#|..#.@...#|..#.....#|…|..#.....#
+                | |^ ^ ^ ^ ^| ^ ^ ^ ^ |^ ^ ^ ^ ^| |
+       *)
+    ignore (garden, row0, col0, n);
+    0
+
+  let num_steps garden (row0, col0) n =
+    let upper =
+      Seq.ints 0 ~until:n
+      |> Seq.map (fun i -> num_row_steps garden (row0 - i, col0) (n - i))
+      |> Seq.reduce ( + )
+    in
+    let lower =
+      Seq.ints 1 ~until:n
+      |> Seq.map (fun i -> num_row_steps garden (row0 + i, col0) (n - i))
+      |> Seq.reduce ( + )
+    in
+    upper + lower
+
   let of_lines = Grid.of_lines (fun _ -> Plot.of_char)
 
   let pp ?highlight =

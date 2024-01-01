@@ -1,4 +1,5 @@
 include Stdlib.Array
+open Fun.Ops
 
 let fill ?(pos = 0) ?len a =
   let n = length a in
@@ -95,6 +96,7 @@ let transpose a =
   let n_rows, n_cols = matrix_size a in
   init n_cols (fun col -> init n_rows (fun row -> get (get a row) col))
 
+let rotate = function `CW -> transpose % rev | `CCW -> rev % transpose
 let value a ~default i = if i >= 0 && i < length a then unsafe_get a i else default
 let index_mod n i = if i < 0 then n - 1 + ((i + 1) mod n) else i mod n
 let get_mod a i = unsafe_get a (index_mod (length a) i)

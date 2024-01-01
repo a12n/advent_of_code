@@ -11,6 +11,10 @@ val reduce : ('a -> 'a -> 'a) -> 'a t -> 'a
 val symmetry : ('a -> 'a -> bool) -> 'a t -> int option
 val rev : 'a t -> 'a t
 val rev_inplace : 'a t -> unit
+
+val rotate : [ `CW | `CCW ] -> 'a t t -> 'a t t
+(** Reoreder matrix elements, rotate 90° CW/CWW. *)
+
 val transpose : 'a t t -> 'a t t
 val value : 'a t -> default:'a -> int -> 'a
 val get_mod : 'a t -> int -> 'a

@@ -43,8 +43,7 @@ module Garden = struct
           result line)
       [] state
 
-  let num_reachable_row garden (row0, col0) n =
-    Printf.eprintf "pos (%d, %d), n %d\n%!" row0 col0 n;
+  let num_reachable_row garden (row, col0) n m =
     (*
        is_even n =
        ..#.....#|…|..#.....#|..#.@...#|..#.....#|…|..#.....#
@@ -54,19 +53,26 @@ module Garden = struct
        ..#.....#|…|..#.....#|..#.@...#|..#.....#|…|..#.....#
                 | |^ ^ ^ ^ ^| ^ ^ ^ ^ |^ ^ ^ ^ ^| |
        *)
-    ignore (garden, row0, col0, n);
-    0
+    let result =
+      Seq.ints (col0 - m) ~until:(col0 + m)
+      |> Seq.filter Int.(if is_even n then is_even else is_odd)
+      |> Seq.map Array.(get_mod (get_mod garden row))
+      |> Seq.filter (( <> ) Plot.Rock)
+      |> Seq.length
+    in
+    Printf.eprintf "pos (%d, %d), n %d, m %d, result %d\n%!" row col0 n m result;
+    result
 
   (** Number of reachable positions in [n] steps from the start position. *)
   let num_reachable garden (row0, col0) n =
     let upper =
       Seq.ints 0 ~until:n
-      |> Seq.map (fun i -> num_reachable_row garden (row0 - i, col0) (n - i))
+      |> Seq.map (fun i -> num_reachable_row garden (row0 - i, col0) n (n - i))
       |> Seq.reduce ( + )
     in
     let lower =
       Seq.ints 1 ~until:n
-      |> Seq.map (fun i -> num_reachable_row garden (row0 + i, col0) (n - i))
+      |> Seq.map (fun i -> num_reachable_row garden (row0 + i, col0) n (n - i))
       |> Seq.reduce ( + )
     in
     upper + lower

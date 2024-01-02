@@ -65,6 +65,11 @@ module Garden = struct
 
   (** Number of reachable positions in [n] steps from the start position. *)
   let num_reachable garden (row0, col0) n =
+    (* TODO:
+       Memoization:
+       (** Mapping of <grid position, repeat left/right/up/down, is_even> to <number of reachable positions>?. *)
+       (Pos.t * [`Left | `Right] option * [`Up | `Down] option * bool, int) Hashtbl.t
+    *)
     let upper =
       Seq.ints 0 ~until:n
       |> Seq.map (fun i -> num_reachable_row garden (row0 - i, col0) n (n - i))

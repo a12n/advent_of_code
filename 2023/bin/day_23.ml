@@ -26,14 +26,14 @@ module Trail_Map = struct
     let row = Array.length trails - 1 in
     (row, Option.get (Array.find_index (( = ) Tile.Path) trails.(row)))
 
-  let hikes trails start finish =
+  let hikes ?(slippery = false) trails start finish =
     let size = Grid.size trails in
     let rec loop seen pos =
       if pos = finish then [ Pos_Set.add pos seen ]
       else
         (match trails.@(pos) with
         | Tile.Path -> Dir.[ Up; Left; Right; Down ]
-        | Tile.Slope dir -> [ dir ]
+        | Tile.Slope dir -> if slippery then [ dir ] else Dir.[ Up; Left; Right; Down ]
         | Tile.Forest -> failwith __FUNCTION__)
         |> List.map Pos.(add pos % of_dir)
         |> List.filter Pos.(is_valid size)

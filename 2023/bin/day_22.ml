@@ -78,11 +78,7 @@ module Snapshot = struct
         let support =
           List.fold_left
             (fun set pos ->
-              let set' =
-                if height.%%{pos} = Some max_z then
-                  Option.fold ~none:set ~some:((Fun.flip Int_Set.add) set) id.%%{pos}
-                else set
-              in
+              let set' = if height.%%{pos} = Some max_z then Int_Set.add id.%{pos} set else set in
               id.%{pos} <- i;
               height.%{pos} <- max_z + 1;
               set')

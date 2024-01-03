@@ -2,9 +2,8 @@ open Advent
 open Day_25
 
 let () =
-  let conns = of_lines (input_lines stdin) in
+  let conns = Config.of_lines (input_lines stdin) in
   Format.(
-    let fmt = err_formatter in
-    pp_print_string fmt "graph {\n";
-    Hashtbl.iter (fun k v -> fprintf fmt "\t%s -- %s;\n" k v) conns;
-    pp_print_string fmt "}\n")
+    fprintf err_formatter "// %d conns\n" (Hashtbl.length conns);
+    Config.pp err_formatter conns
+  )

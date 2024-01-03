@@ -14,7 +14,7 @@ module Tile = struct
 
   let of_char = function '.' -> Path | '#' -> Forest | c -> Slope (Dir.of_char c)
   let to_char = function Path -> '.' | Forest -> '#' | Slope dir -> Dir.to_char dir
-  let to_string = function Path -> "." | Forest -> "▒" | Slope dir -> Dir.to_string dir
+  let to_string = function Path -> "." | Forest -> "█" | Slope dir -> Dir.to_string dir
 end
 
 module Trail_Map = struct

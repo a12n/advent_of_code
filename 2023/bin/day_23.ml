@@ -11,6 +11,12 @@ end
 module Trail_Map = struct
   type t = Tile.t Grid.t
 
+  let start trails = (0, Option.get (Array.find_index (( = ) Tile.Path) trails.(0)))
+
+  let finish trails =
+    let row = Array.length trails - 1 in
+    (row, Option.get (Array.find_index (( = ) Tile.Path) trails.(row)))
+
   let of_lines = Grid.of_lines (fun _ -> Tile.of_char)
   let pp = Grid.pp (fun fmt tile -> Format.pp_print_string fmt (Tile.to_string tile))
 end

@@ -86,7 +86,6 @@ module Snapshot = struct
         in
         let drop = Point.{ zero with z = min.z - (max_z + 1) } in
         (Point.(sub min drop, sub max drop), support))
-      bricks
 
   let pp fmt bricks =
     Format.(

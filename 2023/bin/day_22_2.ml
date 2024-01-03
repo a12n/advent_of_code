@@ -4,9 +4,7 @@ open Hashtbl.Ops
 
 let () =
   let bricks = Snapshot.(settle (of_lines (input_lines stdin))) in
-  Format.(
-    fprintf err_formatter "%d bricks\n%!" (List.length bricks)
-  );
+  Format.(fprintf err_formatter "%d bricks\n%!" (List.length bricks));
   let supports = Hashtbl.create 256 in
   let disintegrate =
     List.fold_left
@@ -41,13 +39,13 @@ let () =
   let other =
     Int_Set.fold
       (fun i total ->
-         let fall = (collect i) in
-         Format.(
-           fprintf err_formatter "After disintegrate %d brick %d bricks fall:" i (Int_Set.cardinal fall);
-           Int_Set.iter (fprintf err_formatter " %d") fall;
-           pp_print_newline err_formatter ()
-         );
-         total + Int_Set.cardinal fall)
+        let fall = collect i in
+        Format.(
+          fprintf err_formatter "After disintegrate %d brick %d bricks fall:" i
+            (Int_Set.cardinal fall);
+          Int_Set.iter (fprintf err_formatter " %d") fall;
+          pp_print_newline err_formatter ());
+        total + Int_Set.cardinal fall)
       disintegrate 0
   in
   print_endline (string_of_int other)

@@ -4,7 +4,7 @@ open Day_22
 let () =
   (* List of settled bricks along with a set of brick numbers
      supporting each brick. *)
-  let bricks = Snapshot.(settle (sort (of_lines (input_lines stdin)))) in
+  let bricks = Snapshot.(settle (of_lines (input_lines stdin))) in
   List.iteri
     (fun i ((Point.{ x = x1; y = y1; z = z1 }, Point.{ x = x2; y = y2; z = z2 }), support) ->
       Printf.eprintf "%d,%d,%d~%d,%d,%d\n%!" x1 y1 z1 x2 y2 z2;

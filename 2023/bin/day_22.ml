@@ -50,7 +50,10 @@ end
 module Snapshot = struct
   type t = Brick.t list
 
-  let of_lines = List.of_seq % Seq.map Brick.of_string
+  let of_lines =
+    List.sort (fun (min1, max1) (min2, max2) ->
+        Stdlib.compare Point.(min1.z, max1.z) Point.(min2.z, max2.z))
+    % List.of_seq % Seq.map Brick.of_string
 
   let grid_span bricks =
     let min = List.reduce (Point.map2 Int.min) (List.map fst bricks) in
@@ -59,13 +62,7 @@ module Snapshot = struct
 
   let grid_size bricks = Brick.size (grid_span bricks)
 
-  let sort bricks =
-    List.sort
-      (fun (min1, max1) (min2, max2) ->
-        Stdlib.compare Point.(min1.z, max1.z) Point.(min2.z, max2.z))
-      bricks
-
-  (** Must be called on bricks sorted with [sort]. *)
+  (** Must be called on bricks sorted by [z]. *)
   let settle =
     let height = Hashtbl.create 256 in
     let id = Hashtbl.create 256 in

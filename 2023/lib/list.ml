@@ -29,5 +29,6 @@ let rec take_pairs = function
   | x0 :: x1 :: xs -> (x0, x1) :: take_pairs xs
   | _ -> invalid_arg __FUNCTION__
 
-let reduce f = function x0 :: xs -> fold_left f x0 xs | [] -> invalid_arg __FUNCTION__
+let reduce_opt f = function x0 :: xs -> Some (fold_left f x0 xs) | [] -> None
+let reduce f xs = Option.get (reduce_opt f xs)
 let rec untake_pairs = function [] -> [] | (x0, x1) :: xs -> x0 :: x1 :: untake_pairs xs

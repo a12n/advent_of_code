@@ -5,6 +5,7 @@ val intersperse : 'a -> 'a list -> 'a list
 val last : 'a list -> 'a
 val make : int -> 'a -> 'a list
 val reduce : ('a -> 'a -> 'a) -> 'a list -> 'a
+val reduce_opt : ('a -> 'a -> 'a) -> 'a list -> 'a option
 val replace_assoc : 'a -> 'b -> ('a * 'b) list -> ('a * 'b) list
 
 val combine_tl : 'a list -> ('a * 'a list) list

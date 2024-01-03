@@ -4,6 +4,7 @@ module Make (Elt : sig
   type t
 
   val zero : t
+  val one : t
   val add : t -> t -> t
   val sub : t -> t -> t
   val mul : t -> t -> t
@@ -14,6 +15,9 @@ struct
   type t = { x : Elt.t; y : Elt.t; z : Elt.t }
 
   let zero = { x = Elt.zero; y = Elt.zero; z = Elt.zero }
+  let unit_x = { zero with x = Elt.one }
+  let unit_y = { zero with y = Elt.one }
+  let unit_z = { zero with z = Elt.one }
   let map f p = { x = f p.x; y = f p.y; z = f p.z }
   let map2 f p q = { x = f p.x q.x; y = f p.y q.y; z = f p.z q.z }
   let add = map2 Elt.add
@@ -33,10 +37,18 @@ struct
     "(" ^ Elt.to_string x ^ ", " ^ Elt.to_string y ^ ", " ^ Elt.to_string z ^ ")"
 
   let pp fmt p = Format.pp_print_string fmt (to_string p)
+
+  module Ops = struct
+    let ( *. ) = mul_elt
+    let ( + ) = add
+    let ( - ) = sub
+  end
 end
 
-include Make (struct
+module Integer = Make (struct
   include Int
 
   let of_string = int_of_string
 end)
+
+module Rational = Make (Q)

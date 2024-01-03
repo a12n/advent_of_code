@@ -72,19 +72,19 @@ module Snapshot = struct
     List.mapi (fun i ((min, max) as brick) ->
         let _, _, size_z = Brick.size brick in
         let bottom = Brick.bottom brick in
-        let max_z =
+        let sup_z =
           List.reduce Int.max (List.map (Option.value ~default:0 % Hashtbl.find_opt height) bottom)
         in
         let support =
           List.fold_left
             (fun set pos ->
-              let set' = if height.%%{pos} = Some max_z then Int_Set.add id.%{pos} set else set in
+              let set' = if height.%%{pos} = Some sup_z then Int_Set.add id.%{pos} set else set in
               id.%{pos} <- i;
-              height.%{pos} <- max_z + size_z;
+              height.%{pos} <- sup_z + size_z;
               set')
             Int_Set.empty bottom
         in
-        let drop = Point.{ zero with z = min.z - (max_z + 1) } in
+        let drop = Point.{ zero with z = min.z - (sup_z + 1) } in
         (Point.(sub min drop, sub max drop), support))
 
   let pp fmt bricks =

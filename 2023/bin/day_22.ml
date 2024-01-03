@@ -1,6 +1,7 @@
 open Advent
 open Hashtbl.Ops
 module Int_Set = Set.Make (Int)
+module Point = Point.Integer
 
 module Brick = struct
   type t = Point.t * Point.t

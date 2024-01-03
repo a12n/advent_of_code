@@ -6,6 +6,7 @@ module Pos : sig
   val add : t -> t -> t
   val mul_int : t -> int -> t
   val sub : t -> t -> t
+  val compare : t -> t -> int
   val is_valid : int * int -> t -> bool
   val of_dir : Dir.t -> t
   val to_dir : t -> Dir.t

@@ -8,6 +8,7 @@ module Pos = struct
   let add (row1, col1) (row2, col2) = (row1 + row2, col1 + col2)
   let mul_int (row, col) n = (row * n, col * n)
   let sub (row1, col1) (row2, col2) = (row1 - row2, col1 - col2)
+  let compare = Stdlib.compare
   let is_valid (n_rows, n_cols) (row, col) = row >= 0 && col >= 0 && row < n_rows && col < n_cols
   let of_dir = Dir.(function Up -> (-1, 0) | Left -> (0, -1) | Right -> (0, 1) | Down -> (1, 0))
 

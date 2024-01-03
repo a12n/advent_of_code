@@ -26,7 +26,7 @@ module Trail_Map = struct
     let row = Array.length trails - 1 in
     (row, Option.get (Array.find_index (( = ) Tile.Path) trails.(row)))
 
-  let hikes ?(slippery = false) trails start finish =
+  let hikes ?(slippery = true) trails start finish =
     let size = Grid.size trails in
     let rec loop seen pos =
       if pos = finish then [ Pos_Set.add pos seen ]

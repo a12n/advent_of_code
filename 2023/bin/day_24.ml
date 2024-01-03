@@ -16,7 +16,7 @@ module Hailstone = struct
   let intersect2 ((p1, v1) : t) ((p2, v2) : t) =
     let* tx = intersect Point.(p1.x, v1.x) Point.(p2.x, v2.x) in
     let* ty = intersect Point.(p1.y, v1.y) Point.(p2.y, v2.y) in
-    Some (tx, ty)
+    if Q.(tx > zero && ty > zero) then Some (tx, ty) else None
 end
 
 let of_lines = List.of_seq % Seq.map Hailstone.of_string

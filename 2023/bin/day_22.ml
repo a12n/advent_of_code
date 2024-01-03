@@ -1,5 +1,5 @@
 open Advent
-open Grid.Ops
+open Hashtbl.Ops
 module Int_Set = Set.Make (Int)
 
 module Point = struct
@@ -66,25 +66,24 @@ module Snapshot = struct
       bricks
 
   let settle bricks =
-    let nx, ny, _ = grid_size bricks in
-    let height = Array.make_matrix nx ny 0 in
-    let id = Array.make_matrix nx ny None in
+    let height = Hashtbl.create 256 in
+    let id = Hashtbl.create 256 in
     List.mapi
       (fun i ((min, max) as brick) ->
         let bottom = Brick.bottom brick in
-        let max_z, _ =
-          List.map (fun pos -> (height.@(pos), pos)) bottom |> List.reduce Stdlib.max
+        let max_z =
+          List.reduce Int.max (List.map (Option.value ~default:0 % Hashtbl.find_opt height) bottom)
         in
         let support =
           List.fold_left
             (fun set pos ->
               let set' =
-                if height.@(pos) = max_z then
-                  Option.fold ~none:set ~some:((Fun.flip Int_Set.add) set) id.@(pos)
+                if height.%%{pos} = Some max_z then
+                  Option.fold ~none:set ~some:((Fun.flip Int_Set.add) set) id.%%{pos}
                 else set
               in
-              id.@(pos) <- Some i;
-              height.@(pos) <- max_z + 1;
+              id.%{pos} <- i;
+              height.%{pos} <- max_z + 1;
               set')
             Int_Set.empty bottom
         in

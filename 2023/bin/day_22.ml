@@ -69,8 +69,8 @@ module Snapshot = struct
   let settle =
     let height = Hashtbl.create 256 in
     let id = Hashtbl.create 256 in
-    List.mapi
-      (fun i ((min, max) as brick) ->
+    List.mapi (fun i ((min, max) as brick) ->
+        let _, _, size_z = Brick.size brick in
         let bottom = Brick.bottom brick in
         let max_z =
           List.reduce Int.max (List.map (Option.value ~default:0 % Hashtbl.find_opt height) bottom)
@@ -80,7 +80,7 @@ module Snapshot = struct
             (fun set pos ->
               let set' = if height.%%{pos} = Some max_z then Int_Set.add id.%{pos} set else set in
               id.%{pos} <- i;
-              height.%{pos} <- max_z + 1;
+              height.%{pos} <- max_z + size_z;
               set')
             Int_Set.empty bottom
         in

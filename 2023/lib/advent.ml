@@ -11,6 +11,7 @@ module String = Advent__String
 module Algorithm = Advent__Algorithm
 module Dir = Advent__Dir
 module Grid = Advent__Grid
+module Point = Advent__Point
 module Polygon = Advent__Polygon
 module Pos = Advent__Pos
 module Segment = Advent__Segment

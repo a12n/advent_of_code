@@ -1,5 +1,9 @@
 open Advent
+module Point = Point.Rational
 module Vector = Point
+
+let ( let* ) = Option.bind
+let intersect (p1, v1) (p2, v2) = if Q.(v1 <> v2) then Some Q.((p2 - p1) / (v1 - v2)) else None
 
 module Hailstone = struct
   type t = Point.t * Vector.t
@@ -9,11 +13,10 @@ module Hailstone = struct
     | [ p; v ] -> (Point.of_string p, Vector.of_string v)
     | _ -> invalid_arg __FUNCTION__
 
-  let intersect (p1, v1) (p2, v2) =
-    (* TODO *)
-    ignore (p1, v1);
-    ignore (p2, v2);
-    None
+  let intersect2 ((p1, v1) : t) ((p2, v2) : t) =
+    let* tx = intersect Point.(p1.x, v1.x) Point.(p2.x, v2.x) in
+    let* ty = intersect Point.(p1.y, v1.y) Point.(p2.y, v2.y) in
+    Some (tx, ty)
 end
 
 let of_lines = List.of_seq % Seq.map Hailstone.of_string

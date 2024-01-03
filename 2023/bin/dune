@@ -112,3 +112,8 @@
  (names day_23_1 day_23_2)
  (modules day_23 day_23_1 day_23_2)
  (libraries advent str))
+
+(executables
+ (names day_24_1 day_24_2)
+ (modules day_24 day_24_1 day_24_2)
+ (libraries advent))

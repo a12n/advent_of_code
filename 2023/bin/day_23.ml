@@ -51,6 +51,12 @@ end
 let run ~slippery =
   let trails = Trail_Map.of_lines (input_lines stdin) in
   let start, finish = Trail_Map.(start trails, finish trails) in
+  Format.(
+    Trail_Map.pp err_formatter trails;
+    Pos.pp err_formatter start;
+    pp_print_string err_formatter " -> ";
+    Pos.pp err_formatter finish;
+    pp_print_newline err_formatter ());
   let hikes = Trail_Map.hikes ~slippery trails start finish in
   let longest =
     List.reduce

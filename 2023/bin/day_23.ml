@@ -26,10 +26,10 @@ module Trail_Map = struct
     let row = Array.length trails - 1 in
     (row, Option.get (Array.find_index (( = ) Tile.Path) trails.(row)))
 
-  let hikes ?(slippery = true) trails start finish =
+  let longest_hike ?(slippery = true) trails start finish =
     let size = Grid.size trails in
     let rec loop seen pos =
-      if pos = finish then [ Pos_Set.add pos seen ]
+      if pos = finish then Some (Pos_Set.add pos seen)
       else
         (match trails.@(pos) with
         | Tile.Path -> Dir.[ Up; Left; Right; Down ]
@@ -39,8 +39,9 @@ module Trail_Map = struct
         |> List.filter Pos.(is_valid size)
         |> List.filter (( <> ) Tile.Forest % Grid.get trails)
         |> List.filter Pos_Set.(is_not_mem seen)
-        |> List.map (fun pos -> loop (Pos_Set.add pos seen) pos)
-        |> List.concat
+        |> List.filter_map (fun pos -> loop (Pos_Set.add pos seen) pos)
+        |> List.reduce_opt (fun longest hike ->
+               if Pos_Set.(cardinal hike > cardinal longest) then hike else longest)
     in
     loop Pos_Set.empty start
 
@@ -57,10 +58,5 @@ let run ~slippery =
     pp_print_string err_formatter " -> ";
     Pos.pp err_formatter finish;
     pp_print_newline err_formatter ());
-  let hikes = Trail_Map.hikes ~slippery trails start finish in
-  let longest =
-    List.reduce
-      (fun hike1 hike2 -> if Pos_Set.(cardinal hike2 > cardinal hike1) then hike2 else hike1)
-      hikes
-  in
-  print_endline (string_of_int (Pos_Set.cardinal longest))
+  let hike = Option.get (Trail_Map.longest_hike ~slippery trails start finish) in
+  print_endline (string_of_int (Pos_Set.cardinal hike))

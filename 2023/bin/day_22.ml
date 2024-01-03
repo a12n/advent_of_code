@@ -65,7 +65,8 @@ module Snapshot = struct
         Stdlib.compare Point.(min1.z, max1.z) Point.(min2.z, max2.z))
       bricks
 
-  let settle bricks =
+  (** Must be called on bricks sorted with [sort]. *)
+  let settle =
     let height = Hashtbl.create 256 in
     let id = Hashtbl.create 256 in
     List.mapi

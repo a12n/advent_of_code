@@ -1,4 +1,13 @@
 open Advent
+open Grid.Ops
+module Pos = Grid.Pos
+
+module Pos_Set = struct
+  include Set.Make (Pos)
+
+  let is_mem = Fun.flip mem
+  let is_not_mem set elt = not (is_mem set elt)
+end
 
 module Tile = struct
   type t = Path | Forest | Slope of Dir.t
@@ -16,6 +25,24 @@ module Trail_Map = struct
   let finish trails =
     let row = Array.length trails - 1 in
     (row, Option.get (Array.find_index (( = ) Tile.Path) trails.(row)))
+
+  let hikes trails start finish =
+    let size = Grid.size trails in
+    let rec loop seen pos =
+      if pos = finish then [ Pos_Set.add pos seen ]
+      else
+        (match trails.@(pos) with
+        | Tile.Path -> Dir.[ Up; Left; Right; Down ]
+        | Tile.Slope dir -> [ dir ]
+        | Tile.Forest -> failwith __FUNCTION__)
+        |> List.map Pos.(add pos % of_dir)
+        |> List.filter Pos.(is_valid size)
+        |> List.filter (( <> ) Tile.Forest % Grid.get trails)
+        |> List.filter Pos_Set.(is_not_mem seen)
+        |> List.map (fun pos -> loop (Pos_Set.add pos seen) pos)
+        |> List.concat
+    in
+    loop Pos_Set.empty start
 
   let of_lines = Grid.of_lines (fun _ -> Tile.of_char)
   let pp = Grid.pp (fun fmt tile -> Format.pp_print_string fmt (Tile.to_string tile))

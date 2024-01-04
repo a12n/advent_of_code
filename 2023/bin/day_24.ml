@@ -13,10 +13,23 @@ module Hailstone = struct
     | [ p; v ] -> (Point.of_string p, Vector.of_string v)
     | _ -> invalid_arg __FUNCTION__
 
-  let intersect2 ((p1, v1) : t) ((p2, v2) : t) =
-    let* tx = intersect Point.(p1.x, v1.x) Point.(p2.x, v2.x) in
-    let* ty = intersect Point.(p1.y, v1.y) Point.(p2.y, v2.y) in
-    if Q.(tx > zero && ty > zero) then Some (tx, ty) else None
+  let intersect2 (p1, v1) (p2, v2) =
+    let Point.{ x = x11; y = y11; _ } = p1 in
+    let Point.{ x = x12; y = y12; _ } = Point.add p1 v1 in
+    let Point.{ x = x21; y = y21; _ } = p2 in
+    let Point.{ x = x22; y = y22; _ } = Point.add p2 v2 in
+    let denom = Q.(((x11 - x12) * (y21 - y22)) - ((y11 - y12) * (x21 - x22))) in
+    if Q.(denom <> zero) then
+      let x =
+        Q.(
+          (((x11 * y12) - (y11 * x12)) * (x21 - x22)) - ((x11 - x12) * ((x21 * y22) - (y21 * x22))))
+      in
+      let y =
+        Q.(
+          (((x11 * y12) - (y11 * x12)) * (y21 - y22)) - ((y11 - y12) * ((x21 * y22) - (y21 * x22))))
+      in
+      Some Q.(x / denom, y / denom)
+    else None
 end
 
 let of_lines = List.of_seq % Seq.map Hailstone.of_string

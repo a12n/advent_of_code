@@ -5,6 +5,10 @@ let rec diffs sub = function
   | x0 :: (x1 :: _ as xs) -> sub x1 x0 :: diffs sub xs
   | [ _ ] | [] -> invalid_arg __FUNCTION__
 
+let fold_lefti f =
+  let rec loop i acc = function [] -> acc | x0 :: xs -> loop (i + 1) (f acc i x0) xs in
+  loop 0
+
 let rec make n elt =
   match n with 0 -> [] | n when n > 0 -> elt :: make (n - 1) elt | _ -> invalid_arg __FUNCTION__
 

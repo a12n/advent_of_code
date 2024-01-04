@@ -12,16 +12,6 @@ let () =
       List.iter (Printf.eprintf " %d") (Hashtbl.find_all supports i);
       Printf.eprintf "\n%!")
     bricks;
-  let unsafe =
-    List.fold_lefti
-      (fun unsafe i _brick ->
-        match Hashtbl.find_all supports i with
-        | [ j ] ->
-            (* Brick [j] is the only brick supporting [i]. It isn't
-               safe to disintegrate it. *)
-            Int_Set.add j unsafe
-        | [] | _ :: _ :: _ -> unsafe)
-      Int_Set.empty bricks
-  in
+  let unsafe = Snapshot.unsafe bricks supports in
   Printf.eprintf "# Unsafe bricks %d/%d\n%!" (Int_Set.cardinal unsafe) (List.length bricks);
   print_endline (string_of_int (List.length bricks - Int_Set.cardinal unsafe))

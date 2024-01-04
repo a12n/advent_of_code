@@ -73,6 +73,17 @@ module Snapshot = struct
       supports,
       supported )
 
+  let unsafe bricks supports =
+    List.fold_lefti
+      (fun unsafe i _brick ->
+        match Hashtbl.find_all supports i with
+        | [ j ] ->
+            (* Brick [j] is the only brick supporting [i]. It isn't
+                safe to disintegrate it. *)
+            Int_Set.add j unsafe
+        | [] | _ :: _ :: _ -> unsafe)
+      Int_Set.empty bricks
+
   let pp fmt bricks =
     Format.(
       pp_print_list ~pp_sep:pp_print_newline Brick.pp fmt bricks;

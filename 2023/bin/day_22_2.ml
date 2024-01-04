@@ -12,6 +12,8 @@ let () =
           match Hashtbl.find_all supports id2 with
           | [] -> failwith __FUNCTION__
           | l ->
+              (* If all bricks which support this one are affected, this
+                 brick is also affected. *)
               if List.for_all (Int_Set.is_mem affected) l then loop (Int_Set.add id2 affected) id2
               else affected)
         affected (Hashtbl.find_all supported id1)

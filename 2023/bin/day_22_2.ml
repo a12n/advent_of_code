@@ -2,31 +2,30 @@ open Advent
 open Day_22
 
 let () =
+  (* Settle bricks. *)
   let bricks, supports, supported = Snapshot.(settle (of_lines (input_lines stdin))) in
-  let unsafe = Snapshot.unsafe bricks supports in
-  let disintegrate i =
-    let queue = Queue.create () in
-    let affected = ref (Int_Set.singleton i) in
-    Queue.add i queue;
-    while not (Queue.is_empty queue) do
-      let i = Queue.take queue in
-      affected :=
-        List.fold_left
-          (fun affected j ->
-            match Hashtbl.find_all supports j with
-            | [] -> failwith __FUNCTION__
-            | l ->
-                if List.for_all (Int_Set.is_mem affected) l then (
-                  Queue.add j queue;
-                  Int_Set.add j affected)
-                else affected)
-          !affected (Hashtbl.find_all supported i)
-    done;
-    !affected
+  (* Define disintegrate function in terms of supports/supportedmappings. *)
+  let disintegrate id =
+    let rec loop affected id1 =
+      List.fold_left
+        (fun affected id2 ->
+          match Hashtbl.find_all supports id2 with
+          | [] -> failwith __FUNCTION__
+          | l ->
+              if List.for_all (Int_Set.is_mem affected) l then loop (Int_Set.add id2 affected) id2
+              else affected)
+        affected (Hashtbl.find_all supported id1)
+    in
+    (* Find affected bricks, remove the disintegrated brick from the
+       set of affected bricks (the problem asks about number of other
+       bricks, besides the disintegrated one. *)
+    Int_Set.remove id (loop (Int_Set.singleton id) id)
   in
-  Int_Set.to_list unsafe
-  |> List.map (fun i ->
-         let affected = disintegrate i in
-         Printf.eprintf "disintegrate %d, affected %d\n%!" i (Int_Set.cardinal affected - 1);
-         Int_Set.cardinal affected - 1)
-  |> List.reduce ( + ) |> string_of_int |> print_endline
+  (* Consider only unsafe bricks, other bricks wouldn't affect anything. *)
+  Int_Set.to_seq (Snapshot.unsafe bricks supports)
+  (* Disintegrate the brick, find out the cardinality of the set of
+     other affected bricks. *)
+  |> Seq.map (Int_Set.cardinal % disintegrate)
+  (* Sum and print. *)
+  |> Seq.reduce ( + )
+  |> string_of_int |> print_endline

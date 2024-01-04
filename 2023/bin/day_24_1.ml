@@ -19,16 +19,21 @@ let () =
              let t2 = Q.((x - p1.x) / v1.x) in
              Format.(
                Point.pp err_formatter p0;
-               pp_print_string err_formatter " @ ";
+               pp_print_string err_formatter "|";
                Vector.pp err_formatter v0;
-               pp_print_string err_formatter "; ";
+               pp_print_string err_formatter " × ";
                Point.pp err_formatter p1;
-               pp_print_string err_formatter " @ ";
+               pp_print_string err_formatter "|";
                Vector.pp err_formatter v1;
-               pp_print_string err_formatter " = ";
+               pp_print_string err_formatter " = {x=";
                pp_print_float err_formatter (Q.to_float x);
-               pp_print_string err_formatter ", ";
+               pp_print_string err_formatter "; y=";
                pp_print_float err_formatter (Q.to_float y);
+               pp_print_string err_formatter "} {t1=";
+               pp_print_float err_formatter (Q.to_float t1);
+               pp_print_string err_formatter "; t2=";
+               pp_print_float err_formatter (Q.to_float t2);
+               pp_print_string err_formatter "}";
                pp_print_newline err_formatter ());
              Some ((x, y), t1, t2))
            hs)

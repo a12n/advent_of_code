@@ -44,26 +44,32 @@ module Snapshot = struct
   let grid_size bricks = Brick.size (grid_span bricks)
 
   (** Must be called on bricks sorted by [z]. *)
-  let settle =
+  let settle bricks =
     let height = Hashtbl.create 256 in
     let id = Hashtbl.create 256 in
-    List.mapi (fun i ((min, max) as brick) ->
-        let _, _, size_z = Brick.size brick in
-        let bottom = Brick.bottom brick in
-        let sup_z =
-          List.reduce Int.max (List.map (Option.value ~default:0 % Hashtbl.find_opt height) bottom)
-        in
-        let support =
-          List.fold_left
-            (fun set pos ->
-              let set' = if height.%%{pos} = Some sup_z then Int_Set.add id.%{pos} set else set in
+    let supports, supported = Hashtbl.(create 1024, create 1024) in
+    ( List.mapi (fun i ((min, max) as brick) ->
+          let _, _, size_z = Brick.size brick in
+          let bottom = Brick.bottom brick in
+          let sup_z =
+            List.map (Option.value ~default:0 % Hashtbl.find_opt height) bottom
+            |> List.reduce Int.max
+          in
+          List.filter_map
+            (fun pos ->
+              let lies_on = if height.%%{pos} = Some sup_z then id.%%{pos} else None in
               id.%{pos} <- i;
               height.%{pos} <- sup_z + size_z;
-              set')
-            Int_Set.empty bottom
-        in
-        let drop = Point.{ zero with z = min.z - (sup_z + 1) } in
-        (Point.(sub min drop, sub max drop), support))
+              lies_on)
+            bottom
+          |> List.sort_uniq Int.compare
+          |> List.iter (fun j ->
+                 Hashtbl.add supports i j;
+                 Hashtbl.add supported j i);
+          let drop = Point.{ zero with z = min.z - (sup_z + 1) } in
+          Point.(sub min drop, sub max drop)) bricks,
+      supports,
+      supported )
 
   let pp fmt bricks =
     Format.(

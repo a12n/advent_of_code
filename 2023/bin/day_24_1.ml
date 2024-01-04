@@ -15,6 +15,8 @@ let () =
          List.filter_map
            (fun ((p1, v1) as h1) ->
              let* x, y = Hailstone.intersect2 h0 h1 in
+             let t1 = Q.((x - p0.x) / v0.x) in
+             let t2 = Q.((x - p1.x) / v1.x) in
              Format.(
                Point.pp err_formatter p0;
                pp_print_string err_formatter " @ ";
@@ -28,11 +30,11 @@ let () =
                pp_print_string err_formatter ", ";
                pp_print_float err_formatter (Q.to_float y);
                pp_print_newline err_formatter ());
-             Some (x, y))
+             Some ((x, y), t1, t2))
            hs)
   |> List.concat
-  |> List.filter (fun (x, y) -> Q.(x >= min_value && x <= max_value && y >= min_value && y <= max_value))
-  |> List.map (fun (x, y) ->
-         Format.(fprintf err_formatter "pass (%f, %f)\n%!" (Q.to_float x) (Q.to_float y));
-         (x, y))
+  |> List.filter (fun ((x, y), t1, t2) ->
+         Q.(t1 > zero && t2 > zero)
+         && Q.(x >= min_value && x <= max_value)
+         && Q.(y >= min_value && y <= max_value))
   |> List.length |> string_of_int |> print_endline

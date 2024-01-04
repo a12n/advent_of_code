@@ -1,6 +1,12 @@
 open Advent
 open Hashtbl.Ops
-module Int_Set = Set.Make (Int)
+
+module Int_Set = struct
+  include Set.Make (Int)
+
+  let is_mem = Fun.flip mem
+end
+
 module Point = Point.Integer
 
 module Brick = struct

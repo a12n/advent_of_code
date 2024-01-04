@@ -46,7 +46,9 @@ module Trail_Map = struct
     loop Pos_Set.empty start
 
   let of_lines = Grid.of_lines (fun _ -> Tile.of_char)
-  let pp = Grid.pp (fun fmt tile -> Format.pp_print_string fmt (Tile.to_string tile))
+
+  let pp ?highlight =
+    Grid.pp ?highlight (fun fmt tile -> Format.pp_print_string fmt (Tile.to_string tile))
 end
 
 let run ~slippery =

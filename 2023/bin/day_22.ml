@@ -48,7 +48,8 @@ module Snapshot = struct
     let height = Hashtbl.create 256 in
     let id = Hashtbl.create 256 in
     let supports, supported = Hashtbl.(create 1024, create 1024) in
-    ( List.mapi (fun i ((min, max) as brick) ->
+    ( List.mapi
+        (fun i ((min, max) as brick) ->
           let _, _, size_z = Brick.size brick in
           let bottom = Brick.bottom brick in
           let sup_z =
@@ -67,7 +68,8 @@ module Snapshot = struct
                  Hashtbl.add supports i j;
                  Hashtbl.add supported j i);
           let drop = Point.{ zero with z = min.z - (sup_z + 1) } in
-          Point.(sub min drop, sub max drop)) bricks,
+          Point.(sub min drop, sub max drop))
+        bricks,
       supports,
       supported )
 

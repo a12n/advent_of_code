@@ -109,7 +109,7 @@ module Graph = struct
       eprintf "// E = %d\n%!" (Hashtbl.length g));
     g
 
-  let pp fmt g =
+  let pp_dot fmt g =
     Format.(
       pp_print_string fmt "graph {\n";
       Hashtbl.fold (fun u (v, _) set -> Pos_Set.(add u (add v set))) g Pos_Set.empty
@@ -127,7 +127,7 @@ end
 let run ~slippery =
   let trails = Trail_Map.of_lines (input_lines stdin) in
   let start, finish = Trail_Map.(start trails, finish trails) in
-  Format.(Graph.of_trail_map trails |> Graph.pp err_formatter);
+  Format.(Graph.of_trail_map trails |> Graph.pp_dot err_formatter);
   let hike = Option.get (Trail_Map.longest_hike ~slippery trails start finish) in
   Format.(Trail_Map.pp ~highlight:(Pos_Set.to_list hike) err_formatter trails);
   print_endline (string_of_int (Pos_Set.cardinal hike))

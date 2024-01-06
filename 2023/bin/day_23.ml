@@ -108,6 +108,9 @@ module Graph = struct
   let pp fmt g =
     Format.(
       pp_print_string fmt "graph {\n";
+      Hashtbl.fold (fun u (v, _) set -> Pos_Set.(add u (add v set))) g Pos_Set.empty
+      |> Pos_Set.iter (fun (row, col) ->
+             fprintf fmt "\t\"(%d,%d)\" [pos=\"%d,%d!\"];\n" row col col (-row));
       Hashtbl.iter
         (fun u (v, w) ->
           fprintf fmt "\t\"(%d,%d)\" -- \"(%d,%d)\" [label=\"%d\"];\n" (fst u) (snd u) (fst v)

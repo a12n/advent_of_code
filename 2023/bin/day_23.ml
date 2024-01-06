@@ -51,9 +51,75 @@ module Trail_Map = struct
     Grid.pp ?highlight (fun fmt tile -> Format.pp_print_string fmt (Tile.to_string tile))
 end
 
+module Graph = struct
+  let vertices trails =
+    let ((n_rows, _) as size) = Grid.size trails in
+    Array.fold_lefti
+      (fun ans row line ->
+        Array.fold_lefti
+          (fun ans col tile ->
+            let dirs =
+              List.filter
+                (fun dir ->
+                  let pos = Pos.(add (row, col) (of_dir dir)) in
+                  Pos.is_valid size pos && trails.@(pos) <> Tile.Forest)
+                (match tile with
+                | Tile.Path | Tile.Slope _ -> Dir.[ Up; Left; Right; Down ]
+                | Tile.Forest -> [])
+            in
+            if
+              List.length dirs > 2
+              || (dirs = [ Dir.Down ] && row = 0)
+              || (dirs = [ Dir.Up ] && row = n_rows - 1)
+            then Pos_Set.add (row, col) ans
+            else ans)
+          ans line)
+      Pos_Set.empty trails
+
+  let edges trails vertices =
+    let size = Grid.size trails in
+    let ans = Hashtbl.create 1024 in
+    Pos_Set.iter
+      (fun start ->
+        let rec loop path pos =
+          if pos <> start && Pos_Set.mem pos vertices then
+            Hashtbl.add ans start (pos, Pos_Set.cardinal path - 1)
+          else
+            (match trails.@(pos) with
+            | Tile.Path | Tile.Slope _ -> Dir.[ Up; Left; Right; Down ]
+            | Tile.Forest -> [])
+            |> List.map Pos.(add pos % of_dir)
+            |> List.filter Pos.(is_valid size)
+            |> List.filter (( <> ) Tile.Forest % Grid.get trails)
+            |> List.filter (Pos_Set.is_not_mem path)
+            |> List.iter (fun next -> loop (Pos_Set.add next path) next)
+        in
+        loop Pos_Set.(singleton start) start)
+      vertices;
+    ans
+
+  let of_trail_map trails =
+    let g = edges trails (vertices trails) in
+    (* Each undirected edge was added twice (from u to v, and from v
+       to u), deduplicate. *)
+    Hashtbl.filter_map_inplace (fun u (v, w) -> if u < v then Some (v, w) else None) g;
+    g
+
+  let pp fmt g =
+    Format.(
+      pp_print_string fmt "graph {\n";
+      Hashtbl.iter
+        (fun u (v, w) ->
+          fprintf fmt "\t\"(%d,%d)\" -- \"(%d,%d)\" [label=\"%d\"];\n" (fst u) (snd u) (fst v)
+            (snd v) w)
+        g;
+      pp_print_string fmt "}\n")
+end
+
 let run ~slippery =
   let trails = Trail_Map.of_lines (input_lines stdin) in
   let start, finish = Trail_Map.(start trails, finish trails) in
+  Format.(Graph.of_trail_map trails |> Graph.pp err_formatter);
   Format.(
     Pos.pp err_formatter start;
     pp_print_string err_formatter " -> ";

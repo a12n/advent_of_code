@@ -99,10 +99,14 @@ module Graph = struct
     ans
 
   let of_trail_map trails =
-    let g = edges trails (vertices trails) in
+    let v = vertices trails in
+    let g = edges trails v in
     (* Each undirected edge was added twice (from u to v, and from v
        to u), deduplicate. *)
     Hashtbl.filter_map_inplace (fun u (v, w) -> if u < v then Some (v, w) else None) g;
+    Printf.(
+      eprintf "// V = %d\n%!" (Pos_Set.cardinal v);
+      eprintf "// E = %d\n%!" (Hashtbl.length g));
     g
 
   let pp fmt g =
@@ -116,7 +120,8 @@ module Graph = struct
           fprintf fmt "\t\"(%d,%d)\" -- \"(%d,%d)\" [label=\"%d\"];\n" (fst u) (snd u) (fst v)
             (snd v) w)
         g;
-      pp_print_string fmt "}\n")
+      pp_print_string fmt "}";
+      pp_print_newline fmt ())
 end
 
 let run ~slippery =

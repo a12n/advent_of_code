@@ -1,25 +1,42 @@
 open Fun.Ops
 
-module type S = sig
-  type ('v, 'w) t
+module type VERTEX = sig
+  type t
 
-  val make : int -> ('v, 'w) t
-  val add_edge : ('v, 'w) t -> 'v -> 'v -> 'w -> unit
-  val replace_edge : ('v, 'w) t -> 'v -> 'v -> 'w -> unit
-  val adjacent : ('v, 'w) t -> 'v -> ('v * 'w) list
-  val edges : ('v, 'w) t -> ('v * 'v * 'w) list
-  val vertices : ('v, 'w) t -> 'v list
-
-  val pp :
-    vertex:([ `Attr | `Edge ] -> Format.formatter -> 'v -> unit) ->
-    weight:(Format.formatter -> 'w -> unit) ->
-    Format.formatter ->
-    ('v, 'w) t ->
-    unit
+  val compare : t -> t -> int
+  val equal : t -> t -> bool
+  val hash : t -> int
+  val pp : ?attr:bool -> Format.formatter -> t -> unit
 end
 
-let pp pp_vertex pp_weight fmt dir vertices edges =
+module type WEIGHT = sig
+  type t
+
+  val zero : t
+  val add : t -> t -> t
+  val equal : t -> t -> bool
+  val hash : t -> int
+  val pp : Format.formatter -> t -> unit
+end
+
+module type S = sig
+  type vertex
+  type weight
+  type t
+
+  val make : int -> t
+  val add_edge : t -> vertex -> vertex -> weight -> unit
+  val replace_edge : t -> vertex -> vertex -> weight -> unit
+  val adjacent : t -> vertex -> (vertex * weight) list
+  val edges : t -> (vertex * vertex * weight) list
+  val vertices : t -> vertex list
+  val pp : Format.formatter -> t -> unit
+end
+
+let pp (type v w) (module V : VERTEX with type t = v) (module W : WEIGHT with type t = w) dir fmt
+    vertices edges =
   Format.(
+    pp_print_newline fmt ();
     fprintf fmt "// V = %d\n" (List.length vertices);
     fprintf fmt "// E = %d\n" (List.length edges);
     pp_print_string fmt (match dir with `Directed -> "digraph" | `Undirected -> "graph");
@@ -27,7 +44,7 @@ let pp pp_vertex pp_weight fmt dir vertices edges =
     List.iter
       (fun u ->
         pp_print_char fmt '\t';
-        pp_vertex `Attr fmt u;
+        V.pp ~attr:true fmt u;
         pp_print_char fmt ';';
         pp_print_newline fmt ())
       vertices;
@@ -35,48 +52,56 @@ let pp pp_vertex pp_weight fmt dir vertices edges =
     List.iter
       (fun (u, v, w) ->
         pp_print_char fmt '\t';
-        pp_vertex `Edge fmt u;
+        V.pp fmt u;
         pp_print_string fmt (match dir with `Directed -> " -> " | `Undirected -> " -- ");
-        pp_vertex `Edge fmt v;
+        V.pp fmt v;
         pp_print_string fmt " [label=\"";
-        pp_weight fmt w;
+        W.pp fmt w;
         pp_print_string fmt "\"];";
         pp_print_newline fmt ())
       edges;
     pp_print_string fmt "}";
     pp_print_newline fmt ())
 
-module Directed = struct
-  type ('v, 'w) t = ('v, ('v, 'w) Hashtbl.t) Hashtbl.t
+module Make_Directed (Vertex : VERTEX) (Weight : WEIGHT) = struct
+  module Vertex_Table = Hashtbl.Make (Vertex)
 
-  let make n = Hashtbl.create n
+  type t = Weight.t Vertex_Table.t Vertex_Table.t
+
+  let make n = Vertex_Table.create n
 
   let adj_tbl g u =
-    match Hashtbl.find_opt g u with
+    match Vertex_Table.find_opt g u with
     | Some tbl -> tbl
     | None ->
-        let tbl = Hashtbl.(create (length g)) in
-        Hashtbl.replace g u tbl;
+        let tbl = Vertex_Table.(create (length g)) in
+        Vertex_Table.replace g u tbl;
         tbl
 
-  let add_edge g u v w = Hashtbl.add (adj_tbl g u) v w
-  let replace_edge g u v w = Hashtbl.replace (adj_tbl g u) v w
+  let add_edge g u v w = Vertex_Table.add (adj_tbl g u) v w
+  let replace_edge g u v w = Vertex_Table.replace (adj_tbl g u) v w
 
   let adjacent g u =
-    Hashtbl.find_opt g u |> Option.fold ~none:[] ~some:(List.of_seq % Hashtbl.to_seq)
+    Vertex_Table.find_opt g u |> Option.fold ~none:[] ~some:(List.of_seq % Vertex_Table.to_seq)
 
   let edges g =
-    Hashtbl.fold (fun u adj ans -> Hashtbl.fold (fun v w ans -> (u, v, w) :: ans) adj ans) g []
+    Vertex_Table.fold
+      (fun u adj ans -> Vertex_Table.fold (fun v w ans -> (u, v, w) :: ans) adj ans)
+      g []
 
   let vertices g =
-    List.sort_uniq Stdlib.compare
-      (Hashtbl.fold (fun u adj ans -> Hashtbl.fold (fun v _ ans -> u :: v :: ans) adj ans) g [])
+    List.sort_uniq Vertex.compare
+      (Vertex_Table.fold
+         (fun u adj ans -> Vertex_Table.fold (fun v _ ans -> u :: v :: ans) adj ans)
+         g [])
 
-  let pp ~vertex ~weight fmt g = pp vertex weight fmt `Directed (vertices g) (edges g)
+  let pp fmt g = pp (module Vertex) (module Weight) `Directed fmt (vertices g) (edges g)
 end
 
-module Undirected = struct
-  type ('v, 'w) t = ('v, 'w) Directed.t
+module Make_Undirected (Vertex : VERTEX) (Weight : WEIGHT) = struct
+  module Directed = Make_Directed (Vertex) (Weight)
+
+  type t = Directed.t
 
   let make = Directed.make
 
@@ -93,5 +118,5 @@ module Undirected = struct
   let adjacent = Directed.adjacent
   let edges g = Directed.edges g |> List.filter (fun (u, v, _) -> u < v)
   let vertices = Directed.vertices
-  let pp ~vertex ~weight fmt g = pp vertex weight fmt `Undirected (vertices g) (edges g)
+  let pp fmt g = pp (module Vertex) (module Weight) `Undirected fmt (vertices g) (edges g)
 end

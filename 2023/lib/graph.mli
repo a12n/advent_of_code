@@ -1,20 +1,38 @@
-module type S = sig
-  type ('v, 'w) t
+module type VERTEX = sig
+  type t
 
-  val make : int -> ('v, 'w) t
-  val add_edge : ('v, 'w) t -> 'v -> 'v -> 'w -> unit
-  val replace_edge : ('v, 'w) t -> 'v -> 'v -> 'w -> unit
-  val adjacent : ('v, 'w) t -> 'v -> ('v * 'w) list
-  val edges : ('v, 'w) t -> ('v * 'v * 'w) list
-  val vertices : ('v, 'w) t -> 'v list
-
-  val pp :
-    vertex:([ `Attr | `Edge ] -> Format.formatter -> 'v -> unit) ->
-    weight:(Format.formatter -> 'w -> unit) ->
-    Format.formatter ->
-    ('v, 'w) t ->
-    unit
+  val compare : t -> t -> int
+  val equal : t -> t -> bool
+  val hash : t -> int
+  val pp : ?attr:bool -> Format.formatter -> t -> unit
 end
 
-module Directed : S
-module Undirected : S
+module type WEIGHT = sig
+  type t
+
+  val zero : t
+  val add : t -> t -> t
+  val equal : t -> t -> bool
+  val hash : t -> int
+  val pp : Format.formatter -> t -> unit
+end
+
+module type S = sig
+  type vertex
+  type weight
+  type t
+
+  val make : int -> t
+  val add_edge : t -> vertex -> vertex -> weight -> unit
+  val replace_edge : t -> vertex -> vertex -> weight -> unit
+  val adjacent : t -> vertex -> (vertex * weight) list
+  val edges : t -> (vertex * vertex * weight) list
+  val vertices : t -> vertex list
+  val pp : Format.formatter -> t -> unit
+end
+
+module Make_Directed (Vertex : VERTEX) (Weight : WEIGHT) :
+  S with type vertex := Vertex.t and type weight := Weight.t
+
+module Make_Undirected (Vertex : VERTEX) (Weight : WEIGHT) :
+  S with type vertex := Vertex.t and type weight := Weight.t

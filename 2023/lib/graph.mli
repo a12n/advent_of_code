@@ -3,6 +3,7 @@ module type S = sig
 
   val make : int -> ('v, 'w) t
   val add_edge : ('v, 'w) t -> 'v -> 'v -> 'w -> unit
+  val replace_edge : ('v, 'w) t -> 'v -> 'v -> 'w -> unit
   val adjacent : ('v, 'w) t -> 'v -> ('v * 'w) list
   val edges : ('v, 'w) t -> ('v * 'v * 'w) list
   val vertices : ('v, 'w) t -> 'v list

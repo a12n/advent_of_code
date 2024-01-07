@@ -5,6 +5,7 @@ module type S = sig
 
   val make : int -> ('v, 'w) t
   val add_edge : ('v, 'w) t -> 'v -> 'v -> 'w -> unit
+  val replace_edge : ('v, 'w) t -> 'v -> 'v -> 'w -> unit
   val adjacent : ('v, 'w) t -> 'v -> ('v * 'w) list
   val edges : ('v, 'w) t -> ('v * 'v * 'w) list
   val vertices : ('v, 'w) t -> 'v list
@@ -59,6 +60,7 @@ module Directed = struct
         tbl
 
   let add_edge g u v w = Hashtbl.add (adj_tbl g u) v w
+  let replace_edge g u v w = Hashtbl.replace (adj_tbl g u) v w
 
   let adjacent g u =
     Hashtbl.find_opt g u |> Option.fold ~none:[] ~some:(List.of_seq % Hashtbl.to_seq)

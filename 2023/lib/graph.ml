@@ -17,6 +17,8 @@ end
 
 let pp pp_vertex pp_weight fmt dir vertices edges =
   Format.(
+    fprintf fmt "// V = %d\n" (List.length vertices);
+    fprintf fmt "// E = %d\n" (List.length edges);
     pp_print_string fmt (match dir with `Directed -> "digraph" | `Undirected -> "graph");
     pp_print_string fmt " {\n";
     List.iter

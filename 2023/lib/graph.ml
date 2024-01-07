@@ -85,6 +85,11 @@ module Undirected = struct
       add_edge g u v w;
       add_edge g v u w)
 
+  let replace_edge g u v w =
+    Directed.(
+      replace_edge g u v w;
+      replace_edge g v u w)
+
   let adjacent = Directed.adjacent
   let edges g = Directed.edges g |> List.filter (fun (u, v, _) -> u < v)
   let vertices = Directed.vertices

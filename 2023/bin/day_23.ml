@@ -9,6 +9,22 @@ module Pos_Set = struct
   let is_not_mem set elt = not (is_mem set elt)
 end
 
+module Graph =
+  Graph2.Make_Undirected
+    (struct
+      include Pos
+
+      let pp ?(attr = false) fmt (row, col) =
+        Format.(
+          fprintf fmt "\"(%d,%d)\"" row col;
+          if attr then fprintf fmt " [pos=\"%d,%d!\"]" col (-row))
+    end)
+    (struct
+      include Int
+
+      let pp = Format.pp_print_int
+    end)
+
 module Tile = struct
   type t = Path | Forest | Slope of Dir.t
 
@@ -49,10 +65,8 @@ module Trail_Map = struct
 
   let pp ?highlight =
     Grid.pp ?highlight (fun fmt tile -> Format.pp_print_string fmt (Tile.to_string tile))
-end
 
-module Graph = struct
-  let vertices trails =
+  let to_graph_vertices trails =
     let ((n_rows, _) as size) = Grid.size trails in
     Array.fold_lefti
       (fun ans row line ->
@@ -76,14 +90,14 @@ module Graph = struct
           ans line)
       Pos_Set.empty trails
 
-  let edges trails vertices =
+  let to_graph trails =
     let size = Grid.size trails in
-    let ans = Hashtbl.create 1024 in
-    Pos_Set.iter
-      (fun start ->
-        let rec loop path pos =
+    let vertices = to_graph_vertices trails in
+    Pos_Set.fold
+      (fun start ans ->
+        let rec loop ans path pos =
           if pos <> start && Pos_Set.mem pos vertices then
-            Hashtbl.add ans start (pos, Pos_Set.cardinal path - 1)
+            Graph.replace_edge ans start pos (Pos_Set.cardinal path - 1)
           else
             (match trails.@(pos) with
             | Tile.Path | Tile.Slope _ -> Dir.[ Up; Left; Right; Down ]
@@ -92,42 +106,16 @@ module Graph = struct
             |> List.filter Pos.(is_valid size)
             |> List.filter (( <> ) Tile.Forest % Grid.get trails)
             |> List.filter (Pos_Set.is_not_mem path)
-            |> List.iter (fun next -> loop (Pos_Set.add next path) next)
+            |> List.fold_left (fun ans next -> loop ans (Pos_Set.add next path) next) ans
         in
-        loop Pos_Set.(singleton start) start)
-      vertices;
-    ans
-
-  let of_trail_map trails =
-    let v = vertices trails in
-    let g = edges trails v in
-    (* Each undirected edge was added twice (from u to v, and from v
-       to u), deduplicate. *)
-    Hashtbl.filter_map_inplace (fun u (v, w) -> if u < v then Some (v, w) else None) g;
-    Printf.(
-      eprintf "// V = %d\n%!" (Pos_Set.cardinal v);
-      eprintf "// E = %d\n%!" (Hashtbl.length g));
-    g
-
-  let pp_dot fmt g =
-    Format.(
-      pp_print_string fmt "graph {\n";
-      Hashtbl.fold (fun u (v, _) set -> Pos_Set.(add u (add v set))) g Pos_Set.empty
-      |> Pos_Set.iter (fun (row, col) ->
-             fprintf fmt "\t\"(%d,%d)\" [pos=\"%d,%d!\"];\n" row col col (-row));
-      Hashtbl.iter
-        (fun u (v, w) ->
-          fprintf fmt "\t\"(%d,%d)\" -- \"(%d,%d)\" [label=\"%d\"];\n" (fst u) (snd u) (fst v)
-            (snd v) w)
-        g;
-      pp_print_string fmt "}";
-      pp_print_newline fmt ())
+        loop ans Pos_Set.(singleton start) start)
+      vertices Graph.empty
 end
 
 let run ~slippery =
   let trails = Trail_Map.of_lines (input_lines stdin) in
   let start, finish = Trail_Map.(start trails, finish trails) in
-  Format.(Graph.of_trail_map trails |> Graph.pp_dot err_formatter);
+  Format.(Graph.pp err_formatter (Trail_Map.to_graph trails));
   let hike = Option.get (Trail_Map.longest_hike ~slippery trails start finish) in
   Format.(Trail_Map.pp ~highlight:(Pos_Set.to_list hike) err_formatter trails);
   print_endline (string_of_int (Pos_Set.cardinal hike))

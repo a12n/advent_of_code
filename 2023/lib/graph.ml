@@ -44,15 +44,29 @@ let pp pp_vertex pp_weight fmt dir vertices edges =
     pp_print_newline fmt ())
 
 module Directed = struct
-  type ('v, 'w) t = ('v, 'v * 'w) Hashtbl.t
+  type ('v, 'w) t = ('v, ('v, 'w) Hashtbl.t) Hashtbl.t
 
   let make n = Hashtbl.create n
-  let add_edge g u v w = Hashtbl.add g u (v, w)
-  let adjacent g u = Hashtbl.find_all g u
-  let edges g = Hashtbl.fold (fun u (v, w) ans -> (u, v, w) :: ans) g []
+
+  let adj_tbl g u =
+    match Hashtbl.find_opt g u with
+    | Some tbl -> tbl
+    | None ->
+        let tbl = Hashtbl.(create (length g)) in
+        Hashtbl.replace g u tbl;
+        tbl
+
+  let add_edge g u v w = Hashtbl.add (adj_tbl g u) v w
+
+  let adjacent g u =
+    Hashtbl.find_opt g u |> Option.fold ~none:[] ~some:(List.of_seq % Hashtbl.to_seq)
+
+  let edges g =
+    Hashtbl.fold (fun u adj ans -> Hashtbl.fold (fun v w ans -> (u, v, w) :: ans) adj ans) g []
 
   let vertices g =
-    Hashtbl.fold (fun u (v, _) ans -> u :: v :: ans) g [] |> List.sort_uniq Stdlib.compare
+    List.sort_uniq Stdlib.compare
+      (Hashtbl.fold (fun u adj ans -> Hashtbl.fold (fun v _ ans -> u :: v :: ans) adj ans) g [])
 
   let pp ~vertex ~weight fmt g = pp vertex weight fmt `Directed (vertices g) (edges g)
 end

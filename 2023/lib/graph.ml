@@ -3,7 +3,7 @@ module type S = sig
 
   val make : int -> ('v, 'w) t
   val add_edge : ('v, 'w) t -> 'v -> 'v -> 'w -> unit
-  val adj : ('v, 'w) t -> 'v -> ('v * 'w) list
+  val adjacent : ('v, 'w) t -> 'v -> ('v * 'w) list
   val edges : ('v, 'w) t -> ('v * 'v * 'w) list
   val vertices : ('v, 'w) t -> 'v list
 
@@ -46,7 +46,7 @@ module Directed = struct
 
   let make n = Hashtbl.create n
   let add_edge g u v w = Hashtbl.add g u (v, w)
-  let adj g u = Hashtbl.find_all g u
+  let adjacent g u = Hashtbl.find_all g u
   let edges g = Hashtbl.fold (fun u (v, w) ans -> (u, v, w) :: ans) g []
 
   let vertices g =
@@ -65,7 +65,7 @@ module Undirected = struct
       add_edge g u v w;
       add_edge g v u w)
 
-  let adj = Directed.adj
+  let adjacent = Directed.adjacent
   let edges g = Directed.edges g |> List.filter (fun (u, v, _) -> u < v)
   let vertices = Directed.vertices
   let pp ~vertex ~weight fmt g = pp vertex weight fmt `Undirected (vertices g) (edges g)

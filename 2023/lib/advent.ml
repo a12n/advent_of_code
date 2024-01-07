@@ -10,6 +10,7 @@ module String = Advent__String
 (* Shared modules *)
 module Algorithm = Advent__Algorithm
 module Dir = Advent__Dir
+module Graph = Advent__Graph
 module Grid = Advent__Grid
 module Point = Advent__Point
 module Polygon = Advent__Polygon

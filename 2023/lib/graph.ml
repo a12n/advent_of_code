@@ -1,3 +1,5 @@
+open Fun.Ops
+
 module type S = sig
   type ('v, 'w) t
 

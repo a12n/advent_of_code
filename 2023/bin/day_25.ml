@@ -1,17 +1,10 @@
 open Advent
 
-module Graph =
-  Graph.Make_Undirected
-    (struct
-      include String
+module Graph = struct
+  include Graph.Make_Undirected (String) (Unit)
 
-      let pp _ = Format.pp_print_string
-    end)
-    (struct
-      include Unit
-
-      let pp _fmt () = ()
-    end)
+  let pp = pp (fun _ -> Format.pp_print_string) (fun _fmt () -> ())
+end
 
 let of_lines lines =
   Seq.fold_left

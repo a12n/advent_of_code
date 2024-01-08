@@ -9,21 +9,17 @@ module Pos_Set = struct
   let is_not_mem set elt = not (is_mem set elt)
 end
 
-module Graph =
-  Graph.Make_Undirected
-    (struct
-      include Pos
+module Graph = struct
+  include Graph.Make_Undirected (Pos) (Int)
 
-      let pp attr fmt (row, col) =
-        Format.(
+  let pp =
+    pp
+      Format.(
+        fun attr fmt (row, col) ->
           fprintf fmt "\"(%d,%d)\"" row col;
           if attr = `Attr then fprintf fmt " [pos=\"%d,%d!\"]" col (-row))
-    end)
-    (struct
-      include Int
-
-      let pp = Format.pp_print_int
-    end)
+      Format.pp_print_int
+end
 
 module Tile = struct
   type t = Path | Forest | Slope of Dir.t

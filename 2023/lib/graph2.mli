@@ -24,6 +24,7 @@ module type S = sig
   val adjacent : t -> vertex -> (vertex * weight) list
   val edges : t -> (vertex * vertex * weight) list
   val vertices : t -> vertex list
+  val components : t -> t list
   val pp : Format.formatter -> t -> unit
 end
 

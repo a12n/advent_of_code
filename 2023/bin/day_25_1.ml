@@ -4,7 +4,7 @@ open Day_25
 let () =
   let conns = of_lines (input_lines stdin) in
   Graph.pp Format.err_formatter conns;
-  (* Identified from Graphviz visualization. *)
+  (* Edges identified from Graphviz visualization. *)
   let conns =
     List.fold_left
       (fun conns (u, v) -> Graph.remove_edge conns u v ())

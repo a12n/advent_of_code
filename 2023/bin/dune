@@ -116,7 +116,7 @@
 (executables
  (names day_24_1 day_24_2)
  (modules day_24 day_24_1 day_24_2)
- (libraries advent zarith))
+ (libraries advent))
 
 (executables
  (names day_25_1 day_25_2)

@@ -2,14 +2,12 @@ module type VERTEX = sig
   type t
 
   val compare : t -> t -> int
-  val pp : [ `Attr | `Edge ] -> Format.formatter -> t -> unit
 end
 
 module type WEIGHT = sig
   type t
 
   val compare : t -> t -> int
-  val pp : Format.formatter -> t -> unit
 end
 
 module type S = sig
@@ -24,11 +22,16 @@ module type S = sig
   val adjacent : t -> vertex -> (vertex * weight) list
   val edges : t -> (vertex * vertex * weight) list
   val vertices : t -> vertex list
-  val pp : Format.formatter -> t -> unit
+
+  val pp :
+    ([ `Attr | `Edge ] -> Format.formatter -> vertex -> unit) ->
+    (Format.formatter -> weight -> unit) ->
+    Format.formatter ->
+    t ->
+    unit
 end
 
-let pp (type v w) (module V : VERTEX with type t = v) (module W : WEIGHT with type t = w) dir fmt
-    vertices edges =
+let pp pp_vertex pp_weight fmt dir vertices edges =
   Format.(
     pp_print_newline fmt ();
     fprintf fmt "// V = %d\n" (List.length vertices);
@@ -42,7 +45,7 @@ let pp (type v w) (module V : VERTEX with type t = v) (module W : WEIGHT with ty
     List.iter
       (fun u ->
         pp_print_char fmt '\t';
-        V.pp `Attr fmt u;
+        pp_vertex `Attr fmt u;
         pp_print_char fmt ';';
         pp_print_newline fmt ())
       vertices;
@@ -50,11 +53,11 @@ let pp (type v w) (module V : VERTEX with type t = v) (module W : WEIGHT with ty
     List.iter
       (fun (u, v, w) ->
         pp_print_char fmt '\t';
-        V.pp `Edge fmt u;
+        pp_vertex `Edge fmt u;
         pp_print_string fmt (match dir with `Directed -> " -> " | `Undirected -> " -- ");
-        V.pp `Edge fmt v;
+        pp_vertex `Edge fmt v;
         pp_print_string fmt " [label=\"";
-        W.pp fmt w;
+        pp_weight fmt w;
         pp_print_string fmt "\"];";
         pp_print_newline fmt ())
       edges;
@@ -108,7 +111,7 @@ module Make_Directed (Vertex : VERTEX) (Weight : WEIGHT) = struct
     Vertex_Map.fold (fun u adj ans -> Vertex_Map.fold (fun v _ws ans -> u :: v :: ans) adj ans) g []
     |> List.sort_uniq Vertex.compare
 
-  let pp fmt g = pp (module Vertex) (module Weight) `Directed fmt (vertices g) (edges g)
+  let pp pp_vertex pp_weight fmt g = pp pp_vertex pp_weight fmt `Directed (vertices g) (edges g)
 end
 
 module Make_Undirected (Vertex : VERTEX) (Weight : WEIGHT) = struct
@@ -150,5 +153,5 @@ module Make_Undirected (Vertex : VERTEX) (Weight : WEIGHT) = struct
       id2vertex;
     List.of_seq (Hashtbl.to_seq_values id2cc)
 
-  let pp fmt g = pp (module Vertex) (module Weight) `Undirected fmt (vertices g) (edges g)
+  let pp pp_vertex pp_weight fmt g = pp pp_vertex pp_weight fmt `Undirected (vertices g) (edges g)
 end

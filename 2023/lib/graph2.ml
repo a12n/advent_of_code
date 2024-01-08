@@ -8,8 +8,6 @@ end
 module type WEIGHT = sig
   type t
 
-  val zero : t
-  val add : t -> t -> t
   val compare : t -> t -> int
   val pp : Format.formatter -> t -> unit
 end

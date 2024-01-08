@@ -20,6 +20,7 @@ module type S = sig
   val empty : t
   val add_edge : t -> vertex -> vertex -> weight -> t
   val replace_edge : t -> vertex -> vertex -> weight -> t
+  val remove_edge : t -> vertex -> vertex -> weight -> t
   val adjacent : t -> vertex -> (vertex * weight) list
   val edges : t -> (vertex * vertex * weight) list
   val vertices : t -> vertex list
@@ -80,6 +81,8 @@ module Make_Directed (Vertex : VERTEX) (Weight : WEIGHT) = struct
   let replace_edge g u v w =
     update_edges g u v (function [] | [ _ ] -> [ w ] | _ :: ws -> w :: ws)
 
+  let remove_edge g u v w = update_edges g u v (List.remove_if (fun w' -> Weight.compare w w' = 0))
+
   let adjacent g u =
     match Vertex_Map.find_opt u g with
     | None -> []
@@ -109,6 +112,7 @@ module Make_Undirected (Vertex : VERTEX) (Weight : WEIGHT) = struct
   let empty = Directed.empty
   let add_edge g u v w = Directed.(add_edge (add_edge g u v w) v u w)
   let replace_edge g u v w = Directed.(replace_edge (replace_edge g u v w) v u w)
+  let remove_edge g u v w = Directed.(remove_edge (remove_edge g u v w) v u w)
   let adjacent = Directed.adjacent
   let edges g = Directed.edges g |> List.filter (fun (u, v, _) -> Vertex.compare u v < 0)
   let vertices = Directed.vertices

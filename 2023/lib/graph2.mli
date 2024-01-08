@@ -20,6 +20,7 @@ module type S = sig
   val empty : t
   val add_edge : t -> vertex -> vertex -> weight -> t
   val replace_edge : t -> vertex -> vertex -> weight -> t
+  val remove_edge : t -> vertex -> vertex -> weight -> t
   val adjacent : t -> vertex -> (vertex * weight) list
   val edges : t -> (vertex * vertex * weight) list
   val vertices : t -> vertex list

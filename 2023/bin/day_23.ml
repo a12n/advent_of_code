@@ -116,22 +116,14 @@ module Trail_Map = struct
     let rec loop dist u =
       if u = finish then Some dist
       else
-        let adj = Graph.adjacent graph u |> List.filter (fun (v, _) -> not (Hashtbl.mem seen v)) in
-        match List.find_opt (fun (v, _) -> v = finish) adj with
-        | Some (v, w) ->
-            Hashtbl.replace seen v ();
-            let ans = loop (dist + w) v in
-            Hashtbl.remove seen v;
-            ans
-        | None ->
-            List.filter_map
-              (fun (v, w) ->
-                Hashtbl.replace seen v ();
-                let ans = loop (dist + w) v in
-                Hashtbl.remove seen v;
-                ans)
-              adj
-            |> List.reduce_opt Int.max
+        Graph.adjacent graph u
+        |> List.filter (fun (v, _) -> not (Hashtbl.mem seen v))
+        |> List.filter_map (fun (v, w) ->
+               Hashtbl.replace seen v ();
+               let ans = loop (dist + w) v in
+               Hashtbl.remove seen v;
+               ans)
+        |> List.reduce_opt Int.max
     in
     loop 0 start
 end

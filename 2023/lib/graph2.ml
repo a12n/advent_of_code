@@ -118,8 +118,30 @@ module Make_Undirected (Vertex : VERTEX) (Weight : WEIGHT) = struct
   let vertices = Directed.vertices
 
   let components g =
-    (* TODO *)
-    [ g ]
+    let vertex2id = Hashtbl.create (Directed.Vertex_Map.cardinal g) in
+    let id2vertex = Hashtbl.create 16 in
+    let rec dfs id u =
+      if Hashtbl.mem vertex2id u then ()
+      else (
+        Hashtbl.add vertex2id u id;
+        Hashtbl.add id2vertex id u;
+        List.iter (dfs id) (List.map fst (adjacent g u)))
+    in
+    ignore
+      (List.fold_left
+         (fun id u ->
+           dfs id u;
+           id + 1)
+         0 (vertices g));
+    let id2cc = Hashtbl.create 16 in
+    Hashtbl.iter
+      (fun id u ->
+        Hashtbl.find_opt id2cc id
+        |> Option.value ~default:Directed.Vertex_Map.empty
+        |> Directed.Vertex_Map.(add u (find u g))
+        |> Hashtbl.replace id2cc id)
+      id2vertex;
+    List.of_seq (Hashtbl.to_seq_values id2cc)
 
   let pp fmt g = pp (module Vertex) (module Weight) `Undirected fmt (vertices g) (edges g)
 end

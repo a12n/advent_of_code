@@ -11,7 +11,6 @@ module String = Advent__String
 module Algorithm = Advent__Algorithm
 module Dir = Advent__Dir
 module Graph = Advent__Graph
-module Graph2 = Advent__Graph2
 module Grid = Advent__Grid
 module Point = Advent__Point
 module Polygon = Advent__Polygon

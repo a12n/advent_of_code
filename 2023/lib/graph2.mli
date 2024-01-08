@@ -2,7 +2,7 @@ module type VERTEX = sig
   type t
 
   val compare : t -> t -> int
-  val pp : ?attr:bool -> Format.formatter -> t -> unit
+  val pp : [ `Attr | `Edge ] -> Format.formatter -> t -> unit
 end
 
 module type WEIGHT = sig

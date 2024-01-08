@@ -5,9 +5,7 @@ module Graph =
     (struct
       include String
 
-      let pp ?attr =
-        ignore attr;
-        Format.pp_print_string
+      let pp _ = Format.pp_print_string
     end)
     (struct
       include Unit

@@ -2,7 +2,7 @@ module type VERTEX = sig
   type t
 
   val compare : t -> t -> int
-  val pp : ?attr:bool -> Format.formatter -> t -> unit
+  val pp : [ `Attr | `Edge ] -> Format.formatter -> t -> unit
 end
 
 module type WEIGHT = sig
@@ -42,7 +42,7 @@ let pp (type v w) (module V : VERTEX with type t = v) (module W : WEIGHT with ty
     List.iter
       (fun u ->
         pp_print_char fmt '\t';
-        V.pp ~attr:true fmt u;
+        V.pp `Attr fmt u;
         pp_print_char fmt ';';
         pp_print_newline fmt ())
       vertices;
@@ -50,9 +50,9 @@ let pp (type v w) (module V : VERTEX with type t = v) (module W : WEIGHT with ty
     List.iter
       (fun (u, v, w) ->
         pp_print_char fmt '\t';
-        V.pp fmt u;
+        V.pp `Edge fmt u;
         pp_print_string fmt (match dir with `Directed -> " -> " | `Undirected -> " -- ");
-        V.pp fmt v;
+        V.pp `Edge fmt v;
         pp_print_string fmt " [label=\"";
         W.pp fmt w;
         pp_print_string fmt "\"];";

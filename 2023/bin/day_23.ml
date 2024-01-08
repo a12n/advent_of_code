@@ -14,10 +14,10 @@ module Graph =
     (struct
       include Pos
 
-      let pp ?(attr = false) fmt (row, col) =
+      let pp attr fmt (row, col) =
         Format.(
           fprintf fmt "\"(%d,%d)\"" row col;
-          if attr then fprintf fmt " [pos=\"%d,%d!\"]" col (-row))
+          if attr = `Attr then fprintf fmt " [pos=\"%d,%d!\"]" col (-row))
     end)
     (struct
       include Int

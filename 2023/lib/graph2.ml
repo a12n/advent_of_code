@@ -34,8 +34,12 @@ let pp (type v w) (module V : VERTEX with type t = v) (module W : WEIGHT with ty
     pp_print_newline fmt ();
     fprintf fmt "// V = %d\n" (List.length vertices);
     fprintf fmt "// E = %d\n" (List.length edges);
-    pp_print_string fmt (match dir with `Directed -> "digraph" | `Undirected -> "graph");
-    pp_print_string fmt " {\n";
+    (match dir with
+    | `Directed -> pp_print_string fmt "digraph {\n"
+    | `Undirected ->
+        pp_print_string fmt "graph {\n";
+        pp_print_string fmt "\tgraph [layout=neato];\n");
+    pp_print_newline fmt ();
     List.iter
       (fun u ->
         pp_print_char fmt '\t';

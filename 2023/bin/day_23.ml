@@ -110,12 +110,17 @@ module Trail_Map = struct
         in
         loop ans Pos_Set.(singleton start) start)
       vertices Graph.empty
-end
 
-let run ~slippery =
-  let trails = Trail_Map.of_lines (input_lines stdin) in
-  let start, finish = Trail_Map.(start trails, finish trails) in
-  Format.(Graph.pp err_formatter (Trail_Map.to_graph trails));
-  let hike = Option.get (Trail_Map.longest_hike ~slippery trails start finish) in
-  Format.(Trail_Map.pp ~highlight:(Pos_Set.to_list hike) err_formatter trails);
-  print_endline (string_of_int (Pos_Set.cardinal hike))
+  let longest_path graph start finish =
+    let rec loop dist seen u =
+      if u = finish then Some dist
+      else
+        let adj = Graph.adjacent graph u |> List.filter (fun (v, _) -> not (Pos_Set.mem v seen)) in
+        match List.find_opt (fun (v, _) -> v = finish) adj with
+        | Some (v, w) -> loop (dist + w) (Pos_Set.add v seen) v
+        | None ->
+            List.filter_map (fun (v, w) -> loop (dist + w) (Pos_Set.add v seen) v) adj
+            |> List.reduce_opt Int.max
+    in
+    loop 0 (Pos_Set.singleton start) start
+end

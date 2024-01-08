@@ -10,7 +10,7 @@ module Pos_Set = struct
 end
 
 module Graph =
-  Graph2.Make_Undirected
+  Graph.Make_Undirected
     (struct
       include Pos
 

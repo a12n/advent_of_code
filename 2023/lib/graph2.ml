@@ -71,9 +71,16 @@ module Make_Directed (Vertex : VERTEX) (Weight : WEIGHT) = struct
   let update_edges g u v f =
     Vertex_Map.update u
       (function
-        | None -> Some (Vertex_Map.singleton v (f []))
+        | None -> ( match f [] with [] -> None | ws -> Some (Vertex_Map.singleton v ws))
         | Some adj ->
-            Some (Vertex_Map.update v (function None -> Some (f []) | Some ws -> Some (f ws)) adj))
+            let adj' =
+              Vertex_Map.update v
+                (function
+                  | None -> ( match f [] with [] -> None | ws' -> Some ws')
+                  | Some ws -> ( match f ws with [] -> None | ws' -> Some ws'))
+                adj
+            in
+            if Vertex_Map.is_empty adj' then None else Some adj')
       g
 
   let add_edge g u v w = update_edges g u v (List.cons w)

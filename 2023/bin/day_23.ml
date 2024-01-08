@@ -112,15 +112,26 @@ module Trail_Map = struct
       vertices Graph.empty
 
   let longest_path graph start finish =
-    let rec loop dist seen u =
+    let seen = Hashtbl.create 8192 in
+    let rec loop dist u =
       if u = finish then Some dist
       else
-        let adj = Graph.adjacent graph u |> List.filter (fun (v, _) -> not (Pos_Set.mem v seen)) in
+        let adj = Graph.adjacent graph u |> List.filter (fun (v, _) -> not (Hashtbl.mem seen v)) in
         match List.find_opt (fun (v, _) -> v = finish) adj with
-        | Some (v, w) -> loop (dist + w) (Pos_Set.add v seen) v
+        | Some (v, w) ->
+            Hashtbl.replace seen v ();
+            let ans = loop (dist + w) v in
+            Hashtbl.remove seen v;
+            ans
         | None ->
-            List.filter_map (fun (v, w) -> loop (dist + w) (Pos_Set.add v seen) v) adj
+            List.filter_map
+              (fun (v, w) ->
+                Hashtbl.replace seen v ();
+                let ans = loop (dist + w) v in
+                Hashtbl.remove seen v;
+                ans)
+              adj
             |> List.reduce_opt Int.max
     in
-    loop 0 (Pos_Set.singleton start) start
+    loop 0 start
 end

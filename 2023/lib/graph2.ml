@@ -24,7 +24,6 @@ module type S = sig
   val adjacent : t -> vertex -> (vertex * weight) list
   val edges : t -> (vertex * vertex * weight) list
   val vertices : t -> vertex list
-  val components : t -> t list
   val pp : Format.formatter -> t -> unit
 end
 
@@ -102,10 +101,6 @@ module Make_Directed (Vertex : VERTEX) (Weight : WEIGHT) = struct
     Vertex_Map.fold (fun u adj ans -> Vertex_Map.fold (fun v _ws ans -> u :: v :: ans) adj ans) g []
     |> List.sort_uniq Vertex.compare
 
-  let components g =
-    (* TODO *)
-    [ g ]
-
   let pp fmt g = pp (module Vertex) (module Weight) `Directed fmt (vertices g) (edges g)
 end
 
@@ -121,6 +116,10 @@ module Make_Undirected (Vertex : VERTEX) (Weight : WEIGHT) = struct
   let adjacent = Directed.adjacent
   let edges g = Directed.edges g |> List.filter (fun (u, v, _) -> Vertex.compare u v < 0)
   let vertices = Directed.vertices
-  let components = Directed.components
+
+  let components g =
+    (* TODO *)
+    [ g ]
+
   let pp fmt g = pp (module Vertex) (module Weight) `Undirected fmt (vertices g) (edges g)
 end

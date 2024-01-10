@@ -30,6 +30,31 @@ module Make (Elt : ELT) = struct
   let of_tuple (x, y, z) = { x; y; z }
   let to_tuple { x; y; z } = (x, y, z)
 
+  (** Intersection of two lines (rays) passing through the origin
+      points to the directions. Result is numbers [t] and [u], such
+      that [o1 + t * d1 = o2 + u * d2]. *)
+  let intersect (o1, d1) (o2, d2) =
+    (* https://paulbourke.net/geometry/pointlineplane/
+       o1 = p1;
+       o2 = p3;
+       d1 = p2 - p1;
+       d2 = p4 - p3; *)
+    let ( * ) = Elt.mul in
+    let ( / ) = Elt.div in
+    let ( - ) = Elt.sub in
+    let ( + ) = Elt.add in
+    let norm_d2 = norm2 d2 in
+    if Elt.(equal norm_d2 zero) then None
+    else
+      let dot_d2_d1 = dot d2 d1 in
+      let denom = (norm2 d1 * norm_d2) - (dot_d2_d1 * dot_d2_d1) in
+      if Elt.(equal denom zero) then None
+      else
+        let diff = sub o1 o2 in
+        let t1 = ((dot diff d2 * dot_d2_d1) - (dot diff d1 * norm_d2)) / denom in
+        let t2 = (dot diff d2 + (t1 * dot_d2_d1)) / norm_d2 in
+        Some (t1, t2)
+
   let of_string s =
     match
       String.split_on_char ',' s |> List.filter (( <> ) "") |> List.map (Elt.of_string % String.trim)

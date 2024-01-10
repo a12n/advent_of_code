@@ -1,5 +1,5 @@
 open Advent
-module Point = Point.Rational
+module Point = Point.Make (Q)
 module Vector = Point
 
 let ( let* ) = Option.bind

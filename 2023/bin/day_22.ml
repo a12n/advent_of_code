@@ -7,7 +7,11 @@ module Int_Set = struct
   let is_mem = Fun.flip mem
 end
 
-module Point = Point.Integer
+module Point = Point.Make (struct
+  include Int
+
+  let of_string = int_of_string
+end)
 
 module Brick = struct
   type t = Point.t * Point.t

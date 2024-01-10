@@ -33,29 +33,27 @@ module Make (Elt : ELT) = struct
   let to_tuple { x; y; z } = (x, y, z)
 
   (** Intersection of two lines (rays) passing through the origin
-      points to the directions. Result is numbers [t] and [u], such
-      that [o1 + t * d1 = o2 + u * d2]. *)
+      points to the directions. Result is a pair of numbers [t1] and
+      [t2], such that [o1 + t1 * d1 = o2 + t2 * d2]. *)
   let intersect (o1, d1) (o2, d2) =
     (* https://paulbourke.net/geometry/pointlineplane/
        o1 = p1;
        o2 = p3;
        d1 = p2 - p1;
        d2 = p4 - p3; *)
+    let ( + ) = Elt.add in
+    let ( - ) = Elt.sub in
     let ( * ) = Elt.mul in
     let ( / ) = Elt.div in
-    let ( - ) = Elt.sub in
-    let ( + ) = Elt.add in
-    let norm_d2 = norm2 d2 in
-    if Elt.(equal norm_d2 zero) then None
-    else
-      let dot_d2_d1 = dot d2 d1 in
-      let denom = (norm2 d1 * norm_d2) - (dot_d2_d1 * dot_d2_d1) in
-      if Elt.(equal denom zero) then None
-      else
-        let diff = sub o1 o2 in
-        let t1 = ((dot diff d2 * dot_d2_d1) - (dot diff d1 * norm_d2)) / denom in
-        let t2 = (dot diff d2 + (t1 * dot_d2_d1)) / norm_d2 in
-        Some (t1, t2)
+    let ( let* ) = Option.bind in
+    let non_zero x = if Elt.(equal x zero) then None else Some x in
+    let* norm_d2 = non_zero (norm2 d2) in
+    let dot_d2_d1 = dot d2 d1 in
+    let* denom = non_zero ((norm2 d1 * norm_d2) - (dot_d2_d1 * dot_d2_d1)) in
+    let diff = sub o1 o2 in
+    let t1 = ((dot diff d2 * dot_d2_d1) - (dot diff d1 * norm_d2)) / denom in
+    let t2 = (dot diff d2 + (t1 * dot_d2_d1)) / norm_d2 in
+    Some (t1, t2)
 
   let of_string s =
     match

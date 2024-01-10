@@ -44,11 +44,3 @@ struct
     let ( - ) = sub
   end
 end
-
-module Integer = Make (struct
-  include Int
-
-  let of_string = int_of_string
-end)
-
-module Rational = Make (Q)

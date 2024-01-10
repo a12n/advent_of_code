@@ -1,6 +1,6 @@
 open Fun.Ops
 
-module Make (Elt : sig
+module type ELT = sig
   type t
 
   val zero : t
@@ -10,8 +10,9 @@ module Make (Elt : sig
   val mul : t -> t -> t
   val of_string : string -> t
   val to_string : t -> string
-end) =
-struct
+end
+
+module Make (Elt : ELT) = struct
   type t = { x : Elt.t; y : Elt.t; z : Elt.t }
 
   let zero = { x = Elt.zero; y = Elt.zero; z = Elt.zero }

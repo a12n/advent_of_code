@@ -25,4 +25,4 @@ val take_pairs : 'a list -> ('a * 'a) list
 (** Turn [[x0; x1; x2; x3; …]] to [[(x0, x1); (x2, x3); …]]. *)
 
 val untake_pairs : ('a * 'a) list -> 'a list
-(** Inverse of [pairs]. *)
+(** Inverse of [take_pairs]. *)

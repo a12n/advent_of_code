@@ -21,6 +21,7 @@ module Make (Elt : ELT) = struct
   let unit_x = { zero with x = Elt.one }
   let unit_y = { zero with y = Elt.one }
   let unit_z = { zero with z = Elt.one }
+  let equal p q = Elt.(equal p.x q.x && equal p.y q.y && equal p.z q.z)
   let map f p = { x = f p.x; y = f p.y; z = f p.z }
   let map2 f p q = { x = f p.x q.x; y = f p.y q.y; z = f p.z q.z }
   let reduce f p = f (f p.x p.y) p.z

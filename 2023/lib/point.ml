@@ -5,9 +5,11 @@ module type ELT = sig
 
   val zero : t
   val one : t
+  val equal : t -> t -> bool
   val add : t -> t -> t
   val sub : t -> t -> t
   val mul : t -> t -> t
+  val div : t -> t -> t
   val of_string : string -> t
   val to_string : t -> string
 end

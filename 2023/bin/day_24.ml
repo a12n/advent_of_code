@@ -30,6 +30,14 @@ module Hailstone = struct
       in
       Some Q.(x / denom, y / denom)
     else None
+
+  let pp fmt (p, v) =
+    Format.(
+      pp_print_char fmt '(';
+      Point.pp fmt p;
+      pp_print_char fmt '@';
+      Vector.pp fmt v;
+      pp_print_char fmt ')')
 end
 
 let of_lines = List.of_seq % Seq.map Hailstone.of_string

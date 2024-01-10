@@ -91,7 +91,50 @@
    -2 x +  40 - v x + 20 v = -2 y + 50 - u y + 25 u
    -4 x +  80 - w x + 20 w = -2 z + 68 - u z + 34 u
    -4 y + 100 - w y + 25 w = -2 z + 68 - v z + 34 v
- *)
+*)
+open Advent
+open Day_24
+
 let () =
-  (* TODO *)
-  ()
+  let hailstones = of_lines (input_lines stdin) in
+  let hailstones =
+    List.map
+      (fun (p, v) ->
+        let ans = (p, Vector.(sub v Q.{ x = of_int (-3); y = of_int 1; z = of_int 2 })) in
+        Format.(
+          pp_print_string err_formatter "// Converted (";
+          Point.pp err_formatter p;
+          pp_print_string err_formatter ", ";
+          Vector.pp err_formatter v;
+          pp_print_string err_formatter ") -> (";
+          Point.pp err_formatter (fst ans);
+          pp_print_string err_formatter ", ";
+          Vector.pp err_formatter (snd ans);
+          pp_print_string err_formatter ")";
+          pp_print_newline err_formatter ());
+        ans)
+      hailstones
+  in
+  List.combine_tl hailstones
+  |> List.iteri (fun i (hi, hs) ->
+         List.iteri
+           (fun j hj ->
+             let ans = Hailstone.intersect2 hi hj in
+             Format.(
+               fprintf err_formatter "// Intersect %d and %d, (" i (j + i + 1);
+               Point.pp err_formatter (fst hi);
+               pp_print_string err_formatter ", ";
+               Vector.pp err_formatter (snd hi);
+               pp_print_string err_formatter ") and (";
+               Point.pp err_formatter (fst hj);
+               pp_print_string err_formatter ", ";
+               Vector.pp err_formatter (snd hj);
+               pp_print_string err_formatter ") -> ";
+               Option.iter
+                 (fun (t1, t2) ->
+                   Q.pp_print err_formatter t1;
+                   pp_print_string err_formatter ", ";
+                   Q.pp_print err_formatter t2)
+                 ans;
+               pp_print_newline err_formatter ()))
+           hs)

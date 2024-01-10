@@ -21,6 +21,9 @@ module Make (Elt : ELT) = struct
   let unit_z = { zero with z = Elt.one }
   let map f p = { x = f p.x; y = f p.y; z = f p.z }
   let map2 f p q = { x = f p.x q.x; y = f p.y q.y; z = f p.z q.z }
+  let reduce f p = f (f p.x p.y) p.z
+  let dot u v = reduce Elt.add (map2 Elt.mul u v)
+  let norm2 u = dot u u
   let add = map2 Elt.add
   let sub = map2 Elt.sub
   let mul_elt v x = map (Elt.mul x) v

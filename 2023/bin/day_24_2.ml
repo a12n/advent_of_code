@@ -160,6 +160,19 @@ let rock_position hailstones v' =
 
 let () =
   let hailstones = of_lines (input_lines stdin) in
-  let v = Vector.{ x = Q.of_int (-3); y = Q.of_int 1; z = Q.of_int 2 } in
-  let p = rock_position hailstones v in
-  Point.reduce Q.add (Option.get p) |> Q.to_string |> print_endline
+  try
+    let k = 300 in
+    for x = -k to k do
+      Printf.eprintf "x %d\n%!" x;
+      for y = -k to k do
+        for z = -k to k do
+          let v = Q.(Vector.{ x = of_int x; y = of_int y; z = of_int z }) in
+          match rock_position hailstones v with
+          | Some p ->
+              print_endline (Q.to_string (Point.reduce Q.add p));
+              raise Exit
+          | None -> ()
+        done
+      done
+    done
+  with Exit -> ()

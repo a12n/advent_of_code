@@ -97,27 +97,18 @@ open Day_24
 
 let rock_position hailstones v' =
   try
-    List.mapi
-      (fun i (p, v) ->
-        let h' = (p, Vector.sub v v') in
-        Format.(
-          fprintf err_formatter "Adjust velocity %d " i;
-          Hailstone.pp err_formatter (p, v);
-          pp_print_string err_formatter " -> ";
-          Hailstone.pp err_formatter h';
-          pp_print_newline err_formatter ());
-        h')
-      hailstones
-    |> List.combine_tl
+    List.combine_tl hailstones
     |> List.fold_lefti
-         (fun ans i (((pi, vi) as hi), hs) ->
+         (fun ans i ((pi, vi), hs) ->
+           let ((pi, vi) as hi) = (pi, Vector.sub vi v') in
            Format.(
              fprintf err_formatter "Intersect %d " i;
              Hailstone.pp err_formatter hi;
              pp_print_string err_formatter " with:";
              pp_print_newline err_formatter ());
            List.fold_lefti
-             (fun ans j hj ->
+             (fun ans j (pj, vj) ->
+               let hj = (pj, Vector.sub vj v') in
                let ixn = Point.intersect hi hj in
                Format.(
                  fprintf err_formatter "\t%d " (j + i + 1);

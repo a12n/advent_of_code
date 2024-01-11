@@ -95,49 +95,64 @@
 open Advent
 open Day_24
 
+let with_debug =
+  if Option.is_some (Sys.getenv_opt "DEBUG") then fun f -> f Format.err_formatter else fun _ -> ()
+
 let rock_position hailstones v' =
   try
     List.combine_tl hailstones
     |> List.fold_lefti
          (fun ans i ((pi, vi), hs) ->
            let ((pi, vi) as hi) = (pi, Vector.sub vi v') in
-           Format.(
-             fprintf err_formatter "Intersect %d " i;
-             Hailstone.pp err_formatter hi;
-             pp_print_string err_formatter " with:";
-             pp_print_newline err_formatter ());
+           with_debug
+             Format.(
+               fun fmt ->
+                 fprintf fmt "Intersect %d " i;
+                 Hailstone.pp fmt hi;
+                 pp_print_string fmt " with:";
+                 pp_print_newline fmt ());
            List.fold_lefti
              (fun ans j (pj, vj) ->
                let hj = (pj, Vector.sub vj v') in
                let ixn = Point.intersect hi hj in
-               Format.(
-                 fprintf err_formatter "\t%d " (j + i + 1);
-                 Hailstone.pp err_formatter hj;
-                 pp_print_string err_formatter " -> ");
+               with_debug
+                 Format.(
+                   fun fmt ->
+                     fprintf fmt "\t%d " (j + i + 1);
+                     Hailstone.pp fmt hj;
+                     pp_print_string fmt " -> ");
                match ixn with
                | None ->
-                   Format.(
-                     pp_print_string err_formatter "None, Exit";
-                     pp_print_newline err_formatter ());
+                   with_debug
+                     Format.(
+                       fun fmt ->
+                         pp_print_string fmt "None, Exit";
+                         pp_print_newline fmt ());
                    raise Exit
                | Some (t1, _) -> (
                    let p' = Point.add pi (Vector.mul_elt vi t1) in
-                   Format.(Point.pp err_formatter p');
+                   with_debug (fun fmt -> Point.pp fmt p');
                    match ans with
                    | None ->
-                       Format.(
-                         pp_print_string err_formatter ", OK";
-                         pp_print_newline err_formatter ());
+                       with_debug
+                         Format.(
+                           fun fmt ->
+                             pp_print_string fmt ", OK";
+                             pp_print_newline fmt ());
                        Some p'
                    | Some p'' when Point.equal p' p'' ->
-                       Format.(
-                         pp_print_string err_formatter ", OK";
-                         pp_print_newline err_formatter ());
+                       with_debug
+                         Format.(
+                           fun fmt ->
+                             pp_print_string fmt ", OK";
+                             pp_print_newline fmt ());
                        ans
                    | Some _ ->
-                       Format.(
-                         pp_print_string err_formatter ", Exit";
-                         pp_print_newline err_formatter ());
+                       with_debug
+                         Format.(
+                           fun fmt ->
+                             pp_print_string fmt ", Exit";
+                             pp_print_newline fmt ());
                        raise Exit))
              ans hs)
          None

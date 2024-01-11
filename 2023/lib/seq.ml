@@ -1,8 +1,7 @@
 include Stdlib.Seq
 
-let ints ?(until = max_int) i =
-  if until < i then invalid_arg __FUNCTION__;
-  Stdlib.Seq.(take (until - i + 1) (ints i))
+let ints ?until i =
+  match until with Some j -> Stdlib.Seq.(take (j - i + 1) (ints i)) | None -> Stdlib.Seq.(ints i)
 
 let reduce f s =
   match uncons s with Some (x0, xs) -> fold_left f x0 xs | None -> invalid_arg __FUNCTION__

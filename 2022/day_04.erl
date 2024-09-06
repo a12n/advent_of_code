@@ -4,19 +4,23 @@
 
 -spec main(1..2) -> ok.
 main(Part) ->
-    SegmentPairs =
+    AllPairs =
+        lists:map(fun binary_to_segment_pair/1, advent:file_lines(standard_io)),
+    FilteredPairs =
         case Part of
             1 ->
-                lists:filtermap(
-                    fun(Line) ->
-                        {First, Second} = binary_to_segment_pair(Line),
+                lists:filter(
+                    fun({First, Second}) ->
                         segment:is_subset(First, Second) orelse
                             segment:is_subset(Second, First)
                     end,
-                    advent:file_lines(standard_io)
-                )
+                    AllPairs
+                );
+            2 ->
+                %% TODO
+                []
         end,
-    io:format(<<"~b~n">>, [length(SegmentPairs)]).
+    io:format(<<"~b~n">>, [length(FilteredPairs)]).
 
 -spec binary_to_segment_pair(binary()) -> {segment:t(), segment:t()}.
 binary_to_segment_pair(Str) ->

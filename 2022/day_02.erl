@@ -18,6 +18,22 @@ main(2) ->
     ok.
 
 %%--------------------------------------------------------------------
+%% Game logic functions.
+%%--------------------------------------------------------------------
+
+%% What shape the specified shape defeats.
+-spec defeats(shape()) -> shape().
+defeats(rock) -> scissors;
+defeats(paper) -> rock;
+defeats(scissors) -> paper.
+
+%% To what shape the specified shape losses.
+-spec looses(shape()) -> shape().
+looses(rock) -> paper;
+looses(paper) -> scissors;
+looses(scissors) -> rock.
+
+%%--------------------------------------------------------------------
 %% Scoring functions.
 %%--------------------------------------------------------------------
 

@@ -4,6 +4,7 @@
 -type shape() :: rock | paper | scissors.
 
 -type round_played() :: {_Their :: shape(), _Your :: shape()}.
+-type round_needed() :: {_Their :: shape(), _Need :: outcome()}.
 
 -type game() :: nonempty_list(round_played()).
 
@@ -14,8 +15,9 @@ main(1) ->
     Game = lists:map(fun parse_round_played/1, file_lines(standard_io)),
     io:format(<<"~b~n">>, [game_score(Game)]);
 main(2) ->
-    %% TODO
-    ok.
+    Plan = lists:map(fun parse_round_needed/1, file_lines(standard_io)),
+    Game = lists:map(fun play_round/1, Plan),
+    io:format(<<"~b~n">>, [game_score(Game)]).
 
 %%--------------------------------------------------------------------
 %% Game logic functions.
@@ -80,6 +82,11 @@ parse_shape($A) -> rock;
 parse_shape($B) -> paper;
 parse_shape($C) -> scissors.
 
+-spec parse_outcome(char()) -> outcome().
+parse_outcome($X) -> lose;
+parse_outcome($Y) -> draw;
+parse_outcome($Z) -> win.
+
 %%--------------------------------------------------------------------
 %% Part 1 functions.
 %%--------------------------------------------------------------------
@@ -100,3 +107,12 @@ parse_round_played(<<Their, $\s, Your>>) ->
 %%--------------------------------------------------------------------
 %% Part 2 functions.
 %%--------------------------------------------------------------------
+
+-spec parse_round_needed(binary()) -> round_needed().
+parse_round_needed(<<Their, $\s, Needed>>) ->
+    {parse_shape(Their), parse_outcome(Needed)}.
+
+-spec play_round(round_needed()) -> round_played().
+play_round({Their, draw}) -> {Their, _Your = Their};
+play_round({Their, lose}) -> {Their, _Your = defeats(Their)};
+play_round({Their, win}) -> {Their, _Your = looses(Their)}.

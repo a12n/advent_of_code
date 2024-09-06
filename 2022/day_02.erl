@@ -35,6 +35,11 @@ looses(rock) -> paper;
 looses(paper) -> scissors;
 looses(scissors) -> rock.
 
+-spec play_round(round_needed()) -> round_played().
+play_round({Their, draw}) -> {Their, _Your = Their};
+play_round({Their, lose}) -> {Their, _Your = defeats(Their)};
+play_round({Their, win}) -> {Their, _Your = looses(Their)}.
+
 %%--------------------------------------------------------------------
 %% Scoring functions.
 %%--------------------------------------------------------------------
@@ -104,8 +109,3 @@ parse_round_played(<<Their, $\s, Your>>) ->
 -spec parse_round_needed(binary()) -> round_needed().
 parse_round_needed(<<Their, $\s, Needed>>) ->
     {parse_shape(Their), parse_outcome(Needed)}.
-
--spec play_round(round_needed()) -> round_played().
-play_round({Their, draw}) -> {Their, _Your = Their};
-play_round({Their, lose}) -> {Their, _Your = defeats(Their)};
-play_round({Their, win}) -> {Their, _Your = looses(Their)}.

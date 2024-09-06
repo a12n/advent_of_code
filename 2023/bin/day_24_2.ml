@@ -95,58 +95,64 @@
 open Advent
 open Day_24
 
+let with_debug =
+  if Option.is_some (Sys.getenv_opt "DEBUG") then fun f -> f Format.err_formatter else fun _ -> ()
+
 let rock_position hailstones v' =
   try
-    List.mapi
-      (fun i (p, v) ->
-        let h' = (p, Vector.sub v v') in
-        Format.(
-          fprintf err_formatter "Adjust velocity %d " i;
-          Hailstone.pp err_formatter (p, v);
-          pp_print_string err_formatter " -> ";
-          Hailstone.pp err_formatter h';
-          pp_print_newline err_formatter ());
-        h')
-      hailstones
-    |> List.combine_tl
+    List.combine_tl hailstones
     |> List.fold_lefti
-         (fun ans i (((pi, vi) as hi), hs) ->
-           Format.(
-             fprintf err_formatter "Intersect %d " i;
-             Hailstone.pp err_formatter hi;
-             pp_print_string err_formatter " with:";
-             pp_print_newline err_formatter ());
+         (fun ans i ((pi, vi), hs) ->
+           let ((pi, vi) as hi) = (pi, Vector.sub vi v') in
+           with_debug
+             Format.(
+               fun fmt ->
+                 fprintf fmt "Intersect %d " i;
+                 Hailstone.pp fmt hi;
+                 pp_print_string fmt " with:";
+                 pp_print_newline fmt ());
            List.fold_lefti
-             (fun ans j hj ->
+             (fun ans j (pj, vj) ->
+               let hj = (pj, Vector.sub vj v') in
                let ixn = Point.intersect hi hj in
-               Format.(
-                 fprintf err_formatter "\t%d " (j + i + 1);
-                 Hailstone.pp err_formatter hj;
-                 pp_print_string err_formatter " -> ");
+               with_debug
+                 Format.(
+                   fun fmt ->
+                     fprintf fmt "\t%d " (j + i + 1);
+                     Hailstone.pp fmt hj;
+                     pp_print_string fmt " -> ");
                match ixn with
                | None ->
-                   Format.(
-                     pp_print_string err_formatter "None, Exit";
-                     pp_print_newline err_formatter ());
+                   with_debug
+                     Format.(
+                       fun fmt ->
+                         pp_print_string fmt "None, Exit";
+                         pp_print_newline fmt ());
                    raise Exit
                | Some (t1, _) -> (
                    let p' = Point.add pi (Vector.mul_elt vi t1) in
-                   Format.(Point.pp err_formatter p');
+                   with_debug (fun fmt -> Point.pp fmt p');
                    match ans with
                    | None ->
-                       Format.(
-                         pp_print_string err_formatter ", OK";
-                         pp_print_newline err_formatter ());
+                       with_debug
+                         Format.(
+                           fun fmt ->
+                             pp_print_string fmt ", OK";
+                             pp_print_newline fmt ());
                        Some p'
                    | Some p'' when Point.equal p' p'' ->
-                       Format.(
-                         pp_print_string err_formatter ", OK";
-                         pp_print_newline err_formatter ());
+                       with_debug
+                         Format.(
+                           fun fmt ->
+                             pp_print_string fmt ", OK";
+                             pp_print_newline fmt ());
                        ans
                    | Some _ ->
-                       Format.(
-                         pp_print_string err_formatter ", Exit";
-                         pp_print_newline err_formatter ());
+                       with_debug
+                         Format.(
+                           fun fmt ->
+                             pp_print_string fmt ", Exit";
+                             pp_print_newline fmt ());
                        raise Exit))
              ans hs)
          None
@@ -154,6 +160,19 @@ let rock_position hailstones v' =
 
 let () =
   let hailstones = of_lines (input_lines stdin) in
-  let v = Vector.{ x = Q.of_int (-3); y = Q.of_int 1; z = Q.of_int 2 } in
-  let p = rock_position hailstones v in
-  Point.reduce Q.add (Option.get p) |> Q.to_string |> print_endline
+  try
+    let k = 300 in
+    for x = -k to k do
+      Printf.eprintf "x %d\n%!" x;
+      for y = -k to k do
+        for z = -k to k do
+          let v = Q.(Vector.{ x = of_int x; y = of_int y; z = of_int z }) in
+          match rock_position hailstones v with
+          | Some p ->
+              print_endline (Q.to_string (Point.reduce Q.add p));
+              raise Exit
+          | None -> ()
+        done
+      done
+    done
+  with Exit -> ()

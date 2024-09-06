@@ -1,4 +1,4 @@
--module(segment).
+-module(segments).
 
 -opaque t() :: {_Min :: integer(), _Max :: integer()}.
 -export_type([t/0]).

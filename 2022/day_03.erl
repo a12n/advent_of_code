@@ -9,7 +9,7 @@
 -export([main/1]).
 
 main(Part) ->
-    Rucksacks = lists:map(fun parse_rucksack/1, advent:file_lines(standard_io)),
+    Rucksacks = lists:map(fun binary_to_rucksack/1, advent:file_lines(standard_io)),
     Groups =
         case Part of
             1 ->
@@ -55,26 +55,26 @@ shared_items({Compartment1, Compartment2}) ->
 %% Parsing functions.
 %%--------------------------------------------------------------------
 
--spec parse_rucksack(binary()) -> rucksack().
-parse_rucksack(ItemsStr) ->
+-spec binary_to_rucksack(binary()) -> rucksack().
+binary_to_rucksack(ItemsStr) ->
     N = byte_size(ItemsStr),
     <<First:(N div 2)/bytes, Second:(N div 2)/bytes>> = ItemsStr,
-    {parse_compartment(First), parse_compartment(Second)}.
+    {binary_to_compartment(First), binary_to_compartment(Second)}.
 
--spec parse_compartment(binary()) -> compartment().
-parse_compartment(<<>>) ->
+-spec binary_to_compartment(binary()) -> compartment().
+binary_to_compartment(<<>>) ->
     #{};
-parse_compartment(<<C, ItemsStr/bytes>>) ->
+binary_to_compartment(<<C, ItemsStr/bytes>>) ->
     maps:update_with(
-        parse_item(C),
+        char_to_item(C),
         fun(N) -> N + 1 end,
         1,
-        parse_compartment(ItemsStr)
+        binary_to_compartment(ItemsStr)
     ).
 
--spec parse_item(byte()) -> item().
-parse_item(C) when C >= $a, C =< $z -> C - $a + 1;
-parse_item(C) when C >= $A, C =< $Z -> C - $A + 27.
+-spec char_to_item(char()) -> item().
+char_to_item(C) when C >= $a, C =< $z -> C - $a + 1;
+char_to_item(C) when C >= $A, C =< $Z -> C - $A + 27.
 
 %%--------------------------------------------------------------------
 %% Part 2 functions.

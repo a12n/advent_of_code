@@ -12,10 +12,10 @@
 
 -spec main(1..2) -> ok.
 main(1) ->
-    Game = lists:map(fun parse_round_played/1, file_lines(standard_io)),
+    Game = lists:map(fun parse_round_played/1, advent:file_lines(standard_io)),
     io:format(<<"~b~n">>, [game_score(Game)]);
 main(2) ->
-    Plan = lists:map(fun parse_round_needed/1, file_lines(standard_io)),
+    Plan = lists:map(fun parse_round_needed/1, advent:file_lines(standard_io)),
     Game = lists:map(fun play_round/1, Plan),
     io:format(<<"~b~n">>, [game_score(Game)]).
 
@@ -69,13 +69,6 @@ round_outcome({Their, Your}) when Their == Your -> draw.
 %%--------------------------------------------------------------------
 %% Parsing functions.
 %%--------------------------------------------------------------------
-
--spec file_lines(io:device()) -> [binary()].
-file_lines(File) ->
-    case io:get_line(File, <<>>) of
-        eof -> [];
-        <<Line/bytes>> -> [string:trim(Line) | file_lines(File)]
-    end.
 
 -spec parse_shape(char()) -> shape().
 parse_shape($A) -> rock;

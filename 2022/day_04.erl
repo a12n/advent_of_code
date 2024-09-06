@@ -5,7 +5,7 @@
 -spec main(1..2) -> ok.
 main(Part) ->
     SegmentPairs =
-        lists:map(fun binary_to_segment_pair/1, advent:file_lines(standard_io)),
+        lists:map(fun binary_to_segment_pair/1, io_ext:read_lines(standard_io)),
     Predicate =
         case Part of
             1 ->

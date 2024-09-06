@@ -9,7 +9,7 @@
 -export([main/1]).
 
 main(Part) ->
-    Rucksacks = lists:map(fun binary_to_rucksack/1, advent:file_lines(standard_io)),
+    Rucksacks = lists:map(fun binary_to_rucksack/1, io_ext:read_lines(standard_io)),
     Groups =
         case Part of
             1 ->

@@ -15,9 +15,9 @@ main(Part) ->
     Game =
         case Part of
             1 ->
-                lists:map(fun parse_round_played/1, advent:file_lines(standard_io));
+                lists:map(fun parse_round_played/1, io_ext:read_lines(standard_io));
             2 ->
-                Plan = lists:map(fun parse_round_needed/1, advent:file_lines(standard_io)),
+                Plan = lists:map(fun parse_round_needed/1, io_ext:read_lines(standard_io)),
                 lists:map(fun play_round/1, Plan)
         end,
     io:format(<<"~b~n">>, [game_score(Game)]).

@@ -1,11 +1,11 @@
 .PHONY: all clean
 
-all:	\
-	day_01.beam	\
-	day_02.beam
+MODULES := $(patsubst %.erl,%.beam,$(wildcard *.erl))
+
+all: $(MODULES)
 
 clean:
-	$(RM) *.beam
+	$(RM) $(MODULES)
 
 %.beam: %.erl
 	erlc -Wall -o $@ $<

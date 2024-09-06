@@ -20,8 +20,8 @@ main(Part) ->
 %% Internal functions.
 %%--------------------------------------------------------------------
 
--spec parse_food(binary()) -> food().
-parse_food(Number) ->
+-spec binary_to_food(binary()) -> food().
+binary_to_food(Number) ->
     binary_to_integer(string:trim(Number)).
 
 -spec read_inventory(io:device()) -> inventory().
@@ -29,7 +29,7 @@ read_inventory(File) ->
     case io:get_line(File, <<>>) of
         eof -> [];
         <<$\n>> -> [];
-        <<Line/bytes>> -> [parse_food(Line) | read_inventory(File)]
+        <<Line/bytes>> -> [binary_to_food(Line) | read_inventory(File)]
     end.
 
 -spec read_inventory_list(io:device()) -> nonempty_list(inventory()).

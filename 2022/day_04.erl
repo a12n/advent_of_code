@@ -4,23 +4,21 @@
 
 -spec main(1..2) -> ok.
 main(Part) ->
-    AllPairs =
+    SegmentPairs =
         lists:map(fun binary_to_segment_pair/1, advent:file_lines(standard_io)),
-    FilteredPairs =
+    Predicate =
         case Part of
             1 ->
-                lists:filter(
-                    fun({First, Second}) ->
-                        segment:is_subset(First, Second) orelse
-                            segment:is_subset(Second, First)
-                    end,
-                    AllPairs
-                );
+                fun({First, Second}) ->
+                    segment:is_subset(First, Second) orelse
+                        segment:is_subset(Second, First)
+                end;
             2 ->
-                %% TODO
-                []
+                fun({First, Second}) ->
+                    not segment:is_disjoint(First, Second)
+                end
         end,
-    io:format(<<"~b~n">>, [length(FilteredPairs)]).
+    io:format(<<"~b~n">>, [length(lists:filter(Predicate, SegmentPairs))]).
 
 -spec binary_to_segment_pair(binary()) -> {segment:t(), segment:t()}.
 binary_to_segment_pair(Str) ->

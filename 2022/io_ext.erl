@@ -13,5 +13,6 @@ read_lines(File, N) ->
         eof ->
             [];
         <<Line/bytes>> ->
-            [string:trim(Line) | read_lines(File, N - 1)]
+            %% Trim the trailing \n.
+            [<<Line:(byte_size(Line) - 1)/bytes>> | read_lines(File, N - 1)]
     end.

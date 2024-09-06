@@ -1,0 +1,23 @@
+#!/usr/bin/env escript
+%% -*- mode: erlang -*-
+
+-type day() :: 1..25.
+-type part() :: 1..2.
+
+-spec script_info(string()) -> {day(), part()}.
+script_info(ScriptName) ->
+    <<"day_", DayStr:2/bytes, "_", PartStr:1/bytes>> =
+        list_to_binary(filename:basename(ScriptName)),
+    case {binary_to_integer(DayStr), binary_to_integer(PartStr)} of
+        {Day, Part} when Day >= 1, Day =< 25, Part >= 1, Part =< 2 -> {Day, Part}
+    end.
+
+-spec day_module(day()) -> module().
+day_module(Day) ->
+    binary_to_atom(iolist_to_binary(io_lib:format(<<"day_~2..0b">>, [Day]))).
+
+main(_Args) ->
+    true = code:add_path(filename:dirname(escript:script_name())),
+    ok = io:setopts([binary, {encoding, utf8}]),
+    {Day, Part} = script_info(escript:script_name()),
+    (day_module(Day)):main(Part).

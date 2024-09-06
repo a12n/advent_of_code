@@ -10,7 +10,10 @@
 -spec main(1..2) -> ok.
 main(1) ->
     Game = read_game(standard_io),
-    io:format(<<"~b~n">>, [game_score(Game)]).
+    io:format(<<"~b~n">>, [game_score(Game)]);
+main(2) ->
+    %% TODO
+    ok.
 
 %%--------------------------------------------------------------------
 %% Scoring functions.

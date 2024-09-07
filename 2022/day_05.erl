@@ -8,9 +8,15 @@
 -export([main/1, parse/1]).
 
 -spec main(1..2) -> ok.
-main(1) ->
-    {Stacks, Moves} = parse(io_ext:read_lines(standard_io)),
-    StacksAfterMoves = lists:foldl(fun crate_mover_9000/2, Stacks, Moves),
+main(Part) ->
+    {InitialStacks, Moves} = parse(io_ext:read_lines(standard_io)),
+    MoverModel =
+        case Part of
+            1 -> 9000
+        end,
+    StacksAfterMoves = lists:foldl(
+        fun(Move, Stacks) -> crate_mover(Move, Stacks, MoverModel) end, InitialStacks, Moves
+    ),
     TopOfEachStack = [
         TopCrate
      || {_, [TopCrate | _]} <- lists:sort(maps:to_list(StacksAfterMoves))
@@ -21,12 +27,22 @@ main(1) ->
 %% Move functions.
 %%--------------------------------------------------------------------
 
--spec crate_mover_9000(move(), stack_map()) -> stack_map().
-crate_mover_9000({N, From, To}, Stacks) ->
+-spec crate_mover(move(), stack_map(), 9000 | 9001) -> stack_map().
+crate_mover({N, From, To}, Stacks, Model) ->
     FromStack = maps:get(From, Stacks),
     ToStack = maps:get(To, Stacks),
     {Crates, LeftOnFromStack} = lists:split(N, FromStack),
-    Stacks#{From := LeftOnFromStack, To := move_crates(Crates, ToStack)}.
+    Stacks#{
+        From := LeftOnFromStack,
+        To :=
+            move_crates(
+                case Model of
+                    9000 -> Crates;
+                    9001 -> lists:reverse(Crates)
+                end,
+                ToStack
+            )
+    }.
 
 -spec move_crates([crate()], stack()) -> stack().
 move_crates([], ToStack) ->

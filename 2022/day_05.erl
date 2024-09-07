@@ -12,7 +12,8 @@ main(Part) ->
     {InitialStacks, Moves} = parse(io_ext:read_lines(standard_io)),
     MoverModel =
         case Part of
-            1 -> 9000
+            1 -> 9000;
+            2 -> 9001
         end,
     StacksAfterMoves = lists:foldl(
         fun(Move, Stacks) -> crate_mover(Move, Stacks, MoverModel) end, InitialStacks, Moves

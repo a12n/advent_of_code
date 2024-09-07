@@ -10,32 +10,33 @@
 -spec main(1..2) -> ok.
 main(1) ->
     {Stacks, Moves} = parse(io_ext:read_lines(standard_io)),
-    Stacks2 = lists:foldl(fun perform_move/2, Stacks, Moves),
-    TopOfEachStack = [Crate || {_, [Crate | _]} <- lists:sort(maps:to_list(Stacks2))],
+    StacksAfterMoves = lists:foldl(fun crate_mover_9000/2, Stacks, Moves),
+    TopOfEachStack = [
+        TopCrate
+     || {_, [TopCrate | _]} <- lists:sort(maps:to_list(StacksAfterMoves))
+    ],
     io:format("~s~n", [TopOfEachStack]).
 
--spec perform_move(move(), stack_map()) -> stack_map().
-perform_move(_Move = {0, _From, _To}, Stacks) ->
-    %% Zero crates, nothing to do.
-    Stacks;
-perform_move(_Move = {_, From, _To = From}, Stacks) ->
-    %% Move to the same stack, nothing to do.
-    Stacks;
-perform_move(_Move = {N, From, To}, Stacks) ->
-    %% ?debugVal({N, From, To}),
+%%--------------------------------------------------------------------
+%% Move functions.
+%%--------------------------------------------------------------------
+
+-spec crate_mover_9000(move(), stack_map()) -> stack_map().
+crate_mover_9000({N, From, To}, Stacks) ->
     FromStack = maps:get(From, Stacks),
     ToStack = maps:get(To, Stacks),
-    {FromStack2, ToStack2} = perform_move(N, FromStack, ToStack),
-    %% ?debugVal({FromStack2, ToStack2}),
-    Stacks#{From := FromStack2, To := ToStack2}.
+    {Crates, LeftOnFromStack} = lists:split(N, FromStack),
+    Stacks#{From := LeftOnFromStack, To := move_crates(Crates, ToStack)}.
 
--spec perform_move(non_neg_integer(), stack(), stack()) -> {stack(), stack()}.
-perform_move(0, FromStack, ToStack) ->
-    %% ?debugVal({N, FromStack, ToStack}),
-    {FromStack, ToStack};
-perform_move(N, [Crate | FromStackLeft], ToStack) when N > 0 ->
-    %% ?debugVal({N, FromStack, ToStack}),
-    perform_move(N - 1, FromStackLeft, [Crate | ToStack]).
+-spec move_crates([crate()], stack()) -> stack().
+move_crates([], ToStack) ->
+    ToStack;
+move_crates([Crate | Crates], ToStack) ->
+    move_crates(Crates, [Crate | ToStack]).
+
+%%--------------------------------------------------------------------
+%% Parsing functions.
+%%--------------------------------------------------------------------
 
 -spec parse([binary()]) -> {stack_map(), [move()]}.
 parse(Lines) ->

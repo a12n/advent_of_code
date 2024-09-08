@@ -18,7 +18,7 @@
 -export([main/1]).
 
 -spec main(1..2) -> ok.
-main(_Part) ->
+main(Part) ->
     Root = update_size(build_tree(io_ext:read_lines(standard_io))),
     case Part of
         1 ->

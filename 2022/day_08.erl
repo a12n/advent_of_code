@@ -5,25 +5,36 @@
 -export([main/1]).
 
 -spec main(1..2) -> ok.
-main(1) ->
-    _Cache = ets:new(max_height, [set, private, named_table]),
+main(Part) ->
     HeightMap =
         maps:map(
             fun(_, Char) -> Char - $0 end,
             map_grids:from_lines(io_ext:read_lines(standard_io))
         ),
     HeightMapSize = map_grids:size(HeightMap),
-    VisibleTrees =
-        maps:filter(
-            fun(Pos, Height) ->
-                Height > max_height(left, Pos, HeightMap, HeightMapSize) orelse
-                    Height > max_height(right, Pos, HeightMap, HeightMapSize) orelse
-                    Height > max_height(up, Pos, HeightMap, HeightMapSize) orelse
-                    Height > max_height(down, Pos, HeightMap, HeightMapSize)
-            end,
-            HeightMap
-        ),
-    io:format(<<"~b~n">>, [maps:size(VisibleTrees)]).
+    case Part of
+        1 ->
+            _Cache = ets:new(max_height, [set, private, named_table]),
+            VisibleTrees = maps:filter(
+                fun(Pos, Height) ->
+                    Height > max_height(left, Pos, HeightMap, HeightMapSize) orelse
+                        Height > max_height(right, Pos, HeightMap, HeightMapSize) orelse
+                        Height > max_height(up, Pos, HeightMap, HeightMapSize) orelse
+                        Height > max_height(down, Pos, HeightMap, HeightMapSize)
+                end,
+                HeightMap
+            ),
+            io:format(<<"~b~n">>, [maps:size(VisibleTrees)]);
+        2 ->
+            MaxScenicScore = maps:fold(
+                fun(Pos, _, Max) ->
+                    max(Max, scenic_score(Pos, HeightMap, HeightMapSize))
+                end,
+                -1,
+                HeightMap
+            ),
+            io:format(<<"~b~n">>, [MaxScenicScore])
+    end.
 
 -spec max_height(
     grid_position:direction(),
@@ -50,4 +61,27 @@ max_height(Dir, Pos, HeightGrid, GridSize) ->
             ),
             true = ets:insert(max_height, {Key, MaxHeight}),
             MaxHeight
+    end.
+
+-spec scenic_score(grid_position:t(), map_grids:t(integer()), {non_neg_integer(), non_neg_integer()}) ->
+    pos_integer().
+scenic_score(Pos, HeightGrid, GridSize) ->
+    viewing_distance(left, Pos, HeightGrid, GridSize) *
+        viewing_distance(right, Pos, HeightGrid, GridSize) *
+        viewing_distance(up, Pos, HeightGrid, GridSize) *
+        viewing_distance(down, Pos, HeightGrid, GridSize).
+
+-spec viewing_distance(grid_position:direction(), grid_position:t(), map_grids:t(integer()), {
+    non_neg_integer(), non_neg_integer()
+}) -> non_neg_integer().
+viewing_distance(left, {_, Col}, _, _) when Col =< 1 -> 0;
+viewing_distance(right, {_, Col}, _, {_, NumCols}) when Col >= NumCols -> 0;
+viewing_distance(up, {Row, _}, _, _) when Row =< 1 -> 0;
+viewing_distance(down, {Row, _}, _, {NumRows, _}) when Row >= NumRows -> 0;
+viewing_distance(Dir, Pos, HeightGrid, GridSize) ->
+    Pos2 = grid_position:add(Pos, grid_position:from_direction(Dir)),
+    Height2 = maps:get(Pos2, HeightGrid, -1),
+    case maps:get(Pos, HeightGrid) of
+        Height when Height > Height2 -> 1 + viewing_distance(Dir, Pos2, HeightGrid, GridSize);
+        _Height -> 1
     end.

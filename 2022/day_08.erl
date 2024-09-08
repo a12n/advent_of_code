@@ -74,14 +74,27 @@ scenic_score(Pos, HeightGrid, GridSize) ->
 -spec viewing_distance(grid_position:direction(), grid_position:t(), map_grids:t(integer()), {
     non_neg_integer(), non_neg_integer()
 }) -> non_neg_integer().
-viewing_distance(left, {_, Col}, _, _) when Col =< 1 -> 0;
-viewing_distance(right, {_, Col}, _, {_, NumCols}) when Col >= NumCols -> 0;
-viewing_distance(up, {Row, _}, _, _) when Row =< 1 -> 0;
-viewing_distance(down, {Row, _}, _, {NumRows, _}) when Row >= NumRows -> 0;
 viewing_distance(Dir, Pos, HeightGrid, GridSize) ->
+    viewing_distance(Dir, Pos, HeightGrid, GridSize, maps:get(Pos, HeightGrid)).
+
+-spec viewing_distance(
+    grid_position:direction(),
+    grid_position:t(),
+    map_grids:t(integer()),
+    {
+        non_neg_integer(), non_neg_integer()
+    },
+    non_neg_integer()
+) -> non_neg_integer().
+viewing_distance(left, {_, Col}, _, _, _) when Col =< 1 -> 0;
+viewing_distance(right, {_, Col}, _, {_, NumCols}, _) when Col >= NumCols -> 0;
+viewing_distance(up, {Row, _}, _, _, _) when Row =< 1 -> 0;
+viewing_distance(down, {Row, _}, _, {NumRows, _}, _) when Row >= NumRows -> 0;
+viewing_distance(Dir, Pos, HeightGrid, GridSize, Height) ->
     Pos2 = grid_position:add(Pos, grid_position:from_direction(Dir)),
-    Height2 = maps:get(Pos2, HeightGrid, -1),
-    case maps:get(Pos, HeightGrid) of
-        Height when Height > Height2 -> 1 + viewing_distance(Dir, Pos2, HeightGrid, GridSize);
-        _Height -> 1
+    case maps:get(Pos2, HeightGrid) of
+        Height2 when Height2 < Height ->
+            1 + viewing_distance(Dir, Pos2, HeightGrid, GridSize, Height);
+        _ ->
+            1
     end.

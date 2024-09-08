@@ -23,16 +23,15 @@ main(_Part) ->
     ?debugVal(Root),
     Root2 = update_size(Root),
     ?debugVal(Root2),
-    Found = filter_entries(
+    Found = filtermap_entries(
         fun
-            (#dir_entry{size = Size}) when Size =< 100000 -> true;
+            (#dir_entry{size = Size}) when Size =< 100000 -> {true,Size};
             (_Other) -> false
         end,
         Root2
     ),
     ?debugVal(Found),
-    Size = lists:foldl(fun(#dir_entry{size = Size}, Total) -> Total + Size end, 0, Found),
-    io:format(<<"~b~n">>, [Size]).
+    io:format(<<"~b~n">>, [lists:sum(Found)]).
 
 -spec build_tree([binary()]) -> #dir_entry{}.
 build_tree([<<"$ cd /">> | Commands]) ->
@@ -93,22 +92,24 @@ update_size(Dir = #dir_entry{size = undefined, children = Children}) ->
     Dir#dir_entry{size = Size, children = Children2};
 update_size(Dir = #dir_entry{size = Size}) when is_integer(Size) -> Dir.
 
--spec filter_entries(fun((entry()) -> boolean()), entry()) -> [entry()].
-filter_entries(Pred, File = #file_entry{}) ->
+-spec filtermap_entries(fun((entry()) -> boolean() | {true, term()}), entry()) -> [term()].
+filtermap_entries(Pred, File = #file_entry{}) ->
     case Pred(File) of
+        {true, Value} -> [Value];
         true -> [File];
         false -> []
     end;
-filter_entries(Pred, Dir = #dir_entry{children = Children}) ->
+filtermap_entries(Pred, Dir = #dir_entry{children = Children}) ->
     SubEntries = lists:flatten(
         lists:map(
             fun(Entry) ->
-                filter_entries(Pred, Entry)
+                filtermap_entries(Pred, Entry)
             end,
             maps:values(Children)
         )
     ),
     case Pred(Dir) of
+        {true, Value} -> [Value | SubEntries];
         true -> [Dir | SubEntries];
         false -> SubEntries
     end.

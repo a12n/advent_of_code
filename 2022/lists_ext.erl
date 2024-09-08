@@ -2,7 +2,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--export([reduce/2, transpose_lists/1, rotate_lists/2]).
+-export([reduce/2, enumerate_lists/1, transpose_lists/1, rotate_lists/2]).
 
 -spec reduce(fun((term(), term()) -> term()), nonempty_list()) -> term().
 reduce(F, [Head | Tail]) -> lists:foldl(F, Head, Tail).
@@ -10,6 +10,21 @@ reduce(F, [Head | Tail]) -> lists:foldl(F, Head, Tail).
 %%--------------------------------------------------------------------
 %% Matrix functions.
 %%--------------------------------------------------------------------
+
+-spec enumerate_lists(nonempty_list(nonempty_list(term()))) ->
+    nonempty_list(nonempty_list({{pos_integer(), pos_integer()}, term()})).
+enumerate_lists(Lists) ->
+    lists:map(
+        fun({Row, List}) ->
+            lists:map(
+                fun({Col, Value}) ->
+                    {{Row, Col}, Value}
+                end,
+                lists:enumerate(List)
+            )
+        end,
+        lists:enumerate(Lists)
+    ).
 
 -spec transpose_lists(nonempty_list(nonempty_list(term()))) -> nonempty_list(nonempty_list(term())).
 transpose_lists([[] | _]) ->
@@ -27,6 +42,22 @@ rotate_lists(ccw, Lists) -> lists:reverse(transpose_lists(Lists)).
 -ifdef(TEST).
 
 -include_lib("eunit/include/eunit.hrl").
+
+enumerate_lists_test() ->
+    ?assertEqual(
+        [
+            [{{1, 1}, a}, {{1, 2}, b}, {{1, 3}, c}],
+            [{{2, 1}, d}, {{2, 2}, e}, {{2, 3}, f}],
+            [{{3, 1}, g}, {{3, 2}, h}, {{3, 3}, i}]
+        ],
+        enumerate_lists(
+            [
+                [a, b, c],
+                [d, e, f],
+                [g, h, i]
+            ]
+        )
+    ).
 
 transpose_lists_test() ->
     ?assertEqual(

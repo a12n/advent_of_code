@@ -11,6 +11,10 @@
     children = #{} :: #{binary() := #dir_entry{} | #file_entry{}}
 }).
 
+-type file_entry() :: #file_entry{}.
+-type dir_entry() :: #dir_entry{}.
+-type entry() :: dir_entry() | file_entry().
+
 -export([main/1]).
 
 -spec main(1..2) -> ok.
@@ -19,7 +23,13 @@ main(_Part) ->
     ?debugVal(Root),
     Root2 = update_size(Root),
     ?debugVal(Root2),
-    Found = find_dirs(Root2),
+    Found = filter_entries(
+        fun
+            (#dir_entry{size = Size}) when Size =< 100000 -> true;
+            (_Other) -> false
+        end,
+        Root2
+    ),
     ?debugVal(Found),
     Size = lists:foldl(fun(#dir_entry{size = Size}, Total) -> Total + Size end, 0, Found),
     io:format(<<"~b~n">>, [Size]).
@@ -83,11 +93,22 @@ update_size(Dir = #dir_entry{size = undefined, children = Children}) ->
     Dir#dir_entry{size = Size, children = Children2};
 update_size(Dir = #dir_entry{size = Size}) when is_integer(Size) -> Dir.
 
--spec find_dirs(#dir_entry{}|#file_entry{}) -> [#dir_entry{}].
-find_dirs(#file_entry{}) -> [];
-find_dirs(Dir=#dir_entry{size = Size,children = Children}) ->
-    SubDirs = lists:flatten(lists:map(fun find_dirs/1, maps:values(Children))),
-    case Size =< 100000 of
-        true -> [Dir|SubDirs];
-        false ->SubDirs
+-spec filter_entries(fun((entry()) -> boolean()), entry()) -> [entry()].
+filter_entries(Pred, File = #file_entry{}) ->
+    case Pred(File) of
+        true -> [File];
+        false -> []
+    end;
+filter_entries(Pred, Dir = #dir_entry{children = Children}) ->
+    SubEntries = lists:flatten(
+        lists:map(
+            fun(Entry) ->
+                filter_entries(Pred, Entry)
+            end,
+            maps:values(Children)
+        )
+    ),
+    case Pred(Dir) of
+        true -> [Dir | SubEntries];
+        false -> SubEntries
     end.

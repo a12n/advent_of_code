@@ -19,19 +19,21 @@
 
 -spec main(1..2) -> ok.
 main(_Part) ->
-    Root = build_tree(io_ext:read_lines(standard_io)),
-    ?debugVal(Root),
-    Root2 = update_size(Root),
-    ?debugVal(Root2),
-    Found = filtermap_entries(
-        fun
-            (#dir_entry{size = Size}) when Size =< 100000 -> {true,Size};
-            (_Other) -> false
-        end,
-        Root2
-    ),
-    ?debugVal(Found),
-    io:format(<<"~b~n">>, [lists:sum(Found)]).
+    Root = update_size(build_tree(io_ext:read_lines(standard_io))),
+    case Part of
+        1 ->
+            SmallerDirSizes = filtermap_entries(
+                fun
+                    (#dir_entry{size = Size}) when Size =< 100000 -> {true, Size};
+                    (_Other) -> false
+                end,
+                Root
+            ),
+            io:format(<<"~b~n">>, [lists:sum(SmallerDirSizes)]);
+        2 ->
+            %% TODO
+            ok
+    end.
 
 -spec build_tree([binary()]) -> #dir_entry{}.
 build_tree([<<"$ cd /">> | Commands]) ->

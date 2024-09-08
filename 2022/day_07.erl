@@ -17,8 +17,12 @@
 main(_Part) ->
     Root = build_tree(io_ext:read_lines(standard_io)),
     ?debugVal(Root),
-    %% TODO
-    ok.
+    Root2 = update_size(Root),
+    ?debugVal(Root2),
+    Found = find_dirs(Root2),
+    ?debugVal(Found),
+    Size = lists:foldl(fun(#dir_entry{size = Size}, Total) -> Total + Size end, 0, Found),
+    io:format(<<"~b~n">>, [Size]).
 
 -spec build_tree([binary()]) -> #dir_entry{}.
 build_tree([<<"$ cd /">> | Commands]) ->
@@ -58,3 +62,32 @@ build_tree([FileSize | Commands], Cur = #dir_entry{children = Children}) ->
     Cur2 = Cur#dir_entry{children = Children2},
     ?debugFmt("file ~p ~p, cur ~p~n", [Name, Size, Cur2]),
     build_tree(Commands, Cur2).
+
+-spec update_size(#dir_entry{}) -> #dir_entry{}.
+update_size(Dir = #dir_entry{size = undefined, children = Children}) ->
+    Children2 = maps:map(
+        fun
+            (_Name, File = #file_entry{}) -> File;
+            (_Name, SubDir = #dir_entry{}) -> update_size(SubDir)
+        end,
+        Children
+    ),
+    Size = maps:fold(
+        fun
+            (_Name, #file_entry{size = Size}, Total) -> Total + Size;
+            (_Name, #dir_entry{size = Size}, Total) -> Total + Size
+        end,
+        0,
+        Children2
+    ),
+    Dir#dir_entry{size = Size, children = Children2};
+update_size(Dir = #dir_entry{size = Size}) when is_integer(Size) -> Dir.
+
+-spec find_dirs(#dir_entry{}|#file_entry{}) -> [#dir_entry{}].
+find_dirs(#file_entry{}) -> [];
+find_dirs(Dir=#dir_entry{size = Size,children = Children}) ->
+    SubDirs = lists:flatten(lists:map(fun find_dirs/1, maps:values(Children))),
+    case Size =< 100000 of
+        true -> [Dir|SubDirs];
+        false ->SubDirs
+    end.

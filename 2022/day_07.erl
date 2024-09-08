@@ -52,37 +52,27 @@ build_tree([<<"$ cd /">> | Commands]) ->
 
 -spec build_tree([binary()], #dir_entry{}) -> {[binary()], #dir_entry{}}.
 build_tree([], Cur) ->
-    ?debugHere,
     {[], Cur};
 build_tree([<<"$ cd ..">> | Commands], Cur) ->
-    ?debugFmt("cd .., cur ~p~n", [Cur]),
     {Commands, Cur};
 build_tree([<<"$ cd ", Name/bytes>> | Commands], Cur = #dir_entry{children = Children}) ->
-    ?debugFmt("cd ~p, cur ~p~n", [Name, Cur]),
     {Commands2, Child} = build_tree(Commands, maps:get(Name, Children, #dir_entry{})),
     Children2 = maps:update_with(Name, fun(_) -> Child end, Child, Children),
-    Cur2 = Cur#dir_entry{children = Children2},
-    ?debugFmt("after cd ~p, cur ~p~n", [Name, Cur2]),
-    build_tree(Commands2, Cur2);
+    build_tree(Commands2, Cur#dir_entry{children = Children2});
 build_tree([<<"$ ls">> | Commands], Cur) ->
-    ?debugFmt("ls, cur ~p~n", [Cur]),
     build_tree(Commands, Cur);
 build_tree([<<"dir ", Name/bytes>> | Commands], Cur = #dir_entry{children = Children}) ->
     Children2 = maps:update_with(
         Name, fun(_) -> error(name_exists) end, #dir_entry{}, Children
     ),
-    Cur2 = Cur#dir_entry{children = Children2},
-    ?debugFmt("dir ~p, cur ~p~n", [Name, Cur2]),
-    build_tree(Commands, Cur2);
+    build_tree(Commands, Cur#dir_entry{children = Children2});
 build_tree([FileSize | Commands], Cur = #dir_entry{children = Children}) ->
     [SizeStr, Name] = binary:split(FileSize, <<" ">>, [global, trim]),
     Size = binary_to_integer(SizeStr),
     Children2 = maps:update_with(
         Name, fun(_) -> error(name_exists) end, #file_entry{size = Size}, Children
     ),
-    Cur2 = Cur#dir_entry{children = Children2},
-    ?debugFmt("file ~p ~p, cur ~p~n", [Name, Size, Cur2]),
-    build_tree(Commands, Cur2).
+    build_tree(Commands, Cur#dir_entry{children = Children2}).
 
 -spec update_size(#dir_entry{}) -> #dir_entry{}.
 update_size(Dir = #dir_entry{size = undefined, children = Children}) ->

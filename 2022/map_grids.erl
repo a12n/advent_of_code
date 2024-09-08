@@ -3,7 +3,7 @@
 -type t(Value) :: #{grid_position:t() := Value}.
 -export_type([t/1]).
 
--export([from_lines/1, transpose/1]).
+-export([from_lines/1, transpose/1, size/1]).
 
 -spec from_lines([iodata()]) -> t(char()).
 from_lines(Lines) ->
@@ -22,5 +22,15 @@ transpose(Grid) ->
             maps:update(grid_pos:transpose(Pos), Value, Result)
         end,
         #{},
+        Grid
+    ).
+
+-spec size(t(term())) -> {non_neg_integer(), non_neg_integer()}.
+size(Grid) ->
+    maps:fold(
+        fun({Row, Col}, _, {NumRows, NumCols}) ->
+            {max(NumRows, Row), max(NumCols, Col)}
+        end,
+        {0, 0},
         Grid
     ).

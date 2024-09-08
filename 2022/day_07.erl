@@ -31,8 +31,18 @@ main(Part) ->
             ),
             io:format(<<"~b~n">>, [lists:sum(SmallerDirSizes)]);
         2 ->
-            %% TODO
-            ok
+            SpaceNeeded = Root#dir_entry.size - 30000000,
+            DirSizes = lists:sort(
+                filtermap_entries(
+                    fun
+                        (#dir_entry{size = Size}) -> {true, Size};
+                        (_File) -> false
+                    end,
+                    Root
+                )
+            ),
+            [Size | _] = lists:dropwhile(fun(Size) -> Size < SpaceNeeded end, DirSizes),
+            io:format(<<"~b~n">>, [Size])
     end.
 
 -spec build_tree([binary()]) -> #dir_entry{}.

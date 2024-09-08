@@ -31,7 +31,9 @@ main(Part) ->
             ),
             io:format(<<"~b~n">>, [lists:sum(SmallerDirSizes)]);
         2 ->
-            SpaceNeeded = Root#dir_entry.size - 30000000,
+            SpaceUsed = Root#dir_entry.size,
+            SpaceAvail = 70000000 - SpaceUsed,
+            SpaceNeeded = 30000000 - SpaceAvail,
             DirSizes = lists:sort(
                 filtermap_entries(
                     fun

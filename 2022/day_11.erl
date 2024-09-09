@@ -98,6 +98,35 @@ monkey_business(Monkeys, Rounds) ->
     ).
 
 -spec one_monkey_business(non_neg_integer(), map()) -> map().
-one_monkey_business(ID, Monkeys) ->
-    %% TODO
-    Monkeys.
+one_monkey_business(ThisID, Monkeys) ->
+    #{
+        ThisID := ThisMonkey = #{
+            items := Items,
+            inspected := NumInspected,
+            operation := Inspect,
+            next := Next
+        }
+    } = Monkeys,
+    try
+        Item = queue:get(Items),
+        InspectedItem = Inspect(Item),
+        ThatID = Next(InspectedItem),
+        #{ThatID := ThatMonkey = #{items := ThatItems}} = Monkeys,
+        one_monkey_business(
+            ThisID,
+            Monkeys#{
+                ThisID := ThisMonkey#{
+                    items := queue:drop(Items),
+                    inspected := NumInspected + 1
+                },
+                ThatID := ThatMonkey#{
+                    items := queue:in(InspectedItem, ThatItems)
+                }
+            }
+        )
+    catch
+        error:empty ->
+            %% This monkey don't have items, end of round for this
+            %% monkey.
+            Monkeys
+    end.

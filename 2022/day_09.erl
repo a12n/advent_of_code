@@ -16,21 +16,21 @@ main(1) ->
 
 -spec simulate([move()]) -> [pos()].
 simulate(Motions) ->
-    simulate(Motions, {0, 0}, {0, 0}, [{0, 0}]).
+    simulate(Motions, [{0, 0}, {0, 0}], [{0, 0}]).
 
--spec simulate([move()], pos(), pos(), [pos()]) -> [pos()].
-simulate([], _, _, Visited) ->
+-spec simulate([move()], [pos()], [pos()]) -> [pos()].
+simulate([], _, Visited) ->
     Visited;
-simulate([{_, 0} | Motions], Head, Tail, Visited) ->
-    simulate(Motions, Head, Tail, Visited);
-simulate([{Dir, N} | Motions], Head, Tail, Visited) ->
+simulate([{_, 0} | Motions], [Head, Tail], Visited) ->
+    simulate(Motions, [Head, Tail], Visited);
+simulate([{Dir, N} | Motions], [Head, Tail], Visited) ->
     Head2 = grids:add_pos(Head, grids:dir_to_pos(Dir)),
     Tail2 =
         case tail_vector(grids:sub_pos(Head2, Tail)) of
             {0, 0} -> Tail;
             NonZero -> grids:add_pos(Tail, NonZero)
         end,
-    simulate([{Dir, N - 1} | Motions], Head2, Tail2, [Tail2 | Visited]).
+    simulate([{Dir, N - 1} | Motions], [Head2, Tail2], [Tail2 | Visited]).
 
 -spec tail_vector(pos()) -> pos().
 tail_vector({R, C}) when abs(R) < 2, abs(C) < 2 -> {0, 0};

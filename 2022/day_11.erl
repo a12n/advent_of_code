@@ -2,8 +2,6 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--type monkey() :: term().
-
 -export([main/1]).
 
 -spec main(1..2) -> ok.
@@ -23,23 +21,30 @@ main(1) ->
     ?debugFmt("Monkeys ~p", [Monkeys]),
     ok.
 
--spec parse_monkeys([{binary(), binary()}]) -> [monkey()].
-parse_monkeys([]) ->
-    [];
-parse_monkeys([
-    {<<"Monkey ", IDStr/bytes>>, <<>>},
-    {<<"Starting items">>, ItemsStr},
-    {<<"Operation">>, OperationStr},
-    {<<"Test">>, <<"divisible by ", DivisorStr/bytes>>},
-    {<<"If true">>, <<"throw to monkey ", TrueIDStr/bytes>>},
-    {<<"If false">>, <<"throw to monkey ", FalseIDStr/bytes>>}
-    | Lines
-]) ->
+-spec parse_monkeys([{binary(), binary()}]) -> map().
+parse_monkeys(Lines) ->
+    parse_monkeys(Lines, #{}).
+
+-spec parse_monkeys([{binary(), binary()}], map()) -> map().
+parse_monkeys([], Monkeys) ->
+    Monkeys;
+parse_monkeys(
+    [
+        {<<"Monkey ", IDStr/bytes>>, <<>>},
+        {<<"Starting items">>, ItemsStr},
+        {<<"Operation">>, OperationStr},
+        {<<"Test">>, <<"divisible by ", DivisorStr/bytes>>},
+        {<<"If true">>, <<"throw to monkey ", TrueIDStr/bytes>>},
+        {<<"If false">>, <<"throw to monkey ", FalseIDStr/bytes>>}
+        | Lines
+    ],
+    Monkeys
+) ->
     ID = binary_to_integer(IDStr),
-    Items = [
+    Items = queue:from_list([
         binary_to_integer(string:trim(ItemStr))
      || ItemStr <- binary:split(ItemsStr, <<",">>, [global])
-    ],
+    ]),
     Operation =
         case binary:split(OperationStr, <<" ">>, [global]) of
             [<<"new">>, <<"=">>, AStr, OpStr, BStr] ->
@@ -66,12 +71,14 @@ parse_monkeys([
         (Item) when Item rem Divisor == 0 -> TrueID;
         (_) -> FalseID
     end,
-    [
-        #{
-            id => ID,
-            items => Items,
-            operation => Operation,
-            next => Next
+    parse_monkeys(
+        Lines,
+        Monkeys#{
+            ID =>
+                #{
+                    items => Items,
+                    operation => Operation,
+                    next => Next
+                }
         }
-        | parse_monkeys(Lines)
-    ].
+    ).

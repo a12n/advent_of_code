@@ -83,3 +83,21 @@ parse_monkeys(
                 }
         }
     ).
+
+-spec monkey_business(map(), non_neg_integer()) -> map().
+monkey_business(Monkeys, 0) ->
+    Monkeys;
+monkey_business(Monkeys, Rounds) ->
+    monkey_business(
+        lists:foldl(
+            fun one_monkey_business/2,
+            Monkeys,
+            lists:sort(maps:keys(Monkeys))
+        ),
+        Rounds - 1
+    ).
+
+-spec one_monkey_business(non_neg_integer(), map()) -> map().
+one_monkey_business(ID, Monkeys) ->
+    %% TODO
+    Monkeys.

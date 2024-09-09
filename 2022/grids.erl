@@ -8,7 +8,7 @@
 -type grid(Value) :: #{pos() := Value}.
 -export_type([grid/1]).
 
--export([add_pos/2, sub_pos/2, dir_to_pos/1, pos_to_dir/1, char_to_dir/1]).
+-export([add_pos/2, sub_pos/2, is_valid_pos/2, dir_to_pos/1, pos_to_dir/1, char_to_dir/1]).
 
 -export([from_lines/1, to_iodata/2, to_iodata/3, transpose/1, size/1]).
 
@@ -17,6 +17,11 @@ add_pos({Row1, Col1}, {Row2, Col2}) -> {Row1 + Row2, Col1 + Col2}.
 
 -spec sub_pos(pos(integer()), pos(integer())) -> pos(integer()).
 sub_pos({Row1, Col1}, {Row2, Col2}) -> {Row1 - Row2, Col1 - Col2}.
+
+-spec is_valid_pos(pos(), {non_neg_integer(), non_neg_integer()}) -> boolean().
+is_valid_pos({Row, Col}, {NumRows, NumCols}) ->
+    Row >= 1 andalso Row =< NumRows andalso
+        Col >= 1 andalso Col =< NumCols.
 
 -spec dir_to_pos(dir()) -> pos(-1..1).
 dir_to_pos(up) -> {-1, 0};

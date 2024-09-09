@@ -11,12 +11,12 @@ main(1) ->
         fun(<<Dir, " ", Num/bytes>>) -> {grids:char_to_dir(Dir), binary_to_integer(Num)} end,
         io_ext:read_lines(standard_io)
     ),
-    Visited = sets:from_list(simulate(Motions), [{version, 2}]),
+    Visited = sets:from_list(simulate(Motions, 2), [{version, 2}]),
     io:format("~b~n", [sets:size(Visited)]).
 
--spec simulate([move()]) -> [pos()].
-simulate(Motions) ->
-    simulate(Motions, [{0, 0}, {0, 0}], [{0, 0}]).
+-spec simulate([move()], pos_integer()) -> [pos()].
+simulate(Motions, N = 2) ->
+    simulate(Motions, lists:duplicate(N, {0, 0}), [{0, 0}]).
 
 -spec simulate([move()], [pos()], [pos()]) -> [pos()].
 simulate([], _, Visited) ->

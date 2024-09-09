@@ -10,7 +10,7 @@
 
 -export([add_pos/2, sub_pos/2, is_valid_pos/2, dir_to_pos/1, pos_to_dir/1, char_to_dir/1]).
 
--export([from_lines/1, to_iodata/2, to_iodata/3, transpose/1, size/1]).
+-export([from_lines/1, to_iodata/2, to_iodata/3, find_values/2, transpose/1, size/1]).
 
 -spec add_pos(pos(integer()), pos(integer())) -> pos(integer()).
 add_pos({Row1, Col1}, {Row2, Col2}) -> {Row1 + Row2, Col1 + Col2}.
@@ -68,6 +68,17 @@ to_iodata(Grid, Size = {_, NumCols}, {Row, Col}, Blank) when Col == NumCols + 1 
     [$\n | to_iodata(Grid, Size, {Row + 1, 1}, Blank)];
 to_iodata(Grid, Size, {Row, Col}, Blank) ->
     [maps:get({Row, Col}, Grid, Blank) | to_iodata(Grid, Size, {Row, Col + 1}, Blank)].
+
+-spec find_values(term(), grid(term())) -> [pos()].
+find_values(Query, Grid) ->
+    maps:fold(
+        fun
+            (Pos, Value, List) when Value == Query -> [Pos | List];
+            (_, _, List) -> List
+        end,
+        [],
+        Grid
+    ).
 
 -spec transpose(grid(term())) -> grid(term()).
 transpose(Grid) ->

@@ -9,17 +9,7 @@
 -spec main(1..2) -> ok.
 main(1) ->
     Motions = lists:map(
-        fun(<<Dir, " ", NumStr/bytes>>) ->
-            {
-                case Dir of
-                    $D -> down;
-                    $U -> up;
-                    $L -> left;
-                    $R -> right
-                end,
-                binary_to_integer(NumStr)
-            }
-        end,
+        fun(<<Dir, " ", Num/bytes>>) -> {grids:char_to_dir(Dir), binary_to_integer(Num)} end,
         io_ext:read_lines(standard_io)
     ),
     io:format("~b~n", [sets:size(simulate(Motions))]).

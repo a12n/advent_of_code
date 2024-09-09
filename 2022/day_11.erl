@@ -6,6 +6,7 @@
 
 -spec main(1..2) -> ok.
 main(1) ->
+    %% Parse input.
     Monkeys = parse_monkeys(
         lists:filtermap(
             fun
@@ -18,8 +19,14 @@ main(1) ->
             io_ext:read_lines(standard_io)
         )
     ),
-    ?debugFmt("Monkeys ~p", [Monkeys]),
-    ok.
+    %% Run simulation.
+    Monkeys2 = monkey_business(Monkeys, _Rounds = 20),
+    %% Print results.
+    [NumInspected1, NumInspected2 | _] = lists:sort(
+        fun erlang:'>='/2,
+        lists:map(fun(#{inspected := NumInspected}) -> NumInspected end, maps:values(Monkeys2))
+    ),
+    io:format(<<"~b~n">>, [NumInspected1 * NumInspected2]).
 
 -spec parse_monkeys([{binary(), binary()}]) -> map().
 parse_monkeys(Lines) ->

@@ -35,37 +35,27 @@ distance(HeightMap, MapSize, StartPos, EndPos) ->
             {{Dist, Pos}, _} when Pos == EndPos -> Dist;
             {{Dist, Pos}, Queue2} ->
                 ?debugVal({Dist, Pos}),
-                case gb_sets:is_member(Pos, Seen) of
-                    true ->
-                        Loop(Queue2, Seen);
-                    false ->
-                        Height = maps:get(Pos, HeightMap),
-                        AdjPosList =
-                            lists:filter(
-                                fun(AdjPos) ->
-                                    AdjHeight = maps:get(AdjPos, HeightMap),
-                                    abs(AdjHeight - Height) < 2
-                                end,
-                                [
-                                    AdjPos
-                                 || AdjPos <- [
-                                        grids:add_pos(Pos, grids:dir_to_pos(Dir))
-                                     || Dir <- [up, left, right, down]
-                                    ],
-                                    grids:is_valid_pos(AdjPos, MapSize)
-                                ]
-                            ),
-                        Loop(
-                            lists:foldl(
-                                fun(AdjPos, Queue) ->
-                                    gb_sets:add({Dist + 1, AdjPos}, Queue)
-                                end,
-                                Queue2,
-                                AdjPosList
-                            ),
-                            gb_sets:add(Pos, Seen)
-                        )
-                end
+                Height = maps:get(Pos, HeightMap),
+                AdjPosList = [
+                    AdjPos
+                 || AdjPos <- [
+                        grids:add_pos(Pos, grids:dir_to_pos(Dir))
+                     || Dir <- [up, left, right, down]
+                    ],
+                    grids:is_valid_pos(AdjPos, MapSize),
+                    not gb_sets:is_member(AdjPos, Seen),
+                    abs(maps:get(AdjPos, HeightMap) - Height) < 2
+                ],
+                Loop(
+                    lists:foldl(
+                        fun(AdjPos, Queue) ->
+                            gb_sets:add({Dist + 1, AdjPos}, Queue)
+                        end,
+                        Queue2,
+                        AdjPosList
+                    ),
+                    gb_sets:add(Pos, Seen)
+                )
         end
     end,
     Loop(gb_sets:singleton({0, StartPos}), gb_sets:empty()).

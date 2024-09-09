@@ -1,10 +1,11 @@
 -module(day_10).
 
--type instruction() :: {addx, integer()} | noop.
--type trace() :: [{_PC :: non_neg_integer(), _X :: integer()}].
-
 -define(SCREEN_WIDTH, 40).
 -define(SCREEN_HEIGHT, 6).
+
+-type crt_pos() :: 0..(?SCREEN_WIDTH * ?SCREEN_HEIGHT - 1).
+-type instruction() :: {addx, integer()} | noop.
+-type trace() :: [{_PC :: non_neg_integer(), _X :: integer()}].
 
 -export([main/1]).
 
@@ -48,11 +49,19 @@ signal_strength([{PC0, X0} | Trace = [{PC1, _} | _]], [T | Points]) when T > PC0
 signal_strength([_ | Trace], Points) ->
     signal_strength(Trace, Points).
 
--spec lit_pixels(trace()) -> [non_neg_integer()].
-lit_pixels(Trace) ->
+-spec lit_pixels(trace()) -> [crt_pos()].
+lit_pixels(Trace) -> lit_pixels(Trace, 0, 0).
+
+-spec lit_pixels(trace(), non_neg_integer(), crt_pos()) -> [crt_pos()].
+lit_pixels([], _, _) ->
+    [];
+lit_pixels(Trace, PC, CRT) ->
     %% TODO
+    _ = Trace,
+    _ = PC,
+    _ = CRT,
     [].
 
--spec pixel_pos(non_neg_integer()) -> grids:pos().
+-spec pixel_pos(crt_pos()) -> grids:pos().
 pixel_pos(Pos) ->
     {(Pos div ?SCREEN_WIDTH) + 1, (Pos rem ?SCREEN_WIDTH) + 1}.

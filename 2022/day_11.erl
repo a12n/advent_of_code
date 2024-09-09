@@ -78,6 +78,7 @@ parse_monkeys(
                         fun(Old) -> Op(A, Old) div WorryDivider end
                 end
         end,
+    %% XXX: In the input, divisors are always prime numbers.
     Divisor = binary_to_integer(DivisorStr),
     TrueID = binary_to_integer(TrueIDStr),
     FalseID = binary_to_integer(FalseIDStr),

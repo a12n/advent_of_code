@@ -8,7 +8,8 @@
 -type grid(Value) :: #{pos() := Value}.
 -export_type([grid/1]).
 
--export([add_pos/2, sub_pos/2, dir_to_pos/1, pos_to_dir/1]).
+-export([add_pos/2, sub_pos/2, dir_to_pos/1, pos_to_dir/1, char_to_dir/1]).
+
 -export([from_lines/1, transpose/1, size/1]).
 
 -spec add_pos(pos(integer()), pos(integer())) -> pos(integer()).
@@ -28,6 +29,12 @@ pos_to_dir({Row, 0}) when Row < 0 -> up;
 pos_to_dir({Row, 0}) when Row > 0 -> down;
 pos_to_dir({0, Col}) when Col < 0 -> left;
 pos_to_dir({0, Col}) when Col > 0 -> right.
+
+-spec char_to_dir(char()) -> dir().
+char_to_dir($D) -> down;
+char_to_dir($L) -> left;
+char_to_dir($R) -> right;
+char_to_dir($U) -> up.
 
 -spec from_lines([iodata()]) -> grid(char()).
 from_lines(Lines) ->

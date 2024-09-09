@@ -15,7 +15,7 @@ main(1) ->
         io_ext:read_lines(standard_io)
     ),
     Trace = trace(Program),
-    SignalStrength = signal_strength(Trace, [20 - 1, 60 - 1, 100 - 1, 140 - 1, 180 - 1, 220 - 1]),
+    SignalStrength = signal_strength(Trace, [20, 60, 100, 140, 180, 220]),
     io:format(<<"~b~n">>, [lists:sum(SignalStrength)]).
 
 -spec trace([instruction()]) -> trace().
@@ -34,7 +34,7 @@ trace([{addx, Y} | Program], PC, X) ->
 -spec signal_strength(trace(), [non_neg_integer()]) -> [integer()].
 signal_strength(_, []) ->
     [];
-signal_strength([{PC0, X0} | Trace = [{PC1, _} | _]], [T | Points]) when T >= PC0, T < PC1 ->
-    [X0 * (T + 1) | signal_strength(Trace, Points)];
+signal_strength([{PC0, X0} | Trace = [{PC1, _} | _]], [T | Points]) when T > PC0, T =< PC1 ->
+    [X0 * T | signal_strength(Trace, Points)];
 signal_strength([_ | Trace], Points) ->
     signal_strength(Trace, Points).

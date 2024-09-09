@@ -10,7 +10,7 @@
 
 -export([add_pos/2, sub_pos/2, dir_to_pos/1, pos_to_dir/1, char_to_dir/1]).
 
--export([from_lines/1, transpose/1, size/1]).
+-export([from_lines/1, to_iodata/2, transpose/1, size/1]).
 
 -spec add_pos(pos(integer()), pos(integer())) -> pos(integer()).
 add_pos({Row1, Col1}, {Row2, Col2}) -> {Row1 + Row2, Col1 + Col2}.
@@ -45,6 +45,17 @@ from_lines(Lines) ->
             {Col, Value} <- lists:enumerate(binary_to_list(iolist_to_binary(Line)))
         ]
     ).
+
+-spec to_iodata(grid(char()), {pos_integer(), pos_integer()}) -> iodata().
+to_iodata(Grid, Size) -> to_iodata(Grid, Size, {1, 1}).
+
+-spec to_iodata(grid(char()), {pos_integer(), pos_integer()}, {pos_integer(), pos_integer()}) ->
+    iodata().
+to_iodata(_, {NumRows, _}, {Row, _}) when Row == NumRows + 1 -> "";
+to_iodata(Grid, Size = {_, NumCols}, {Row, Col}) when Col == NumCols + 1 ->
+    [$\n | to_iodata(Grid, Size, {Row + 1, 1})];
+to_iodata(Grid, Size, {Row, Col}) ->
+    [maps:get({Row, Col}, Grid, $\s) | to_iodata(Grid, Size, {Row, Col + 1})].
 
 -spec transpose(grid(term())) -> grid(term()).
 transpose(Grid) ->

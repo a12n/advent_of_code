@@ -50,17 +50,22 @@ signal_strength([_ | Trace], Points) ->
     signal_strength(Trace, Points).
 
 -spec lit_pixels(cpu_trace()) -> [crt_pos()].
-lit_pixels(Trace) -> lit_pixels(Trace, 0, 0).
+lit_pixels(Trace) -> lit_pixels(Trace, 0).
 
--spec lit_pixels(cpu_trace(), non_neg_integer(), crt_pos()) -> [crt_pos()].
-lit_pixels([], _, _) ->
+-spec lit_pixels(cpu_trace(), non_neg_integer()) -> [crt_pos()].
+lit_pixels(_, PC) when PC >= (?SCREEN_WIDTH * ?SCREEN_HEIGHT) ->
+    %% The whole screen covered.
     [];
-lit_pixels([{PC0, X0} | Trace], PC, CRT) ->
-    %% TODO
-    _ = Trace,
-    _ = PC,
-    _ = CRT,
-    [].
+lit_pixels([_ | TraceLeft = [{PC1, _} | _]], PC) when PC >= PC1 ->
+    %% Drop the first trace sample, CRT PC is at the next sample now.
+    lit_pixels(TraceLeft, PC);
+lit_pixels(Trace = [{_, X} | _], PC) ->
+    CRT = PC rem (?SCREEN_WIDTH * ?SCREEN_HEIGHT),
+    Col = CRT rem ?SCREEN_WIDTH,
+    case Col >= (X - 1) andalso Col =< (X + 1) of
+        true -> [CRT | lit_pixels(Trace, PC + 1)];
+        false -> lit_pixels(Trace, PC + 1)
+    end.
 
 -spec pixel_pos(crt_pos()) -> grids:pos().
 pixel_pos(Pos) ->

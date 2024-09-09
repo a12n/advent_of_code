@@ -20,22 +20,26 @@ main(Part) ->
     io:format("~b~n", [sets:size(Visited)]).
 
 -spec simulate([move()], pos_integer()) -> [pos()].
-simulate(Motions, N = 2) ->
-    simulate(Motions, lists:duplicate(N, {0, 0}), [{0, 0}]).
+simulate(Motions, NumKnots) ->
+    simulate(Motions, lists:duplicate(NumKnots, {0, 0}), [{0, 0}]).
 
 -spec simulate([move()], [pos()], [pos()]) -> [pos()].
 simulate([], _, Visited) ->
     Visited;
-simulate([{_, 0} | Motions], [Head, Tail], Visited) ->
-    simulate(Motions, [Head, Tail], Visited);
-simulate([{Dir, N} | Motions], [Head, Tail], Visited) ->
-    Head2 = grids:add_pos(Head, grids:dir_to_pos(Dir)),
-    Tail2 =
-        case tail_vector(grids:sub_pos(Head2, Tail)) of
-            {0, 0} -> Tail;
-            NonZero -> grids:add_pos(Tail, NonZero)
+simulate([{_, 0} | Motions], Knots, Visited) ->
+    simulate(Motions, Knots, Visited);
+simulate([{Dir, N} | Motions], [HeadKnot | Knots], Visited) ->
+    HeadKnot2 = grids:add_pos(HeadKnot, grids:dir_to_pos(Dir)),
+    {Knots2, LastKnot} = lists:mapfoldl(
+        fun(Knot, Leading) ->
+            Vector = tail_vector(grids:sub_pos(Leading, Knot)),
+            Knot2 = grids:add_pos(Knot, Vector),
+            {Knot2, Knot2}
         end,
-    simulate([{Dir, N - 1} | Motions], [Head2, Tail2], [Tail2 | Visited]).
+        HeadKnot2,
+        Knots
+    ),
+    simulate([{Dir, N - 1} | Motions], [HeadKnot2 | Knots2], [LastKnot | Visited]).
 
 -spec tail_vector(pos()) -> pos().
 tail_vector({R, C}) when abs(R) < 2, abs(C) < 2 -> {0, 0};

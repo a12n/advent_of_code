@@ -6,7 +6,7 @@
 -export([main/1]).
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
     Program = lists:map(
         fun
             (<<"addx ", N/bytes>>) -> {addx, binary_to_integer(N)};
@@ -15,8 +15,14 @@ main(1) ->
         io_ext:read_lines(standard_io)
     ),
     Trace = trace(Program),
-    SignalStrength = signal_strength(Trace, [20, 60, 100, 140, 180, 220]),
-    io:format(<<"~b~n">>, [lists:sum(SignalStrength)]).
+    case Part of
+        1 ->
+            SignalStrength = signal_strength(Trace, [20, 60, 100, 140, 180, 220]),
+            io:format(<<"~b~n">>, [lists:sum(SignalStrength)]);
+        2 ->
+            LitPixels = maps:from_list([{Pos, $#} || Pos <- lit_pixels(Trace)]),
+            io:format(grids:to_iodata(LitPixels, {6, 40}))
+    end.
 
 -spec trace([instruction()]) -> trace().
 trace(Program) -> [{0, 1} | trace(Program, 0, 1)].
@@ -38,3 +44,8 @@ signal_strength([{PC0, X0} | Trace = [{PC1, _} | _]], [T | Points]) when T > PC0
     [X0 * T | signal_strength(Trace, Points)];
 signal_strength([_ | Trace], Points) ->
     signal_strength(Trace, Points).
+
+-spec lit_pixels(trace()) -> [grids:pos(integer())].
+lit_pixels(Trace) ->
+    %% TODO
+    [].

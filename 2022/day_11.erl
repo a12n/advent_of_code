@@ -5,7 +5,12 @@
 -export([main/1]).
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
+    {WorryDivider, Rounds} =
+        case Part of
+            1 -> {3, 20};
+            2 -> {1, 10000}
+        end,
     %% Parse input.
     Monkeys = parse_monkeys(
         lists:filtermap(
@@ -17,10 +22,11 @@ main(1) ->
                     {true, {string:trim(Key), string:trim(Value)}}
             end,
             io_ext:read_lines(standard_io)
-        )
+        ),
+        WorryDivider
     ),
     %% Run simulation.
-    Monkeys2 = monkey_business(Monkeys, _Rounds = 20),
+    Monkeys2 = monkey_business(Monkeys, Rounds),
     %% Print results.
     [NumInspected1, NumInspected2 | _] = lists:sort(
         fun erlang:'>='/2,
@@ -28,12 +34,12 @@ main(1) ->
     ),
     io:format(<<"~b~n">>, [NumInspected1 * NumInspected2]).
 
--spec parse_monkeys([{binary(), binary()}]) -> map().
-parse_monkeys(Lines) ->
-    parse_monkeys(Lines, #{}).
+-spec parse_monkeys([{binary(), binary()}], pos_integer()) -> map().
+parse_monkeys(Lines, WorryDivider) ->
+    parse_monkeys(Lines, WorryDivider, #{}).
 
--spec parse_monkeys([{binary(), binary()}], map()) -> map().
-parse_monkeys([], Monkeys) ->
+-spec parse_monkeys([{binary(), binary()}], pos_integer(), map()) -> map().
+parse_monkeys([], _, Monkeys) ->
     Monkeys;
 parse_monkeys(
     [
@@ -45,6 +51,7 @@ parse_monkeys(
         {<<"If false">>, <<"throw to monkey ", FalseIDStr/bytes>>}
         | Lines
     ],
+    WorryDivider,
     Monkeys
 ) ->
     ID = binary_to_integer(IDStr),
@@ -62,13 +69,13 @@ parse_monkeys(
                     end,
                 case {AStr, BStr} of
                     {<<"old">>, <<"old">>} ->
-                        fun(Old) -> Op(Old, Old) div 3 end;
+                        fun(Old) -> Op(Old, Old) div WorryDivider end;
                     {<<"old">>, _} ->
                         B = binary_to_integer(BStr),
-                        fun(Old) -> Op(Old, B) div 3 end;
+                        fun(Old) -> Op(Old, B) div WorryDivider end;
                     {_, <<"old">>} ->
                         A = binary_to_integer(AStr),
-                        fun(Old) -> Op(A, Old) div 3 end
+                        fun(Old) -> Op(A, Old) div WorryDivider end
                 end
         end,
     Divisor = binary_to_integer(DivisorStr),
@@ -80,6 +87,7 @@ parse_monkeys(
     end,
     parse_monkeys(
         Lines,
+        WorryDivider,
         Monkeys#{
             ID =>
                 #{

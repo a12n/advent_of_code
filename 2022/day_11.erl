@@ -77,6 +77,7 @@ parse_monkeys(
             ID =>
                 #{
                     items => Items,
+                    inspected => 0,
                     operation => Operation,
                     next => Next
                 }

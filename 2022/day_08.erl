@@ -9,9 +9,9 @@ main(Part) ->
     HeightMap =
         maps:map(
             fun(_, Char) -> Char - $0 end,
-            map_grids:from_lines(io_ext:read_lines(standard_io))
+            grids:from_lines(io_ext:read_lines(standard_io))
         ),
-    HeightMapSize = map_grids:size(HeightMap),
+    HeightMapSize = grids:size(HeightMap),
     case Part of
         1 ->
             _Cache = ets:new(max_height, [set, private, named_table]),
@@ -36,14 +36,9 @@ main(Part) ->
             io:format(<<"~b~n">>, [MaxScenicScore])
     end.
 
--spec max_height(
-    grid_position:direction(),
-    grid_position:t(),
-    map_grids:t(integer()),
-    {
-        non_neg_integer(), non_neg_integer()
-    }
-) -> integer().
+-spec max_height(grids:dir(), grids:pos(), grids:grid(integer()), {
+    non_neg_integer(), non_neg_integer()
+}) -> integer().
 max_height(left, {_, Col}, _, _) when Col =< 1 -> -1;
 max_height(up, {Row, _}, _, _) when Row =< 1 -> -1;
 max_height(right, {_, Col}, _, {_, NumCols}) when Col >= NumCols -> -1;
@@ -63,7 +58,7 @@ max_height(Dir, Pos, HeightGrid, GridSize) ->
             MaxHeight
     end.
 
--spec scenic_score(grid_position:t(), map_grids:t(integer()), {non_neg_integer(), non_neg_integer()}) ->
+-spec scenic_score(grids:pos(), grids:grid(integer()), {non_neg_integer(), non_neg_integer()}) ->
     pos_integer().
 scenic_score(Pos, HeightGrid, GridSize) ->
     viewing_distance(left, Pos, HeightGrid, GridSize) *
@@ -71,19 +66,17 @@ scenic_score(Pos, HeightGrid, GridSize) ->
         viewing_distance(up, Pos, HeightGrid, GridSize) *
         viewing_distance(down, Pos, HeightGrid, GridSize).
 
--spec viewing_distance(grid_position:direction(), grid_position:t(), map_grids:t(integer()), {
+-spec viewing_distance(grids:dir(), grids:pos(), grids:grid(integer()), {
     non_neg_integer(), non_neg_integer()
 }) -> non_neg_integer().
 viewing_distance(Dir, Pos, HeightGrid, GridSize) ->
     viewing_distance(Dir, Pos, HeightGrid, GridSize, maps:get(Pos, HeightGrid)).
 
 -spec viewing_distance(
-    grid_position:direction(),
-    grid_position:t(),
-    map_grids:t(integer()),
-    {
-        non_neg_integer(), non_neg_integer()
-    },
+    grids:dir(),
+    grids:pos(),
+    grids:grid(integer()),
+    {non_neg_integer(), non_neg_integer()},
     non_neg_integer()
 ) -> non_neg_integer().
 viewing_distance(left, {_, Col}, _, _, _) when Col =< 1 -> 0;

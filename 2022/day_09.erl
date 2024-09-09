@@ -6,12 +6,17 @@
 -export([main/1]).
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
     Motions = lists:map(
         fun(<<Dir, " ", Num/bytes>>) -> {grids:char_to_dir(Dir), binary_to_integer(Num)} end,
         io_ext:read_lines(standard_io)
     ),
-    Visited = sets:from_list(simulate(Motions, 2), [{version, 2}]),
+    NumKnots =
+        case Part of
+            1 -> 2;
+            2 -> 10
+        end,
+    Visited = sets:from_list(simulate(Motions, NumKnots), [{version, 2}]),
     io:format("~b~n", [sets:size(Visited)]).
 
 -spec simulate([move()], pos_integer()) -> [pos()].

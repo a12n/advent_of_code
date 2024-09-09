@@ -16,7 +16,7 @@ main(1) ->
 
 -spec simulate([move()]) -> pos_set().
 simulate(Motions) ->
-    simulate(Motions, {0, 0}, {0, 0}, sets:new([])).
+    simulate(Motions, {0, 0}, {0, 0}, sets:new([{version, 2}])).
 
 -spec simulate([move()], pos(), pos(), pos_set()) -> pos_set().
 simulate(Motions, Head, Tail, Visited) ->

@@ -14,11 +14,8 @@ main(1) ->
         end,
         io_ext:read_lines(standard_io)
     ),
-    io:format(standard_error, <<"~p~n">>, [Program]),
     Trace = trace(Program),
-    io:format(standard_error, <<"trace ~p~n">>, [Trace]),
     SignalStrength = signal_strength(Trace, [20 - 1, 60 - 1, 100 - 1, 140 - 1, 180 - 1, 220 - 1]),
-    io:format(standard_error, <<"signal_strength ~p~n">>, [SignalStrength]),
     io:format(<<"~b~n">>, [lists:sum(SignalStrength)]).
 
 -spec trace([instruction()]) -> trace().

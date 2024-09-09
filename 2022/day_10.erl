@@ -3,9 +3,9 @@
 -define(SCREEN_WIDTH, 40).
 -define(SCREEN_HEIGHT, 6).
 
+-type cpu_trace() :: [{_PC :: non_neg_integer(), _X :: integer()}].
 -type crt_pos() :: 0..(?SCREEN_WIDTH * ?SCREEN_HEIGHT - 1).
 -type instruction() :: {addx, integer()} | noop.
--type trace() :: [{_PC :: non_neg_integer(), _X :: integer()}].
 
 -export([main/1]).
 
@@ -18,7 +18,7 @@ main(Part) ->
         end,
         io_ext:read_lines(standard_io)
     ),
-    Trace = trace(Program),
+    Trace = cpu_trace(Program),
     case Part of
         1 ->
             SignalStrength = signal_strength(Trace, [20, 60, 100, 140, 180, 220]),
@@ -28,20 +28,20 @@ main(Part) ->
             io:format(grids:to_iodata(LitPixels, {?SCREEN_HEIGHT, ?SCREEN_WIDTH}))
     end.
 
--spec trace([instruction()]) -> trace().
-trace(Program) -> [{0, 1} | trace(Program, 0, 1)].
+-spec cpu_trace([instruction()]) -> cpu_trace().
+cpu_trace(Program) -> [{0, 1} | cpu_trace(Program, 0, 1)].
 
--spec trace([instruction()], non_neg_integer(), integer()) -> trace().
-trace([], _, _) ->
+-spec cpu_trace([instruction()], non_neg_integer(), integer()) -> cpu_trace().
+cpu_trace([], _, _) ->
     [];
-trace([noop | Program], PC, X) ->
-    trace(Program, PC + 1, X);
-trace([{addx, Y} | Program], PC, X) ->
+cpu_trace([noop | Program], PC, X) ->
+    cpu_trace(Program, PC + 1, X);
+cpu_trace([{addx, Y} | Program], PC, X) ->
     PC2 = PC + 2,
     X2 = X + Y,
-    [{PC2, X2} | trace(Program, PC2, X2)].
+    [{PC2, X2} | cpu_trace(Program, PC2, X2)].
 
--spec signal_strength(trace(), [non_neg_integer()]) -> [integer()].
+-spec signal_strength(cpu_trace(), [non_neg_integer()]) -> [integer()].
 signal_strength(_, []) ->
     [];
 signal_strength([{PC0, X0} | Trace = [{PC1, _} | _]], [T | Points]) when T > PC0, T =< PC1 ->
@@ -49,13 +49,13 @@ signal_strength([{PC0, X0} | Trace = [{PC1, _} | _]], [T | Points]) when T > PC0
 signal_strength([_ | Trace], Points) ->
     signal_strength(Trace, Points).
 
--spec lit_pixels(trace()) -> [crt_pos()].
+-spec lit_pixels(cpu_trace()) -> [crt_pos()].
 lit_pixels(Trace) -> lit_pixels(Trace, 0, 0).
 
--spec lit_pixels(trace(), non_neg_integer(), crt_pos()) -> [crt_pos()].
+-spec lit_pixels(cpu_trace(), non_neg_integer(), crt_pos()) -> [crt_pos()].
 lit_pixels([], _, _) ->
     [];
-lit_pixels(Trace, PC, CRT) ->
+lit_pixels([{PC0, X0} | Trace], PC, CRT) ->
     %% TODO
     _ = Trace,
     _ = PC,

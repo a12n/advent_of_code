@@ -21,17 +21,16 @@ main(1) ->
                 io_ext:read_lines(standard_io)
             )
         ),
-    Indices = lists:filtermap(
+    PairIndexList = lists:filtermap(
         fun({Index, {A, B}}) ->
-            %% ?debugFmt("Index ~p, compare ~p ~p", [Index, A, B]),
             case compare(A, B) of
-                -1 -> {true, Index};
+                K when K < 0 -> {true, Index};
                 _ -> false
             end
         end,
         lists:enumerate(lists_ext:consec_pairs(Terms))
     ),
-    io:format(<<"~b~n">>, [lists:sum(Indices)]).
+    io:format(<<"~b~n">>, [lists:sum(PairIndexList)]).
 
 -spec compare(integer() | [integer()], integer() | [integer()]) -> integer().
 compare(A, B) when is_integer(A), is_integer(B) -> A - B;

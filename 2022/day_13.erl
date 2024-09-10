@@ -33,33 +33,18 @@ main(1) ->
     ),
     io:format(<<"~b~n">>, [lists:sum(Indices)]).
 
--spec compare(integer() | [integer()], integer() | [integer()]) -> -1..1.
-compare(A, B) when is_integer(A), is_integer(B) ->
-    %% ?debugFmt("compare ~p ~p", [A, B]),
-    if
-        A < B -> -1;
-        A > B -> +1;
-        A == B -> 0
-    end;
-compare(A, B) when is_integer(A), is_list(B) ->
-    %% ?debugFmt("compare ~p ~p", [A, B]),
-    compare([A], B);
-compare(A, B) when is_list(A), is_integer(B) ->
-    %% ?debugFmt("compare ~p ~p", [A, B]),
-    compare(A, [B]);
-compare(A = [], B = [_ | _]) ->
-    %% ?debugFmt("compare ~p ~p", [A, B]),
+-spec compare(integer() | [integer()], integer() | [integer()]) -> integer().
+compare(A, B) when is_integer(A), is_integer(B) -> A - B;
+compare(A, B) when is_integer(A), is_list(B) -> compare([A], B);
+compare(A, B) when is_list(A), is_integer(B) -> compare(A, [B]);
+compare([], [_ | _]) ->
     -1;
-compare(A = [_ | _], B = []) ->
-    %% ?debugFmt("compare ~p ~p", [A, B]),
+compare([_ | _], []) ->
     +1;
-compare(A = [], B = []) ->
-    %% ?debugFmt("compare ~p ~p", [A, B]),
+compare([], []) ->
     0;
 compare([A0 | A], [B0 | B]) ->
-    %% ?debugFmt("compare ~p ~p", [[A0 | A], [B0 | B]]),
     case compare(A0, B0) of
-        -1 -> -1;
         0 -> compare(A, B);
-        +1 -> +1
+        K -> K
     end.

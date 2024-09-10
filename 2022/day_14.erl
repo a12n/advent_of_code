@@ -24,6 +24,7 @@ main(1) ->
             end,
             io_ext:read_lines(standard_io)
         ),
+    Source = {0, 500},
     Rocks = maps:map(
         fun(_, _) ->
             %% Make rocks printable with grids:to_iodata/3.
@@ -35,7 +36,7 @@ main(1) ->
     ?debugFmt("Paths ~p", [Paths]),
     ?debugFmt("Rocks ~p", [Rocks]),
     io:format(standard_error, <<"Rocks =~n~s">>, [
-        grids:to_iodata(Rocks, {0, MinCol}, MaxPos)
+        grids:to_iodata(Rocks#{Source => $+}, {0, MinCol}, MaxPos)
     ]),
     ok.
 

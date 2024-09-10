@@ -12,6 +12,7 @@
 -export([
     add_pos/2,
     sub_pos/2,
+    taxicab_distance/2,
     is_valid_pos/2,
     dir_to_pos/1,
     pos_to_dir/1,
@@ -32,6 +33,9 @@ add_pos({Row1, Col1}, {Row2, Col2}) -> {Row1 + Row2, Col1 + Col2}.
 
 -spec sub_pos(pos(integer()), pos(integer())) -> pos(integer()).
 sub_pos({Row1, Col1}, {Row2, Col2}) -> {Row1 - Row2, Col1 - Col2}.
+
+-spec taxicab_distance(pos(integer()), pos(integer())) -> non_neg_integer().
+taxicab_distance({Row1, Col1}, {Row2, Col2}) -> abs(Row1 - Row2) + abs(Col1 - Col2).
 
 -spec is_valid_pos(pos(), {non_neg_integer(), non_neg_integer()}) -> boolean().
 is_valid_pos({Row, Col}, {NumRows, NumCols}) ->

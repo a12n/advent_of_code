@@ -91,7 +91,7 @@ transpose(Grid) ->
         Grid
     ).
 
--spec size(grid(term())) -> {non_neg_integer(), non_neg_integer()}.
+-spec size(grid(term())) -> pos(non_neg_integer()).
 size(Grid) ->
     maps:fold(
         fun({Row, Col}, _, {NumRows, NumCols}) ->

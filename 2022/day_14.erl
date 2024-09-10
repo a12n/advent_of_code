@@ -17,7 +17,7 @@
 -export([main/1]).
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
     Paths =
         lists:map(
             fun(<<Line/bytes>>) ->
@@ -33,8 +33,13 @@ main(1) ->
         ),
     Source = {0, 500},
     Rocks = paths_to_rocks(Paths),
-    {NumSimulations, _} = simulate(Rocks, ground_level(Rocks), Source),
-    io:format(<<"~b~n">>, [NumSimulations]).
+    case Part of
+        1 ->
+            {NumSimulations, _} = simulate_abyss(Rocks, ground_level(Rocks), Source),
+            io:format(<<"~b~n">>, [NumSimulations]);
+        2 ->
+            ok
+    end.
 
 -spec path_to_lines(path()) -> [line()].
 path_to_lines([]) -> [];
@@ -71,12 +76,10 @@ paths_to_rocks(Paths) ->
         Paths
     ).
 
--spec simulate(rocks(), ground_level(), pos()) -> {non_neg_integer(), rocks()}.
-simulate(Rocks, GroundLevel, Source) ->
-    {{_, MinCol}, MaxPos} = grids:extent(Rocks),
-    io:format(standard_error, <<"~s">>, [ansi:erase(display)]),
+-spec simulate_abyss(rocks(), ground_level(), pos()) -> {non_neg_integer(), rocks()}.
+simulate_abyss(Rocks, GroundLevel, Source) ->
     (fun Loop(Rocks, N) ->
-        case simulate1(Rocks, GroundLevel, Source) of
+        case simulate1_abyss(Rocks, GroundLevel, Source) of
             {true, Rocks2} -> Loop(Rocks2, N + 1);
             false -> {N, Rocks}
         end
@@ -84,15 +87,8 @@ simulate(Rocks, GroundLevel, Source) ->
         Rocks, 0
     ).
 
--spec simulate1(rocks(), ground_level(), pos()) -> {true, rocks()} | false.
-simulate1(Rocks, GroundLevel, Sand = {Y, X}) ->
-    io:format(standard_error, <<"~s">>, [
-        iolist_to_binary([
-            ansi:cursor({position, {1, 1}}),
-            grids:to_iodata(Rocks#{Sand => $o}, {0, 493}, {10, 504})
-        ])
-    ]),
-    %% timer:sleep(100),
+-spec simulate1_abyss(rocks(), ground_level(), pos()) -> {true, rocks()} | false.
+simulate1_abyss(Rocks, GroundLevel, Sand = {Y, X}) ->
     case maps:find(X, GroundLevel) of
         {ok, GroundY} when GroundY < Y ->
             %% Sand is below any ground, falls to abyss.
@@ -109,13 +105,13 @@ simulate1(Rocks, GroundLevel, Sand = {Y, X}) ->
                     {true, Rocks#{Sand => $o}};
                 #{Down := _, DownLeft := _} ->
                     %% There are rocks down and down-left, but no rock down-rock.
-                    simulate1(Rocks, GroundLevel, DownRight);
+                    simulate1_abyss(Rocks, GroundLevel, DownRight);
                 #{Down := _} ->
                     %% There's rock down, but no rocks down-left and down-right.
-                    simulate1(Rocks, GroundLevel, DownLeft);
+                    simulate1_abyss(Rocks, GroundLevel, DownLeft);
                 #{} ->
                     %% There's no rocks down, down-left and down-right.
-                    simulate1(Rocks, GroundLevel, Down)
+                    simulate1_abyss(Rocks, GroundLevel, Down)
             end;
         error ->
             %% No ground below sand, falls to abyss.

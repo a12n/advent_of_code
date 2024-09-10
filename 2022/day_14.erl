@@ -72,8 +72,8 @@ paths_to_rocks(Paths) ->
         Paths
     ).
 
--spec simulate(rocks(), ground_level(), pos()) -> {true, rocks(), ground_level()} | false.
-simulate(Rocks, GroundLevel, _Sand = {Y, X}) ->
+-spec simulate1(rocks(), ground_level(), pos()) -> {true, rocks(), ground_level()} | false.
+simulate1(Rocks, GroundLevel, _Sand = {Y, X}) ->
     case maps:find(X, GroundLevel) of
         {ok, GroundY} when Y < GroundY ->
             StopY = GroundY - 1,
@@ -86,10 +86,10 @@ simulate(Rocks, GroundLevel, _Sand = {Y, X}) ->
                     {true, Rocks#{{StopY, X} => $o}, GroundLevel#{X := StopY}};
                 #{DownLeft := _} ->
                     %% Down-left position is rock, flow down-right.
-                    simulate(Rocks, GroundLevel, DownRight);
+                    simulate1(Rocks, GroundLevel, DownRight);
                 #{} ->
                     %% Down-left position isn't set as rock, flow down-left.
-                    simulate(Rocks, GroundLevel, DownLeft)
+                    simulate1(Rocks, GroundLevel, DownLeft)
             end;
         error ->
             %% No ground below SandPos, falls to abyss.

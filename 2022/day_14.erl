@@ -2,6 +2,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
+-type line() :: {point(), point()}.
 -type path() :: [point()].
 -type point() :: {integer(), integer()}.
 -type point_set() :: sets:set(point()).
@@ -23,35 +24,40 @@ main(1) ->
             end,
             io_ext:read_lines(standard_io)
         ),
-    Rocks = lists_ext:reduce(fun sets:union/2, lists:map(fun path_to_set/1, Paths)),
+    Rocks = paths_to_point_set(Paths),
     ?debugFmt("Paths ~p", [Paths]),
     ?debugFmt("Rocks ~p", [Rocks]),
     ok.
 
--spec path_to_set(path()) -> point_set().
-path_to_set(Path) -> path_to_set(Path, sets:new([{version, 2}])).
+-spec path_to_lines(path()) -> [line()].
+path_to_lines([]) -> [];
+path_to_lines([P0, P1]) -> [{P0, P1}];
+path_to_lines([P0 | PointsLeft = [P1 | _]]) -> [{P0, P1} | path_to_lines(PointsLeft)].
 
--spec path_to_set(path(), point_set()) -> point_set().
-path_to_set([], Set) ->
-    Set;
-path_to_set([P], Set) ->
-    sets:add_element(P, Set);
-path_to_set([P | PointsLeft = [Q | _]], Set) ->
-    NewPoints =
-        case {P, Q} of
-            {{X1, Y}, {X2, Y}} ->
-                %% Horizontal line.
-                [{X, Y} || X <- lists_ext:seq(X1, X2)];
-            {{X, Y1}, {X, Y2}} ->
-                %% Vertical line.
-                [{X, Y} || Y <- lists_ext:seq(Y1, Y2)]
+-spec line_to_points(line()) -> [point()].
+line_to_points({{X1, Y}, {X2, Y}}) ->
+    %% Horizontal line.
+    [{X, Y} || X <- lists_ext:seq(X1, X2)];
+line_to_points({{X, Y1}, {X, Y2}}) ->
+    %% Vertical line.
+    [{X, Y} || Y <- lists_ext:seq(Y1, Y2)].
+
+-spec paths_to_point_set([path()]) -> point_set().
+paths_to_point_set(Paths) ->
+    lists:foldl(
+        fun(Path, Result) ->
+            lists:foldl(
+                fun(Line, Result) ->
+                    lists:foldl(
+                        fun sets:add_element/2,
+                        Result,
+                        line_to_points(Line)
+                    )
+                end,
+                Result,
+                path_to_lines(Path)
+            )
         end,
-    ?debugFmt("P ~p → Q ~p = ~p", [P, Q, NewPoints]),
-    UpdatedSet = sets:union(
-        Set,
-        sets:from_list(
-            NewPoints,
-            [{version, 2}]
-        )
-    ),
-    path_to_set(PointsLeft, UpdatedSet).
+        _Result = sets:new([{version, 2}]),
+        Paths
+    ).

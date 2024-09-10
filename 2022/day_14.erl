@@ -82,14 +82,14 @@ paths_to_rocks(Paths) ->
 simulate_abyss(Rocks, GroundLevel, Source) ->
     (fun Loop(Rocks, N) ->
         case simulate1_abyss(Rocks, GroundLevel, Source) of
-            {true, Rocks2} -> Loop(Rocks2, N + 1);
+            {true, Sand} -> Loop(Rocks#{Sand => $o}, N + 1);
             false -> {N, Rocks}
         end
     end)(
         Rocks, 0
     ).
 
--spec simulate1_abyss(rocks(), ground_level(), pos()) -> {true, rocks()} | false.
+-spec simulate1_abyss(rocks(), ground_level(), pos()) -> {true, pos()} | false.
 simulate1_abyss(Rocks, GroundLevel, Sand = {Y, X}) ->
     case maps:find(X, GroundLevel) of
         {ok, GroundY} when GroundY < Y ->
@@ -104,7 +104,7 @@ simulate1_abyss(Rocks, GroundLevel, Sand = {Y, X}) ->
                     %% There are rocks down, down-left and
                     %% down-right. Nowhere to fall further, sand comes
                     %% to rest.
-                    {true, Rocks#{Sand => $o}};
+                    {true, Sand};
                 #{Down := _, DownLeft := _} ->
                     %% There are rocks down and down-left, but no rock down-rock.
                     simulate1_abyss(Rocks, GroundLevel, DownRight);

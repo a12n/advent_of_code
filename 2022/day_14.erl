@@ -122,8 +122,19 @@ simulate1_abyss(Rocks, GroundLevel, Sand = {Y, X}) ->
 
 -spec simulate_clogs(rocks(), integer(), pos()) -> {non_neg_integer(), rocks()}.
 simulate_clogs(Rocks, GroundLevel, Source) ->
+    (fun Loop(Rocks, N) ->
+        case simulate1_clogs(Rocks, GroundLevel, Source) of
+            Sand when Sand == Source -> {N, Rocks};
+            Sand -> Loop(Rocks#{Sand => $o}, N + 1)
+        end
+    end)(
+        Rocks, 0
+    ).
+
+-spec simulate1_clogs(rocks(), integer(), pos()) -> pos().
+simulate1_clogs(Rocks, GroundLevel, Sand) ->
     %% TODO
-    {0, Rocks}.
+    Sand.
 
 -spec ground_level(rocks()) -> ground_level().
 ground_level(Rocks) ->

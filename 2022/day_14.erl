@@ -74,11 +74,8 @@ paths_to_rocks(Paths) ->
 -spec simulate(rocks(), ground_level(), pos()) -> {non_neg_integer(), rocks()}.
 simulate(Rocks, GroundLevel, Source) ->
     {{_, MinCol}, MaxPos} = grids:extent(Rocks),
+    io:format(standard_error, <<"~s">>, [ansi:erase(display)]),
     (fun Loop(Rocks, N) ->
-        ?debugFmt("~nSand #~b =~n~s", [
-            N,
-            grids:to_iodata(Rocks#{Source => $+}, {0, MinCol}, MaxPos)
-        ]),
         case simulate1(Rocks, GroundLevel, Source) of
             {true, Rocks2} -> Loop(Rocks2, N + 1);
             false -> {N, Rocks}
@@ -89,17 +86,21 @@ simulate(Rocks, GroundLevel, Source) ->
 
 -spec simulate1(rocks(), ground_level(), pos()) -> {true, rocks()} | false.
 simulate1(Rocks, GroundLevel, Sand = {Y, X}) ->
-    ?debugFmt("Sand ~p ~p", [Y, X]),
+    io:format(standard_error, <<"~s">>, [
+        iolist_to_binary([
+            ansi:cursor({position, {1, 1}}),
+            grids:to_iodata(Rocks#{Sand => $o}, {0, 493}, {10, 504})
+        ])
+    ]),
+    %% timer:sleep(100),
     case maps:find(X, GroundLevel) of
         {ok, GroundY} when GroundY < Y ->
             %% Sand is below any ground, falls to abyss.
-            ?debugFmt("GroundY at ~p = ~p", [X, GroundY]),
             false;
         {ok, _} ->
             Down = {Y + 1, X},
             DownLeft = {Y + 1, X - 1},
             DownRight = {Y + 1, X + 1},
-            ?debugFmt("Down ~p, DownLeft ~p, DownRight ~p", [Down, DownLeft, DownRight]),
             case Rocks of
                 #{Down := _, DownLeft := _, DownRight := _} ->
                     %% There are rocks down, down-left and
@@ -118,7 +119,6 @@ simulate1(Rocks, GroundLevel, Sand = {Y, X}) ->
             end;
         error ->
             %% No ground below sand, falls to abyss.
-            ?debugFmt("No ground for sand X ~p", [X]),
             false
     end.
 

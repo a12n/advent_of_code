@@ -2,10 +2,15 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--type line() :: {point(), point()}.
--type path() :: [point()].
--type point() :: {integer(), integer()}.
--type point_set() :: #{point() := char()}.
+-type line() :: {_Begin :: pos(), _End :: pos()}.
+-type path() :: [pos()].
+-type pos() :: grids:pos(integer()).
+
+%% Mapping of X coordinates to the corresponding top Y coordinates.
+-type ground_level() :: #{integer() := integer()}.
+
+%% Mapping of coordinates to rock types.
+-type rocks() :: #{pos() := char()}.
 
 -export([main/1]).
 
@@ -67,4 +72,14 @@ paths_to_point_set(Paths) ->
         end,
         _Result = #{},
         Paths
+    ).
+
+-spec ground_level(rocks()) -> ground_level().
+ground_level(Rocks) ->
+    maps:fold(
+        fun({Y, X}, _, Result) ->
+            maps:update_with(X, fun(TopY) -> min(TopY, Y) end, Y, Result)
+        end,
+        #{},
+        Rocks
     ).

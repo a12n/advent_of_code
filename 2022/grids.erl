@@ -53,22 +53,20 @@ from_lines(Lines) ->
     ).
 
 -spec to_iodata(grid(char()), {pos_integer(), pos_integer()}) -> iodata().
-to_iodata(Grid, Size) -> to_iodata(Grid, Size, _Opts = #{}).
+to_iodata(Grid, Size) -> to_iodata(Grid, _Min = {1, 1}, _Max = Size).
 
--spec to_iodata(grid(char()), {pos_integer(), pos_integer()}, map()) -> iodata().
-to_iodata(Grid, Size, Opts) ->
-    Blank = maps:get(blank, Opts, $.),
-    to_iodata(Grid, Size, {1, 1}, Blank).
-
--spec to_iodata(
-    grid(char()), {pos_integer(), pos_integer()}, {pos_integer(), pos_integer()}, char()
-) ->
-    iodata().
-to_iodata(_, {NumRows, _}, {Row, _}, _) when Row == NumRows + 1 -> "";
-to_iodata(Grid, Size = {_, NumCols}, {Row, Col}, Blank) when Col == NumCols + 1 ->
-    [$\n | to_iodata(Grid, Size, {Row + 1, 1}, Blank)];
-to_iodata(Grid, Size, {Row, Col}, Blank) ->
-    [maps:get({Row, Col}, Grid, Blank) | to_iodata(Grid, Size, {Row, Col + 1}, Blank)].
+-spec to_iodata(grid(integer(), char()), pos(integer()), pos(integer())) -> iodata().
+to_iodata(Grid, {MinRow, MinCol}, {MaxRow, MaxCol}) ->
+    Blank = $.,
+    (fun
+        Loop(Row, _) when Row == MaxRow + 1 -> "";
+        Loop(Row, Col) when Col == MaxCol + 1 ->
+            [$\n | Loop(Row + 1, MinCol)];
+        Loop(Row, Col) ->
+            [maps:get({Row, Col}, Grid, Blank) | Loop(Row, Col + 1)]
+    end)(
+        MinRow, MinCol
+    ).
 
 -spec find_values(term(), grid(term())) -> [pos()].
 find_values(Query, Grid) ->

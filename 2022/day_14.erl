@@ -132,7 +132,7 @@ simulate_clogs(Rocks, GroundLevel, Source) ->
     ).
 
 -spec simulate1_clogs(rocks(), integer(), pos()) -> pos().
-simulate1_clogs(Rocks, GroundLevel, Sand = {Y,X}) ->
+simulate1_clogs(Rocks, GroundLevel, Sand = {Y, X}) ->
     DownY = Y + 1,
     Down = {DownY, X},
     DownLeft = {DownY, X - 1},

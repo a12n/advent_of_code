@@ -5,8 +5,9 @@
 -type pos(Integer) :: {Integer, Integer}.
 -export_type([dir/0, pos/0, pos/1]).
 
--type grid(Value) :: #{pos() := Value}.
--export_type([grid/1]).
+-type grid(Integer, Value) :: #{pos(Integer) := Value}.
+-type grid(Value) :: grid(pos_integer(), Value).
+-export_type([grid/1, grid/2]).
 
 -export([add_pos/2, sub_pos/2, is_valid_pos/2, dir_to_pos/1, pos_to_dir/1, char_to_dir/1]).
 

@@ -9,9 +9,23 @@
 -type grid(Value) :: grid(pos_integer(), Value).
 -export_type([grid/1, grid/2]).
 
--export([add_pos/2, sub_pos/2, is_valid_pos/2, dir_to_pos/1, pos_to_dir/1, char_to_dir/1]).
+-export([
+    add_pos/2,
+    sub_pos/2,
+    is_valid_pos/2,
+    dir_to_pos/1,
+    pos_to_dir/1,
+    char_to_dir/1
+]).
 
--export([from_lines/1, to_iodata/2, to_iodata/3, find_values/2, transpose/1, size/1, extent/1]).
+-export([
+    from_lines/1,
+    to_iodata/2, to_iodata/3,
+    find_values/2,
+    transpose/1,
+    size/1,
+    extent/1
+]).
 
 -spec add_pos(pos(integer()), pos(integer())) -> pos(integer()).
 add_pos({Row1, Col1}, {Row2, Col2}) -> {Row1 + Row2, Col1 + Col2}.

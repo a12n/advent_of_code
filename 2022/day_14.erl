@@ -6,7 +6,9 @@
 -type path() :: [pos()].
 -type pos() :: grids:pos(integer()).
 
-%% Mapping of X coordinates to the corresponding top Y coordinates.
+%% Mapping of X coordinates to the corresponding bottom Y
+%% coordinates. If sand X isn't in this set (or it's Y is below the
+%% corresponding Y in the ground level), it falls to abyss.
 -type ground_level() :: #{integer() := integer()}.
 
 %% Mapping of coordinates to rock types.
@@ -31,7 +33,7 @@ main(1) ->
         ),
     Source = {0, 500},
     Rocks = paths_to_rocks(Paths),
-    {NumSimulations, _, _} = simulate(Rocks, ground_level(Rocks), Source),
+    {NumSimulations, _} = simulate(Rocks, ground_level(Rocks), Source),
     io:format(<<"~b~n">>, [NumSimulations]).
 
 -spec path_to_lines(path()) -> [line()].
@@ -40,12 +42,12 @@ path_to_lines([P0, P1]) -> [{P0, P1}];
 path_to_lines([P0 | PointsLeft = [P1 | _]]) -> [{P0, P1} | path_to_lines(PointsLeft)].
 
 -spec line_to_positions(line()) -> [pos()].
-line_to_positions({{X1, Y}, {X2, Y}}) ->
+line_to_positions({{Y, X1}, {Y, X2}}) ->
     %% Horizontal line.
-    [{X, Y} || X <- lists_ext:seq(X1, X2)];
-line_to_positions({{X, Y1}, {X, Y2}}) ->
+    [{Y, X} || X <- lists_ext:seq(X1, X2)];
+line_to_positions({{Y1, X}, {Y2, X}}) ->
     %% Vertical line.
-    [{X, Y} || Y <- lists_ext:seq(Y1, Y2)].
+    [{Y, X} || Y <- lists_ext:seq(Y1, Y2)].
 
 -spec paths_to_rocks([path()]) -> rocks().
 paths_to_rocks(Paths) ->
@@ -69,45 +71,54 @@ paths_to_rocks(Paths) ->
         Paths
     ).
 
--spec simulate(rocks(), ground_level(), pos()) -> {non_neg_integer(), rocks(), ground_level()}.
+-spec simulate(rocks(), ground_level(), pos()) -> {non_neg_integer(), rocks()}.
 simulate(Rocks, GroundLevel, Source) ->
     {{_, MinCol}, MaxPos} = grids:extent(Rocks),
-    (fun Loop(Rocks, GroundLevel, N) ->
+    (fun Loop(Rocks, N) ->
         ?debugFmt("~nSand #~b =~n~s", [
             N,
             grids:to_iodata(Rocks#{Source => $+}, {0, MinCol}, MaxPos)
         ]),
         case simulate1(Rocks, GroundLevel, Source) of
-            {true, Rocks2, GroundLevel2} ->
-                Loop(Rocks2, GroundLevel2, N + 1);
-            false ->
-                {N, Rocks, GroundLevel}
+            {true, Rocks2} -> Loop(Rocks2, N + 1);
+            false -> {N, Rocks}
         end
     end)(
-        Rocks, GroundLevel, 0
+        Rocks, 0
     ).
 
--spec simulate1(rocks(), ground_level(), pos()) -> {true, rocks(), ground_level()} | false.
-simulate1(Rocks, GroundLevel, _Sand = {Y, X}) ->
+-spec simulate1(rocks(), ground_level(), pos()) -> {true, rocks()} | false.
+simulate1(Rocks, GroundLevel, Sand = {Y, X}) ->
+    ?debugFmt("Sand ~p ~p", [Y, X]),
     case maps:find(X, GroundLevel) of
-        {ok, GroundY} when Y < GroundY ->
-            StopY = GroundY - 1,
-            DownLeft = {StopY + 1, X - 1},
-            DownRight = {StopY + 1, X + 1},
+        {ok, GroundY} when GroundY < Y ->
+            %% Sand is below any ground, falls to abyss.
+            ?debugFmt("GroundY at ~p = ~p", [X, GroundY]),
+            false;
+        {ok, _} ->
+            Down = {Y + 1, X},
+            DownLeft = {Y + 1, X - 1},
+            DownRight = {Y + 1, X + 1},
+            ?debugFmt("Down ~p, DownLeft ~p, DownRight ~p", [Down, DownLeft, DownRight]),
             case Rocks of
-                #{DownLeft := _, DownRight := _} ->
-                    %% Both down-left and down-right positions are
-                    %% already "rock", sand comes to rest.
-                    {true, Rocks#{{StopY, X} => $o}, GroundLevel#{X := StopY}};
-                #{DownLeft := _} ->
-                    %% Down-left position is rock, flow down-right.
+                #{Down := _, DownLeft := _, DownRight := _} ->
+                    %% There are rocks down, down-left and
+                    %% down-right. Nowhere to fall further, sand comes
+                    %% to rest.
+                    {true, Rocks#{Sand => $o}};
+                #{Down := _, DownLeft := _} ->
+                    %% There are rocks down and down-left, but no rock down-rock.
                     simulate1(Rocks, GroundLevel, DownRight);
+                #{Down := _} ->
+                    %% There's rock down, but no rocks down-left and down-right.
+                    simulate1(Rocks, GroundLevel, DownLeft);
                 #{} ->
-                    %% Down-left position isn't set as rock, flow down-left.
-                    simulate1(Rocks, GroundLevel, DownLeft)
+                    %% There's no rocks down, down-left and down-right.
+                    simulate1(Rocks, GroundLevel, Down)
             end;
         error ->
-            %% No ground below SandPos, falls to abyss.
+            %% No ground below sand, falls to abyss.
+            ?debugFmt("No ground for sand X ~p", [X]),
             false
     end.
 
@@ -115,7 +126,7 @@ simulate1(Rocks, GroundLevel, _Sand = {Y, X}) ->
 ground_level(Rocks) ->
     maps:fold(
         fun({Y, X}, _, Result) ->
-            maps:update_with(X, fun(TopY) -> min(TopY, Y) end, Y, Result)
+            maps:update_with(X, fun(BottomY) -> max(BottomY, Y) end, Y, Result)
         end,
         #{},
         Rocks

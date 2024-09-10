@@ -128,7 +128,7 @@ simulate_clogs(Rocks, GroundLevel, Source) ->
             Sand -> Loop(Rocks#{Sand => $o}, N + 1)
         end
     end)(
-        Rocks, 0
+        Rocks, 1
     ).
 
 -spec simulate1_clogs(rocks(), integer(), pos()) -> pos().

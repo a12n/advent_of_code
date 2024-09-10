@@ -132,9 +132,30 @@ simulate_clogs(Rocks, GroundLevel, Source) ->
     ).
 
 -spec simulate1_clogs(rocks(), integer(), pos()) -> pos().
-simulate1_clogs(Rocks, GroundLevel, Sand) ->
-    %% TODO
-    Sand.
+simulate1_clogs(Rocks, GroundLevel, Sand = {Y,X}) ->
+    DownY = Y + 1,
+    Down = {DownY, X},
+    DownLeft = {DownY, X - 1},
+    DownRight = {DownY, X + 1},
+    case Rocks of
+        #{Down := _, DownLeft := _, DownRight := _} ->
+            %% There are rocks down, down-left and
+            %% down-right. Nowhere to fall further, sand comes
+            %% to rest.
+            {true, Sand};
+        #{Down := _, DownLeft := _} when DownY < GroundLevel ->
+            %% There are rocks down and down-left, but no rock down-rock.
+            simulate1_abyss(Rocks, GroundLevel, DownRight);
+        #{Down := _} when DownY < GroundLevel ->
+            %% There's rock down, but no rocks down-left and down-right.
+            simulate1_abyss(Rocks, GroundLevel, DownLeft);
+        #{} when DownY < GroundLevel ->
+            %% There's no rocks down, down-left and down-right.
+            simulate1_abyss(Rocks, GroundLevel, Down);
+        #{} ->
+            %% Sand lies on the ground.
+            {true, Sand}
+    end.
 
 -spec ground_level(rocks()) -> ground_level().
 ground_level(Rocks) ->

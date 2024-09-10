@@ -33,13 +33,15 @@ main(Part) ->
         ),
     Source = {0, 500},
     Rocks = paths_to_rocks(Paths),
-    case Part of
-        1 ->
-            {NumSimulations, _} = simulate_abyss(Rocks, ground_level(Rocks), Source),
-            io:format(<<"~b~n">>, [NumSimulations]);
-        2 ->
-            ok
-    end.
+    {NumSimulations, _} =
+        case Part of
+            1 ->
+                simulate_abyss(Rocks, ground_level(Rocks), Source);
+            2 ->
+                {_, {MaxRow, _}} = grids:extent(Rocks),
+                simulate_clogs(Rocks, MaxRow + 2, Source)
+        end,
+    io:format(<<"~b~n">>, [NumSimulations]).
 
 -spec path_to_lines(path()) -> [line()].
 path_to_lines([]) -> [];
@@ -117,6 +119,11 @@ simulate1_abyss(Rocks, GroundLevel, Sand = {Y, X}) ->
             %% No ground below sand, falls to abyss.
             false
     end.
+
+-spec simulate_clogs(rocks(), integer(), pos()) -> {non_neg_integer(), rocks()}.
+simulate_clogs(Rocks, GroundLevel, Source) ->
+    %% TODO
+    {0, Rocks}.
 
 -spec ground_level(rocks()) -> ground_level().
 ground_level(Rocks) ->

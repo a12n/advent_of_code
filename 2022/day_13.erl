@@ -8,8 +8,8 @@
 main(1) ->
     Terms =
         lists:map(
-            fun(Line) ->
-                {ok, Tokens, _} = erl_scan:string(binary_to_list(Line)),
+            fun(TermStr) ->
+                {ok, Tokens, _} = erl_scan:string(binary_to_list(TermStr)),
                 {ok, Term} = erl_parse:parse_term(Tokens),
                 Term
             end,

@@ -76,6 +76,24 @@ paths_to_rocks(Paths) ->
         Paths
     ).
 
+-spec simulate(rocks(), ground_level(), pos()) -> {non_neg_integer(), rocks(), ground_level()}.
+simulate(Rocks, GroundLevel, Source) ->
+    {{_, MinCol}, MaxPos} = grids:extent(Rocks),
+    (fun Loop(Rocks, GroundLevel, N) ->
+        ?debugFmt("~nSand #~b =~n~s", [
+            N,
+            grids:to_iodata(Rocks#{Source => $+}, {0, MinCol}, MaxPos)
+        ]),
+        case simulate1(Rocks, GroundLevel, Source) of
+            {true, Rocks2, GroundLevel2} ->
+                Loop(Rocks2, GroundLevel2, N + 1);
+            false ->
+                {N, Rocks, GroundLevel}
+        end
+    end)(
+        Rocks, GroundLevel, 0
+    ).
+
 -spec simulate1(rocks(), ground_level(), pos()) -> {true, rocks(), ground_level()} | false.
 simulate1(Rocks, GroundLevel, _Sand = {Y, X}) ->
     case maps:find(X, GroundLevel) of

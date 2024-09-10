@@ -32,9 +32,11 @@
     | back
     | {back, pos_integer()}.
 
--export_type([color/0, attr/0, cursor/0]).
+-type erase() :: display.
 
--export([attrs/1, attrs/2, cursor/1]).
+-export_type([color/0, attr/0, cursor/0, erase/0]).
+
+-export([attrs/1, attrs/2, cursor/1, erase/1]).
 
 -define(CSI, "\e[").
 
@@ -60,6 +62,9 @@ attrs(Attrs) when is_list(Attrs) ->
 
 -spec attrs(attr() | [attr()], iodata()) -> iodata().
 attrs(Attrs, Text) -> [attrs(Attrs), Text, attrs(reset)].
+
+-spec erase(erase()) -> iodata().
+erase(display) -> [?CSI, $2, $J].
 
 -spec cursor(cursor()) -> iodata().
 cursor({position, {1, 1}}) ->

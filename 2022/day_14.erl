@@ -31,15 +31,8 @@ main(1) ->
         ),
     Source = {0, 500},
     Rocks = paths_to_rocks(Paths),
-    {{_, MinCol}, MaxPos} = grids:extent(Rocks),
-    io:format(standard_error, <<"~nRocks =~n~s">>, [
-        grids:to_iodata(Rocks#{Source => $+}, {0, MinCol}, MaxPos)
-    ]),
-    {true, Rocks2, _} = simulate1(Rocks, ground_level(Rocks), Source),
-    io:format(standard_error, <<"~nRocks #1 =~n~s">>, [
-        grids:to_iodata(Rocks2#{Source => $+}, {0, MinCol}, MaxPos)
-    ]),
-    ok.
+    {NumSimulations, _, _} = simulate(Rocks, ground_level(Rocks), Source),
+    io:format(<<"~b~n">>, [NumSimulations]).
 
 -spec path_to_lines(path()) -> [line()].
 path_to_lines([]) -> [];

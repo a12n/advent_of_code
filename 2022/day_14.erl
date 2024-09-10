@@ -24,7 +24,13 @@ main(1) ->
             end,
             io_ext:read_lines(standard_io)
         ),
-    Rocks = paths_to_point_set(Paths),
+    Rocks = maps:map(
+        fun(_, _) ->
+            %% Make rocks printable with grids:to_iodata/3.
+            $#
+        end,
+        paths_to_point_set(Paths)
+    ),
     ?debugFmt("Paths ~p", [Paths]),
     ?debugFmt("Rocks ~p", [Rocks]),
     ok.

@@ -31,8 +31,12 @@ main(1) ->
         end,
         paths_to_point_set(Paths)
     ),
+    {{_, MinCol}, MaxPos} = grids:extent(Rocks),
     ?debugFmt("Paths ~p", [Paths]),
     ?debugFmt("Rocks ~p", [Rocks]),
+    io:format(standard_error, <<"Rocks =~n~s">>, [
+        grids:to_iodata(Rocks, {0, MinCol}, MaxPos)
+    ]),
     ok.
 
 -spec path_to_lines(path()) -> [line()].

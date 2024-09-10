@@ -32,9 +32,7 @@ main(1) ->
     Source = {0, 500},
     Rocks = paths_to_rocks(Paths),
     {{_, MinCol}, MaxPos} = grids:extent(Rocks),
-    ?debugFmt("Paths ~p", [Paths]),
-    ?debugFmt("Rocks ~p", [Rocks]),
-    io:format(standard_error, <<"Rocks =~n~s">>, [
+    io:format(standard_error, <<"~nRocks =~n~s">>, [
         grids:to_iodata(Rocks#{Source => $+}, {0, MinCol}, MaxPos)
     ]),
     ok.

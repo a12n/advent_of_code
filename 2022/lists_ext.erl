@@ -2,7 +2,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--export([consec_pairs/1, reduce/2, enumerate_lists/1, transpose_lists/1, rotate_lists/2]).
+-export([consec_pairs/1, reduce/2, seq/2, enumerate_lists/1, transpose_lists/1, rotate_lists/2]).
 
 -spec consec_pairs([term()]) -> [{term(), term()}].
 consec_pairs([]) -> [];
@@ -10,6 +10,10 @@ consec_pairs([Elt1, Elt2 | List]) -> [{Elt1, Elt2} | consec_pairs(List)].
 
 -spec reduce(fun((term(), term()) -> term()), nonempty_list()) -> term().
 reduce(F, [Head | Tail]) -> lists:foldl(F, Head, Tail).
+
+-spec seq(integer(), integer()) -> [integer()].
+seq(From, To) when From =< To -> lists:seq(From, To);
+seq(From, To) -> lists:seq(From, To, -1).
 
 %%--------------------------------------------------------------------
 %% Matrix functions.

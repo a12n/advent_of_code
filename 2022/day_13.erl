@@ -5,7 +5,7 @@
 -export([main/1]).
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
     Terms =
         lists:map(
             fun(TermStr) ->
@@ -21,16 +21,36 @@ main(1) ->
                 io_ext:read_lines(standard_io)
             )
         ),
-    PairIndexList = lists:filtermap(
-        fun({Index, {A, B}}) ->
-            case compare(A, B) of
-                K when K < 0 -> {true, Index};
-                _ -> false
-            end
-        end,
-        lists:enumerate(lists_ext:consec_pairs(Terms))
-    ),
-    io:format(<<"~b~n">>, [lists:sum(PairIndexList)]).
+    case Part of
+        1 ->
+            PairIndexList = lists:filtermap(
+                fun({Index, {A, B}}) ->
+                    case compare(A, B) of
+                        K when K < 0 -> {true, Index};
+                        _ -> false
+                    end
+                end,
+                lists:enumerate(lists_ext:consec_pairs(Terms))
+            ),
+            io:format(<<"~b~n">>, [lists:sum(PairIndexList)]);
+        2 ->
+            [Index1, Index2] = lists:filtermap(
+                fun
+                    ({Index, [[2]]}) -> {true, Index};
+                    ({Index, [[6]]}) -> {true, Index};
+                    (_) -> false
+                end,
+                lists:enumerate(
+                    lists:sort(
+                        fun(A, B) ->
+                            compare(A, B) =< 0
+                        end,
+                        [[[2]], [[6]] | Terms]
+                    )
+                )
+            ),
+            io:format(<<"~b~n">>, [Index1 * Index2])
+    end.
 
 -spec compare(integer() | [integer()], integer() | [integer()]) -> integer().
 compare(A, B) when is_integer(A), is_integer(B) -> A - B;

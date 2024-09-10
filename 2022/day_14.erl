@@ -17,7 +17,7 @@ main(1) ->
                 lists:map(
                     fun(<<Point/bytes>>) ->
                         [X, Y] = binary:split(Point, <<",">>),
-                        {binary_to_integer(X), binary_to_integer(Y)}
+                        {binary_to_integer(Y), binary_to_integer(X)}
                     end,
                     binary:split(Line, <<" -> ">>, [global])
                 )

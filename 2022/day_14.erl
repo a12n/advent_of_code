@@ -145,13 +145,13 @@ simulate1_clogs(Rocks, GroundLevel, Sand = {Y, X}) ->
             Sand;
         #{Down := _, DownLeft := _} when DownY < GroundLevel ->
             %% There are rocks down and down-left, but no rock down-rock.
-            simulate1_abyss(Rocks, GroundLevel, DownRight);
+            simulate1_clogs(Rocks, GroundLevel, DownRight);
         #{Down := _} when DownY < GroundLevel ->
             %% There's rock down, but no rocks down-left and down-right.
-            simulate1_abyss(Rocks, GroundLevel, DownLeft);
+            simulate1_clogs(Rocks, GroundLevel, DownLeft);
         #{} when DownY < GroundLevel ->
             %% There's no rocks down, down-left and down-right.
-            simulate1_abyss(Rocks, GroundLevel, Down);
+            simulate1_clogs(Rocks, GroundLevel, Down);
         #{} ->
             %% Sand lies on the ground.
             Sand

@@ -5,7 +5,7 @@
 -type line() :: {point(), point()}.
 -type path() :: [point()].
 -type point() :: {integer(), integer()}.
--type point_set() :: sets:set(point()).
+-type point_set() :: #{point() := char()}.
 
 -export([main/1]).
 
@@ -25,13 +25,7 @@ main(1) ->
             io_ext:read_lines(standard_io)
         ),
     Source = {0, 500},
-    Rocks = maps:map(
-        fun(_, _) ->
-            %% Make rocks printable with grids:to_iodata/3.
-            $#
-        end,
-        paths_to_point_set(Paths)
-    ),
+    Rocks = paths_to_point_set(Paths),
     {{_, MinCol}, MaxPos} = grids:extent(Rocks),
     ?debugFmt("Paths ~p", [Paths]),
     ?debugFmt("Rocks ~p", [Rocks]),
@@ -60,7 +54,9 @@ paths_to_point_set(Paths) ->
             lists:foldl(
                 fun(Line, Result) ->
                     lists:foldl(
-                        fun sets:add_element/2,
+                        fun(Point, Result) ->
+                            Result#{Point => $#}
+                        end,
                         Result,
                         line_to_points(Line)
                     )
@@ -69,6 +65,6 @@ paths_to_point_set(Paths) ->
                 path_to_lines(Path)
             )
         end,
-        _Result = sets:new([{version, 2}]),
+        _Result = #{},
         Paths
     ).

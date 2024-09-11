@@ -16,6 +16,7 @@
     is_subset/2,
     size/1,
     intersection/2,
+    union/1,
     union/2,
     subtract/2
 ]).
@@ -45,6 +46,18 @@ is_subset({Min1, Max1}, {Min2, Max2}) -> ?IS_SUBSET(Min1, Max1, Min2, Max2).
 -spec intersection(t(), t()) -> t() | undefined.
 intersection({Min1, Max1}, {Min2, Max2}) when ?IS_DISJOINT(Min1, Max1, Min2, Max2) -> undefined;
 intersection({Min1, Max1}, {Min2, Max2}) -> {max(Min1, Min2), min(Max1, Max2)}.
+
+%% Sorted list of segments.
+-spec union([t()]) -> [t()].
+union([]) ->
+    [];
+union([S1]) ->
+    [S1];
+union([S1 | SegmentsPast1 = [S2 | SegmentsPast2]]) ->
+    case union(S1, S2) of
+        undefined -> [S1, union(SegmentsPast1)];
+        S3 -> union([S3 | SegmentsPast2])
+    end.
 
 -spec union(t(), t()) -> t() | undefined.
 union({Min1, Max1}, S2) when ?IS_EMPTY(Min1, Max1) -> S2;

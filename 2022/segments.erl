@@ -48,8 +48,8 @@ is_empty({Min, Max}) -> ?IS_EMPTY(Min, Max).
 -spec is_subset(t(), t()) -> boolean().
 is_subset({Min1, Max1}, {Min2, Max2}) -> ?IS_SUBSET(Min1, Max1, Min2, Max2).
 
--spec intersection(t(), t()) -> t() | undefined.
-intersection({Min1, Max1}, {Min2, Max2}) when ?IS_DISJOINT(Min1, Max1, Min2, Max2) -> undefined;
+-spec intersection(t(), t()) -> t().
+intersection({Min1, Max1}, {Min2, Max2}) when ?IS_DISJOINT(Min1, Max1, Min2, Max2) -> empty();
 intersection({Min1, Max1}, {Min2, Max2}) -> {max(Min1, Min2), min(Max1, Max2)}.
 
 %% @doc

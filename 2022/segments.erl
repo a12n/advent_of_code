@@ -17,7 +17,8 @@
     is_subset/2,
     size/1,
     intersection/2,
-    union/1,
+    merge/1,
+    merge/2,
     union/2,
     subtract/2
 ]).
@@ -51,29 +52,43 @@ is_subset({Min1, Max1}, {Min2, Max2}) -> ?IS_SUBSET(Min1, Max1, Min2, Max2).
 intersection({Min1, Max1}, {Min2, Max2}) when ?IS_DISJOINT(Min1, Max1, Min2, Max2) -> undefined;
 intersection({Min1, Max1}, {Min2, Max2}) -> {max(Min1, Min2), min(Max1, Max2)}.
 
-%% Sorted list of segments.
--spec union([t()]) -> [t()].
-union([]) ->
-    [];
-union([S1]) ->
-    [S1];
-union([S1 | SegmentsPast1 = [S2 | SegmentsPast2]]) ->
-    case union(S1, S2) of
-        undefined -> [S1, union(SegmentsPast1)];
-        S3 -> union([S3 | SegmentsPast2])
-    end.
-
--spec union(t(), t()) -> t() | undefined.
-union({Min1, Max1}, S2) when ?IS_EMPTY(Min1, Max1) -> S2;
-union(S1, {Min2, Max2}) when ?IS_EMPTY(Min2, Max2) -> S1;
-union({Min1, Max1}, {Min2, Max2}) when ?IS_DISJOINT(Min1, Max1, Min2, Max2) ->
+%% @doc
+%% Like union/2, but works only for non-list segments and only merges
+%% intersecting/touching segments. If segments are disjoint, returns
+%% `undefined`.
+%% @end
+-spec merge(t(), t()) -> t() | undefined.
+merge({Min1, Max1}, S2) when ?IS_EMPTY(Min1, Max1) -> S2;
+merge(S1, {Min2, Max2}) when ?IS_EMPTY(Min2, Max2) -> S1;
+merge({Min1, Max1}, {Min2, Max2}) when ?IS_DISJOINT(Min1, Max1, Min2, Max2) ->
     if
         (Max1 + 1) == Min2 -> {Min1, Max2};
         (Max2 + 1) == Min1 -> {Min2, Max1};
         true -> undefined
     end;
-union({Min1, Max1}, {Min2, Max2}) ->
+merge({Min1, Max1}, {Min2, Max2}) ->
     {min(Min1, Min2), max(Max1, Max2)}.
+
+%% @doc
+%% Tries to merge/2 subsequent segments in a sorted list.
+%% @end
+-spec merge([t()]) -> t() | [t()].
+merge([]) ->
+    empty();
+merge([S1]) ->
+    S1;
+merge([S1 | SegmentsPast1 = [S2 | SegmentsPast2]]) ->
+    case merge(S1, S2) of
+        undefined -> [S1 | merge(SegmentsPast1)];
+        S3 -> merge([S3 | SegmentsPast2])
+    end.
+
+-spec union(t(), t()) -> t() | undefined.
+union(S1 = {Min1, Max1}, S2 = {Min2, Max2}) ->
+    case merge(S1, S2) of
+        S3 = {_, _} -> S3;
+        undefined -> undefined
+    end.
 
 -spec subtract(t(), t()) -> t() | {t(), t()} | undefined.
 subtract(S1 = {Min1, Max1}, S2) ->

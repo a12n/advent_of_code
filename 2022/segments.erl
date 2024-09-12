@@ -91,7 +91,7 @@ union(S1 = {Min1, Max1}, S2 = {Min2, Max2}) ->
         undefined when Max2 < Min1 -> [S2, S1]
     end.
 
--spec subtract(t(), t()) -> t() | {t(), t()} | undefined.
+-spec subtract(t(), t()) -> t() | [t()].
 subtract(S1 = {Min1, Max1}, S2) ->
     case intersection(S1, S2) of
         {Min, Max} when ?IS_EMPTY(Min, Max) -> S1;
@@ -107,9 +107,9 @@ subtract(S1 = {Min1, Max1}, S2) ->
                     true -> undefined
                 end,
             case {LeftOfS2, RightOfS2} of
-                {undefined, undefined} -> undefined;
+                {undefined, undefined} -> empty();
                 {{_, _}, undefined} -> LeftOfS2;
                 {undefined, {_, _}} -> RightOfS2;
-                {{_, _}, {_, _}} -> {LeftOfS2, RightOfS2}
+                {{_, _}, {_, _}} -> [LeftOfS2, RightOfS2]
             end
     end.

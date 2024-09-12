@@ -1,9 +1,11 @@
 -module(day_15).
 
+-include_lib("eunit/include/eunit.hrl").
+
 -export([main/1]).
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
     SensorBeaconPairs =
         lists:map(
             fun(<<Line/bytes>>) ->
@@ -36,36 +38,59 @@ main(1) ->
             [{{18, 2}, {15, -2}}, {{16, 9}, {16, 10}} | _] -> true;
             _ -> false
         end,
-    Row =
-        case IsSampleInput of
-            true -> 10;
-            false -> 2000000
-        end,
-    CoveredSegments = segments_covered(Row, SensorBeaconPairs),
-    RowBeaconX = lists:uniq(
-        lists:filtermap(
-            fun
-                ({_, {Y, X}}) when Y == Row -> {true, X};
-                (_) -> false
-            end,
-            SensorBeaconPairs
-        )
-    ),
-    NumPositions = lists:foldl(
-        fun(BeaconX, Num) ->
-            case
-                lists:any(
-                    fun(Segment) -> segments:is_element(BeaconX, Segment) end, CoveredSegments
+    case Part of
+        1 ->
+            Row =
+                case IsSampleInput of
+                    true -> 10;
+                    false -> 2000000
+                end,
+            CoveredSegments = segments_covered(Row, SensorBeaconPairs),
+            RowBeaconX = lists:uniq(
+                lists:filtermap(
+                    fun
+                        ({_, {Y, X}}) when Y == Row -> {true, X};
+                        (_) -> false
+                    end,
+                    SensorBeaconPairs
                 )
-            of
-                true -> Num - 1;
-                false -> Num
-            end
-        end,
-        lists:sum(lists:map(fun segments:size/1, CoveredSegments)),
-        RowBeaconX
-    ),
-    io:format(<<"~b~n">>, [NumPositions]).
+            ),
+            NumPositions = lists:foldl(
+                fun(BeaconX, Num) ->
+                    case
+                        lists:any(
+                            fun(Segment) -> segments:is_element(BeaconX, Segment) end,
+                            CoveredSegments
+                        )
+                    of
+                        true -> Num - 1;
+                        false -> Num
+                    end
+                end,
+                lists:sum(lists:map(fun segments:size/1, CoveredSegments)),
+                RowBeaconX
+            ),
+            io:format(<<"~b~n">>, [NumPositions]);
+        2 ->
+            MaxCoord =
+                case IsSampleInput of
+                    true -> 20;
+                    false -> 4000000
+                end,
+            CoveredSegments =
+                lists:filtermap(
+                    fun(Row) ->
+                        ?debugFmt("Row ~p", [Row]),
+                        case segments_covered(Row, SensorBeaconPairs) of
+                            [] -> false;
+                            Segments -> {true, Segments}
+                        end
+                    end,
+                    lists:seq(0, MaxCoord)
+                ),
+            ?debugFmt("CoveredSegments ~p", [CoveredSegments]),
+            ok
+    end.
 
 -spec segment_covered_by_pair(integer(), {grids:pos(integer()), grids:pos(integer())}) ->
     segments:t().

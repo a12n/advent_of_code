@@ -92,28 +92,27 @@ main(Part) ->
             ok
     end.
 
--spec segment_covered_by_pair(integer(), {grids:pos(integer()), grids:pos(integer())}) ->
+-spec columns_covered_by_pair(integer(), {grids:pos(integer()), grids:pos(integer())}) ->
     segments:t().
-segment_covered_by_pair(Row, {Sensor = {Y, X}, Beacon}) ->
-    Dist = grids:taxicab_distance(Sensor, Beacon),
-    case Dist - abs(Row - Y) of
+columns_covered_by_pair(Row, {Sensor = {Y, X}, Beacon}) ->
+    Distance = grids:taxicab_distance(Sensor, Beacon),
+    case Distance - abs(Row - Y) of
         N when N > 0 -> segments:from_endpoints(X - N, X + N);
         _ -> segments:empty()
     end.
 
--spec segments_covered(integer(), [{grids:pos(integer()), grids:pos(integer())}]) -> [segments:t()].
-segments_covered(Row, SensorBeaconPairs) ->
-    segments:union(
-        lists:sort(
-            lists:filtermap(
-                fun(SensorBeacon) ->
-                    Segment = segment_covered_by_pair(Row, SensorBeacon),
-                    case segments:is_empty(Segment) of
-                        true -> false;
-                        false -> {true, Segment}
-                    end
-                end,
-                SensorBeaconPairs
-            )
+-spec columns_covered(integer(), [{grids:pos(integer()), grids:pos(integer())}]) ->
+    integer_sets:t().
+columns_covered(Row, SensorBeaconPairs) ->
+    integer_sets:from_segments(
+        lists:filtermap(
+            fun(SensorBeacon) ->
+                Segment = columns_covered_by_pair(Row, SensorBeacon),
+                case segments:is_empty(Segment) of
+                    false -> {true, Segment};
+                    true -> false
+                end
+            end,
+            SensorBeaconPairs
         )
     ).

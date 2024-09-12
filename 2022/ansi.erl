@@ -1,6 +1,7 @@
 -module(ansi).
 
 -type color() ::
+    %% Standard colors
     black
     | red
     | green
@@ -8,7 +9,10 @@
     | blue
     | magenta
     | cyan
-    | white.
+    | white
+    %% 256-color lookup tables
+    | {rgb, 0..5, 0..5, 0..5}
+    | {gray, 0..23}.
 
 -type attr() ::
     reset
@@ -105,16 +109,36 @@ attr_iodata({blink, fast}) -> $6;
 attr_iodata({blink, false}) -> <<"25">>;
 attr_iodata(invert) -> $7;
 attr_iodata(strike) -> $9;
-attr_iodata({fg, Color}) -> <<$3, (color_iodata(Color))>>;
-attr_iodata({bg, Color}) -> <<$4, (color_iodata(Color))>>.
+attr_iodata({fg, Color}) -> [$3, color_iodata(Color)];
+attr_iodata({bg, Color}) -> [$4, color_iodata(Color)].
 
 -spec color_iodata(color() | default) -> byte().
-color_iodata(black) -> $0;
-color_iodata(red) -> $1;
-color_iodata(green) -> $2;
-color_iodata(yellow) -> $3;
-color_iodata(blue) -> $4;
-color_iodata(magenta) -> $5;
-color_iodata(cyan) -> $6;
-color_iodata(white) -> $7;
-color_iodata(default) -> $9.
+color_iodata(black) ->
+    $0;
+color_iodata(red) ->
+    $1;
+color_iodata(green) ->
+    $2;
+color_iodata(yellow) ->
+    $3;
+color_iodata(blue) ->
+    $4;
+color_iodata(magenta) ->
+    $5;
+color_iodata(cyan) ->
+    $6;
+color_iodata(white) ->
+    $7;
+color_iodata(default) ->
+    $9;
+color_iodata({rgb, R, G, B}) when
+    R >= 0,
+    R =< 5,
+    G >= 0,
+    G =< 5,
+    B >= 0,
+    B =< 5
+->
+    ["8;5;", integer_to_binary(16 + 36 * R + 6 * G + B)];
+color_iodata({gray, G}) when G >= 0, G =< 23 ->
+    ["8;5;", integer_to_binary(G + 232)].

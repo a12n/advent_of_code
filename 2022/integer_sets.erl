@@ -86,7 +86,10 @@ subtract(Segments1 = [_ | _], Segments2 = [_ | _]) ->
 normalize([]) ->
     [];
 normalize([S]) ->
-    [S];
+    case segments:is_empty(S) of
+        false -> [S];
+        true -> []
+    end;
 normalize([S1, S2 | SegmentsLeft]) ->
     case segments:merge(S1, S2) of
         undefined -> [S1 | normalize([S2 | SegmentsLeft])];

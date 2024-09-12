@@ -1,7 +1,5 @@
 -module(day_12).
 
--include_lib("eunit/include/eunit.hrl").
-
 -export([main/1]).
 
 -spec main(1..2) -> ok.
@@ -21,14 +19,10 @@ main(1) ->
 ) ->
     non_neg_integer().
 distance(HeightMap, MapSize, StartPos, EndPos) ->
-    ?debugVal({MapSize, StartPos, EndPos}),
     Loop = fun Loop(Queue, Seen) ->
-        %% ?debugVal(gb_sets:to_list(Queue)),
-        %% ?debugVal(gb_sets:to_list(Seen)),
         case gb_sets:take_smallest(Queue) of
             {{Dist, Pos}, _} when Pos == EndPos -> Dist;
             {{Dist, Pos}, Queue2} ->
-                ?debugVal({Dist, Pos}),
                 Height = maps:get(Pos, HeightMap),
                 AdjPosList = [
                     AdjPos

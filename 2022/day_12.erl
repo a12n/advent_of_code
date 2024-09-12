@@ -6,17 +6,11 @@
 
 -spec main(1..2) -> ok.
 main(1) ->
-    HeightMap = maps:map(
-        fun
-            (_, $S) -> $a - 1;
-            (_, $E) -> $z + 1;
-            (_, C) -> C
-        end,
-        grids:from_lines(io_ext:read_lines(standard_io))
-    ),
+    HeightMap0 = grids:from_lines(io_ext:read_lines(standard_io)),
+    [StartPos] = grids:find_values($S, HeightMap0),
+    [EndPos] = grids:find_values($E, HeightMap0),
+    HeightMap = HeightMap0#{StartPos := $a, EndPos := $z},
     MapSize = grids:size(HeightMap),
-    [StartPos] = grids:find_values($a - 1, HeightMap),
-    [EndPos] = grids:find_values($z + 1, HeightMap),
     io:format(<<"~b~n">>, [distance(HeightMap, MapSize, StartPos, EndPos)]).
 
 -spec distance(

@@ -54,7 +54,31 @@ main(1) ->
             )
         ),
     io:format(standard_error, <<"CoveredSegments ~p~n">>, [CoveredSegments]),
-    ok.
+    RowBeaconX = lists:uniq(
+        lists:filtermap(
+            fun
+                ({_, {Y, X}}) when Y == Row -> {true, X};
+                (_) -> false
+            end,
+            SensorBeaconPairs
+        )
+    ),
+    io:format(standard_error, <<"RowBeaconX ~p~n">>, [RowBeaconX]),
+    NumPositions = lists:foldl(
+        fun(BeaconX, Num) ->
+            case
+                lists:any(
+                    fun(Segment) -> segments:is_element(BeaconX, Segment) end, CoveredSegments
+                )
+            of
+                true -> Num - 1;
+                false -> Num
+            end
+        end,
+        lists:sum(lists:map(fun segments:size/1, CoveredSegments)),
+        RowBeaconX
+    ),
+    io:format(<<"~b~n">>, [NumPositions]).
 
 -spec covered_row_positions(integer(), {grids:pos(integer()), grids:pos(integer())}) ->
     segments:t().

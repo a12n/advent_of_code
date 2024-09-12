@@ -14,7 +14,8 @@
     size/1,
     intersection/2,
     union/2,
-    subtract/2
+    subtract/2,
+    fold/3
 ]).
 
 -spec empty() -> t().
@@ -78,6 +79,10 @@ subtract(Segments1 = [_ | _], Segments2 = [_ | _]) ->
             lists:flatten([segments:subtract(S1, S2) || S1 <- Segments1, S2 <- Segments2])
         )
     ).
+
+-spec fold(fun((integer(), term()) -> term()), term(), t()) -> term().
+fold(Fun, Acc0, Segments) ->
+    lists:foldl(fun(S, Acc) -> segments:fold(Fun, Acc, S) end, Acc0, Segments).
 
 %% @doc
 %% Tries to merge consecutive segments in a sorted list.

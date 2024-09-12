@@ -94,6 +94,7 @@ union(S1 = {Min1, Max1}, S2 = {Min2, Max2}) ->
 -spec subtract(t(), t()) -> t() | {t(), t()} | undefined.
 subtract(S1 = {Min1, Max1}, S2) ->
     case intersection(S1, S2) of
+        {Min, Max} when ?IS_EMPTY(Min, Max) -> S1;
         {Min, Max} ->
             LeftOfS2 =
                 if
@@ -110,7 +111,5 @@ subtract(S1 = {Min1, Max1}, S2) ->
                 {{_, _}, undefined} -> LeftOfS2;
                 {undefined, {_, _}} -> RightOfS2;
                 {{_, _}, {_, _}} -> {LeftOfS2, RightOfS2}
-            end;
-        undefined ->
-            S1
+            end
     end.

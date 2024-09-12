@@ -1,7 +1,5 @@
 -module(day_15).
 
--include_lib("eunit/include/eunit.hrl").
-
 -export([main/1]).
 
 -spec main(1..2) -> ok.
@@ -57,7 +55,6 @@ main(1) ->
                 )
             )
         ),
-    io:format(standard_error, <<"CoveredSegments ~p~n">>, [CoveredSegments]),
     RowBeaconX = lists:uniq(
         lists:filtermap(
             fun
@@ -67,7 +64,6 @@ main(1) ->
             SensorBeaconPairs
         )
     ),
-    io:format(standard_error, <<"RowBeaconX ~p~n">>, [RowBeaconX]),
     NumPositions = lists:foldl(
         fun(BeaconX, Num) ->
             case
@@ -88,7 +84,6 @@ main(1) ->
     segments:t().
 covered_row_positions(Row, {Sensor = {Y, X}, Beacon}) ->
     Dist = grids:taxicab_distance(Sensor, Beacon),
-    ?debugFmt("Row ~p, Sensor ~p, Beacon ~p, Dist ~p", [Row, Sensor, Beacon, Dist]),
     case Dist - abs(Row - Y) of
         N when N > 0 -> segments:from_endpoints(X - N, X + N);
         _ -> segments:empty()

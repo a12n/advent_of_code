@@ -3,7 +3,7 @@
 -export([main/1]).
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
     HeightMap0 = grids:from_lines(io_ext:read_lines(standard_io)),
     [StartPos] = grids:find_values($S, HeightMap0),
     [EndPos] = grids:find_values($E, HeightMap0),
@@ -20,16 +20,16 @@ main(1) ->
     %%         MapSize
     %%     )
     %% ]),
-    io:format(<<"~b~n">>, [distance(HeightMap, MapSize, StartPos, EndPos)]).
+    io:format(<<"~b~n">>, [
+        case Part of
+            1 -> there_and(HeightMap, MapSize, StartPos, EndPos);
+            2 -> back_again(HeightMap, MapSize, EndPos, $a)
+        end
+    ]).
 
--spec distance(
-    grids:grid(integer()),
-    {pos_integer(), pos_integer()},
-    grids:pos(),
-    grids:pos()
-) ->
+-spec there_and(grids:grid(integer()), {pos_integer(), pos_integer()}, grids:pos(), grids:pos()) ->
     non_neg_integer().
-distance(HeightMap, MapSize, StartPos, EndPos) ->
+there_and(HeightMap, MapSize, StartPos, EndPos) ->
     Loop = fun Loop(Queue, Seen) ->
         case gb_sets:take_smallest(Queue) of
             {{Dist, Pos}, _} when Pos == EndPos -> Dist;
@@ -60,3 +60,16 @@ distance(HeightMap, MapSize, StartPos, EndPos) ->
         end
     end,
     Loop(gb_sets:singleton({0, StartPos}), gb_sets:empty()).
+
+-spec back_again(
+    grids:grid(integer()),
+    {pos_integer(), pos_integer()},
+    grids:pos(),
+    char()
+) ->
+    non_neg_integer().
+back_again(HeightMap, MapSize, StartPos, EndChar) ->
+    %% Go from StartPos (which is at the highest point), and go to $a (EndChar) positions.
+    %% The next positions generation rules are reversed.
+    %% Keep all reached $a, choose the one with min steps.
+    0.

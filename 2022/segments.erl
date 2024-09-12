@@ -12,6 +12,7 @@
     from_endpoints/2,
     from_length/2,
     is_disjoint/2,
+    is_element/2,
     is_empty/1,
     is_subset/2,
     size/1,
@@ -36,6 +37,9 @@ size({Min, Max}) -> max(0, Max - Min + 1).
 
 -spec is_disjoint(t(), t()) -> boolean().
 is_disjoint({Min1, Max1}, {Min2, Max2}) -> ?IS_DISJOINT(Min1, Max1, Min2, Max2).
+
+-spec is_element(integer(), t()) -> boolean().
+is_element(Elt, {Min, Max}) -> Elt >= Min andalso Elt =< Max.
 
 -spec is_empty(t()) -> boolean().
 is_empty({Min, Max}) -> ?IS_EMPTY(Min, Max).

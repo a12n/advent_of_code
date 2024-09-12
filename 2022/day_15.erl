@@ -64,8 +64,10 @@ main(Part) ->
                     true -> 20;
                     false -> 4000000
                 end,
+            AllRows = integer_sets:from_segment(segments:from_endpoints(0, MaxCoord)),
+            AllColunms = integer_sets:from_segment(segments:from_endpoints(0, MaxCoord)),
             PossibleRowColumns = rows_columns_covered(
-                {0, MaxCoord}, {0, MaxCoord}, SensorBeaconPairs
+                AllRows, AllColunms, SensorBeaconPairs
             ),
             ?debugFmt("PossibleRowColumns ~p", [PossibleRowColumns]),
             ok
@@ -96,23 +98,18 @@ row_columns_covered(Row, SensorBeaconPairs) ->
         )
     ).
 
--spec rows_columns_covered({integer(), integer()}, {integer(), integer()}, [
+-spec rows_columns_covered(integer_sets:t(), integer_sets:t(), [
     {grids:pos(integer()), grids:pos(integer())}
-]) ->
-    [{integer(), integer_sets:t()}].
-rows_columns_covered({MinRow, MaxRow}, {MinCol, MaxCol}, SensorBeaconPairs) ->
-    AllColunms = integer_sets:from_segment(segments:from_endpoints(MinCol, MaxCol)),
-    lists:filtermap(
-        fun(Row) ->
-            case
-                integer_sets:subtract(
-                    AllColunms,
-                    row_columns_covered(Row, SensorBeaconPairs)
-                )
-            of
-                [] -> false;
-                Cols -> {true, {Row, Cols}}
+]) -> [{integer(), integer_sets:t()}].
+rows_columns_covered(AllRows, AllColunms, SensorBeaconPairs) ->
+    integer_sets:fold(
+        fun(Row, List) ->
+            Colunms = row_columns_covered(Row, SensorBeaconPairs),
+            case integer_sets:subtract(AllColunms, Colunms) of
+                [] -> List;
+                Cols -> [{Row, Cols} | List]
             end
         end,
-        lists:seq(MinRow, MaxRow)
+        [],
+        AllRows
     ).

@@ -41,21 +41,7 @@ main(1) ->
             true -> 10;
             false -> 2000000
         end,
-    CoveredSegments =
-        segments:union(
-            lists:sort(
-                lists:filtermap(
-                    fun(SensorBeacon) ->
-                        Segment = covered_row_positions(Row, SensorBeacon),
-                        case segments:is_empty(Segment) of
-                            true -> false;
-                            false -> {true, Segment}
-                        end
-                    end,
-                    SensorBeaconPairs
-                )
-            )
-        ),
+    CoveredSegments = segments_covered(Row, SensorBeaconPairs),
     RowBeaconX = lists:uniq(
         lists:filtermap(
             fun
@@ -81,11 +67,28 @@ main(1) ->
     ),
     io:format(<<"~b~n">>, [NumPositions]).
 
--spec covered_row_positions(integer(), {grids:pos(integer()), grids:pos(integer())}) ->
+-spec segment_covered_by_pair(integer(), {grids:pos(integer()), grids:pos(integer())}) ->
     segments:t().
-covered_row_positions(Row, {Sensor = {Y, X}, Beacon}) ->
+segment_covered_by_pair(Row, {Sensor = {Y, X}, Beacon}) ->
     Dist = grids:taxicab_distance(Sensor, Beacon),
     case Dist - abs(Row - Y) of
         N when N > 0 -> segments:from_endpoints(X - N, X + N);
         _ -> segments:empty()
     end.
+
+-spec segments_covered(integer(), [{grids:pos(integer()), grids:pos(integer())}]) -> [segments:t()].
+segments_covered(Row, SensorBeaconPairs) ->
+    segments:union(
+        lists:sort(
+            lists:filtermap(
+                fun(SensorBeacon) ->
+                    Segment = segment_covered_by_pair(Row, SensorBeacon),
+                    case segments:is_empty(Segment) of
+                        true -> false;
+                        false -> {true, Segment}
+                    end
+                end,
+                SensorBeaconPairs
+            )
+        )
+    ).

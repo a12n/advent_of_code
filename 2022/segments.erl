@@ -10,6 +10,7 @@
 -export([
     empty/0,
     from_endpoints/2,
+    from_integer/1,
     from_length/2,
     is_disjoint/2,
     is_element/2,
@@ -28,6 +29,9 @@ empty() -> {0, -1}.
 
 -spec from_endpoints(integer(), integer()) -> t().
 from_endpoints(Min, Max) when Min =< Max -> {Min, Max}.
+
+-spec from_integer(integer()) -> t().
+from_integer(N) -> {N, N}.
 
 -spec from_length(integer(), non_neg_integer()) -> t().
 from_length(Min, 0) -> {Min, Min};

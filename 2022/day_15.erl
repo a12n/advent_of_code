@@ -64,17 +64,19 @@ main(Part) ->
                     true -> 20;
                     false -> 4000000
                 end,
-            CoveredSegments =
+            AllColunms = integer_sets:from_segment(segments:from_endpoints(0, MaxCoord)),
+            ?debugFmt("AllColunms ~p", [AllColunms]),
+            PossibleRowColumns =
                 lists:filtermap(
                     fun(Row) ->
-                        case columns_covered(Row, SensorBeaconPairs) of
+                        case integer_sets:subtract(AllColunms, columns_covered(Row, SensorBeaconPairs)) of
                             [] -> false;
                             Cols -> {true, {Row, Cols}}
                         end
                     end,
                     lists:seq(0, MaxCoord)
                 ),
-            ?debugFmt("CoveredSegments ~p", [CoveredSegments]),
+            ?debugFmt("PossibleRowColumns ~p", [PossibleRowColumns]),
             ok
     end.
 

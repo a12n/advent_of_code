@@ -45,7 +45,7 @@ distance(HeightMap, MapSize, StartPos, EndPos) ->
                     ],
                     grids:is_valid_pos(AdjPos, MapSize),
                     not gb_sets:is_member(AdjPos, Seen),
-                    abs(maps:get(AdjPos, HeightMap) - Height) < 2
+                    (maps:get(AdjPos, HeightMap) - Height) < 2
                 ],
                 Loop(
                     lists:foldl(

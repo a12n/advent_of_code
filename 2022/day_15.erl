@@ -31,14 +31,15 @@ main(1) ->
             end,
             io_ext:read_lines(standard_io)
         ),
-    Row =
+    IsSampleInput =
         case SensorBeaconPairs of
-            [{{18, 2}, {15, -2}}, {{16, 9}, {16, 10}} | _] ->
-                %% Sample input.
-                10;
-            _ ->
-                %% Puzzle input.
-                2000000
+            [{{18, 2}, {15, -2}}, {{16, 9}, {16, 10}} | _] -> true;
+            _ -> false
+        end,
+    Row =
+        case IsSampleInput of
+            true -> 10;
+            false -> 2000000
         end,
     CoveredSegments =
         segments:union(

@@ -20,7 +20,8 @@
     intersection/2,
     merge/2,
     union/2,
-    subtract/2
+    subtract/2,
+    fold/3
 ]).
 
 -spec empty() -> t().
@@ -102,3 +103,12 @@ subtract(S1 = {Min1, Max1}, S2) ->
                 {{_, _}, {_, _}} -> [LeftOfS2, RightOfS2]
             end
     end.
+
+-spec fold(fun((integer(), term()) -> term()), term(), t()) -> term().
+fold(Fun, Acc0, {Min, Max}) ->
+    (fun
+        Loop(I, Acc) when I > Max -> Acc;
+        Loop(I, Acc) -> Loop(I + 1, Fun(I, Acc))
+    end)(
+        Min, Acc0
+    ).

@@ -66,11 +66,24 @@ main(Part) ->
                 end,
             AllRows = integer_sets:from_segment(segments:from_endpoints(0, MaxCoord)),
             AllColunms = integer_sets:from_segment(segments:from_endpoints(0, MaxCoord)),
-            PossibleRowColumns = rows_columns_covered(
+            %% For all rows, exclude columns, keep only rows where
+            %% possible set of columns isn't empty.
+            [{Row, Colunms}] = rows_columns_covered(
                 AllRows, AllColunms, SensorBeaconPairs
             ),
-            ?debugFmt("PossibleRowColumns ~p", [PossibleRowColumns]),
-            ok
+            %% For the found row, run the same function for everything
+            %% transposed.
+            [{Col, _}] = rows_columns_covered(
+                Colunms,
+                integer_sets:from_list([Row]),
+                lists:map(
+                    fun({{SensorY, SensorX}, {BeaconY, BeaconX}}) ->
+                        {{SensorX, SensorY}, {BeaconX, BeaconY}}
+                    end,
+                    SensorBeaconPairs
+                )
+            ),
+            io:format(<<"~b~n">>, [Row * Col])
     end.
 
 -spec row_columns_covered_by_pair(integer(), {grids:pos(integer()), grids:pos(integer())}) ->

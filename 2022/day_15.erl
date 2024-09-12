@@ -67,10 +67,9 @@ main(Part) ->
             CoveredSegments =
                 lists:filtermap(
                     fun(Row) ->
-                        ?debugFmt("Row ~p", [Row]),
-                        case segments_covered(Row, SensorBeaconPairs) of
+                        case columns_covered(Row, SensorBeaconPairs) of
                             [] -> false;
-                            Segments -> {true, Segments}
+                            Cols -> {true, {Row, Cols}}
                         end
                     end,
                     lists:seq(0, MaxCoord)

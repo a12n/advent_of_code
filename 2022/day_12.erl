@@ -72,4 +72,37 @@ back_again(HeightMap, MapSize, StartPos, EndChar) ->
     %% Go from StartPos (which is at the highest point), and go to $a (EndChar) positions.
     %% The next positions generation rules are reversed.
     %% Keep all reached $a, choose the one with min steps.
-    0.
+    (fun Loop(Queue, Seen, MinDist) ->
+        try
+            {{Dist, Pos}, Queue2} = gb_sets:take_smallest(Queue),
+            Height = maps:get(Pos, HeightMap),
+            AdjPosList = [
+                AdjPos
+             || AdjPos <- [
+                    grids:add_pos(Pos, grids:dir_to_pos(Dir))
+                 || Dir <- [up, left, right, down]
+                ],
+                grids:is_valid_pos(AdjPos, MapSize),
+                not gb_sets:is_member(AdjPos, Seen),
+                (maps:get(AdjPos, HeightMap) - Height) > -2
+            ],
+            Loop(
+                lists:foldl(
+                    fun(AdjPos, Queue) ->
+                        gb_sets:add({Dist + 1, AdjPos}, Queue)
+                    end,
+                    Queue2,
+                    AdjPosList
+                ),
+                gb_sets:add(Pos, Seen),
+                case Height == EndChar of
+                    true -> min(MinDist, Dist);
+                    false -> MinDist
+                end
+            )
+        catch
+            error:function_clause -> MinDist
+        end
+    end)(
+        gb_sets:singleton({0, StartPos}), gb_sets:empty(), infinity
+    ).

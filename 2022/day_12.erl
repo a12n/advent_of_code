@@ -9,6 +9,17 @@ main(1) ->
     [EndPos] = grids:find_values($E, HeightMap0),
     HeightMap = HeightMap0#{StartPos := $a, EndPos := $z},
     MapSize = grids:size(HeightMap),
+    %% io:format([
+    %%     ansi:erase(display),
+    %%     ansi:cursor({position, {1, 1}}),
+    %%     grids:to_iodata(
+    %%         maps:map(
+    %%             fun(_, C) -> ansi:attrs({fg, {gray, 23 * (C - $a) div 25}}, C) end,
+    %%             HeightMap
+    %%         ),
+    %%         MapSize
+    %%     )
+    %% ]),
     io:format(<<"~b~n">>, [distance(HeightMap, MapSize, StartPos, EndPos)]).
 
 -spec distance(
@@ -24,6 +35,8 @@ distance(HeightMap, MapSize, StartPos, EndPos) ->
             {{Dist, Pos}, _} when Pos == EndPos -> Dist;
             {{Dist, Pos}, Queue2} ->
                 Height = maps:get(Pos, HeightMap),
+                %% io:format([ansi:cursor({position, Pos}), ansi:attrs({fg, green}, Height)]),
+                %% timer:sleep(25),
                 AdjPosList = [
                     AdjPos
                  || AdjPos <- [

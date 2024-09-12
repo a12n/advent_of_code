@@ -18,7 +18,6 @@
     is_subset/2,
     size/1,
     intersection/2,
-    merge/1,
     merge/2,
     union/2,
     subtract/2
@@ -72,20 +71,6 @@ merge({Min1, Max1}, {Min2, Max2}) when ?IS_DISJOINT(Min1, Max1, Min2, Max2) ->
     end;
 merge({Min1, Max1}, {Min2, Max2}) ->
     {min(Min1, Min2), max(Max1, Max2)}.
-
-%% @doc
-%% Tries to merge/2 subsequent segments in a sorted list.
-%% @end
--spec merge([t()]) -> t() | [t()].
-merge([]) ->
-    empty();
-merge([S1]) ->
-    S1;
-merge([S1 | SegmentsPast1 = [S2 | SegmentsPast2]]) ->
-    case merge(S1, S2) of
-        undefined -> [S1 | merge(SegmentsPast1)];
-        S3 -> merge([S3 | SegmentsPast2])
-    end.
 
 -spec union(t(), t()) -> t() | [t()].
 union(S1 = {Min1, Max1}, S2 = {Min2, Max2}) ->

@@ -27,7 +27,7 @@ from_list(List) -> from_segments([segments:from_integer(N) || N <- List]).
 from_segment(S) -> [S].
 
 -spec from_segments([segments:t()]) -> t().
-from_segments(Segments) -> normalize(segments:merge(lists:sort(Segments))).
+from_segments(Segments) -> normalize(lists:sort(Segments)).
 
 -spec size(t()) -> non_neg_integer().
 size(Segments) ->
@@ -54,10 +54,8 @@ intersection(_, []) ->
     empty();
 intersection(Segments1 = [_ | _], Segments2 = [_ | _]) ->
     normalize(
-        segments:merge(
-            lists:sort(
-                lists:flatten([segments:intersection(S1, S2) || S1 <- Segments1, S2 <- Segments2])
-            )
+        lists:sort(
+            lists:flatten([segments:intersection(S1, S2) || S1 <- Segments1, S2 <- Segments2])
         )
     ).
 
@@ -67,7 +65,7 @@ union([], Segments2) ->
 union(Segments1, []) ->
     Segments1;
 union(Segments1 = [_ | _], Segments2 = [_ | _]) ->
-    normalize(segments:merge(lists:sort(lists:append(Segments1, Segments2)))).
+    normalize(lists:sort(lists:append(Segments1, Segments2))).
 
 -spec subtract(t(), t()) -> t().
 subtract(Segments1, []) ->
@@ -76,21 +74,21 @@ subtract([], _) ->
     empty();
 subtract(Segments1 = [_ | _], Segments2 = [_ | _]) ->
     normalize(
-        segments:merge(
-            lists:sort(
-                lists:flatten([segments:subtract(S1, S2) || S1 <- Segments1, S2 <- Segments2])
-            )
+        lists:sort(
+            lists:flatten([segments:subtract(S1, S2) || S1 <- Segments1, S2 <- Segments2])
         )
     ).
 
 %% @doc
-%% Converts result of segments:merge/1 to integer set of type t/0.
+%% Tries to merge consecutive segments in a sorted list.
 %% @end
--spec normalize(segments:t() | [segments:t()]) -> t().
-normalize(S = {_, _}) ->
-    case segments:is_empty(S) of
-        true -> [];
-        false -> [S]
-    end;
-normalize(Segments = [_ | _]) ->
-    Segments.
+-spec normalize(t()) -> t().
+normalize([]) ->
+    [];
+normalize([S]) ->
+    [S];
+normalize([S1, S2 | SegmentsLeft]) ->
+    case segments:merge(S1, S2) of
+        undefined -> [S1 | normalize([S2 | SegmentsLeft])];
+        S3 -> normalize([S3 | SegmentsLeft])
+    end.

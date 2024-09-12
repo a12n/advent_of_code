@@ -45,8 +45,8 @@ main(Part) ->
                     true -> 10;
                     false -> 2000000
                 end,
-            CoveredSegments = segments_covered(Row, SensorBeaconPairs),
-            RowBeaconX = lists:uniq(
+            ExcludedColumns = columns_covered(Row, SensorBeaconPairs),
+            BeaconColumns = integer_sets:from_list(
                 lists:filtermap(
                     fun
                         ({_, {Y, X}}) when Y == Row -> {true, X};
@@ -55,22 +55,9 @@ main(Part) ->
                     SensorBeaconPairs
                 )
             ),
-            NumPositions = lists:foldl(
-                fun(BeaconX, Num) ->
-                    case
-                        lists:any(
-                            fun(Segment) -> segments:is_element(BeaconX, Segment) end,
-                            CoveredSegments
-                        )
-                    of
-                        true -> Num - 1;
-                        false -> Num
-                    end
-                end,
-                lists:sum(lists:map(fun segments:size/1, CoveredSegments)),
-                RowBeaconX
-            ),
-            io:format(<<"~b~n">>, [NumPositions]);
+            io:format(<<"~b~n">>, [
+                integer_sets:size(integer_sets:subtract(ExcludedColumns, BeaconColumns))
+            ]);
         2 ->
             MaxCoord =
                 case IsSampleInput of

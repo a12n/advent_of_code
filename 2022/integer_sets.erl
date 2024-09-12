@@ -5,6 +5,7 @@
 
 -export([
     empty/0,
+    from_list/1,
     from_segment/1,
     from_segments/1,
     is_element/2,
@@ -18,6 +19,9 @@
 
 -spec empty() -> t().
 empty() -> [].
+
+-spec from_list([integer()]) -> t().
+from_list(List) -> from_segments([segments:from_integer(N) || N <- List]).
 
 -spec from_segment(segments:t()) -> t().
 from_segment(S) -> [S].

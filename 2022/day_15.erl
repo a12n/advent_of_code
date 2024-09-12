@@ -71,6 +71,7 @@ main(Part) ->
             [{Row, Colunms}] = rows_columns_covered(
                 AllRows, AllColunms, SensorBeaconPairs
             ),
+            io:format(standard_error, <<"Row ~p, Colunms ~p~n">>, [Row, Colunms]),
             %% For the found row, run the same function for everything
             %% transposed.
             [{Col, _}] = rows_columns_covered(
@@ -83,7 +84,9 @@ main(Part) ->
                     SensorBeaconPairs
                 )
             ),
-            io:format(<<"~b~n">>, [Row * Col])
+            io:format(standard_error, <<"Col ~p~n">>, [Col]),
+            Frequency = Col * 4000000 + Row,
+            io:format(<<"~b~n">>, [Frequency])
     end.
 
 -spec row_columns_covered_by_pair(integer(), {grids:pos(integer()), grids:pos(integer())}) ->

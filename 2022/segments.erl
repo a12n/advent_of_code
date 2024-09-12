@@ -1,6 +1,6 @@
 -module(segments).
 
--opaque t() :: {_Min :: integer(), _Max :: integer()}.
+-type t() :: {_Min :: integer(), _Max :: integer()}.
 -export_type([t/0]).
 
 -define(IS_EMPTY(Min, Max), Min > Max).
@@ -24,7 +24,7 @@
 ]).
 
 -spec empty() -> t().
-empty() -> {1, 0}.
+empty() -> {0, -1}.
 
 -spec from_endpoints(integer(), integer()) -> t().
 from_endpoints(Min, Max) when Min =< Max -> {Min, Max}.

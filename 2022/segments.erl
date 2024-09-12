@@ -83,11 +83,12 @@ merge([S1 | SegmentsPast1 = [S2 | SegmentsPast2]]) ->
         S3 -> merge([S3 | SegmentsPast2])
     end.
 
--spec union(t(), t()) -> t() | undefined.
+-spec union(t(), t()) -> t() | [t()].
 union(S1 = {Min1, Max1}, S2 = {Min2, Max2}) ->
     case merge(S1, S2) of
         S3 = {_, _} -> S3;
-        undefined -> undefined
+        undefined when Max1 < Min2 -> [S1, S2];
+        undefined when Max2 < Min1 -> [S2, S1]
     end.
 
 -spec subtract(t(), t()) -> t() | {t(), t()} | undefined.

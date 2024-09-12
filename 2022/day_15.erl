@@ -6,10 +6,6 @@
 
 -spec main(1..2) -> ok.
 main(1) ->
-    Row =
-        10,
-    %% 2000000
-
     SensorBeaconPairs =
         lists:map(
             fun(<<Line/bytes>>) ->
@@ -37,7 +33,15 @@ main(1) ->
             end,
             io_ext:read_lines(standard_io)
         ),
-    io:format(standard_error, <<"SensorBeaconPairs ~p~n">>, [SensorBeaconPairs]),
+    Row =
+        case SensorBeaconPairs of
+            [{{18, 2}, {15, -2}}, {{16, 9}, {16, 10}} | _] ->
+                %% Sample input.
+                10;
+            _ ->
+                %% Puzzle input.
+                2000000
+        end,
     CoveredSegments =
         segments:union(
             lists:sort(

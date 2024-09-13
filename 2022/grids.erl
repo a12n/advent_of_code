@@ -55,10 +55,14 @@ pos_to_dir({0, Col}) when Col < 0 -> left;
 pos_to_dir({0, Col}) when Col > 0 -> right.
 
 -spec char_to_dir(char()) -> dir().
+char_to_dir($^) -> up;
+char_to_dir($v) -> down;
+char_to_dir($<) -> left;
+char_to_dir($>) -> right;
+char_to_dir($U) -> up;
 char_to_dir($D) -> down;
 char_to_dir($L) -> left;
-char_to_dir($R) -> right;
-char_to_dir($U) -> up.
+char_to_dir($R) -> right.
 
 -spec from_lines([iodata()]) -> grid(char()).
 from_lines(Lines) ->

@@ -15,6 +15,7 @@
     taxicab_distance/2,
     is_valid_pos/2,
     dir_to_pos/1,
+    dir_to_pos/2,
     pos_to_dir/1,
     char_to_dir/1
 ]).
@@ -43,10 +44,13 @@ is_valid_pos({Row, Col}, {NumRows, NumCols}) ->
         Col >= 1 andalso Col =< NumCols.
 
 -spec dir_to_pos(dir()) -> pos(-1..1).
-dir_to_pos(up) -> {-1, 0};
-dir_to_pos(left) -> {0, -1};
-dir_to_pos(right) -> {0, 1};
-dir_to_pos(down) -> {1, 0}.
+dir_to_pos(Dir) -> dir_to_pos(Dir, 1).
+
+-spec dir_to_pos(dir(), pos_integer()) -> pos(integer()).
+dir_to_pos(up, N) -> {-N, 0};
+dir_to_pos(left, N) -> {0, -N};
+dir_to_pos(right, N) -> {0, N};
+dir_to_pos(down, N) -> {N, 0}.
 
 -spec pos_to_dir(pos(integer())) -> dir().
 pos_to_dir({Row, 0}) when Row < 0 -> up;

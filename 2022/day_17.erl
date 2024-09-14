@@ -47,7 +47,7 @@ shapes() ->
         ])
     ].
 
--spec move_shape(grids:dir() | grids:pos(integer()), map()) -> map().
+-spec move_shape(grids:dir() | grids:pos(integer()), shape()) -> shape().
 move_shape(Move = {_, _}, Shape) ->
     maps:from_list(
         [{grids:add_pos(Pos, Move), Char} || {Pos, Char} <- maps:to_list(Shape)]

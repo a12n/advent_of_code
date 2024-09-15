@@ -76,7 +76,6 @@ filter(Pred, Seq) -> filtermap(fun(Value) -> {Pred(Value), Value} end, Seq).
 -spec map(fun((term()) -> term()), seq(term())) -> seq(term()).
 map(Fun, Seq) -> filtermap(fun(Value) -> {true, Fun(Value)} end, Seq).
 
-%% FIXME
 -spec filtermap(fun((term()) -> {true | false, term()} | boolean()), seq(term())) -> seq(term()).
 filtermap(Fun, Seq) ->
     fun() ->
@@ -160,14 +159,14 @@ cycle_test() ->
 
 filter_test() ->
     IsEven = fun(N) -> N rem 2 == 0 end,
-    ?assertEqual([], filter(IsEven, empty())),
-    ?assertEqual([], filter(IsEven, from_list([1, 3, 5]))),
-    ?assertEqual([2, 4, 6], filter(IsEven, from_list([1, 2, 3, 4, 5, 6]))).
+    ?assertEqual([], to_list(filter(IsEven, empty()))),
+    ?assertEqual([], to_list(filter(IsEven, from_list([1, 3, 5])))),
+    ?assertEqual([2, 4, 6], to_list(filter(IsEven, from_list([1, 2, 3, 4, 5, 6])))).
 
 map_test() ->
     Sqr = fun(N) -> N * N end,
-    ?assertEqual([], map(Sqr, empty())),
-    ?assertEqual([1, 4, 9, 16], map(Sqr, from_list([1, 2, 3, 4]))).
+    ?assertEqual([], to_list(map(Sqr, empty()))),
+    ?assertEqual([1, 4, 9, 16], to_list(map(Sqr, from_list([1, 2, 3, 4])))).
 
 filtermap_test() ->
     ?assertEqual(

@@ -22,7 +22,7 @@
 
 -export([
     from_lines/1,
-    to_iodata/2, to_iodata/3,
+    to_iodata/1, to_iodata/2, to_iodata/3,
     find_values/2,
     transpose/1,
     size/1,
@@ -96,6 +96,11 @@ to_iodata(Grid, {MinRow, MinCol}, {MaxRow, MaxCol}) ->
     end)(
         MinRow, MinCol
     ).
+
+-spec to_iodata(grid(integer(), char())) -> iodata().
+to_iodata(Grid) ->
+    {MinPos, MaxPos} = extent(Grid),
+    to_iodata(Grid, MinPos, MaxPos).
 
 -spec find_values(term(), grid(term())) -> [pos()].
 find_values(Query, Grid) ->

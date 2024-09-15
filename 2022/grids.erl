@@ -27,7 +27,8 @@
     transpose/1,
     size/1,
     extent/1,
-    move/2
+    move/2,
+    intersects/2
 ]).
 
 -spec add_pos(pos(integer()), pos(integer())) -> pos(integer()).
@@ -149,3 +150,13 @@ move(Move = {_, _}, Grid) ->
     );
 move(Dir, Grid) ->
     move(dir_to_pos(Dir), Grid).
+
+-spec intersects(grid(integer(), term()), grid(integer(), term())) -> boolean().
+intersects(Grid1, Grid2) ->
+    try
+        maps:intersect_with(fun(Pos, _, _) -> throw(Pos) end, Grid1, Grid2),
+        false
+    catch
+        throw:{_, _} ->
+            true
+    end.

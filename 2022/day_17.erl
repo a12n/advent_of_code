@@ -23,9 +23,7 @@ main(1) ->
     %% ?debugFmt("LeftWall ~p, RightWall ~p", [LeftWall, RightWall]),
     %% ?debugFmt("Ground ~p", [Ground]),
     Ground2 = simulate(ShapesSeq, MovesSeq, LeftWall, RightWall, Ground, _NumShapes = 2022),
-    ?debugFmt("Ground2 ~p", [top(Ground2)]),
-    %% TODO
-    ok.
+    io:format(<<"~b~n">>, [-top(Ground2)]).
 
 -spec shape([string()]) -> shape().
 shape(Definition) ->
@@ -144,7 +142,7 @@ simulate(Shapes0, Moves0, LeftWall, RightWall, Ground0, NumShapes0) ->
             {Shape0, NextShapes} = Shapes(),
             Shape = grids:move({top(Ground) - (3 + 1), 0}, Shape0),
             %% TODO: Move shape to the row.
-            ?debugFmt("Shape ~p, NumShapes ~p", [Shape, NumShapes]),
+            %% ?debugFmt("Shape ~p, NumShapes ~p", [Shape, NumShapes]),
             %% ?debugFmt("Ground ~p", [Ground]),
             {Ground2, NextMoves} = simulate_one(Shape, Moves, LeftWall, RightWall, Ground),
             %% ?debugFmt("Ground2~n~s", [grids:to_iodata(Ground2)]),

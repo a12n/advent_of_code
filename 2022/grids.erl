@@ -26,7 +26,8 @@
     find_values/2,
     transpose/1,
     size/1,
-    extent/1
+    extent/1,
+    move/2
 ]).
 
 -spec add_pos(pos(integer()), pos(integer())) -> pos(integer()).
@@ -140,3 +141,11 @@ extent(Grid) ->
         undefined,
         Grid
     ).
+
+-spec move(dir() | pos(integer()), grid(integer(), term())) -> grid(integer(), term()).
+move(Move = {_, _}, Grid) ->
+    maps:from_list(
+        [{grids:add_pos(Pos, Move), Value} || {Pos, Value} <- maps:to_list(Grid)]
+    );
+move(Dir, Grid) ->
+    move(dir_to_pos(Dir), Grid).

@@ -6,6 +6,7 @@
 -export([
     empty/0,
     from_list/1,
+    to_list/1,
     append/2,
     duplicate/2,
     cycle/2,
@@ -25,6 +26,14 @@ empty() -> fun() -> undefined end.
 -spec from_list(list()) -> seq(term()).
 from_list([]) -> empty();
 from_list([Value | Tail]) -> fun() -> {Value, from_list(Tail)} end.
+
+-spec to_list(seq(term())) -> list().
+to_list(Seq) ->
+    %% TODO: Tail-recursive?
+    case Seq() of
+        undefined -> [];
+        {Value, Next} -> [Value | to_list(Next)]
+    end.
 
 -spec append(seq(term()), seq(term())) -> seq(term()).
 append(Seq1, Seq2) ->

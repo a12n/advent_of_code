@@ -45,7 +45,7 @@ append(Seq1, Seq2) ->
 -spec duplicate(non_neg_integer() | infinity, term()) -> seq(term()).
 duplicate(infinity, Value) -> fun() -> {Value, duplicate(infinity, Value)} end;
 duplicate(0, _) -> empty();
-duplicate(N, Value) -> fun() -> {Value, duplicate(N - 1, Value)} end.
+duplicate(N, Value) when N > 0 -> fun() -> {Value, duplicate(N - 1, Value)} end.
 
 -spec cycle(non_neg_integer() | infinity, seq(term())) -> seq(term()).
 cycle(0, _) ->

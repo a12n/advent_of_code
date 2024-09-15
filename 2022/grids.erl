@@ -28,7 +28,8 @@
     size/1,
     extent/1,
     move/2,
-    intersects/2
+    intersects/2,
+    intersects_line/2
 ]).
 
 -spec add_pos(pos(integer()), pos(integer())) -> pos(integer()).
@@ -160,3 +161,7 @@ intersects(Grid1, Grid2) ->
         throw:{_, _} ->
             true
     end.
+
+-spec intersects_line(grid(integer(), term()), {vert | horiz, integer()}) -> boolean().
+intersects_line(Grid, {vert, Line}) -> maps_ext:any(fun({_, Col}, _) -> Col == Line end, Grid);
+intersects_line(Grid, {horiz, Line}) -> maps_ext:any(fun({Row, _}, _) -> Row == Line end, Grid).

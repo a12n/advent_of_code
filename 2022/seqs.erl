@@ -121,3 +121,104 @@ range(From, infinity, Incr) -> fun() -> {From, range(From + Incr, infinity, Incr
 range(From, To, Incr) when Incr > 0, From > To -> empty();
 range(From, To, Incr) when Incr < 0, From < To -> empty();
 range(From, To, Incr) -> fun() -> {From, range(From + Incr, To, Incr)} end.
+
+-ifdef(TEST).
+
+-include_lib("eunit/include/eunit.hrl").
+
+empty_test() ->
+    Seq = empty(),
+    ?assertEqual(undefined, Seq()),
+    ?assertEqual(undefined, Seq()).
+
+from_list_test() ->
+    Seq1 = from_list([]),
+    ?assertEqual(undefined, Seq1()),
+    Seq2 = from_list([1, 2, 3]),
+    {1, Seq3} = Seq2(),
+    {2, Seq4} = Seq3(),
+    {3, Seq5} = Seq4(),
+    undefined = Seq5().
+
+to_list_test() ->
+    ?assertEqual([], to_list(empty())),
+    ?assertEqual([1, 2, 3], to_list(from_list([1, 2, 3]))).
+
+append_test() ->
+    ?assertEqual([1, 2, 3], to_list(append(from_list([1, 2, 3]), empty()))),
+    ?assertEqual([4, 5, 6], to_list(append(empty(), from_list([4, 5, 6])))),
+    ?assertEqual([1, 2, 3, 4, 5, 6], to_list(append(from_list([1, 2, 3]), from_list([4, 5, 6])))).
+
+duplicate_test() ->
+    ?assertEqual([], to_list(duplicate(0, a))),
+    ?assertEqual([a, a, a], to_list(duplicate(3, a))).
+
+cycle_test() ->
+    ?assertEqual([], to_list(cycle(0, from_list([1, 2, 3])))),
+    ?assertEqual([], to_list(cycle(3, empty()))),
+    ?assertEqual([1, 2, 3, 1, 2, 3, 1, 2, 3], to_list(cycle(3, from_list([1, 2, 3])))).
+
+filter_test() ->
+    IsEven = fun(N) -> N rem 2 == 0 end,
+    ?assertEqual([], filter(IsEven, empty())),
+    ?assertEqual([], filter(IsEven, from_list([1, 3, 5]))),
+    ?assertEqual([2, 4, 6], filter(IsEven, from_list([1, 2, 3, 4, 5, 6]))).
+
+map_test() ->
+    Sqr = fun(N) -> N * N end,
+    ?assertEqual([], map(Sqr, empty())),
+    ?assertEqual([1, 4, 9, 16], map(Sqr, from_list([1, 2, 3, 4]))).
+
+filtermap_test() ->
+    ?assertEqual(
+        [<<"2">>, <<"4">>, <<"6">>],
+        to_list(
+            filtermap(
+                fun
+                    (N) when N rem 2 == 0 -> {true, integer_to_binary(N)};
+                    (_) -> false
+                end,
+                from_list([1, 2, 3, 4, 5, 6])
+            )
+        )
+    ).
+
+fold_test() ->
+    AddToMap = fun(N, Ans) -> Ans#{N => []} end,
+    ?assertEqual(#{}, fold(AddToMap, #{}, empty())),
+    ?assertEqual(#{1 => [], 2 => [], 3 => []}, fold(AddToMap, #{}, from_list([1, 2, 3]))).
+
+foreach_test() ->
+    IsEven = fun(N) -> N rem 2 == 0 end,
+    Sqr = fun(N) -> N * N end,
+    Self = self(),
+    spawn(fun() ->
+        foreach(fun(N) -> Self ! N end, map(Sqr, filter(IsEven, from_list([1, 2, 3, 4, 5, 6]))))
+    end),
+    ?assertEqual(
+        4,
+        receive
+            N -> N
+        end
+    ),
+    ?assertEqual(
+        16,
+        receive
+            N -> N
+        end
+    ),
+    ?assertEqual(
+        36,
+        receive
+            N -> N
+        end
+    ),
+    ?assertEqual(
+        ok,
+        receive
+            N -> N
+        after 1000 -> ok
+        end
+    ).
+
+-endif.

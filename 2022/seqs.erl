@@ -50,6 +50,8 @@ duplicate(N, Value) when N > 0 -> fun() -> {Value, duplicate(N - 1, Value)} end.
 -spec cycle(non_neg_integer() | infinity, seq(term())) -> seq(term()).
 cycle(0, _) ->
     empty();
+cycle(1, Seq) ->
+    Seq;
 cycle(N, InitialSeq) ->
     case InitialSeq() of
         undefined ->

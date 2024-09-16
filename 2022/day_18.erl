@@ -49,7 +49,7 @@ surface_area(Cubes) ->
 
 -spec expand_steam(map()) -> map().
 expand_steam(Cubes) ->
-    {MinPos = {MinX, MinY, MinZ}, MaxPos = {MaxX, MaxY, MaxZ}} = grids3:extent(Cubes),
+    {MinPos = {MinX, MinY, MinZ}, {MaxX, MaxY, MaxZ}} = grids3:extent(Cubes),
     %% Introduce explicit outside air voxels into the map.
     ExplicitCubes0 =
         maps:merge_with(
@@ -65,39 +65,32 @@ expand_steam(Cubes) ->
     %% Start expansion at MinPos, it must be an outside air voxel.
     ?AIR_OUTSIDE = maps:get(MinPos, ExplicitCubes0),
     %% Do the expansion.
-    (fun Loop(ExplicitCubes, ToRemove) ->
-        case queue:out(ToRemove) of
-            {{value, Pos = {X, Y, Z}}, ToRemove2} ->
-                Loop(
-                    maps:remove(Pos, ExplicitCubes),
-                    lists:foldl(
-                        fun queue:in/2,
-                        ToRemove2,
-                        [
-                            AdjPos
-                         || AdjPos <- [
-                                {X - 1, Y, Z},
-                                {X + 1, Y, Z},
-                                {X, Y - 1, Z},
-                                {X, Y + 1, Z},
-                                {X, Y, Z - 1},
-                                {X, Y, Z + 1}
-                            ],
-                            maps:find(AdjPos, ExplicitCubes) == {ok, ?AIR_OUTSIDE}
-                        ]
-                    )
-                );
-            {empty, _} ->
-                %% Done expansion. Mark air inside, to make it
-                %% different from air outside.
-                maps:map(
-                    fun
-                        (_, ?LAVA) -> ?LAVA;
-                        (_, ?AIR_OUTSIDE) -> ?AIR_INSIDE
-                    end,
+    Cubes2 =
+        (fun Loop(Pos = {X, Y, Z}, ExplicitCubes) ->
+            case maps:find(Pos, ExplicitCubes) of
+                {ok, ?AIR_OUTSIDE} ->
+                    %% Remove, expand adjacent.
+                    lists:foldl(Loop, maps:remove(Pos, ExplicitCubes), [
+                        {X - 1, Y, Z},
+                        {X + 1, Y, Z},
+                        {X, Y - 1, Z},
+                        {X, Y + 1, Z},
+                        {X, Y, Z - 1},
+                        {X, Y, Z + 1}
+                    ]);
+                {ok, ?LAVA} ->
+                    ExplicitCubes;
+                error ->
                     ExplicitCubes
-                )
-        end
-    end)(
-        ExplicitCubes0, queue:from_list([MinPos])
+            end
+        end)(
+            MinPos, ExplicitCubes0
+        ),
+    %% Rewrite the ?AIR_OUTSIDE voxels left as ?AIR_INSIDE.
+    maps:map(
+        fun
+            (_, ?LAVA) -> ?LAVA;
+            (_, ?AIR_OUTSIDE) -> ?AIR_INSIDE
+        end,
+        Cubes2
     ).

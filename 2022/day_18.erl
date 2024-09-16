@@ -2,7 +2,8 @@
 
 -export([main/1]).
 
--define(AIR, $.).
+-define(AIR_INSIDE, $o).
+-define(AIR_OUTSIDE, $.).
 -define(LAVA, $#).
 
 -spec main(1..2) -> ok.
@@ -34,7 +35,8 @@ main(Part) ->
 surface_area(Cubes) ->
     length([
         AdjPos
-     || {{X, Y, Z}, ?LAVA} <- maps:to_list(Cubes),
+     || {{X, Y, Z}, Type} <- maps:to_list(Cubes),
+        Type =/= ?AIR_OUTSIDE,
         AdjPos <- [
             {X - 1, Y, Z},
             {X + 1, Y, Z},
@@ -43,5 +45,5 @@ surface_area(Cubes) ->
             {X, Y, Z - 1},
             {X, Y, Z + 1}
         ],
-        maps:get(AdjPos, Cubes, ?AIR) /= ?LAVA
+        maps:get(AdjPos, Cubes, ?AIR_OUTSIDE) == ?AIR_OUTSIDE
     ]).

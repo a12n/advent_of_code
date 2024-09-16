@@ -6,7 +6,7 @@
 -define(LAVA, $#).
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
     Cubes =
         maps:from_list(
             [
@@ -21,7 +21,14 @@ main(1) ->
                     )
             ]
         ),
-    io:format(<<"~b~n">>, [surface_area(Cubes)]).
+    case Part of
+        1 ->
+            io:format(<<"~b~n">>, [surface_area(Cubes)]);
+        2 ->
+            {MinPos, MaxPos} = grids3:extent(Cubes),
+            io:format(<<"MinPos ~p, MaxPos ~p~n">>, [MinPos, MaxPos]),
+            ok
+    end.
 
 -spec surface_area(map()) -> non_neg_integer().
 surface_area(Cubes) ->

@@ -6,11 +6,6 @@
 
 -spec main(1..2) -> ok.
 main(Part) ->
-    {WorryDivider, Rounds} =
-        case Part of
-            1 -> {3, 20};
-            2 -> {1, 10000}
-        end,
     %% Parse input.
     Monkeys = parse_monkeys(
         lists:filtermap(
@@ -23,10 +18,22 @@ main(Part) ->
             end,
             io_ext:read_lines(standard_io)
         ),
-        WorryDivider
+        _WorryDivider =
+            case Part of
+                1 -> 3;
+                2 -> 1
+            end
     ),
     %% Run simulation.
-    Monkeys2 = monkey_business(Monkeys, Rounds),
+    {Rounds, Modulo} =
+        case Part of
+            1 ->
+                {20, undefined};
+            2 ->
+                {10000,
+                    lists_ext:product([Divisor || #{divisor := Divisor} <- maps:values(Monkeys)])}
+        end,
+    Monkeys2 = monkey_business(Monkeys, Rounds, Modulo),
     %% Print results.
     [NumInspected1, NumInspected2 | _] = lists:sort(
         fun erlang:'>='/2,
@@ -94,27 +101,31 @@ parse_monkeys(
                 #{
                     items => Items,
                     inspected => 0,
+                    divisor => Divisor,
                     operation => Operation,
                     next => Next
                 }
         }
     ).
 
--spec monkey_business(map(), non_neg_integer()) -> map().
-monkey_business(Monkeys, 0) ->
+-spec monkey_business(map(), non_neg_integer(), pos_integer() | undefined) -> map().
+monkey_business(Monkeys, 0, _) ->
     Monkeys;
-monkey_business(Monkeys, Rounds) ->
+monkey_business(Monkeys0, Rounds, Modulo) ->
     monkey_business(
         lists:foldl(
-            fun one_monkey_business/2,
-            Monkeys,
-            lists:sort(maps:keys(Monkeys))
+            fun(ID, Monkeys) ->
+                one_monkey_business(ID, Monkeys, Modulo)
+            end,
+            Monkeys0,
+            lists:sort(maps:keys(Monkeys0))
         ),
-        Rounds - 1
+        Rounds - 1,
+        Modulo
     ).
 
--spec one_monkey_business(non_neg_integer(), map()) -> map().
-one_monkey_business(ThisID, Monkeys) ->
+-spec one_monkey_business(non_neg_integer(), map(), pos_integer() | undefined) -> map().
+one_monkey_business(ThisID, Monkeys, Modulo) ->
     #{
         ThisID := ThisMonkey = #{
             items := Items,
@@ -125,9 +136,13 @@ one_monkey_business(ThisID, Monkeys) ->
     } = Monkeys,
     try
         Item = queue:get(Items),
-        InspectedItem = Inspect(Item),
-        ThatID = Next(InspectedItem),
-        #{ThatID := ThatMonkey = #{items := ThatItems}} = Monkeys,
+        InspectedItem =
+            case Modulo of
+                undefined -> Inspect(Item);
+                _ -> Inspect(Item) rem Modulo
+            end,
+        NextID = Next(InspectedItem),
+        #{NextID := NextMonkey = #{items := NextItems}} = Monkeys,
         one_monkey_business(
             ThisID,
             Monkeys#{
@@ -135,10 +150,11 @@ one_monkey_business(ThisID, Monkeys) ->
                     items := queue:drop(Items),
                     inspected := NumInspected + 1
                 },
-                ThatID := ThatMonkey#{
-                    items := queue:in(InspectedItem, ThatItems)
+                NextID := NextMonkey#{
+                    items := queue:in(InspectedItem, NextItems)
                 }
-            }
+            },
+            Modulo
         )
     catch
         error:empty ->

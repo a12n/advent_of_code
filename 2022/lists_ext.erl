@@ -2,7 +2,15 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--export([consec_pairs/1, reduce/2, seq/2, enumerate_lists/1, transpose_lists/1, rotate_lists/2]).
+-export([
+    consec_pairs/1,
+    reduce/2,
+    seq/2,
+    product/1,
+    enumerate_lists/1,
+    transpose_lists/1,
+    rotate_lists/2
+]).
 
 -spec consec_pairs([term()]) -> [{term(), term()}].
 consec_pairs([]) -> [];
@@ -14,6 +22,9 @@ reduce(F, [Head | Tail]) -> lists:foldl(F, Head, Tail).
 -spec seq(integer(), integer()) -> [integer()].
 seq(From, To) when From =< To -> lists:seq(From, To);
 seq(From, To) -> lists:seq(From, To, -1).
+
+-spec product([number()]) -> number().
+product(Numbers) -> lists:foldl(fun erlang:'*'/2, 1, Numbers).
 
 %%--------------------------------------------------------------------
 %% Matrix functions.

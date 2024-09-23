@@ -81,7 +81,7 @@ parse_valve(Line) ->
         <<"valve", _/bytes>>
         | AdjList
     ] =
-        binary:split(Line, [<<" ">>, <<",">>, <<"=">>, <<";">>], [global, trim, trim_all]),
+        binary:split(Line, [<<" ">>, <<",">>, <<"=">>, <<";">>], [global, trim_all]),
     {Valve, binary_to_integer(FlowStr), AdjList}.
 
 maximum_flow(Valves, TotalTime, Start) ->

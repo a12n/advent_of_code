@@ -12,30 +12,45 @@
 
 -spec main(1..2) -> ok.
 main(1) ->
-    {FlowMap, AdjacentMap} =
+    {FlowRates, Adjacent} =
         lists:foldl(
-            fun(Line, {FlowMap, AdjacentMap}) ->
+            fun(Line, {FlowRates, Adjacent}) ->
                 {Valve, Flow, AdjList} = parse_valve(Line),
-                {FlowMap#{Valve => Flow}, AdjacentMap#{Valve => AdjList}}
+                {FlowRates#{Valve => Flow}, Adjacent#{Valve => AdjList}}
             end,
             {#{}, #{}},
             io_ext:read_lines(standard_io)
         ),
-    DistanceMap = distances(AdjacentMap),
-    ?debugFmt("FlowMap ~p, AdjacentMap ~p, DistanceMap ~p", [FlowMap, AdjacentMap, DistanceMap]),
-    %% Distance = maps:from_list([{ID, distances(ID, Adjacent)} || ID <- maps:keys(Adjacent)]),
-    %% ?debugFmt("Distance ~p", [Distance]),
-    %% io:format(standard_error, <<"~p valves ~p~n">>, [maps:size(Valves), Valves]),
-    %% NonZeroValves = maps:keys(maps:filter(fun(_, {Flow, _}) -> Flow > 0 end, Valves)),
-    %% io:format(standard_error, <<"NonZeroValves ~p~n">>, [NonZeroValves]),
-    %% io:format(graphviz:to_iodata(Valves)),
-    %% Valves = maps:from_list([
-    %%     {ID, {Flow, AdjList}}
-    %%  || {ID, Flow, AdjList} <- lists:map(fun parse_valve/1, io_ext:read_lines(standard_io))
-    %% ]),
-    %% ?debugFmt("Valves ~p", [Valves]),
-    %% io:format("~b~n", [maximum_flow(Valves, 30, <<"AA">>)]),
-    ok.
+    Distances = distances(Adjacent),
+    ?debugFmt("FlowRates ~p, Adjacent ~p, Distances ~p", [FlowRates, Adjacent, Distances]),
+    NonZeroValves = maps:keys(maps:filter(fun(_, Flow) -> Flow > 0 end, FlowRates)),
+    MaxFlow = maximum_flow(FlowRates, Distances, NonZeroValves, <<"AA">>, 30),
+    io:format(<<"~b~n">>, [MaxFlow]).
+
+-spec maximum_flow(flow_map(), distance_map(), [binary()], binary(), non_neg_integer()) ->
+    non_neg_integer().
+maximum_flow(_, _, _, PrevValve, TimeLeft) when TimeLeft =< 0 ->
+    io:format(standard_error, <<"PrevValve ~p, TimeLeft ~p~n">>, [PrevValve, TimeLeft]),
+    0;
+maximum_flow(FlowRates, Distances, NonZeroValves, PrevValve, TimeLeft) ->
+    io:format(standard_error, <<"NonZeroValves ~p, PrevValve ~p, TimeLeft ~p~n">>, [
+        NonZeroValves, PrevValve, TimeLeft
+    ]),
+    lists:foldl(
+        fun erlang:max/2,
+        0,
+        lists:map(
+            fun(Valve) ->
+                Distance = maps:get(Valve, maps:get(PrevValve, Distances)),
+                TimeLeft2 = TimeLeft - Distance - 1,
+                TimeLeft2 * maps:get(Valve, FlowRates) +
+                    maximum_flow(
+                        FlowRates, Distances, lists:delete(Valve, NonZeroValves), Valve, TimeLeft2
+                    )
+            end,
+            NonZeroValves
+        )
+    ).
 
 -spec distances(adjacent_map()) -> distance_map().
 distances(Adjacent) ->
@@ -83,51 +98,3 @@ parse_valve(Line) ->
     ] =
         binary:split(Line, [<<" ">>, <<",">>, <<"=">>, <<";">>], [global, trim_all]),
     {Valve, binary_to_integer(FlowStr), AdjList}.
-
-maximum_flow(Valves, TotalTime, Start) ->
-    (fun
-        Loop(_, TimeLeft, ID) when TimeLeft =< 0 ->
-            %% ?debugFmt("TimeLeft ~p, ID ~p", [TimeLeft, ID]),
-            %% io:format(standard_error, <<"No time left @ ~s~n">>, [, ID]),
-            0;
-        Loop(Closed, _, _) when map_size(Closed) == 0 ->
-            %% ?debugFmt("Closed ~p", [Closed]),
-            io:format(standard_error, <<"All opened~n">>, []),
-            0;
-        Loop(Closed, TimeLeft, ID) ->
-            {Flow, Adjacent} = maps:get(ID, Valves),
-            %% ?debugFmt("Closed ~p, TimeLeft ~p, ID ~p, Flow ~p, Adjacent ~p", [
-            %%     Closed, TimeLeft, ID, Flow, Adjacent
-            %% ]),
-            case maps:find(ID, Closed) of
-                {ok, _} when Flow > 0 ->
-                    WhenOpened =
-                        Flow * (TimeLeft - 1) +
-                            lists:max([
-                                Loop(maps:remove(ID, Closed), TimeLeft - 2, AdjID)
-                             || AdjID <- Adjacent
-                            ]),
-                    %% ?debugFmt("WhenOpened ~p", [WhenOpened]),
-                    WhenNotOpened =
-                        lists:max([Loop(Closed, TimeLeft - 1, AdjID) || AdjID <- Adjacent]),
-                    %% ?debugFmt("WhenNotOpened ~p", [WhenNotOpened]),
-                    max(WhenOpened, WhenNotOpened);
-                {ok, _} ->
-                    %% Only mark as opened.
-                    WhenNotOpened =
-                        lists:max([
-                            Loop(maps:remove(ID, Closed), TimeLeft - 1, AdjID)
-                         || AdjID <- Adjacent
-                        ]),
-                    %% ?debugFmt("WhenNotOpened ~p, zero flow", [WhenNotOpened]),
-                    WhenNotOpened;
-                error ->
-                    %% Already opened
-                    AlreadyOpened =
-                        lists:max([Loop(Closed, TimeLeft - 1, AdjID) || AdjID <- Adjacent]),
-                    %% ?debugFmt("AlreadyOpened ~p", [AlreadyOpened]),
-                    AlreadyOpened
-            end
-    end)(
-        maps:map(fun(_, _) -> [] end, Valves), TotalTime, Start
-    ).

@@ -38,18 +38,18 @@ main(1) ->
     ok.
 
 -spec distances(adjacent_map()) -> distance_map().
-distances(AdjacentMap) ->
-    maps:map(fun(Valve, _) -> valve_distances(Valve, AdjacentMap) end, AdjacentMap).
+distances(Adjacent) ->
+    maps:map(fun(Valve, _) -> valve_distances(Valve, Adjacent) end, Adjacent).
 
 -spec valve_distances(binary(), adjacent_map()) -> #{binary() => non_neg_integer()}.
-valve_distances(SourceValve, AdjacentMap) ->
+valve_distances(SourceValve, Adjacent) ->
     (fun Loop(Queue, Distances) ->
         try
             {{Dist, Valve}, Queue2} = gb_sets:take_smallest(Queue),
             Distances2 = Distances#{Valve => Dist},
             AdjList = [
                 {Dist + 1, AdjValve}
-             || AdjValve <- maps:get(Valve, AdjacentMap, []),
+             || AdjValve <- maps:get(Valve, Adjacent, []),
                 not maps:is_key(AdjValve, Distances2)
             ],
             Queue3 =

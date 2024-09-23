@@ -28,23 +28,27 @@ main(1) ->
 
 -spec maximum_flow(flow_map(), distance_map(), [binary()], binary(), non_neg_integer()) ->
     non_neg_integer().
-maximum_flow(_, _, _, PrevValve, TimeLeft) when TimeLeft =< 0 ->
-    io:format(standard_error, <<"PrevValve ~p, TimeLeft ~p~n">>, [PrevValve, TimeLeft]),
+maximum_flow(_, _, _, _, TimeLeft) when TimeLeft =< 0 ->
     0;
 maximum_flow(FlowRates, Distances, NonZeroValves, PrevValve, TimeLeft) ->
-    io:format(standard_error, <<"NonZeroValves ~p, PrevValve ~p, TimeLeft ~p~n">>, [
-        NonZeroValves, PrevValve, TimeLeft
-    ]),
     lists:foldl(
         fun erlang:max/2,
         0,
         lists:map(
             fun(Valve) ->
                 Distance = maps:get(Valve, maps:get(PrevValve, Distances)),
-                TimeLeft2 = TimeLeft - Distance - 1,
-                TimeLeft2 * maps:get(Valve, FlowRates) +
+                Flow = maps:get(Valve, FlowRates),
+                LessTimeLeft = TimeLeft - Distance - 1,
+                %% io:format(standard_error, <<"Distance from ~s to ~s is ~b, ~s flow is ~b~n">>, [
+                %%     PrevValve, Valve, Distance, Valve, Flow
+                %% ]),
+                LessTimeLeft * Flow +
                     maximum_flow(
-                        FlowRates, Distances, lists:delete(Valve, NonZeroValves), Valve, TimeLeft2
+                        FlowRates,
+                        Distances,
+                        lists:delete(Valve, NonZeroValves),
+                        Valve,
+                        LessTimeLeft
                     )
             end,
             NonZeroValves

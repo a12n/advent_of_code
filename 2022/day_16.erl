@@ -22,7 +22,6 @@ main(1) ->
             io_ext:read_lines(standard_io)
         ),
     Distances = distances(Adjacent),
-    ?debugFmt("FlowRates ~p, Adjacent ~p, Distances ~p", [FlowRates, Adjacent, Distances]),
     NonZeroValves = maps:keys(maps:filter(fun(_, Flow) -> Flow > 0 end, FlowRates)),
     MaxFlow = maximum_flow(FlowRates, Distances, NonZeroValves, <<"AA">>, 30),
     io:format(<<"~b~n">>, [MaxFlow]).

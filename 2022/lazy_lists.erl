@@ -1,16 +1,9 @@
 -module(lazy_lists).
 
--type lazy_list(Elt) :: list(Elt) | maybe_improper_list(Elt, fun(() -> lazy_list(Elt))).
+-type lazy_list_fun(Elt) :: fun(() -> lazy_list(Elt)).
+-type lazy_list(Elt) :: list(Elt) | maybe_improper_list(Elt, lazy_list_fun(Elt)).
 -type lazy_list() :: lazy_list(term()).
 -export_type([lazy_list/0, lazy_list/1]).
-
--define(LAZY(Expr), fun() -> Expr end).
--define(FORCE(Tail),
-    if
-        is_function(Tail, 0) -> Tail();
-        is_list(Tail) -> Tail
-    end
-).
 
 -export([
     from_list/1,
@@ -28,26 +21,27 @@
     drop/2,
     zip/2,
     zipwith/3,
-    enumerate/1, enumerate/2, enumerate/3
+    enumerate/1, enumerate/2, enumerate/3,
+    force_tail/1
 ]).
 
 -spec from_list(list()) -> lazy_list().
 from_list([]) -> [];
-from_list([Elt | Tail]) -> [Elt | ?LAZY(from_list(?FORCE(Tail)))].
+from_list([Elt | Tail]) -> [Elt | fun() -> from_list(force_tail(Tail)) end].
 
 -spec to_list(lazy_list()) -> list().
 to_list([]) -> [];
-to_list([Elt | Tail]) -> [Elt | to_list(?FORCE(Tail))].
+to_list([Elt | Tail]) -> [Elt | to_list(force_tail(Tail))].
 
 -spec append(lazy_list(), lazy_list()) -> lazy_list().
 append(LazyList1, []) -> LazyList1;
 append([], LazyList2) -> LazyList2;
-append([Elt1 | Tail1], LazyList2) -> [Elt1 | ?LAZY(append(?FORCE(Tail1), LazyList2))].
+append([Elt1 | Tail1], LazyList2) -> [Elt1 | fun() -> append(force_tail(Tail1), LazyList2) end].
 
 -spec duplicate(non_neg_integer() | infinity, term()) -> lazy_list().
-duplicate(infinity, Elt) -> [Elt | ?LAZY(duplicate(infinity, Elt))];
+duplicate(infinity, Elt) -> [Elt | fun() -> duplicate(infinity, Elt) end];
 duplicate(0, _) -> [];
-duplicate(N, Elt) when N > 0 -> [Elt | ?LAZY(duplicate(N - 1, Elt))].
+duplicate(N, Elt) when N > 0 -> [Elt | fun() -> duplicate(N - 1, Elt) end].
 
 -spec cycle(non_neg_integer() | infinity, lazy_list()) -> lazy_list().
 cycle(0, _) ->
@@ -59,7 +53,7 @@ cycle(_, []) ->
 cycle(infinity, LazyList) ->
     (fun
         Loop([]) -> Loop(LazyList);
-        Loop([Elt | Tail]) -> [Elt | ?LAZY(Loop(?FORCE(Tail)))]
+        Loop([Elt | Tail]) -> [Elt | fun() -> Loop(force_tail(Tail)) end]
     end)(
         LazyList
     );
@@ -67,7 +61,7 @@ cycle(N, LazyList) when N > 0 ->
     (fun
         Loop(0, _) -> [];
         Loop(M, []) -> Loop(M - 1, LazyList);
-        Loop(M, [Elt | Tail]) -> [Elt | ?LAZY(Loop(M, ?FORCE(Tail)))]
+        Loop(M, [Elt | Tail]) -> [Elt | fun() -> Loop(M, force_tail(Tail)) end]
     end)(
         N, LazyList
     ).
@@ -83,22 +77,22 @@ filtermap(_, []) ->
     [];
 filtermap(Fun, [Elt | Tail]) ->
     case Fun(Elt) of
-        true -> [Elt | ?LAZY(filtermap(Fun, ?FORCE(Tail)))];
-        {true, Elt2} -> [Elt2 | ?LAZY(filtermap(Fun, ?FORCE(Tail)))];
-        false -> filtermap(Fun, ?FORCE(Tail));
-        {false, _} -> filtermap(Fun, ?FORCE(Tail))
+        true -> [Elt | fun() -> filtermap(Fun, force_tail(Tail)) end];
+        {true, Elt2} -> [Elt2 | fun() -> filtermap(Fun, force_tail(Tail)) end];
+        false -> filtermap(Fun, force_tail(Tail));
+        {false, _} -> filtermap(Fun, force_tail(Tail))
     end.
 
 -spec fold(fun(), term(), lazy_list()) -> term().
 fold(_, Acc, []) -> Acc;
-fold(Fun, Acc, [Elt | Tail]) -> fold(Fun, Fun(Elt, Acc), ?FORCE(Tail)).
+fold(Fun, Acc, [Elt | Tail]) -> fold(Fun, Fun(Elt, Acc), force_tail(Tail)).
 
 -spec foreach(fun((term()) -> term()), lazy_list()) -> ok.
 foreach(_, []) ->
     ok;
 foreach(Fun, [Elt | Tail]) ->
     Fun(Elt),
-    foreach(Fun, ?FORCE(Tail)).
+    foreach(Fun, force_tail(Tail)).
 
 -spec seq(integer()) -> lazy_list(integer()).
 seq(From) -> seq(From, infinity).
@@ -109,17 +103,17 @@ seq(From, To) when From =< To -> seq(From, To, 1).
 -spec seq(integer(), integer() | infinity, neg_integer() | pos_integer()) -> lazy_list(integer()).
 seq(From, To, Incr) when is_integer(To), From > To, Incr > 0 -> [];
 seq(From, To, Incr) when is_integer(To), From < To, Incr < 0 -> [];
-seq(From, To, Incr) -> [From | ?LAZY(seq(From + Incr, To, Incr))].
+seq(From, To, Incr) -> [From | fun() -> seq(From + Incr, To, Incr) end].
 
 -spec take(non_neg_integer(), lazy_list()) -> lazy_list().
 take(0, _) -> [];
 take(_, []) -> [];
-take(N, [Elt | Tail]) when N > 0 -> [Elt | ?LAZY(take(N - 1, ?FORCE(Tail)))].
+take(N, [Elt | Tail]) when N > 0 -> [Elt | fun() -> take(N - 1, force_tail(Tail)) end].
 
 -spec drop(non_neg_integer(), lazy_list()) -> lazy_list().
 drop(0, LazyList) -> LazyList;
 drop(_, []) -> [];
-drop(N, [_ | Tail]) when N > 0 -> drop(N - 1, ?FORCE(Tail)).
+drop(N, [_ | Tail]) when N > 0 -> drop(N - 1, force_tail(Tail)).
 
 -spec zip(lazy_list(), lazy_list()) -> lazy_list({term(), term()}).
 zip(LazyList1, LazyList2) -> zipwith(fun(Elt1, Elt2) -> {Elt1, Elt2} end, LazyList1, LazyList2).
@@ -130,7 +124,7 @@ zipwith(_, [], _) ->
 zipwith(_, _, []) ->
     [];
 zipwith(Combine, [Elt1 | Tail1], [Elt2 | Tail2]) ->
-    [Combine(Elt1, Elt2) | ?LAZY(zipwith(Combine, ?FORCE(Tail1), ?FORCE(Tail2)))].
+    [Combine(Elt1, Elt2) | fun() -> zipwith(Combine, force_tail(Tail1), force_tail(Tail2)) end].
 
 -spec enumerate(lazy_list()) -> lazy_list({pos_integer(), term()}).
 enumerate(LazyList) -> enumerate(1, LazyList).
@@ -140,6 +134,12 @@ enumerate(Index, LazyList) -> enumerate(Index, 1, LazyList).
 
 -spec enumerate(integer(), integer(), lazy_list()) -> lazy_list({integer(), term()}).
 enumerate(Index, Incr, LazyList) -> zip(seq(Index, infinity, Incr), LazyList).
+
+-spec force_tail
+    (lazy_list_fun(term())) -> maybe_improper_list(term(), lazy_list_fun(term()));
+    (list()) -> list().
+force_tail(Tail) when is_function(Tail, 0) -> Tail();
+force_tail(Tail) when is_list(Tail) -> Tail.
 
 -ifdef(TEST).
 

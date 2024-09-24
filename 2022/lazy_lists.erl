@@ -25,7 +25,10 @@
     foreach/2,
     seq/1, seq/2, seq/3,
     take/2,
-    drop/2
+    drop/2,
+    zip/2,
+    zipwith/3,
+    enumerate/1, enumerate/2, enumerate/3
 ]).
 
 -spec from_list(list()) -> lazy_list().
@@ -117,6 +120,26 @@ take(N, [Elt | Tail]) when N > 0 -> [Elt | ?LAZY(take(N - 1, ?FORCE(Tail)))].
 drop(0, LazyList) -> LazyList;
 drop(_, []) -> [];
 drop(N, [_ | Tail]) when N > 0 -> drop(N - 1, ?FORCE(Tail)).
+
+-spec zip(lazy_list(), lazy_list()) -> lazy_list({term(), term()}).
+zip(LazyList1, LazyList2) -> zipwith(fun(Elt1, Elt2) -> {Elt1, Elt2} end, LazyList1, LazyList2).
+
+-spec zipwith(fun(), lazy_list(), lazy_list()) -> lazy_list().
+zipwith(_, [], _) ->
+    [];
+zipwith(_, _, []) ->
+    [];
+zipwith(Combine, [Elt1 | Tail1], [Elt2 | Tail2]) ->
+    [Combine(Elt1, Elt2) | ?LAZY(zipwith(Combine, ?FORCE(Tail1), ?FORCE(Tail2)))].
+
+-spec enumerate(lazy_list()) -> lazy_list({pos_integer(), term()}).
+enumerate(LazyList) -> enumerate(1, LazyList).
+
+-spec enumerate(integer(), lazy_list()) -> lazy_list({integer(), term()}).
+enumerate(Index, LazyList) -> enumerate(Index, 1, LazyList).
+
+-spec enumerate(integer(), integer(), lazy_list()) -> lazy_list({integer(), term()}).
+enumerate(Index, Incr, LazyList) -> zip(seq(Index, infinity, Incr), LazyList).
 
 -ifdef(TEST).
 

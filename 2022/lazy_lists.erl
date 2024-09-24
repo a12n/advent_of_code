@@ -1,10 +1,18 @@
 -module(lazy_lists).
 
--type lazy_list(Value) :: fun(() -> {Value, _Next :: lazy_list(Value)} | undefined).
--export_type([lazy_list/1]).
+-type lazy_list(Elt) :: list(Elt) | maybe_improper_list(Elt, fun(() -> lazy_list(Elt))).
+-type lazy_list() :: lazy_list(term()).
+-export_type([lazy_list/0, lazy_list/1]).
+
+-define(LAZY(Expr), fun() -> Expr end).
+-define(FORCE(Tail),
+    if
+        is_function(Tail, 0) -> Tail();
+        is_list(Tail) -> Tail
+    end
+).
 
 -export([
-    empty/0,
     from_list/1,
     to_list/1,
     append/2,
@@ -15,120 +23,92 @@
     filtermap/2,
     fold/3,
     foreach/2,
-    range/1,
-    range/2,
-    range/3
+    seq/1, seq/2, seq/3
 ]).
 
--spec empty() -> lazy_list(term()).
-empty() -> fun() -> undefined end.
+-spec from_list(list()) -> lazy_list().
+from_list([]) -> [];
+from_list([Elt | Tail]) -> [Elt | ?LAZY(from_list(?FORCE(Tail)))].
 
--spec from_list(list()) -> lazy_list(term()).
-from_list([]) -> empty();
-from_list([Value | Tail]) -> fun() -> {Value, from_list(Tail)} end.
+-spec to_list(lazy_list()) -> list().
+to_list([]) -> [];
+to_list([Elt | Tail]) -> [Elt | to_list(?FORCE(Tail))].
 
--spec to_list(lazy_list(term())) -> list().
-to_list(Seq) ->
-    %% TODO: Tail-recursive?
-    case Seq() of
-        undefined -> [];
-        {Value, Next} -> [Value | to_list(Next)]
-    end.
+-spec append(lazy_list(), lazy_list()) -> lazy_list().
+append(LazyList1, []) -> LazyList1;
+append([], LazyList2) -> LazyList2;
+append([Elt1 | Tail1], LazyList2) -> [Elt1 | ?LAZY(append(?FORCE(Tail1), LazyList2))].
 
--spec append(lazy_list(term()), lazy_list(term())) -> lazy_list(term()).
-append(Seq1, Seq2) ->
-    case Seq1() of
-        undefined -> Seq2;
-        {Value, Next} -> fun() -> {Value, append(Next, Seq2)} end
-    end.
+-spec duplicate(non_neg_integer() | infinity, term()) -> lazy_list().
+duplicate(infinity, Elt) -> [Elt | ?LAZY(duplicate(infinity, Elt))];
+duplicate(0, _) -> [];
+duplicate(N, Elt) when N > 0 -> [Elt | ?LAZY(duplicate(N - 1, Elt))].
 
--spec duplicate(non_neg_integer() | infinity, term()) -> lazy_list(term()).
-duplicate(infinity, Value) -> fun() -> {Value, duplicate(infinity, Value)} end;
-duplicate(0, _) -> empty();
-duplicate(N, Value) when N > 0 -> fun() -> {Value, duplicate(N - 1, Value)} end.
-
--spec cycle(non_neg_integer() | infinity, lazy_list(term())) -> lazy_list(term()).
+-spec cycle(non_neg_integer() | infinity, lazy_list()) -> lazy_list().
 cycle(0, _) ->
-    empty();
-cycle(1, Seq) ->
-    Seq;
-cycle(N, InitialSeq) ->
-    case InitialSeq() of
-        undefined ->
-            empty();
-        {_, _} ->
-            (fun
-                Loop(_, I) when I >= N ->
-                    empty();
-                Loop(Seq, I) ->
-                    case Seq() of
-                        undefined -> Loop(InitialSeq, I + 1);
-                        {Value, Next} -> fun() -> {Value, Loop(Next, I)} end
-                    end
-            end)(
-                InitialSeq, 0
-            )
+    [];
+cycle(1, LazyList) ->
+    LazyList;
+cycle(_, []) ->
+    [];
+cycle(infinity, LazyList) ->
+    (fun
+        Loop([]) -> Loop(LazyList);
+        Loop([Elt | Tail]) -> [Elt | ?LAZY(Loop(?FORCE(Tail)))]
+    end)(
+        LazyList
+    );
+cycle(N, LazyList) when N > 0 ->
+    (fun
+        Loop(0, _) -> [];
+        Loop(M, []) -> Loop(M - 1, LazyList);
+        Loop(M, [Elt | Tail]) -> [Elt | ?LAZY(Loop(M, ?FORCE(Tail)))]
+    end)(
+        N, LazyList
+    ).
+
+-spec filter(fun((term()) -> boolean()), lazy_list()) -> lazy_list().
+filter(Pred, LazyList) -> filtermap(fun(Elt) -> {Pred(Elt), Elt} end, LazyList).
+
+-spec map(fun((term()) -> term()), lazy_list()) -> lazy_list().
+map(Fun, LazyList) -> filtermap(fun(Elt) -> {true, Fun(Elt)} end, LazyList).
+
+-spec filtermap(fun((term()) -> {true | false, term()} | boolean()), lazy_list()) -> lazy_list().
+filtermap(_, []) ->
+    [];
+filtermap(Fun, [Elt | Tail]) ->
+    case Fun(Elt) of
+        true -> [Elt | ?LAZY(filtermap(Fun, ?FORCE(Tail)))];
+        {true, Elt2} -> [Elt2 | ?LAZY(filtermap(Fun, ?FORCE(Tail)))];
+        false -> filtermap(Fun, ?FORCE(Tail));
+        {false, _} -> filtermap(Fun, ?FORCE(Tail))
     end.
 
--spec filter(fun((term()) -> boolean()), lazy_list(term())) -> lazy_list(term()).
-filter(Pred, Seq) -> filtermap(fun(Value) -> {Pred(Value), Value} end, Seq).
+-spec fold(fun(), term(), lazy_list()) -> term().
+fold(_, Acc, []) -> Acc;
+fold(Fun, Acc, [Elt | Tail]) -> fold(Fun, Fun(Elt, Acc), ?FORCE(Tail)).
 
--spec map(fun((term()) -> term()), lazy_list(term())) -> lazy_list(term()).
-map(Fun, Seq) -> filtermap(fun(Value) -> {true, Fun(Value)} end, Seq).
+-spec foreach(fun((term()) -> term()), lazy_list()) -> ok.
+foreach(_, []) ->
+    ok;
+foreach(Fun, [Elt | Tail]) ->
+    Fun(Elt),
+    foreach(Fun, ?FORCE(Tail)).
 
--spec filtermap(fun((term()) -> {true | false, term()} | boolean()), lazy_list(term())) -> lazy_list(term()).
-filtermap(Fun, Seq) ->
-    fun() ->
-        case Seq() of
-            undefined ->
-                undefined;
-            {Value, Next} ->
-                case Fun(Value) of
-                    false -> (filtermap(Fun, Next))();
-                    {false, _} -> (filtermap(Fun, Next))();
-                    true -> {Value, filtermap(Fun, Next)};
-                    {true, Value2} -> {Value2, filtermap(Fun, Next)}
-                end
-        end
-    end.
+-spec seq(integer()) -> lazy_list(integer()).
+seq(From) -> seq(From, infinity).
 
--spec fold(fun((term(), term()) -> term()), term(), lazy_list(term())) -> term().
-fold(Fun, Acc, Seq) ->
-    case Seq() of
-        undefined -> Acc;
-        {Value, Next} -> fold(Fun, Fun(Value, Acc), Next)
-    end.
+-spec seq(integer(), integer() | infinity) -> lazy_list(integer()).
+seq(From, To) when From =< To -> seq(From, To, 1).
 
--spec foreach(fun(), lazy_list(term())) -> ok.
-foreach(Fun, Seq) ->
-    case Seq() of
-        undefined ->
-            ok;
-        {Value, Next} ->
-            Fun(Value),
-            foreach(Fun, Next)
-    end.
-
--spec range(integer()) -> lazy_list(integer()).
-range(From) -> range(From, infinity).
-
--spec range(integer(), integer() | infinity) -> lazy_list(integer()).
-range(From, To) when From =< To -> range(From, To, 1).
-
--spec range(integer(), integer() | infinity, neg_integer() | pos_integer()) -> lazy_list(integer()).
-range(From, infinity, Incr) -> fun() -> {From, range(From + Incr, infinity, Incr)} end;
-range(From, To, Incr) when Incr > 0, From > To -> empty();
-range(From, To, Incr) when Incr < 0, From < To -> empty();
-range(From, To, Incr) -> fun() -> {From, range(From + Incr, To, Incr)} end.
+-spec seq(integer(), integer() | infinity, neg_integer() | pos_integer()) -> lazy_list(integer()).
+seq(From, To, Incr) when is_integer(To), From > To, Incr > 0 -> [];
+seq(From, To, Incr) when is_integer(To), From < To, Incr < 0 -> [];
+seq(From, To, Incr) -> [From | ?LAZY(seq(From + Incr, To, Incr))].
 
 -ifdef(TEST).
 
 -include_lib("eunit/include/eunit.hrl").
-
-empty_test() ->
-    Seq = empty(),
-    ?assertEqual(undefined, Seq()),
-    ?assertEqual(undefined, Seq()).
 
 from_list_test() ->
     Seq1 = from_list([]),

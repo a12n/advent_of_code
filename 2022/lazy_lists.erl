@@ -23,7 +23,9 @@
     filtermap/2,
     fold/3,
     foreach/2,
-    seq/1, seq/2, seq/3
+    seq/1, seq/2, seq/3,
+    take/2,
+    drop/2
 ]).
 
 -spec from_list(list()) -> lazy_list().
@@ -105,6 +107,16 @@ seq(From, To) when From =< To -> seq(From, To, 1).
 seq(From, To, Incr) when is_integer(To), From > To, Incr > 0 -> [];
 seq(From, To, Incr) when is_integer(To), From < To, Incr < 0 -> [];
 seq(From, To, Incr) -> [From | ?LAZY(seq(From + Incr, To, Incr))].
+
+-spec take(non_neg_integer(), lazy_list()) -> lazy_list().
+take(0, _) -> [];
+take(_, []) -> [];
+take(N, [Elt | Tail]) when N > 0 -> [Elt | ?LAZY(take(N - 1, ?FORCE(Tail)))].
+
+-spec drop(non_neg_integer(), lazy_list()) -> lazy_list().
+drop(0, LazyList) -> LazyList;
+drop(_, []) -> [];
+drop(N, [_ | Tail]) when N > 0 -> drop(N - 1, ?FORCE(Tail)).
 
 -ifdef(TEST).
 

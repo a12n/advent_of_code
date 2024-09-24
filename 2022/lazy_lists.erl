@@ -1,7 +1,7 @@
--module(seqs).
+-module(lazy_lists).
 
--type seq(Value) :: fun(() -> {Value, _Next :: seq(Value)} | undefined).
--export_type([seq/1]).
+-type lazy_list(Value) :: fun(() -> {Value, _Next :: lazy_list(Value)} | undefined).
+-export_type([lazy_list/1]).
 
 -export([
     empty/0,
@@ -20,14 +20,14 @@
     range/3
 ]).
 
--spec empty() -> seq(term()).
+-spec empty() -> lazy_list(term()).
 empty() -> fun() -> undefined end.
 
--spec from_list(list()) -> seq(term()).
+-spec from_list(list()) -> lazy_list(term()).
 from_list([]) -> empty();
 from_list([Value | Tail]) -> fun() -> {Value, from_list(Tail)} end.
 
--spec to_list(seq(term())) -> list().
+-spec to_list(lazy_list(term())) -> list().
 to_list(Seq) ->
     %% TODO: Tail-recursive?
     case Seq() of
@@ -35,19 +35,19 @@ to_list(Seq) ->
         {Value, Next} -> [Value | to_list(Next)]
     end.
 
--spec append(seq(term()), seq(term())) -> seq(term()).
+-spec append(lazy_list(term()), lazy_list(term())) -> lazy_list(term()).
 append(Seq1, Seq2) ->
     case Seq1() of
         undefined -> Seq2;
         {Value, Next} -> fun() -> {Value, append(Next, Seq2)} end
     end.
 
--spec duplicate(non_neg_integer() | infinity, term()) -> seq(term()).
+-spec duplicate(non_neg_integer() | infinity, term()) -> lazy_list(term()).
 duplicate(infinity, Value) -> fun() -> {Value, duplicate(infinity, Value)} end;
 duplicate(0, _) -> empty();
 duplicate(N, Value) when N > 0 -> fun() -> {Value, duplicate(N - 1, Value)} end.
 
--spec cycle(non_neg_integer() | infinity, seq(term())) -> seq(term()).
+-spec cycle(non_neg_integer() | infinity, lazy_list(term())) -> lazy_list(term()).
 cycle(0, _) ->
     empty();
 cycle(1, Seq) ->
@@ -70,13 +70,13 @@ cycle(N, InitialSeq) ->
             )
     end.
 
--spec filter(fun((term()) -> boolean()), seq(term())) -> seq(term()).
+-spec filter(fun((term()) -> boolean()), lazy_list(term())) -> lazy_list(term()).
 filter(Pred, Seq) -> filtermap(fun(Value) -> {Pred(Value), Value} end, Seq).
 
--spec map(fun((term()) -> term()), seq(term())) -> seq(term()).
+-spec map(fun((term()) -> term()), lazy_list(term())) -> lazy_list(term()).
 map(Fun, Seq) -> filtermap(fun(Value) -> {true, Fun(Value)} end, Seq).
 
--spec filtermap(fun((term()) -> {true | false, term()} | boolean()), seq(term())) -> seq(term()).
+-spec filtermap(fun((term()) -> {true | false, term()} | boolean()), lazy_list(term())) -> lazy_list(term()).
 filtermap(Fun, Seq) ->
     fun() ->
         case Seq() of
@@ -92,14 +92,14 @@ filtermap(Fun, Seq) ->
         end
     end.
 
--spec fold(fun((term(), term()) -> term()), term(), seq(term())) -> term().
+-spec fold(fun((term(), term()) -> term()), term(), lazy_list(term())) -> term().
 fold(Fun, Acc, Seq) ->
     case Seq() of
         undefined -> Acc;
         {Value, Next} -> fold(Fun, Fun(Value, Acc), Next)
     end.
 
--spec foreach(fun(), seq(term())) -> ok.
+-spec foreach(fun(), lazy_list(term())) -> ok.
 foreach(Fun, Seq) ->
     case Seq() of
         undefined ->
@@ -109,13 +109,13 @@ foreach(Fun, Seq) ->
             foreach(Fun, Next)
     end.
 
--spec range(integer()) -> seq(integer()).
+-spec range(integer()) -> lazy_list(integer()).
 range(From) -> range(From, infinity).
 
--spec range(integer(), integer() | infinity) -> seq(integer()).
+-spec range(integer(), integer() | infinity) -> lazy_list(integer()).
 range(From, To) when From =< To -> range(From, To, 1).
 
--spec range(integer(), integer() | infinity, neg_integer() | pos_integer()) -> seq(integer()).
+-spec range(integer(), integer() | infinity, neg_integer() | pos_integer()) -> lazy_list(integer()).
 range(From, infinity, Incr) -> fun() -> {From, range(From + Incr, infinity, Incr)} end;
 range(From, To, Incr) when Incr > 0, From > To -> empty();
 range(From, To, Incr) when Incr < 0, From < To -> empty();

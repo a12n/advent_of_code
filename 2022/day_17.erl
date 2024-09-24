@@ -9,17 +9,17 @@
 
 -spec main(1..2) -> ok.
 main(1) ->
-    MovesSeq = seqs:cycle(
+    MovesSeq = lazy_lists:cycle(
         infinity,
-        seqs:from_list([
+        lazy_lists:from_list([
             grids:char_to_dir(Char)
          || Line <- io_ext:read_lines(standard_io, 1), Char <- binary_to_list(Line)
         ])
     ),
-    ShapesSeq = seqs:cycle(infinity, seqs:from_list(shapes())),
+    ShapesSeq = lazy_lists:cycle(infinity, lazy_lists:from_list(shapes())),
     LeftWall = 0 - (2 + 1),
     RightWall = LeftWall + (7 + 1),
-    Ground = maps:from_list([{{0, Col}, $-} || Col <- lists:seq(LeftWall + 1, RightWall - 1)]),
+    Ground = maps:from_list([{{0, Col}, $-} || Col <- lists:lazy_list(LeftWall + 1, RightWall - 1)]),
     %% ?debugFmt("LeftWall ~p, RightWall ~p", [LeftWall, RightWall]),
     %% ?debugFmt("Ground ~p", [Ground]),
     Ground2 = simulate(ShapesSeq, MovesSeq, LeftWall, RightWall, Ground, _NumShapes = 2022),
@@ -86,8 +86,8 @@ fall_down(Shape, Ground) ->
         true -> false
     end.
 
--spec simulate_one(shape(), seqs:seq(grids:dir()), integer(), integer(), shape()) ->
-    {shape(), seqs:seq(grids:dir())}.
+-spec simulate_one(shape(), lazy_lists:lazy_list(grids:dir()), integer(), integer(), shape()) ->
+    {shape(), lazy_lists:lazy_list(grids:dir())}.
 simulate_one(Shape0, Moves0, LeftWall, RightWall, Ground) ->
     (fun Loop(Shape, Moves) ->
         {Move, NextMoves} = Moves(),
@@ -131,7 +131,12 @@ simulate_one(Shape0, Moves0, LeftWall, RightWall, Ground) ->
     ).
 
 -spec simulate(
-    seqs:seq(shape()), seqs:seq(grids:dir()), integer(), integer(), shape(), non_neg_integer()
+    lazy_lists:lazy_list(shape()),
+    lazy_lists:lazy_list(grids:dir()),
+    integer(),
+    integer(),
+    shape(),
+    non_neg_integer()
 ) -> shape().
 simulate(Shapes0, Moves0, LeftWall, RightWall, Ground0, NumShapes0) ->
     (fun

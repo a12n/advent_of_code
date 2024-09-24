@@ -123,21 +123,18 @@ drop(N, [_ | Tail]) when N > 0 -> drop(N - 1, ?FORCE(Tail)).
 -include_lib("eunit/include/eunit.hrl").
 
 from_list_test() ->
-    Seq1 = from_list([]),
-    ?assertEqual(undefined, Seq1()),
-    Seq2 = from_list([1, 2, 3]),
-    {1, Seq3} = Seq2(),
-    {2, Seq4} = Seq3(),
-    {3, Seq5} = Seq4(),
-    undefined = Seq5().
+    [1 | F1] = from_list([1, 2, 3]),
+    [2 | F2] = F1(),
+    [3 | F3] = F2(),
+    [] = F3().
 
 to_list_test() ->
-    ?assertEqual([], to_list(empty())),
+    ?assertEqual([], to_list([])),
     ?assertEqual([1, 2, 3], to_list(from_list([1, 2, 3]))).
 
 append_test() ->
-    ?assertEqual([1, 2, 3], to_list(append(from_list([1, 2, 3]), empty()))),
-    ?assertEqual([4, 5, 6], to_list(append(empty(), from_list([4, 5, 6])))),
+    ?assertEqual([1, 2, 3], to_list(append(from_list([1, 2, 3]), []))),
+    ?assertEqual([4, 5, 6], to_list(append([], from_list([4, 5, 6])))),
     ?assertEqual([1, 2, 3, 4, 5, 6], to_list(append(from_list([1, 2, 3]), from_list([4, 5, 6])))).
 
 duplicate_test() ->
@@ -146,18 +143,18 @@ duplicate_test() ->
 
 cycle_test() ->
     ?assertEqual([], to_list(cycle(0, from_list([1, 2, 3])))),
-    ?assertEqual([], to_list(cycle(3, empty()))),
+    ?assertEqual([], to_list(cycle(3, []))),
     ?assertEqual([1, 2, 3, 1, 2, 3, 1, 2, 3], to_list(cycle(3, from_list([1, 2, 3])))).
 
 filter_test() ->
     IsEven = fun(N) -> N rem 2 == 0 end,
-    ?assertEqual([], to_list(filter(IsEven, empty()))),
+    ?assertEqual([], to_list(filter(IsEven, []))),
     ?assertEqual([], to_list(filter(IsEven, from_list([1, 3, 5])))),
     ?assertEqual([2, 4, 6], to_list(filter(IsEven, from_list([1, 2, 3, 4, 5, 6])))).
 
 map_test() ->
     Sqr = fun(N) -> N * N end,
-    ?assertEqual([], to_list(map(Sqr, empty()))),
+    ?assertEqual([], to_list(map(Sqr, []))),
     ?assertEqual([1, 4, 9, 16], to_list(map(Sqr, from_list([1, 2, 3, 4])))).
 
 filtermap_test() ->
@@ -176,7 +173,7 @@ filtermap_test() ->
 
 fold_test() ->
     AddToMap = fun(N, Ans) -> Ans#{N => []} end,
-    ?assertEqual(#{}, fold(AddToMap, #{}, empty())),
+    ?assertEqual(#{}, fold(AddToMap, #{}, [])),
     ?assertEqual(#{1 => [], 2 => [], 3 => []}, fold(AddToMap, #{}, from_list([1, 2, 3]))).
 
 foreach_test() ->

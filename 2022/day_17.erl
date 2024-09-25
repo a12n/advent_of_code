@@ -7,6 +7,9 @@
 
 -type shape() :: grids:grid(integer(), char()).
 
+-type shape_bits() :: 2#0000000..2#1111111.
+-type shape2() :: nonempty_list(shape_bits()).
+
 -spec main(1..2) -> ok.
 main(1) ->
     MovesSeq = lazy_lists:cycle(
@@ -39,6 +42,47 @@ shape(Definition) ->
         ]
     ).
 
+-spec shapes2() -> [shape2()].
+shapes2() ->
+    [
+        %% ####
+        [
+            2#0011110
+        ],
+        %% .#.
+        %% ###
+        %% .#.
+        [
+            2#0001000,
+            2#0011100,
+            2#0001000
+        ],
+        %% ..#
+        %% ..#
+        %% ###
+        [
+            2#0000100,
+            2#0000100,
+            2#0011100
+        ],
+        %% #
+        %% #
+        %% #
+        %% #
+        [
+            2#0010000,
+            2#0010000,
+            2#0010000,
+            2#0010000
+        ],
+        %% ##
+        %% ##
+        [
+            2#0011000,
+            2#0011000
+        ]
+    ].
+
 -spec shapes() -> [shape()].
 shapes() ->
     [
@@ -66,6 +110,27 @@ shapes() ->
             "##"
         ])
     ].
+
+-spec shift_bits(shape_bits(), left | right) -> shape_bits().
+shift_bits(Bits, left) when (Bits band 2#1000000) == 0 -> Bits bsl 1;
+shift_bits(Bits, right) when (Bits band 2#0000001) == 0 -> Bits bsr 1.
+
+-spec shift(shape2(), left | right) -> shape2().
+shift(Shape, Dir) ->
+    try
+        [shift_bits(Bits, Dir) || Bits <- Shape]
+    catch
+        error:function_clause -> Shape
+    end.
+
+-spec intersects(shape2(), shape2()) -> boolean().
+intersects([], _) ->
+    false;
+intersects([ShapeHead | ShapeTail], [GroundHead | GroundTail]) ->
+    case ShapeHead band GroundHead of
+        0 -> intersects(ShapeTail, GroundTail);
+        _ -> true
+    end.
 
 -spec push_side(shape(), left | right, integer(), integer()) -> shape().
 push_side(Shape, Move, LeftWall, RightWall) ->

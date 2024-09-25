@@ -12,21 +12,16 @@
 
 -spec main(1..2) -> ok.
 main(1) ->
-    MovesSeq = lazy_lists:cycle(
+    Shifts = lazy_lists:cycle(
         infinity,
         lazy_lists:from_list([
             grids:char_to_dir(Char)
          || Line <- io_ext:read_lines(standard_io, 1), Char <- binary_to_list(Line)
         ])
     ),
-    ShapesSeq = lazy_lists:cycle(infinity, lazy_lists:from_list(shapes())),
-    LeftWall = 0 - (2 + 1),
-    RightWall = LeftWall + (7 + 1),
-    Ground = maps:from_list([{{0, Col}, $-} || Col <- lists:lazy_list(LeftWall + 1, RightWall - 1)]),
-    %% ?debugFmt("LeftWall ~p, RightWall ~p", [LeftWall, RightWall]),
-    %% ?debugFmt("Ground ~p", [Ground]),
-    Ground2 = simulate(ShapesSeq, MovesSeq, LeftWall, RightWall, Ground, _NumShapes = 2022),
-    io:format(<<"~b~n">>, [-top(Ground2)]).
+    Shapes = lazy_lists:cycle(infinity, lazy_lists:from_list(shapes2())),
+    Ground2 = simulate2(Shapes, Shifts, _Ground = [], _N = 2022),
+    io:format(<<"~b~n">>, [length(Ground2)]).
 
 -spec shape([string()]) -> shape().
 shape(Definition) ->

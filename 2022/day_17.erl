@@ -152,7 +152,7 @@ merge_shapes(Shape1, []) ->
     Shape1;
 merge_shapes([], Shape2) ->
     Shape2;
-merge_shapes([Bits1 | Shape1], [Bits2, Shape2]) ->
+merge_shapes([Bits1 | Shape1], [Bits2 | Shape2]) ->
     [(Bits1 bor Bits2) | merge_shapes(Shape1, Shape2)].
 
 -spec simulate_one2(shape2(), shape2(), lazy_lists:lazy_list(left | right)) ->

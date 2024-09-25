@@ -126,9 +126,11 @@ shift(Shape, Dir) ->
 -spec intersects(shape2(), shape2()) -> boolean().
 intersects([], _) ->
     false;
-intersects([ShapeHead | ShapeTail], [GroundHead | GroundTail]) ->
-    case ShapeHead band GroundHead of
-        0 -> intersects(ShapeTail, GroundTail);
+intersects(_, []) ->
+    false;
+intersects([Bits1 | Shape1], [Bits2 | Shape2]) ->
+    case Bits1 band Bits2 of
+        0 -> intersects(Shape1, Shape2);
         _ -> true
     end.
 

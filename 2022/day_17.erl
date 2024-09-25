@@ -83,6 +83,19 @@ shapes2() ->
         ]
     ].
 
+-spec shape_bits_to_iodata(shape_bits()) -> iodata().
+shape_bits_to_iodata(Bits) ->
+    [
+        case (Bits bsr K) band 1 of
+            0 -> $.;
+            1 -> $#
+        end
+     || K <- lists:seq(6, 0, -1)
+    ].
+
+-spec shape_to_iodata(shape2()) -> iodata().
+shape_to_iodata(Shape) -> [[shape_bits_to_iodata(Bits), $\n] || Bits <- Shape].
+
 -spec shapes() -> [shape()].
 shapes() ->
     [

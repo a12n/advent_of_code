@@ -134,6 +134,45 @@ intersects([Bits1 | Shape1], [Bits2 | Shape2]) ->
         _ -> true
     end.
 
+-spec merge_shapes(shape2(), shape2()) -> shape2().
+merge_shapes(Shape1, []) ->
+    Shape1;
+merge_shapes([], Shape2) ->
+    Shape2;
+merge_shapes([Bits1 | Shape1], [Bits2, Shape2]) ->
+    [(Bits1 bor Bits2) | merge_shapes(Shape1, Shape2)].
+
+-spec simulate_one2(shape2(), shape2(), lazy_lists:lazy_list(left | right)) ->
+    {shape2(), lazy_list:lazy_list(left | right)}.
+simulate_one2(Shape, Ground, [Dir | Shifts]) ->
+    %% Push to the side.
+    Shape2 = shift(Shape, Dir),
+    %% If push makes it intersect with the ground, undo the push.
+    Shape3 =
+        case intersects(Shape2, Ground) of
+            false -> Shape2;
+            true -> Shape
+        end,
+    %% Move down, intersect with the next ground level.
+    case Ground of
+        [] ->
+            %% Reached bottom, the shape is the new ground now.
+            {Shape3, lazy_lists:force_tail(Shifts)};
+        [FirstGroundBits | NextGround] ->
+            %% Check intersection with the next ground level.
+            case intersects(Shape3, NextGround) of
+                false ->
+                    %% Doesn't intersect, fall further.
+                    {Ground2, Shifts2} = simulate_one2(
+                                           Shape3, NextGround, lazy_lists:force_tail(Shifts)
+                    ),
+                    {[FirstGroundBits | Ground2], Shifts2};
+                true ->
+                    Ground2 = merge_shapes(Shape3, Ground),
+                    {Ground2, lazy_lists:force_tail(Shifts)}
+            end
+    end.
+
 -spec push_side(shape(), left | right, integer(), integer()) -> shape().
 push_side(Shape, Move, LeftWall, RightWall) ->
     Shape2 = grids:move(Move, Shape),

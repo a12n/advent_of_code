@@ -158,6 +158,8 @@ merge_shapes([Bits1 | Shape1], [Bits2 | Shape2]) ->
 -spec simulate_one2(shape2(), shape2(), lazy_lists:lazy_list(left | right)) ->
     {shape2(), lazy_list:lazy_list(left | right)}.
 simulate_one2(Shape, Ground, [Dir | Shifts]) ->
+    io:format(standard_error, <<"Dir ~p~n">>, [Dir]),
+    io:format(standard_error, <<"~s~n">>, [shape_to_iodata(merge_shapes(Shape, Ground))]),
     %% Push to the side.
     Shape2 = shift(Shape, Dir),
     %% If push makes it intersect with the ground, undo the push.

@@ -18,6 +18,12 @@ main(1) ->
          || Line <- io_ext:read_lines(standard_io, 1), Char <- binary_to_list(Line)
         ])
     ),
+    lists:foreach(
+        fun({I, Shape}) ->
+            io:format(standard_error, <<"Shape ~b =~n~s~n">>, [I, shape_to_iodata(Shape)])
+        end,
+        lists:enumerate(shapes2())
+    ),
     Shapes = lazy_lists:cycle(infinity, lazy_lists:from_list(shapes2())),
     Ground2 = simulate2(Shapes, Shifts, _Ground = [], _N = 2022),
     io:format(<<"~b~n">>, [length(Ground2)]).

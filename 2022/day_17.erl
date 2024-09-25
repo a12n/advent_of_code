@@ -2,8 +2,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-%% -export([main/1]).
--compile(export_all).
+-export([main/1]).
 
 -type shape() :: grids:grid(integer(), char()).
 

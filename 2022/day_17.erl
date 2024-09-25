@@ -169,6 +169,7 @@ simulate_one2(Shape, Ground, [Dir | Shifts]) ->
             true -> Shape
         end,
     %% Move down, intersect with the next ground level.
+    %% FIXME: One extra shift before coming to rest.
     case Ground of
         [] ->
             %% Reached bottom, the shape is the new ground now.

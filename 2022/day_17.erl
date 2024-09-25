@@ -164,7 +164,7 @@ simulate_one2(Shape, Ground, [Dir | Shifts]) ->
                 false ->
                     %% Doesn't intersect, fall further.
                     {Ground2, Shifts2} = simulate_one2(
-                                           Shape3, NextGround, lazy_lists:force_tail(Shifts)
+                        Shape3, NextGround, lazy_lists:force_tail(Shifts)
                     ),
                     {[FirstGroundBits | Ground2], Shifts2};
                 true ->
@@ -172,6 +172,24 @@ simulate_one2(Shape, Ground, [Dir | Shifts]) ->
                     {Ground2, lazy_lists:force_tail(Shifts)}
             end
     end.
+
+-spec simulate2(
+    lazy_lists:lazy_list(shape2()),
+    lazy_lists:lazy_list(left | right),
+    shape2(),
+    non_neg_integer()
+) -> shape2().
+simulate2(_, _, Ground, 0) ->
+    Ground;
+simulate2([Shape | Shapes], Shifts, Ground, N) ->
+    %% Extend ground up with empty bits, to align with the falling shape.
+    Ground2 = lists:duplicate(length(Shape) + 3, 2#0000000) ++ Ground,
+    %% Fall shape.
+    {Ground3, Shifts2} = simulate_one2(Shape, Ground2, Shifts),
+    %% Remove empty bits from the top of the ground.
+    Ground4 = lists:dropwhile(fun(Bits) -> Bits == 2#0000000 end, Ground3),
+    %% Simulate next shape.
+    simulate2(lazy_lists:force_tail(Shapes), Shifts2, Ground4, N - 1).
 
 -spec push_side(shape(), left | right, integer(), integer()) -> shape().
 push_side(Shape, Move, LeftWall, RightWall) ->

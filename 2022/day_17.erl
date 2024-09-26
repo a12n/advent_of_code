@@ -18,7 +18,7 @@ main(1) ->
          || Line <- io_ext:read_lines(standard_io, 1), Char <- binary_to_list(Line)
         ])
     ),
-    N = 9,
+    N = 2022,
     %% Vsn 1
     %% Shapes = lazy_lists:cycle(infinity, lazy_lists:from_list(shapes())),
     %% LeftWall = 0 - (2 + 1),
@@ -162,13 +162,7 @@ merge_shapes([Bits1 | Shape1], [Bits2 | Shape2]) ->
 
 -spec simulate_one2(shape2(), shape2(), lazy_lists:lazy_list(left | right)) ->
     {shape2(), lazy_lists:lazy_list(left | right)}.
-simulate_one2(Shape, [], Shifts) ->
-    %% Reached bottom, the shape is the new ground now.
-    %% FIXME: Must merge with the existing ground to the left/right.
-    {Shape, Shifts};
-simulate_one2(Shape, Ground = [GroundBits1 | NextGround], [Dir | Shifts]) ->
-    io:format(standard_error, <<"Dir ~p~n">>, [Dir]),
-    io:format(standard_error, <<"~s~n">>, [shape_to_iodata(merge_shapes(Shape, Ground))]),
+simulate_one2(Shape, Ground, [Dir | Shifts]) ->
     %% Push to the side.
     Shape2 = shift(Shape, Dir),
     %% If push makes it intersect with the ground, undo the push.
@@ -179,16 +173,27 @@ simulate_one2(Shape, Ground = [GroundBits1 | NextGround], [Dir | Shifts]) ->
         end,
     %% Move down, intersect with the next ground level.
     %% Check intersection with the next ground level.
-    case intersects(Shape3, NextGround) of
-        false ->
-            %% Doesn't intersect, fall further.
-            {Ground2, Shifts2} = simulate_one2(
-                Shape3, NextGround, lazy_lists:force_tail(Shifts)
-            ),
-            {[GroundBits1 | Ground2], Shifts2};
-        true ->
-            Ground2 = merge_shapes(Shape3, Ground),
-            {Ground2, lazy_lists:force_tail(Shifts)}
+    case {Shape3, Ground} of
+        {[_], [_]} ->
+            {merge_shapes(Shape3, Ground), lazy_lists:force_tail(Shifts)};
+        {[_, _], [_, _]} ->
+            {merge_shapes(Shape3, Ground), lazy_lists:force_tail(Shifts)};
+        {[_, _, _], [_, _, _]} ->
+            {merge_shapes(Shape3, Ground), lazy_lists:force_tail(Shifts)};
+        {[_, _, _, _], [_, _, _, _]} ->
+            {merge_shapes(Shape3, Ground), lazy_lists:force_tail(Shifts)};
+        {_, [GroundBits1 | NextGround]} ->
+            case intersects(Shape3, NextGround) of
+                false ->
+                    %% Doesn't intersect, fall further.
+                    {Ground2, Shifts2} = simulate_one2(
+                        Shape3, NextGround, lazy_lists:force_tail(Shifts)
+                    ),
+                    {[GroundBits1 | Ground2], Shifts2};
+                true ->
+                    Ground2 = merge_shapes(Shape3, Ground),
+                    {Ground2, lazy_lists:force_tail(Shifts)}
+            end
     end.
 
 -spec simulate2(

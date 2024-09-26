@@ -200,6 +200,10 @@ simulate2([Shape | Shapes], Shifts, Ground, N) ->
     {Ground3, Shifts2} = simulate_one2(Shape, Ground2, Shifts),
     %% Remove empty bits from the top of the ground.
     Ground4 = lists:dropwhile(fun(Bits) -> Bits == 2#0000000 end, Ground3),
+    %% TODO: Detect cycle: compare lower and upper halves of the
+    %% ground. Are the same? Also take into account the corresponding
+    %% shifts and shapes. E.g., maintain list of {ShapeNumber, Shift,
+    %% ShapeBits} for ground.
     %% Simulate next shape.
     simulate2(lazy_lists:force_tail(Shapes), Shifts2, Ground4, N - 1).
 

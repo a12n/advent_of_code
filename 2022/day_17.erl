@@ -161,11 +161,11 @@ merge_shapes([Bits1 | Shape1], [Bits2 | Shape2]) ->
     [(Bits1 bor Bits2) | merge_shapes(Shape1, Shape2)].
 
 -spec simulate_one2(shape2(), shape2(), lazy_lists:lazy_list(left | right)) ->
-    {shape2(), lazy_list:lazy_list(left | right)}.
+    {shape2(), lazy_lists:lazy_list(left | right)}.
 simulate_one2(Shape, [], Shifts) ->
     %% Reached bottom, the shape is the new ground now.
     {Shape, Shifts};
-simulate_one2(Shape, Ground=[GroundBits1 | NextGround], [Dir | Shifts]) ->
+simulate_one2(Shape, Ground = [GroundBits1 | NextGround], [Dir | Shifts]) ->
     io:format(standard_error, <<"Dir ~p~n">>, [Dir]),
     io:format(standard_error, <<"~s~n">>, [shape_to_iodata(merge_shapes(Shape, Ground))]),
     %% Push to the side.
@@ -182,8 +182,8 @@ simulate_one2(Shape, Ground=[GroundBits1 | NextGround], [Dir | Shifts]) ->
         false ->
             %% Doesn't intersect, fall further.
             {Ground2, Shifts2} = simulate_one2(
-                                   Shape3, NextGround, lazy_lists:force_tail(Shifts)
-                                  ),
+                Shape3, NextGround, lazy_lists:force_tail(Shifts)
+            ),
             {[GroundBits1 | Ground2], Shifts2};
         true ->
             Ground2 = merge_shapes(Shape3, Ground),
@@ -234,8 +234,7 @@ fall_down(Shape, Ground) ->
 -spec simulate_one(shape(), lazy_lists:lazy_list(grids:dir()), integer(), integer(), shape()) ->
     {shape(), lazy_lists:lazy_list(grids:dir())}.
 simulate_one(Shape0, Moves0, LeftWall, RightWall, Ground) ->
-    (fun Loop(Shape, Moves) ->
-        {Move, NextMoves} = Moves(),
+    (fun Loop(Shape, [Move | NextMoves]) ->
         %% ?debugFmt("Move ~p, Shape~n~s", [Move, grids:to_iodata(maps:merge(Shape, Ground))]),
         Shape2 = grids:move(Move, Shape),
         %% ?debugFmt("Shape2 ~p", [Shape2]),
@@ -264,12 +263,12 @@ simulate_one(Shape0, Moves0, LeftWall, RightWall, Ground) ->
                 %% the move. Shape is on the ground, it's a part
                 %% of ground now. Return the updated ground.
                 %% ?debugFmt("Can't move down, merge ~p with the ground", [Shape3]),
-                {maps:merge(Ground, Shape3), NextMoves};
+                {maps:merge(Ground, Shape3), lazy_lists:force_tail(NextMoves)};
             false ->
                 %% Shape is still falling, next step of the
                 %% simulation.
                 %% ?debugFmt("Moved down, the shape now ~p", [Shape4]),
-                Loop(Shape4, NextMoves)
+                Loop(Shape4, lazy_lists:force_tail(NextMoves))
         end
     end)(
         Shape0, Moves0
@@ -288,15 +287,14 @@ simulate(Shapes0, Moves0, LeftWall, RightWall, Ground0, NumShapes0) ->
         Loop(_, _, Ground, 0) ->
             %% ?debugFmt("NumShapes ~p, return ground ~p", [0, Ground]),
             Ground;
-        Loop(Shapes, Moves, Ground, NumShapes) ->
-            {Shape0, NextShapes} = Shapes(),
+        Loop([Shape0 | NextShapes], Moves, Ground, NumShapes) ->
             Shape = grids:move({top(Ground) - (3 + 1), 0}, Shape0),
             %% TODO: Move shape to the row.
             %% ?debugFmt("Shape ~p, NumShapes ~p", [Shape, NumShapes]),
             %% ?debugFmt("Ground ~p", [Ground]),
             {Ground2, NextMoves} = simulate_one(Shape, Moves, LeftWall, RightWall, Ground),
             %% ?debugFmt("Ground2~n~s", [grids:to_iodata(Ground2)]),
-            Loop(NextShapes, NextMoves, Ground2, NumShapes - 1)
+            Loop(lazy_lists:force_tail(NextShapes), NextMoves, Ground2, NumShapes - 1)
     end)(
         Shapes0, Moves0, Ground0, NumShapes0
     ).

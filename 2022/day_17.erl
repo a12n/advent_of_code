@@ -18,14 +18,19 @@ main(1) ->
          || Line <- io_ext:read_lines(standard_io, 1), Char <- binary_to_list(Line)
         ])
     ),
-    lists:foreach(
-        fun({I, Shape}) ->
-            io:format(standard_error, <<"Shape ~b =~n~s~n">>, [I, shape_to_iodata(Shape)])
-        end,
-        lists:enumerate(shapes2())
-    ),
+    N = 9,
+    %% Vsn 1
+    %% Shapes = lazy_lists:cycle(infinity, lazy_lists:from_list(shapes())),
+    %% LeftWall = 0 - (2 + 1),
+    %% RightWall = LeftWall + (7 + 1),
+    %% Ground = maps:from_list([{{0, Col}, $-} || Col <- lists:seq(LeftWall + 1, RightWall - 1)]),
+    %% Ground2 = simulate(Shapes, Shifts, LeftWall, RightWall, Ground, N),
+    %% io:format(standard_error, <<"~s">>, [grids:to_iodata(Ground2)]),
+    %% io:format(<<"~b~n">>, [-top(Ground2)]).
+    %% Vsn 2
     Shapes = lazy_lists:cycle(infinity, lazy_lists:from_list(shapes2())),
-    Ground2 = simulate2(Shapes, Shifts, _Ground = [], _N = 2022),
+    Ground2 = simulate2(Shapes, Shifts, _Ground = [], N),
+    io:format(standard_error, <<"~s">>, [shape_to_iodata(Ground2)]),
     io:format(<<"~b~n">>, [length(Ground2)]).
 
 -spec shape([string()]) -> shape().

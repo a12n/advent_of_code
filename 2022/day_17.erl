@@ -164,6 +164,7 @@ merge_shapes([Bits1 | Shape1], [Bits2 | Shape2]) ->
     {shape2(), lazy_lists:lazy_list(left | right)}.
 simulate_one2(Shape, [], Shifts) ->
     %% Reached bottom, the shape is the new ground now.
+    %% FIXME: Must merge with the existing ground to the left/right.
     {Shape, Shifts};
 simulate_one2(Shape, Ground = [GroundBits1 | NextGround], [Dir | Shifts]) ->
     io:format(standard_error, <<"Dir ~p~n">>, [Dir]),

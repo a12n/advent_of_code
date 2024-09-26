@@ -157,7 +157,10 @@ merge_shapes([Bits1 | Shape1], [Bits2 | Shape2]) ->
 
 -spec simulate_one2(shape2(), shape2(), lazy_lists:lazy_list(left | right)) ->
     {shape2(), lazy_list:lazy_list(left | right)}.
-simulate_one2(Shape, Ground, [Dir | Shifts]) ->
+simulate_one2(Shape, [], Shifts) ->
+    %% Reached bottom, the shape is the new ground now.
+    {Shape, Shifts};
+simulate_one2(Shape, Ground=[GroundBits1 | NextGround], [Dir | Shifts]) ->
     io:format(standard_error, <<"Dir ~p~n">>, [Dir]),
     io:format(standard_error, <<"~s~n">>, [shape_to_iodata(merge_shapes(Shape, Ground))]),
     %% Push to the side.
@@ -169,24 +172,17 @@ simulate_one2(Shape, Ground, [Dir | Shifts]) ->
             true -> Shape
         end,
     %% Move down, intersect with the next ground level.
-    %% FIXME: One extra shift before coming to rest.
-    case Ground of
-        [] ->
-            %% Reached bottom, the shape is the new ground now.
-            {Shape3, lazy_lists:force_tail(Shifts)};
-        [FirstGroundBits | NextGround] ->
-            %% Check intersection with the next ground level.
-            case intersects(Shape3, NextGround) of
-                false ->
-                    %% Doesn't intersect, fall further.
-                    {Ground2, Shifts2} = simulate_one2(
-                        Shape3, NextGround, lazy_lists:force_tail(Shifts)
-                    ),
-                    {[FirstGroundBits | Ground2], Shifts2};
-                true ->
-                    Ground2 = merge_shapes(Shape3, Ground),
-                    {Ground2, lazy_lists:force_tail(Shifts)}
-            end
+    %% Check intersection with the next ground level.
+    case intersects(Shape3, NextGround) of
+        false ->
+            %% Doesn't intersect, fall further.
+            {Ground2, Shifts2} = simulate_one2(
+                                   Shape3, NextGround, lazy_lists:force_tail(Shifts)
+                                  ),
+            {[GroundBits1 | Ground2], Shifts2};
+        true ->
+            Ground2 = merge_shapes(Shape3, Ground),
+            {Ground2, lazy_lists:force_tail(Shifts)}
     end.
 
 -spec simulate2(

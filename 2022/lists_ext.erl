@@ -3,6 +3,8 @@
 -include_lib("eunit/include/eunit.hrl").
 
 -export([
+    drop/2,
+    take/2,
     consec_pairs/1,
     reduce/2,
     seq/2,
@@ -11,6 +13,16 @@
     transpose_lists/1,
     rotate_lists/2
 ]).
+
+-spec drop(non_neg_integer(), list()) -> list().
+drop(0, List) -> List;
+drop(_, []) -> [];
+drop(N, [_ | List]) when N > 0 -> drop(N - 1, List).
+
+-spec take(non_neg_integer(), list()) -> list().
+take(0, _) -> [];
+take(_, []) -> [];
+take(N, [Elt | List]) -> [Elt | take(N - 1, List)].
 
 -spec consec_pairs([term()]) -> [{term(), term()}].
 consec_pairs([]) -> [];

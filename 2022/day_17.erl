@@ -14,8 +14,9 @@ main(1) ->
     Shifts = lazy_lists:cycle(
         infinity,
         lazy_lists:from_list([
-            grids:char_to_dir(Char)
-         || Line <- io_ext:read_lines(standard_io, 1), Char <- binary_to_list(Line)
+            {I, grids:char_to_dir(Char)}
+         || Line <- io_ext:read_lines(standard_io, 1),
+            {I, Char} <- lists:enumerate(binary_to_list(Line))
         ])
     ),
     N = 2022,
@@ -28,8 +29,8 @@ main(1) ->
     %% io:format(standard_error, <<"~s">>, [grids:to_iodata(Ground2)]),
     %% io:format(<<"~b~n">>, [-top(Ground2)]).
     %% Vsn 2
-    Shapes = lazy_lists:cycle(infinity, lazy_lists:from_list(shapes2())),
-    Ground2 = simulate2(Shapes, Shifts, _Ground = [], N),
+    Shapes = lazy_lists:cycle(infinity, lazy_lists:from_list(lists:enumerate(shapes2()))),
+    Ground2 = simulate2(Shapes, Shifts, _Ground = [], N, 0),
     io:format(standard_error, <<"~s">>, [shape_to_iodata(Ground2)]),
     io:format(<<"~b~n">>, [length(Ground2)]).
 
@@ -160,9 +161,9 @@ merge_shapes([], Shape2) ->
 merge_shapes([Bits1 | Shape1], [Bits2 | Shape2]) ->
     [(Bits1 bor Bits2) | merge_shapes(Shape1, Shape2)].
 
--spec simulate_one2(shape2(), shape2(), lazy_lists:lazy_list(left | right)) ->
-    {shape2(), lazy_lists:lazy_list(left | right)}.
-simulate_one2(Shape, Ground, [Dir | Shifts]) ->
+-spec simulate_one2(shape2(), shape2(), lazy_lists:lazy_list({pos_integer(), left | right})) ->
+    {shape2(), lazy_lists:lazy_list({pos_integer(), left | right})}.
+simulate_one2(Shape, Ground, [{_, Dir} | Shifts]) ->
     %% Push to the side.
     Shape2 = shift(Shape, Dir),
     %% If push makes it intersect with the ground, undo the push.
@@ -197,14 +198,15 @@ simulate_one2(Shape, Ground, [Dir | Shifts]) ->
     end.
 
 -spec simulate2(
-    lazy_lists:lazy_list(shape2()),
-    lazy_lists:lazy_list(left | right),
+    lazy_lists:lazy_list({pos_integer(), shape2()}),
+    lazy_lists:lazy_list({pos_integer(), left | right}),
     shape2(),
+    pos_integer(),
     non_neg_integer()
 ) -> shape2().
-simulate2(_, _, Ground, 0) ->
+simulate2(_, _, Ground, N, I) when I == N ->
     Ground;
-simulate2([Shape | Shapes], Shifts, Ground, N) ->
+simulate2([{ShapeI, Shape} | Shapes], Shifts = [{ShiftI, _} | _], Ground, N, I) ->
     %% Extend ground up with empty bits, to align with the falling shape.
     Ground2 = lists:duplicate(length(Shape) + 3, 2#0000000) ++ Ground,
     %% Fall shape.
@@ -216,7 +218,7 @@ simulate2([Shape | Shapes], Shifts, Ground, N) ->
     %% shifts and shapes. E.g., maintain list of {ShapeNumber, Shift,
     %% ShapeBits} for ground.
     %% Simulate next shape.
-    simulate2(lazy_lists:force_tail(Shapes), Shifts2, Ground4, N - 1).
+    simulate2(lazy_lists:force_tail(Shapes), Shifts2, Ground4, N, I + 1).
 
 -spec push_side(shape(), left | right, integer(), integer()) -> shape().
 push_side(Shape, Move, LeftWall, RightWall) ->

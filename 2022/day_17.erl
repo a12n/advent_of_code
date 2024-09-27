@@ -10,7 +10,7 @@
 -type shape2() :: nonempty_list(shape_bits()).
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
     Shifts = lazy_lists:cycle(
         infinity,
         lazy_lists:from_list([
@@ -19,7 +19,11 @@ main(1) ->
             {I, Char} <- lists:enumerate(binary_to_list(Line))
         ])
     ),
-    N = 1000000000000,
+    N =
+        case Part of
+            1 -> 2022;
+            2 -> 1000000000000
+        end,
     %% Vsn 1
     %% Shapes = lazy_lists:cycle(infinity, lazy_lists:from_list(shapes())),
     %% LeftWall = 0 - (2 + 1),

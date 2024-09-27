@@ -19,7 +19,7 @@ main(1) ->
             {I, Char} <- lists:enumerate(binary_to_list(Line))
         ])
     ),
-    N = 2022,
+    N = 1000000000000,
     %% Vsn 1
     %% Shapes = lazy_lists:cycle(infinity, lazy_lists:from_list(shapes())),
     %% LeftWall = 0 - (2 + 1),
@@ -207,16 +207,19 @@ simulate_one2(Shape, Ground, [{_, Dir} | Shifts]) ->
 simulate2(_, _, Ground, N, I) when I == N ->
     Ground;
 simulate2([{ShapeI, Shape} | Shapes], Shifts = [{ShiftI, _} | _], Ground, N, I) ->
+    Key = {ShapeI, ShiftI, lists_ext:take(10000, Ground)},
+    case persistent_term:get(Key, undefined) of
+        undefined -> ok;
+        {J, Len} -> error({already_seen, Key, {J, Len}})
+    end,
     %% Extend ground up with empty bits, to align with the falling shape.
     Ground2 = lists:duplicate(length(Shape) + 3, 2#0000000) ++ Ground,
     %% Fall shape.
     {Ground3, Shifts2} = simulate_one2(Shape, Ground2, Shifts),
     %% Remove empty bits from the top of the ground.
     Ground4 = lists:dropwhile(fun(Bits) -> Bits == 2#0000000 end, Ground3),
-    %% TODO: Detect cycle: compare lower and upper halves of the
-    %% ground. Are the same? Also take into account the corresponding
-    %% shifts and shapes. E.g., maintain list of {ShapeNumber, Shift,
-    %% ShapeBits} for ground.
+    %% Save already seen state for cycle detection.
+    ok = persistent_term:put(Key, {I, length(Ground4)}),
     %% Simulate next shape.
     simulate2(lazy_lists:force_tail(Shapes), Shifts2, Ground4, N, I + 1).
 

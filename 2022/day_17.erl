@@ -11,14 +11,11 @@
 
 -spec main(1..2) -> ok.
 main(Part) ->
-    Shifts = lazy_lists:cycle(
-        infinity,
-        lazy_lists:from_list([
-            {I, grids:char_to_dir(Char)}
-         || Line <- io_ext:read_lines(standard_io, 1),
-            {I, Char} <- lists:enumerate(binary_to_list(Line))
-        ])
-    ),
+    Shifts = list_to_tuple([
+        grids:char_to_dir(Char)
+     || Line <- io_ext:read_lines(standard_io, 1),
+        Char <- binary_to_list(Line)
+    ]),
     N =
         case Part of
             1 -> 2022;
@@ -33,8 +30,8 @@ main(Part) ->
     %% io:format(standard_error, <<"~s">>, [grids:to_iodata(Ground2)]),
     %% io:format(<<"~b~n">>, [-top(Ground2)]).
     %% Vsn 2
-    Shapes = lazy_lists:cycle(infinity, lazy_lists:from_list(lists:enumerate(shapes2()))),
-    Height = simulate2(Shapes, Shifts, _Ground = [], _Height = 0, N, 0),
+    Shapes = list_to_tuple(shapes2()),
+    Height = simulate2(Shapes, 0, Shifts, 0, _Ground = [], N, 0),
     io:format(<<"~b~n">>, [Height]).
 
 -spec shape([string()]) -> shape().
@@ -164,9 +161,11 @@ merge_shapes([], Shape2) ->
 merge_shapes([Bits1 | Shape1], [Bits2 | Shape2]) ->
     [(Bits1 bor Bits2) | merge_shapes(Shape1, Shape2)].
 
--spec simulate_one2(shape2(), shape2(), lazy_lists:lazy_list({pos_integer(), left | right})) ->
-    {shape2(), lazy_lists:lazy_list({pos_integer(), left | right})}.
-simulate_one2(Shape, Ground, [{_, Dir} | Shifts]) ->
+-spec simulate_one2(shape2(), tuple(), non_neg_integer(), shape2()) ->
+    {shape2(), non_neg_integer()}.
+simulate_one2(Shape, ShiftArray, ShiftIndex, Ground) ->
+    Dir = element(ShiftIndex + 1, ShiftArray),
+    ShiftIndex2 = (ShiftIndex + 1) rem size(ShiftArray),
     %% Push to the side.
     Shape2 = shift(Shape, Dir),
     %% If push makes it intersect with the ground, undo the push.
@@ -179,71 +178,72 @@ simulate_one2(Shape, Ground, [{_, Dir} | Shifts]) ->
     %% Check intersection with the next ground level.
     case {Shape3, Ground} of
         {[_], [_]} ->
-            {merge_shapes(Shape3, Ground), lazy_lists:force_tail(Shifts)};
+            {merge_shapes(Shape3, Ground), ShiftIndex2};
         {[_, _], [_, _]} ->
-            {merge_shapes(Shape3, Ground), lazy_lists:force_tail(Shifts)};
+            {merge_shapes(Shape3, Ground), ShiftIndex2};
         {[_, _, _], [_, _, _]} ->
-            {merge_shapes(Shape3, Ground), lazy_lists:force_tail(Shifts)};
+            {merge_shapes(Shape3, Ground), ShiftIndex2};
         {[_, _, _, _], [_, _, _, _]} ->
-            {merge_shapes(Shape3, Ground), lazy_lists:force_tail(Shifts)};
+            {merge_shapes(Shape3, Ground), ShiftIndex2};
         {_, [GroundBits1 | NextGround]} ->
             case intersects(Shape3, NextGround) of
                 false ->
                     %% Doesn't intersect, fall further.
-                    {Ground2, Shifts2} = simulate_one2(
-                        Shape3, NextGround, lazy_lists:force_tail(Shifts)
+                    {Ground2, ShiftIndex3} = simulate_one2(
+                        Shape3, ShiftArray, ShiftIndex2, NextGround
                     ),
-                    {[GroundBits1 | Ground2], Shifts2};
+                    {[GroundBits1 | Ground2], ShiftIndex3};
                 true ->
-                    Ground2 = merge_shapes(Shape3, Ground),
-                    {Ground2, lazy_lists:force_tail(Shifts)}
+                    {merge_shapes(Shape3, Ground), ShiftIndex2}
             end
     end.
 
 -spec simulate2(
-    lazy_lists:lazy_list({pos_integer(), shape2()}),
-    lazy_lists:lazy_list({pos_integer(), left | right}),
-    shape2(),
+    tuple(),
     non_neg_integer(),
+    tuple(),
+    non_neg_integer(),
+    shape2(),
     pos_integer(),
     non_neg_integer()
 ) -> shape2().
-simulate2(_, _, Ground, Height, N, I) when I >= N ->
-    Height + length(Ground);
-simulate2([{ShapeI, Shape} | Shapes], Shifts = [{ShiftI, _} | _], Ground, Height, N, I) ->
-    Key = {ShapeI, ShiftI, lists_ext:take(10000, Ground)},
-    {Height2, I2} =
-        case persistent_term:get(Key, undefined) of
-            {CycleI, CycleLen} when ((N - I) div CycleI) > 0 ->
-                Times = (N - I) div CycleI,
-                io:format(
-                    standard_error,
-                    <<"Already seen: Shape ~b, Shift ~b, Ground ~p, CycleI ~p, CycleLen ~p, Times ~p~n">>,
-                    [
-                        element(1, Key),
-                        element(2, Key),
-                        lists_ext:take(5, element(3, Key)),
-                        CycleI,
-                        CycleLen,
-                        Times
-                    ]
-                ),
-                {Height + Times * CycleLen, I + Times * CycleI};
-            _ ->
-                {Height, I + 1}
-            %% error({already_seen, Key, {J, Len}})
-        end,
-    io:format(standard_error, <<"Height ~p -> ~p, I ~p -> ~p~n">>, [Height, Height2, I, I2]),
+simulate2(_, _, _, _, Ground, N, I) when I >= N ->
+    length(Ground);
+simulate2(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, N, I) ->
+    Key = {ShapeIndex, ShiftIndex, lists_ext:take(10000, Ground)},
+    case persistent_term:get(Key, undefined) of
+        {CycleI, CycleLen} when ((N - I) div CycleI) > 0 ->
+            Times = (N - I) div CycleI,
+            io:format(
+                standard_error,
+                <<"Already seen: Shape ~b, Shift ~b, Ground ~p, CycleI ~p, CycleLen ~p, Times ~p~n">>,
+                [
+                    element(1, Key),
+                    element(2, Key),
+                    lists_ext:take(5, element(3, Key)),
+                    CycleI,
+                    CycleLen,
+                    Times
+                ]
+            ),
+            %% TODO: simulate2(Shapes, NextShiftsAfterSimulateOne, Ground, Height + Times * CycleLen, I + Times * CycleI)
+            ok;
+        _ ->
+            ok
+        %% error({already_seen, Key, {J, Len}})
+    end,
     %% Extend ground up with empty bits, to align with the falling shape.
+    Shape = element(ShapeIndex + 1, ShapeArray),
+    ShapeIndex2 = (ShapeIndex + 1) rem size(ShapeArray),
     Ground2 = lists:duplicate(length(Shape) + 3, 2#0000000) ++ Ground,
     %% Fall shape.
-    {Ground3, Shifts2} = simulate_one2(Shape, Ground2, Shifts),
+    {Ground3, ShiftIndex2} = simulate_one2(Shape, ShiftArray, ShiftIndex, Ground2),
     %% Remove empty bits from the top of the ground.
     Ground4 = lists:dropwhile(fun(Bits) -> Bits == 2#0000000 end, Ground3),
     %% Save already seen state for cycle detection.
     ok = persistent_term:put(Key, {I, length(Ground4)}),
     %% Simulate next shape.
-    simulate2(lazy_lists:force_tail(Shapes), Shifts2, Ground4, Height2, N, I2).
+    simulate2(ShapeArray, ShapeIndex2, ShiftArray, ShiftIndex2, Ground4, N, I + 1).
 
 -spec push_side(shape(), left | right, integer(), integer()) -> shape().
 push_side(Shape, Move, LeftWall, RightWall) ->

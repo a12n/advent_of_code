@@ -4,8 +4,8 @@
 
 -export([main/1]).
 
+-type shape() :: nonempty_list(shape_bits()).
 -type shape_bits() :: 2#0000000..2#1111111.
--type shape2() :: nonempty_list(shape_bits()).
 
 -spec main(1..2) -> ok.
 main(Part) ->
@@ -19,12 +19,11 @@ main(Part) ->
             1 -> 2022;
             2 -> 1000000000000
         end,
-    Shapes = list_to_tuple(shapes2()),
-    Height = simulate2(Shapes, 0, Shifts, 0, _Ground = [], N, 0),
+    Height = simulate(list_to_tuple(shapes()), 0, Shifts, 0, _Ground = [], N, 0),
     io:format(<<"~b~n">>, [Height]).
 
--spec shapes2() -> [shape2()].
-shapes2() ->
+-spec shapes() -> [shape()].
+shapes() ->
     [
         %% ####
         [
@@ -74,14 +73,14 @@ shape_bits_to_iodata(Bits) ->
      || K <- lists:seq(6, 0, -1)
     ].
 
--spec shape_to_iodata(shape2()) -> iodata().
+-spec shape_to_iodata(shape()) -> iodata().
 shape_to_iodata(Shape) -> [[shape_bits_to_iodata(Bits), $\n] || Bits <- Shape].
 
 -spec shift_bits(shape_bits(), left | right) -> shape_bits().
 shift_bits(Bits, left) when (Bits band 2#1000000) == 0 -> Bits bsl 1;
 shift_bits(Bits, right) when (Bits band 2#0000001) == 0 -> Bits bsr 1.
 
--spec shift(shape2(), left | right) -> shape2().
+-spec shift(shape(), left | right) -> shape().
 shift(Shape, Dir) ->
     try
         [shift_bits(Bits, Dir) || Bits <- Shape]
@@ -89,7 +88,7 @@ shift(Shape, Dir) ->
         error:function_clause -> Shape
     end.
 
--spec intersects(shape2(), shape2()) -> boolean().
+-spec intersects(shape(), shape()) -> boolean().
 intersects([], _) ->
     false;
 intersects(_, []) ->
@@ -100,7 +99,7 @@ intersects([Bits1 | Shape1], [Bits2 | Shape2]) ->
         _ -> true
     end.
 
--spec merge_shapes(shape2(), shape2()) -> shape2().
+-spec merge_shapes(shape(), shape()) -> shape().
 merge_shapes(Shape1, []) ->
     Shape1;
 merge_shapes([], Shape2) ->
@@ -108,9 +107,9 @@ merge_shapes([], Shape2) ->
 merge_shapes([Bits1 | Shape1], [Bits2 | Shape2]) ->
     [(Bits1 bor Bits2) | merge_shapes(Shape1, Shape2)].
 
--spec simulate_one2(shape2(), tuple(), non_neg_integer(), shape2()) ->
-    {shape2(), non_neg_integer()}.
-simulate_one2(Shape, ShiftArray, ShiftIndex, Ground) ->
+-spec simulate_one(shape(), tuple(), non_neg_integer(), shape()) ->
+    {shape(), non_neg_integer()}.
+simulate_one(Shape, ShiftArray, ShiftIndex, Ground) ->
     Dir = element(ShiftIndex + 1, ShiftArray),
     ShiftIndex2 = (ShiftIndex + 1) rem size(ShiftArray),
     %% Push to the side.
@@ -136,7 +135,7 @@ simulate_one2(Shape, ShiftArray, ShiftIndex, Ground) ->
             case intersects(Shape3, NextGround) of
                 false ->
                     %% Doesn't intersect, fall further.
-                    {Ground2, ShiftIndex3} = simulate_one2(
+                    {Ground2, ShiftIndex3} = simulate_one(
                         Shape3, ShiftArray, ShiftIndex2, NextGround
                     ),
                     {[GroundBits1 | Ground2], ShiftIndex3};
@@ -145,18 +144,18 @@ simulate_one2(Shape, ShiftArray, ShiftIndex, Ground) ->
             end
     end.
 
--spec simulate2(
+-spec simulate(
     tuple(),
     non_neg_integer(),
     tuple(),
     non_neg_integer(),
-    shape2(),
+    shape(),
     pos_integer(),
     non_neg_integer()
-) -> shape2().
-simulate2(_, _, _, _, Ground, N, I) when I >= N ->
+) -> non_neg_integer().
+simulate(_, _, _, _, Ground, N, I) when I >= N ->
     length(Ground);
-simulate2(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, N, I) ->
+simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, N, I) ->
     Key = {ShapeIndex, ShiftIndex, lists_ext:take(10000, Ground)},
     case persistent_term:get(Key, undefined) of
         {CycleI, CycleLen} when ((N - I) div CycleI) > 0 ->
@@ -184,10 +183,10 @@ simulate2(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, N, I) ->
     ShapeIndex2 = (ShapeIndex + 1) rem size(ShapeArray),
     Ground2 = lists:duplicate(length(Shape) + 3, 2#0000000) ++ Ground,
     %% Fall shape.
-    {Ground3, ShiftIndex2} = simulate_one2(Shape, ShiftArray, ShiftIndex, Ground2),
+    {Ground3, ShiftIndex2} = simulate_one(Shape, ShiftArray, ShiftIndex, Ground2),
     %% Remove empty bits from the top of the ground.
     Ground4 = lists:dropwhile(fun(Bits) -> Bits == 2#0000000 end, Ground3),
     %% Save already seen state for cycle detection.
     ok = persistent_term:put(Key, {I, length(Ground4)}),
     %% Simulate next shape.
-    simulate2(ShapeArray, ShapeIndex2, ShiftArray, ShiftIndex2, Ground4, N, I + 1).
+    simulate(ShapeArray, ShapeIndex2, ShiftArray, ShiftIndex2, Ground4, N, I + 1).

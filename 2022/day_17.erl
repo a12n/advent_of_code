@@ -64,18 +64,9 @@ shapes() ->
         ]
     ].
 
--spec shape_bits_to_iodata(shape_bits()) -> iodata().
-shape_bits_to_iodata(Bits) ->
-    [
-        case (Bits bsr K) band 1 of
-            0 -> $.;
-            1 -> $#
-        end
-     || K <- lists:seq(6, 0, -1)
-    ].
-
--spec shape_to_iodata(shape()) -> iodata().
-shape_to_iodata(Shape) -> [[shape_bits_to_iodata(Bits), $\n] || Bits <- Shape].
+%%--------------------------------------------------------------------
+%% Shape bits operations
+%%--------------------------------------------------------------------
 
 -spec shift_bits(shape_bits(), left | right) -> shape_bits().
 shift_bits(Bits, left) when (Bits band 2#1000000) == 0 -> Bits bsl 1;
@@ -100,17 +91,18 @@ intersects([Bits1 | Shape1], [Bits2 | Shape2]) ->
         _ -> true
     end.
 
--spec merge_shapes(shape(), shape()) -> shape().
-merge_shapes(Shape1, []) ->
-    Shape1;
-merge_shapes([], Shape2) ->
-    Shape2;
-merge_shapes([Bits1 | Shape1], [Bits2 | Shape2]) ->
-    [(Bits1 bor Bits2) | merge_shapes(Shape1, Shape2)].
+-spec merge(shape(), shape()) -> shape().
+merge(Shape1, []) -> Shape1;
+merge([], Shape2) -> Shape2;
+merge([Bits1 | Shape1], [Bits2 | Shape2]) -> [(Bits1 bor Bits2) | merge(Shape1, Shape2)].
 
--spec simulate_one(shape(), tuple(), non_neg_integer(), shape()) ->
+%%--------------------------------------------------------------------
+%% Simulation functions
+%%--------------------------------------------------------------------
+
+-spec simulate1(shape(), tuple(), non_neg_integer(), shape()) ->
     {shape(), non_neg_integer()}.
-simulate_one(Shape, ShiftArray, ShiftIndex, Ground) ->
+simulate1(Shape, ShiftArray, ShiftIndex, Ground) ->
     Dir = element(ShiftIndex + 1, ShiftArray),
     ShiftIndex2 = (ShiftIndex + 1) rem size(ShiftArray),
     %% Push to the side.
@@ -125,23 +117,23 @@ simulate_one(Shape, ShiftArray, ShiftIndex, Ground) ->
     %% Check intersection with the next ground level.
     case {Shape3, Ground} of
         {[_], [_]} ->
-            {merge_shapes(Shape3, Ground), ShiftIndex2};
+            {merge(Shape3, Ground), ShiftIndex2};
         {[_, _], [_, _]} ->
-            {merge_shapes(Shape3, Ground), ShiftIndex2};
+            {merge(Shape3, Ground), ShiftIndex2};
         {[_, _, _], [_, _, _]} ->
-            {merge_shapes(Shape3, Ground), ShiftIndex2};
+            {merge(Shape3, Ground), ShiftIndex2};
         {[_, _, _, _], [_, _, _, _]} ->
-            {merge_shapes(Shape3, Ground), ShiftIndex2};
+            {merge(Shape3, Ground), ShiftIndex2};
         {_, [GroundBits1 | NextGround]} ->
             case intersects(Shape3, NextGround) of
                 false ->
                     %% Doesn't intersect, fall further.
-                    {Ground2, ShiftIndex3} = simulate_one(
+                    {Ground2, ShiftIndex3} = simulate1(
                         Shape3, ShiftArray, ShiftIndex2, NextGround
                     ),
                     {[GroundBits1 | Ground2], ShiftIndex3};
                 true ->
-                    {merge_shapes(Shape3, Ground), ShiftIndex2}
+                    {merge(Shape3, Ground), ShiftIndex2}
             end
     end.
 
@@ -192,7 +184,7 @@ simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N) ->
             %% Extend ground up with empty bits, to align with the falling shape.
             Ground2 = lists:duplicate(length(Shape) + 3, 2#0000000) ++ Ground,
             %% Fall shape.
-            {Ground3, ShiftIndex2} = simulate_one(Shape, ShiftArray, ShiftIndex, Ground2),
+            {Ground3, ShiftIndex2} = simulate1(Shape, ShiftArray, ShiftIndex, Ground2),
             %% Remove empty bits from the top of the ground.
             Ground4 = lists:dropwhile(fun(Bits) -> Bits == 2#0000000 end, Ground3),
             GroundLength = length(Ground4),

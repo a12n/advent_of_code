@@ -12,7 +12,17 @@
 
 -export_type([treap/0]).
 
--export([empty/0, from_list/1, from_list/2, size/1, split/2, merge/2, search/2, foldl/3, foldr/3]).
+-export([
+    empty/0,
+    from_list/1, from_list/2,
+    to_list/1,
+    size/1,
+    split/2,
+    merge/2,
+    search/2,
+    foldl/3,
+    foldr/3
+]).
 
 -spec empty() -> treap().
 empty() -> undefined.
@@ -46,6 +56,9 @@ from_list(List, Rand0) ->
         {empty(), Rand0},
         List
     ).
+
+-spec to_list(treap()) -> list().
+to_list(Treap) -> foldr(fun(Value, List) -> [Value | List] end, [], Treap).
 
 -spec size(treap()) -> non_neg_integer().
 size(undefined) -> 0;

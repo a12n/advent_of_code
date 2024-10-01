@@ -165,21 +165,10 @@ simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N) ->
         [N, ShapeIndex, ShiftIndex, Height]
     ),
     Key = {ShapeIndex, ShiftIndex, lists_ext:take(10000, Ground)},
-    case
-        lists:sort(
-            fun({_, #{left := N1}}, {_, #{left := N2}}) -> N1 >= N2 end, ets:lookup(cycles, Key)
-        )
-    of
+    case lists:sort(fun({_, {N1, _}}, {_, {N2, _}}) -> N1 >= N2 end, ets:lookup(cycles, Key)) of
         [
-            {_, #{
-                left := CycleN1,
-                length := CycleLength1,
-                shift := CycleShiftIndex
-            }},
-            {_, #{
-                left := CycleN2,
-                length := CycleLength2
-            }}
+            {_, {CycleN1, CycleLength1}},
+            {_, {CycleN2, CycleLength2}}
             | _
         ] when N > (CycleN1 - CycleN2) ->
             DiffN = CycleN1 - CycleN2,
@@ -208,14 +197,7 @@ simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N) ->
             Ground4 = lists:dropwhile(fun(Bits) -> Bits == 2#0000000 end, Ground3),
             GroundLength = length(Ground4),
             %% Save already seen state for cycle detection.
-            true = ets:insert(
-                cycles,
-                {Key, #{
-                    left => N,
-                    length => GroundLength,
-                    shift => ShiftIndex2
-                }}
-            ),
+            true = ets:insert(cycles, {Key, {N, GroundLength}}),
             %% Simulate next shape.
             simulate(
                 ShapeArray, ShapeIndex2, ShiftArray, ShiftIndex2, Ground4, Height, N - 1

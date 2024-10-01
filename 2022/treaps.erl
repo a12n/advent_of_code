@@ -1,5 +1,4 @@
 -module(treaps).
-%% -feature(maybe_expr, enable).
 
 -record(treap_node, {
     value :: term(),
@@ -108,26 +107,19 @@ merge(
 search(_, undefined) ->
     false;
 search(Pred, #treap_node{value = Value, left = Left, right = Right}) ->
-    %% maybe
-    %%     false ?= search(Pred, Left),
-    %%     false ?=
-    %%         case Pred(Value) of
-    %%             false -> false;
-    %%             true -> {value, ?MODULE:size(Left), Value}
-    %%         end,
-    %%     false ?= search(Pred, Right)
-    %% end.
     case search(Pred, Left) of
-        Found = {value, _, _} ->
-            Found;
+        {value, Index, Found} ->
+            {value, Index, Found};
         false ->
             case Pred(Value) of
                 true ->
                     {value, ?MODULE:size(Left), Value};
                 false ->
                     case search(Pred, Right) of
-                        Found = {value, _, _} -> Found;
-                        false -> false
+                        {value, Index, Found} ->
+                            {value, ?MODULE:size(Left) + 1 + Index, Found};
+                        false ->
+                            false
                     end
             end
     end.

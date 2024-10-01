@@ -19,6 +19,7 @@
     size/1,
     split/2,
     merge/2,
+    nth/2,
     search/2,
     foldl/3,
     foldr/3
@@ -114,6 +115,18 @@ merge(
             true -> Treap1#treap_node{right = merge(Right1, Treap2)};
             false -> Treap2#treap_node{left = merge(Treap1, Left2)}
         end
+    ).
+
+-spec nth(pos_integer(), treap()) -> term().
+nth(N, Treap) when N > 0 ->
+    (fun Loop(I, #treap_node{value = Value, left = Left, right = Right}) ->
+        case ?MODULE:size(Left) of
+            LeftSize when I < LeftSize -> Loop(I, Left);
+            LeftSize when I > LeftSize -> Loop(I - LeftSize - 1, Right);
+            _LeftSize -> Value
+        end
+    end)(
+        N - 1, Treap
     ).
 
 -spec search(fun((term()) -> boolean()), treap()) -> false | {value, non_neg_integer(), term()}.

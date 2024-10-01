@@ -21,6 +21,7 @@
     split/2,
     merge/2,
     nth/2,
+    map/2,
     search/2,
     foldl/3,
     foldr/3,
@@ -129,6 +130,12 @@ nth(N, Treap) when N > 0 ->
     end)(
         N - 1, Treap
     ).
+
+-spec map(fun((term()) -> term()), treap()) -> treap().
+map(_, undefined) ->
+    undefined;
+map(Fun, Treap = #treap_node{value = Value, left = Left, right = Right}) ->
+    Treap#treap_node{value = Fun(Value), left = map(Fun, Left), right = map(Fun, Right)}.
 
 -spec search(fun((term()) -> boolean()), treap()) -> false | {value, non_neg_integer(), term()}.
 search(_, undefined) ->

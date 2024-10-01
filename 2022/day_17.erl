@@ -181,7 +181,7 @@ simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N) ->
                 length := CycleLength2
             }}
             | _
-        ] ->
+        ] when N > (CycleN1 - CycleN2) ->
             DiffN = CycleN1 - CycleN2,
             DiffLength = CycleLength2 - CycleLength1,
             Times = N div DiffN,

@@ -6,36 +6,13 @@
 
 -spec main(1..2) -> ok.
 main(1) ->
-    Numbers = lists:map(fun binary_to_integer/1, io_ext:read_lines(standard_io)),
-    ?debugFmt("Numbers ~p", [Numbers]),
-    Numbers2 =
-        lists:foldl(
-            fun(I, Treap) ->
-                %% ?debugFmt("~p: treap ~p", [I, treaps:to_list(Treap)]),
-                {value, Pos, _} = treaps:search(
-                    fun
-                        ({J, _}) -> J == I;
-                        (_) -> false
-                    end,
-                    Treap
-                ),
-                %% ?debugFmt("~p: found at pos ~p", [I, Pos]),
-                {Value = {_, Number}, Pri, Treap2} = treaps:take(Pos, Treap),
-                %% ?debugFmt("~p: taken ~p at pos ~p, after take ~p", [
-                %%     I, Number, Pos, treaps:to_list(Treap2)
-                %% ]),
-                Pos2 = index(treaps:size(Treap2), (Pos - 1) + Number) + 1,
-                %% ?debugFmt("~p: new pos ~p", [I, Pos2]),
-                Treap3 = treaps:insert(Pos2, Value, Pri, Treap2),
-                %% ?debugFmt("~p: after insert ~p", [
-                %%     I, treaps:to_list(Treap3)
-                %% ]),
-                Treap3
-            end,
-            treaps:from_list(lists:enumerate(Numbers)),
-            lists:seq(1, length(Numbers))
-        ),
-    ?debugFmt("Numbers2 ~p", [treaps:to_list(Numbers2)]),
+    Numbers = treaps:from_list(
+        %% Pairs of {Index, Number} values.
+        lists:enumerate(
+            lists:map(fun binary_to_integer/1, io_ext:read_lines(standard_io))
+        )
+    ),
+    Numbers2 = mix(Numbers, 1),
     {value, ZeroPos, _} = treaps:search(
         fun
             ({_, 0}) -> true;
@@ -43,13 +20,13 @@ main(1) ->
         end,
         Numbers2
     ),
-    ?debugFmt("ZeroPos ~p", [ZeroPos]),
+    io:format(standard_error, <<"[~p] = 0~n">>, [ZeroPos]),
     Sum = lists:sum(
         lists:map(
             fun(Offset) ->
                 Pos = index(treaps:size(Numbers2), (ZeroPos - 1) + Offset) + 1,
                 {_, Value} = treaps:nth(Pos, Numbers2),
-                ?debugFmt("Number at offset ~p from zero (pos ~p) is ~p", [Offset, Pos, Value]),
+                io:format(standard_error, <<"[~p + ~p; ~p] = ~p~n">>, [ZeroPos, Offset, Pos, Value]),
                 Value
             end,
             [1000, 2000, 3000]
@@ -60,3 +37,20 @@ main(1) ->
 -spec index(pos_integer(), integer()) -> non_neg_integer().
 index(N, I) when I < 0 -> N + (I rem N);
 index(N, I) -> I rem N.
+
+-spec mix(treaps:treap(), non_neg_integer()) -> treaps:treap().
+mix(Numbers, 0) ->
+    Numbers;
+mix(Numbers, N) ->
+    Numbers2 =
+        lists:foldl(
+            fun(I, Treap) ->
+                {value, Pos, _} = treaps:search(fun({J, _}) -> J == I end, Treap),
+                {Value = {_, Number}, Pri, Treap2} = treaps:take(Pos, Treap),
+                Pos2 = index(treaps:size(Treap2), (Pos - 1) + Number) + 1,
+                treaps:insert(Pos2, Value, Pri, Treap2)
+            end,
+            Numbers,
+            lists:seq(1, treaps:size(Numbers))
+        ),
+    mix(Numbers2, N - 1).

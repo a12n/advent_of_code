@@ -23,7 +23,8 @@
     nth/2,
     search/2,
     foldl/3,
-    foldr/3
+    foldr/3,
+    take/2
 ]).
 
 -spec empty() -> treap().
@@ -160,6 +161,12 @@ foldr(_, Acc, undefined) ->
     Acc;
 foldr(Fun, Acc, #treap_node{value = Value, left = Left, right = Right}) ->
     foldr(Fun, Fun(Value, foldr(Fun, Acc, Right)), Left).
+
+-spec take(pos_integer(), treap()) -> {term(), integer(), treap()}.
+take(N, Treap = #treap_node{size = Size}) when N > 0, N =< Size ->
+    {Before, Treap2} = split(N - 1, Treap),
+    {#treap_node{value = Value, priority = Pri}, After} = split(1, Treap2),
+    {Value, Pri, merge(Before, After)}.
 
 -spec update_size(#treap_node{}) -> #treap_node{}.
 update_size(Treap = #treap_node{left = Left, right = Right}) ->

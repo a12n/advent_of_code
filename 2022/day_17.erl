@@ -192,9 +192,9 @@ simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N) ->
             ),
             simulate(
                 ShapeArray,
-                ShapeIndex2,
+                ShapeIndex,
                 ShiftArray,
-                CycleShiftIndex,
+                ShiftIndex,
                 Ground,
                 Height + Times * DiffLength,
                 N - Times * DiffN

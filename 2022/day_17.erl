@@ -158,6 +158,8 @@ simulate_one(Shape, ShiftArray, ShiftIndex, Ground) ->
 simulate(_, _, _, _, Ground, Height, N, Index) when Index >= N ->
     Height + length(Ground);
 simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N, Index) ->
+    Shape = element(ShapeIndex + 1, ShapeArray),
+    ShapeIndex2 = (ShapeIndex + 1) rem size(ShapeArray),
     io:format(
         standard_error,
         <<"~b/~b: ShapeIndex ~p, ShiftIndex ~p, Height ~p~n">>,
@@ -189,7 +191,7 @@ simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N, Inde
             ),
             simulate(
                 ShapeArray,
-                ShapeIndex + 1,
+                ShapeIndex2,
                 ShiftArray,
                 CycleShiftIndex,
                 Ground,
@@ -199,8 +201,6 @@ simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N, Inde
             );
         _ ->
             %% Extend ground up with empty bits, to align with the falling shape.
-            Shape = element(ShapeIndex + 1, ShapeArray),
-            ShapeIndex2 = (ShapeIndex + 1) rem size(ShapeArray),
             Ground2 = lists:duplicate(length(Shape) + 3, 2#0000000) ++ Ground,
             %% Fall shape.
             {Ground3, ShiftIndex2} = simulate_one(Shape, ShiftArray, ShiftIndex, Ground2),

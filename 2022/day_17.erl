@@ -171,13 +171,13 @@ simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N) ->
             {_, {CycleN2, CycleLength2}}
             | _
         ] when N > (CycleN1 - CycleN2) ->
-            DiffN = CycleN1 - CycleN2,
-            DiffLength = CycleLength2 - CycleLength1,
-            Times = N div DiffN,
+            CycleN = CycleN1 - CycleN2,
+            CycleLength = CycleLength2 - CycleLength1,
+            Times = N div CycleN,
             io:format(
                 standard_error,
                 <<"Cycle: N ~p, CycleN ~p/~p/~p, CycleLength ~p/~p/~p, Times ~p~n">>,
-                [N, CycleN1, CycleN2, DiffN, CycleLength1, CycleLength2, DiffLength, Times]
+                [N, CycleN1, CycleN2, CycleN, CycleLength1, CycleLength2, CycleLength, Times]
             ),
             simulate(
                 ShapeArray,
@@ -185,8 +185,8 @@ simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N) ->
                 ShiftArray,
                 ShiftIndex,
                 Ground,
-                Height + Times * DiffLength,
-                N - Times * DiffN
+                Height + Times * CycleLength,
+                N - Times * CycleN
             );
         _ ->
             %% Extend ground up with empty bits, to align with the falling shape.

@@ -5,14 +5,18 @@
 -export([main/1, index/2]).
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
     Numbers = treaps:from_list(
         %% Pairs of {Index, Number} values.
         lists:enumerate(
             lists:map(fun binary_to_integer/1, io_ext:read_lines(standard_io))
         )
     ),
-    Numbers2 = mix(Numbers, 1),
+    Numbers2 =
+        case Part of
+            1 -> mix(Numbers, 1);
+            2 -> mix(treaps:map(fun({I, Number}) -> {I, Number * 811589153} end, Numbers), 10)
+        end,
     {value, ZeroPos, _} = treaps:search(
         fun
             ({_, 0}) -> true;

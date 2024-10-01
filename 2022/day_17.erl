@@ -20,7 +20,7 @@ main(Part) ->
             1 -> 2022;
             2 -> 1000000000000
         end,
-    Height = simulate(list_to_tuple(shapes()), 0, Shifts, 0, _Ground = [], _Height = 0, N, 0),
+    Height = simulate(list_to_tuple(shapes()), 0, Shifts, 0, _Ground = [], _Height = 0, N),
     io:format(<<"~b~n">>, [Height]).
 
 -spec shapes() -> [shape()].
@@ -152,42 +152,43 @@ simulate_one(Shape, ShiftArray, ShiftIndex, Ground) ->
     non_neg_integer(),
     shape(),
     non_neg_integer(),
-    pos_integer(),
     non_neg_integer()
 ) -> non_neg_integer().
-simulate(_, _, _, _, Ground, Height, N, Index) when Index >= N ->
+simulate(_, _, _, _, Ground, Height, 0) ->
     Height + length(Ground);
-simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N, Index) ->
+simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N) ->
     Shape = element(ShapeIndex + 1, ShapeArray),
     ShapeIndex2 = (ShapeIndex + 1) rem size(ShapeArray),
     io:format(
         standard_error,
-        <<"~b/~b: ShapeIndex ~p, ShiftIndex ~p, Height ~p~n">>,
-        [Index, N, ShapeIndex, ShiftIndex, Height]
+        <<"~b: ShapeIndex ~p, ShiftIndex ~p, Height ~p~n">>,
+        [N, ShapeIndex, ShiftIndex, Height]
     ),
     Key = {ShapeIndex, ShiftIndex, lists_ext:take(10000, Ground)},
     case
         lists:sort(
-            fun({_, #{index := A}}, {_, #{index := B}}) -> A =< B end, ets:lookup(cycles, Key)
+            fun({_, #{left := N1}}, {_, #{left := N2}}) -> N1 >= N2 end, ets:lookup(cycles, Key)
         )
     of
         [
             {_, #{
-                index := CycleIndex1,
+                left := CycleN1,
                 length := CycleLength1,
                 shift := CycleShiftIndex
             }},
             {_, #{
-                index := CycleIndex2,
+                left := CycleN2,
                 length := CycleLength2
             }}
             | _
         ] ->
-            Times = (N - Index) div (CycleIndex2 - CycleIndex1),
+            DiffN = CycleN1 - CycleN2,
+            DiffLength = CycleLength2 - CycleLength1,
+            Times = N div DiffN,
             io:format(
                 standard_error,
-                <<"Cycle: Index ~p, CycleIndex ~p/~p, CycleLength ~p/~p, Times ~p~n">>,
-                [Index, CycleIndex1, CycleIndex2, CycleLength1, CycleLength2, Times]
+                <<"Cycle: N ~p, CycleN ~p/~p/~p, CycleLength ~p/~p/~p, Times ~p~n">>,
+                [N, CycleN1, CycleN2, DiffN, CycleLength1, CycleLength2, DiffLength, Times]
             ),
             simulate(
                 ShapeArray,
@@ -195,9 +196,8 @@ simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N, Inde
                 ShiftArray,
                 CycleShiftIndex,
                 Ground,
-                Height + Times * (CycleLength2 - CycleLength1),
-                N,
-                Index + Times * (CycleIndex2 - CycleIndex1)
+                Height + Times * DiffLength,
+                N - Times * DiffN
             );
         _ ->
             %% Extend ground up with empty bits, to align with the falling shape.
@@ -211,13 +211,13 @@ simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N, Inde
             true = ets:insert(
                 cycles,
                 {Key, #{
-                    index => Index,
+                    left => N,
                     length => GroundLength,
                     shift => ShiftIndex2
                 }}
             ),
             %% Simulate next shape.
             simulate(
-                ShapeArray, ShapeIndex2, ShiftArray, ShiftIndex2, Ground4, Height, N, Index + 1
+                ShapeArray, ShapeIndex2, ShiftArray, ShiftIndex2, Ground4, Height, N - 1
             )
     end.

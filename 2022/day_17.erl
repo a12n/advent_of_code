@@ -9,7 +9,7 @@
 
 -spec main(1..2) -> ok.
 main(Part) ->
-    _Table = ets:new(cycles, [named_table]),
+    _Table = ets:new(cycles, [bag, named_table]),
     Shifts = list_to_tuple([
         grids:char_to_dir(Char)
      || Line <- io_ext:read_lines(standard_io, 1),
@@ -160,36 +160,32 @@ simulate(_, _, _, _, Ground, Height, N, Index) when Index >= N ->
 simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N, Index) ->
     io:format(
         standard_error,
-        <<"ShapeIndex ~p, ShiftIndex ~p, Height ~p, N ~p, Index ~p~n">>,
-        [ShapeIndex, ShiftIndex, Height, N, Index]
+        <<"~b/~b: ShapeIndex ~p, ShiftIndex ~p, Height ~p~n">>,
+        [Index, N, ShapeIndex, ShiftIndex, Height]
     ),
     Key = {ShapeIndex, ShiftIndex, lists_ext:take(10000, Ground)},
-    case ets:lookup(cycles, Key) of
+    case
+        lists:sort(
+            fun({_, #{index := A}}, {_, #{index := B}}) -> A =< B end, ets:lookup(cycles, Key)
+        )
+    of
         [
             {_, #{
-                index := CycleIndex,
-                length := CycleLength,
+                index := CycleIndex1,
+                length := CycleLength1,
                 shift := CycleShiftIndex
+            }},
+            {_, #{
+                index := CycleIndex2,
+                length := CycleLength2
             }}
-        ] when ((N - Index) div CycleIndex) > 1 ->
-            Times = (N - Index) div CycleIndex,
+            | _
+        ] ->
+            Times = (N - Index) div (CycleIndex2 - CycleIndex1),
             io:format(
                 standard_error,
-                <<"N ~p, Index ~p, CycleIndex ~p, Times ~p~n">>,
-                [N, Index, CycleIndex, Times]
-            ),
-            io:format(
-                standard_error,
-                <<"Already seen: ShapeIndex ~b, ShiftIndex ~b, Ground ~p, CycleIndex ~p, CycleLength ~p, CycleShiftIndex ~p, Times ~p~n">>,
-                [
-                    ShapeIndex,
-                    ShiftIndex,
-                    lists_ext:take(5, element(3, Key)),
-                    CycleIndex,
-                    CycleLength,
-                    CycleShiftIndex,
-                    Times
-                ]
+                <<"Cycle: Index ~p, CycleIndex ~p/~p, CycleLength ~p/~p, Times ~p~n">>,
+                [Index, CycleIndex1, CycleIndex2, CycleLength1, CycleLength2, Times]
             ),
             simulate(
                 ShapeArray,
@@ -197,11 +193,11 @@ simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N, Inde
                 ShiftArray,
                 CycleShiftIndex,
                 Ground,
-                Height + Times * CycleLength,
+                Height + Times * (CycleLength2 - CycleLength1),
                 N,
-                Index + Times * CycleIndex
+                Index + Times * (CycleIndex2 - CycleIndex1)
             );
-        [] ->
+        _ ->
             %% Extend ground up with empty bits, to align with the falling shape.
             Shape = element(ShapeIndex + 1, ShapeArray),
             ShapeIndex2 = (ShapeIndex + 1) rem size(ShapeArray),

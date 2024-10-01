@@ -139,7 +139,7 @@ search(Pred, #treap_node{value = Value, left = Left, right = Right}) ->
         false ->
             case Pred(Value) of
                 true ->
-                    {value, ?MODULE:size(Left), Value};
+                    {value, ?MODULE:size(Left) + 1, Value};
                 false ->
                     case search(Pred, Right) of
                         {value, Index, Found} ->

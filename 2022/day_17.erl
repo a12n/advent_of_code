@@ -12,7 +12,7 @@ main(Part) ->
     Shifts = list_to_tuple([
         grids:char_to_dir(Char)
      || Line <- io_ext:read_lines(standard_io, 1),
-        Char <- binary_to_list(Line)
+        <<Char>> <= Line
     ]),
     N =
         case Part of

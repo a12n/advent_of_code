@@ -9,6 +9,7 @@
 
 -spec main(1..2) -> ok.
 main(Part) ->
+    _Table = ets:new(cycles, [named_table]),
     Shifts = list_to_tuple([
         grids:char_to_dir(Char)
      || Line <- io_ext:read_lines(standard_io, 1),
@@ -19,7 +20,7 @@ main(Part) ->
             1 -> 2022;
             2 -> 1000000000000
         end,
-    Height = simulate(list_to_tuple(shapes()), 0, Shifts, 0, _Ground = [], N, 0),
+    Height = simulate(list_to_tuple(shapes()), 0, Shifts, 0, _Ground = [], _Height = 0, N, 0),
     io:format(<<"~b~n">>, [Height]).
 
 -spec shapes() -> [shape()].
@@ -150,43 +151,77 @@ simulate_one(Shape, ShiftArray, ShiftIndex, Ground) ->
     tuple(),
     non_neg_integer(),
     shape(),
+    non_neg_integer(),
     pos_integer(),
     non_neg_integer()
 ) -> non_neg_integer().
-simulate(_, _, _, _, Ground, N, I) when I >= N ->
-    length(Ground);
-simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, N, I) ->
+simulate(_, _, _, _, Ground, Height, N, Index) when Index >= N ->
+    Height + length(Ground);
+simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N, Index) ->
+    io:format(
+        standard_error,
+        <<"ShapeIndex ~p, ShiftIndex ~p, Height ~p, N ~p, Index ~p~n">>,
+        [ShapeIndex, ShiftIndex, Height, N, Index]
+    ),
     Key = {ShapeIndex, ShiftIndex, lists_ext:take(10000, Ground)},
-    case persistent_term:get(Key, undefined) of
-        {CycleI, CycleLen} when ((N - I) div CycleI) > 0 ->
-            Times = (N - I) div CycleI,
+    case ets:lookup(cycles, Key) of
+        [
+            {_, #{
+                index := CycleIndex,
+                length := CycleLength,
+                shift := CycleShiftIndex
+            }}
+        ] when ((N - Index) div CycleIndex) > 1 ->
+            Times = (N - Index) div CycleIndex,
             io:format(
                 standard_error,
-                <<"Already seen: Shape ~b, Shift ~b, Ground ~p, CycleI ~p, CycleLen ~p, Times ~p~n">>,
+                <<"N ~p, Index ~p, CycleIndex ~p, Times ~p~n">>,
+                [N, Index, CycleIndex, Times]
+            ),
+            io:format(
+                standard_error,
+                <<"Already seen: ShapeIndex ~b, ShiftIndex ~b, Ground ~p, CycleIndex ~p, CycleLength ~p, CycleShiftIndex ~p, Times ~p~n">>,
                 [
-                    element(1, Key),
-                    element(2, Key),
+                    ShapeIndex,
+                    ShiftIndex,
                     lists_ext:take(5, element(3, Key)),
-                    CycleI,
-                    CycleLen,
+                    CycleIndex,
+                    CycleLength,
+                    CycleShiftIndex,
                     Times
                 ]
             ),
-            %% TODO: simulate2(Shapes, NextShiftsAfterSimulateOne, Ground, Height + Times * CycleLen, I + Times * CycleI)
-            ok;
-        _ ->
-            ok
-        %% error({already_seen, Key, {J, Len}})
-    end,
-    %% Extend ground up with empty bits, to align with the falling shape.
-    Shape = element(ShapeIndex + 1, ShapeArray),
-    ShapeIndex2 = (ShapeIndex + 1) rem size(ShapeArray),
-    Ground2 = lists:duplicate(length(Shape) + 3, 2#0000000) ++ Ground,
-    %% Fall shape.
-    {Ground3, ShiftIndex2} = simulate_one(Shape, ShiftArray, ShiftIndex, Ground2),
-    %% Remove empty bits from the top of the ground.
-    Ground4 = lists:dropwhile(fun(Bits) -> Bits == 2#0000000 end, Ground3),
-    %% Save already seen state for cycle detection.
-    ok = persistent_term:put(Key, {I, length(Ground4)}),
-    %% Simulate next shape.
-    simulate(ShapeArray, ShapeIndex2, ShiftArray, ShiftIndex2, Ground4, N, I + 1).
+            simulate(
+                ShapeArray,
+                ShapeIndex + 1,
+                ShiftArray,
+                CycleShiftIndex,
+                Ground,
+                Height + Times * CycleLength,
+                N,
+                Index + Times * CycleIndex
+            );
+        [] ->
+            %% Extend ground up with empty bits, to align with the falling shape.
+            Shape = element(ShapeIndex + 1, ShapeArray),
+            ShapeIndex2 = (ShapeIndex + 1) rem size(ShapeArray),
+            Ground2 = lists:duplicate(length(Shape) + 3, 2#0000000) ++ Ground,
+            %% Fall shape.
+            {Ground3, ShiftIndex2} = simulate_one(Shape, ShiftArray, ShiftIndex, Ground2),
+            %% Remove empty bits from the top of the ground.
+            Ground4 = lists:dropwhile(fun(Bits) -> Bits == 2#0000000 end, Ground3),
+            GroundLength = length(Ground4),
+            %% Save already seen state for cycle detection.
+            true = ets:insert(
+                cycles,
+                {Key, #{
+                    index => Index,
+                    length => GroundLength,
+                    shift => ShiftIndex2
+                }}
+            ),
+            %% Simulate next shape.
+            simulate(
+                ShapeArray, ShapeIndex2, ShiftArray, ShiftIndex2, Ground4, Height, N, Index + 1
+            )
+    end.

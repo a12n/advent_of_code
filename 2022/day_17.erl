@@ -164,7 +164,7 @@ simulate(ShapeArray, ShapeIndex, ShiftArray, ShiftIndex, Ground, Height, N) ->
         <<"~b: ShapeIndex ~p, ShiftIndex ~p, Height ~p~n">>,
         [N, ShapeIndex, ShiftIndex, Height]
     ),
-    Key = {ShapeIndex, ShiftIndex, lists_ext:take(10000, Ground)},
+    Key = {ShapeIndex, ShiftIndex, lists_ext:take(1000, Ground)},
     case lists:sort(fun({_, {N1, _}}, {_, {N2, _}}) -> N1 >= N2 end, ets:lookup(cycles, Key)) of
         [
             {_, {CycleN1, CycleLength1}},

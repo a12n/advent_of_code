@@ -24,7 +24,8 @@
     search/2,
     foldl/3,
     foldr/3,
-    take/2
+    take/2,
+    insert/3, insert/4
 ]).
 
 -spec empty() -> treap().
@@ -167,6 +168,17 @@ take(N, Treap = #treap_node{size = Size}) when N > 0, N =< Size ->
     {Before, Treap2} = split(N - 1, Treap),
     {#treap_node{value = Value, priority = Pri}, After} = split(1, Treap2),
     {Value, Pri, merge(Before, After)}.
+
+-spec insert(pos_integer(), term(), treap()) -> treap().
+insert(N, Value, Treap) ->
+    insert(N, Value, rand:uniform(16#FFFFFFFF_FFFFFFFF), Treap).
+
+-spec insert(pos_integer(), term(), integer(), treap()) -> treap().
+insert(1, Value, Pri, undefined) ->
+    new(Value, Pri);
+insert(N, Value, Pri, Treap = #treap_node{size = Size}) when N > 0, N =< Size + 1 ->
+    {Before, After} = split(N - 1, Treap),
+    merge(merge(Before, new(Value, Pri)), After).
 
 -spec update_size(#treap_node{}) -> #treap_node{}.
 update_size(Treap = #treap_node{left = Left, right = Right}) ->

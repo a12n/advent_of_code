@@ -14,6 +14,7 @@
 
 -export([
     empty/0,
+    new/1, new/2,
     from_list/1, from_list/2,
     to_list/1,
     size/1,
@@ -28,15 +29,17 @@
 -spec empty() -> treap().
 empty() -> undefined.
 
+-spec new(term()) -> treap().
+new(Value) -> new(Value, rand:uniform(16#FFFFFFFF_FFFFFFFF)).
+
+-spec new(term(), integer()) -> treap().
+new(Value, Pri) -> #treap_node{value = Value, priority = Pri, size = 1}.
+
 -spec from_list(list()) -> treap().
 from_list(List) ->
     lists:foldl(
         fun(Value, Root) ->
-            merge(Root, #treap_node{
-                value = Value,
-                priority = rand:uniform(16#FFFFFFFF_FFFFFFFF),
-                size = 1
-            })
+            merge(Root, new(Value))
         end,
         empty(),
         List
@@ -47,11 +50,7 @@ from_list(List, Rand0) ->
     lists:foldl(
         fun(Value, {Root, Rand}) ->
             {Pri, Rand2} = rand:uniform_s(16#FFFFFFFF_FFFFFFFF, Rand),
-            Root2 = merge(Root, #treap_node{
-                value = Value,
-                priority = Pri,
-                size = 1
-            }),
+            Root2 = merge(Root, new(Value, Pri)),
             {Root2, Rand2}
         end,
         {empty(), Rand0},

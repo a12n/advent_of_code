@@ -12,7 +12,7 @@
 
 -export_type([treap/0]).
 
--export([empty/0, from_list/1, from_list/2, size/1, split/2, merge/2, search/2]).
+-export([empty/0, from_list/1, from_list/2, size/1, split/2, merge/2, search/2, fold/3]).
 
 -spec empty() -> treap().
 empty() -> undefined.
@@ -123,6 +123,12 @@ search(Pred, #treap_node{value = Value, left = Left, right = Right}) ->
                     end
             end
     end.
+
+-spec fold(fun((term(), term()) -> term()), term(), treap()) -> term().
+fold(_, Acc, undefined) ->
+    Acc;
+fold(Fun, Acc, #treap_node{value = Value, left = Left, right = Right}) ->
+    fold(Fun, Fun(Value, fold(Fun, Acc, Left)), Right).
 
 -spec update_size(#treap_node{}) -> #treap_node{}.
 update_size(Treap = #treap_node{left = Left, right = Right}) ->

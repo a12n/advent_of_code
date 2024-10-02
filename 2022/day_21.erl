@@ -43,7 +43,7 @@ main(1) ->
         ]
     ),
     %% Awake all monkeys.
-    lists:foreach(fun(PID) -> PID ! init end, pg:get_members(monkeys)),
+    lists:foreach(fun(PID) -> PID ! init end, pg:get_local_members(monkeys)),
     %% Wait result.
     io:format(<<"~b~n">>, [
         (fun WaitAns() ->
@@ -70,7 +70,7 @@ monkey(ID, {init, State}) ->
     end;
 monkey(ID, {yell, Number}) ->
     io:format(standard_error, <<"~s: yell ~p~n">>, [ID, Number]),
-    lists:foreach(fun(PID) -> PID ! {result, ID, Number} end, pg:get_members(monkeys));
+    lists:foreach(fun(PID) -> PID ! {result, ID, Number} end, pg:get_local_members(monkeys));
 monkey(ID, {calculate, Fun, Left, Right}) when is_number(Left), is_number(Right) ->
     io:format(standard_error, <<"~s: calculated, ~p ~p~n">>, [ID, Left, Right]),
     monkey(ID, {yell, Fun(Left, Right)});

@@ -17,7 +17,8 @@
     dir_to_pos/1,
     dir_to_pos/2,
     pos_to_dir/1,
-    char_to_dir/1
+    char_to_dir/1,
+    rotate_dir/2
 ]).
 
 -export([
@@ -70,6 +71,16 @@ char_to_dir($U) -> up;
 char_to_dir($D) -> down;
 char_to_dir($L) -> left;
 char_to_dir($R) -> right.
+
+-spec rotate_dir(cw | ccw, dir()) -> dir().
+rotate_dir(cw, up) -> right;
+rotate_dir(cw, right) -> down;
+rotate_dir(cw, down) -> left;
+rotate_dir(cw, left) -> up;
+rotate_dir(ccw, up) -> left;
+rotate_dir(ccw, right) -> up;
+rotate_dir(ccw, down) -> right;
+rotate_dir(ccw, left) -> down.
 
 -spec from_lines([iodata()]) -> grid(char()).
 from_lines(Lines) ->

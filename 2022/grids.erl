@@ -97,7 +97,7 @@ to_iodata(Grid, Size) -> to_iodata(Grid, _Min = {1, 1}, _Max = Size).
 
 -spec to_iodata(grid(integer(), char()), pos(integer()), pos(integer())) -> iodata().
 to_iodata(Grid, {MinRow, MinCol}, {MaxRow, MaxCol}) ->
-    Blank = $.,
+    Blank = $\s,
     (fun
         Loop(Row, _) when Row == MaxRow + 1 -> "";
         Loop(Row, Col) when Col == MaxCol + 1 ->

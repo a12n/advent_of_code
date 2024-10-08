@@ -26,7 +26,28 @@ main(1) ->
     %% io:format(standard_error, <<"Eval ~p~n">>, [
     %%     eval(FlowRates, Distances, [<<"DD">>, <<"BB">>, <<"JJ">>, <<"HH">>, <<"EE">>, <<"CC">>], 30)
     %% ]),
+    true = register(
+        result_printer,
+        spawn(fun() ->
+            (fun Loop(MaxTotalFlow) ->
+                receive
+                    stop ->
+                        ok;
+                    {Visited, NotVisited, TimeLeft, TotalFlow} when TotalFlow > MaxTotalFlow ->
+                        io:format(standard_error, <<"~s ~b = ~b~n">>, [
+                            [Visited, $-, NotVisited], TimeLeft, TotalFlow
+                        ]),
+                        Loop(TotalFlow);
+                    _ ->
+                        Loop(MaxTotalFlow)
+                end
+            end)(
+                0
+            )
+        end)
+    ),
     MaxFlow = maximum_flow(FlowRates, Distances, [<<"AA">>], NonZeroValves, 30, 0),
+    result_printer ! stop,
     io:format(<<"~b~n">>, [MaxFlow]).
 
 -spec eval(flow_map(), distance_map(), [binary()], non_neg_integer()) -> non_neg_integer().
@@ -82,7 +103,7 @@ for_each_perm(Fun, Perm, List) ->
 ) ->
     non_neg_integer().
 maximum_flow(_, _, Visited, NotVisited, TimeLeft, TotalFlow) when NotVisited == []; TimeLeft == 0 ->
-    io:format(standard_error, <<"~s ~b = ~b~n">>, [[Visited, $-, NotVisited], TimeLeft, TotalFlow]),
+    result_printer ! {Visited, NotVisited, TimeLeft, TotalFlow},
     TotalFlow;
 maximum_flow(FlowRates, Distances, Visited = [PrevValve | _], NotVisited, TimeLeft, TotalFlow) ->
     %% DD BB JJ HH EE CC

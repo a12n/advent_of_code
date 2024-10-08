@@ -23,9 +23,6 @@ main(1) ->
         ),
     Distances = distances(Adjacent),
     NonZeroValves = maps:keys(maps:filter(fun(_, Flow) -> Flow > 0 end, FlowRates)),
-    %% io:format(standard_error, <<"Eval ~p~n">>, [
-    %%     eval(FlowRates, Distances, [<<"DD">>, <<"BB">>, <<"JJ">>, <<"HH">>, <<"EE">>, <<"CC">>], 30)
-    %% ]),
     true = register(
         result_printer,
         spawn(fun() ->
@@ -57,32 +54,13 @@ eval(FlowRates, Distances, NonZeroValves, TimeLeft) ->
 -spec eval(flow_map(), distance_map(), binary(), [binary()], non_neg_integer(), non_neg_integer()) ->
     non_neg_integer().
 eval(_, _, _, NonZeroValves, TimeLeft, TotalFlow) when NonZeroValves == []; TimeLeft == 0 ->
-    io:format(standard_error, <<"eval: NonZeroValves ~p, TimeLeft ~p, TotalFlow ~p~n">>, [
-        NonZeroValves, TimeLeft, TotalFlow
-    ]),
     TotalFlow;
 eval(FlowRates, Distances, Valve, [NextValve | NonZeroValves], TimeLeft, TotalFlow) ->
     Distance = maps:get(NextValve, maps:get(Valve, Distances)),
     Flow = maps:get(NextValve, FlowRates),
     TimeLeft2 = max(0, TimeLeft - Distance - 1),
     TotalFlow2 = TotalFlow + TimeLeft2 * Flow,
-    io:format(
-        standard_error,
-        <<"eval: Valve ~p -> ~p, Distance ~p, Flow ~p, TimeLeft ~p - ~p - 1 = ~p, TotalFlow ~p + ~p = ~p~n">>,
-        [
-            Valve,
-            NextValve,
-            Distance,
-            Flow,
-            TimeLeft,
-            TimeLeft - TimeLeft2,
-            TimeLeft2,
-            TotalFlow,
-            TotalFlow2 - TotalFlow,
-            TotalFlow2
-        ]
-    ),
-    eval(FlowRates, Distances, NextValve, NonZeroValves, TimeLeft2, TotalFlow + TimeLeft2 * Flow).
+    eval(FlowRates, Distances, NextValve, NonZeroValves, TimeLeft2, TotalFlow2).
 
 -spec for_each_perm(fun(), list()) -> ok.
 for_each_perm(Fun, List) -> for_each_perm(Fun, [], List).

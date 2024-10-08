@@ -26,7 +26,7 @@ main(1) ->
     %% io:format(standard_error, <<"Eval ~p~n">>, [
     %%     eval(FlowRates, Distances, [<<"DD">>, <<"BB">>, <<"JJ">>, <<"HH">>, <<"EE">>, <<"CC">>], 30)
     %% ]),
-    MaxFlow = maximum_flow(FlowRates, Distances, NonZeroValves, <<"AA">>, 30),
+    MaxFlow = maximum_flow(FlowRates, Distances, [<<"AA">>], NonZeroValves, 30, 0),
     io:format(<<"~b~n">>, [MaxFlow]).
 
 -spec eval(flow_map(), distance_map(), [binary()], non_neg_integer()) -> non_neg_integer().
@@ -77,11 +77,15 @@ for_each_perm(Fun, Perm, List) ->
         List
     ).
 
--spec maximum_flow(flow_map(), distance_map(), [binary()], binary(), non_neg_integer()) ->
+-spec maximum_flow(
+    flow_map(), distance_map(), [binary()], [binary()], non_neg_integer(), non_neg_integer()
+) ->
     non_neg_integer().
-maximum_flow(_, _, _, _, 0) ->
-    0;
-maximum_flow(FlowRates, Distances, NonZeroValves, PrevValve, TimeLeft) ->
+maximum_flow(_, _, Visited, NotVisited, TimeLeft, TotalFlow) when NotVisited == []; TimeLeft == 0 ->
+    io:format(standard_error, <<"~s ~b = ~b~n">>, [[Visited, $-, NotVisited], TimeLeft, TotalFlow]),
+    TotalFlow;
+maximum_flow(FlowRates, Distances, Visited = [PrevValve | _], NotVisited, TimeLeft, TotalFlow) ->
+    %% DD BB JJ HH EE CC
     lists:foldl(
         fun erlang:max/2,
         0,
@@ -89,23 +93,19 @@ maximum_flow(FlowRates, Distances, NonZeroValves, PrevValve, TimeLeft) ->
             fun(Valve) ->
                 Distance = maps:get(Valve, maps:get(PrevValve, Distances)),
                 Flow = maps:get(Valve, FlowRates),
-                NonZeroValves2 = lists:delete(Valve, NonZeroValves),
+                NotVisited2 = lists:delete(Valve, NotVisited),
                 TimeLeft2 = max(0, TimeLeft - Distance - 1),
-                Result =
-                    TimeLeft2 * Flow +
-                        maximum_flow(
-                            FlowRates,
-                            Distances,
-                            NonZeroValves2,
-                            Valve,
-                            TimeLeft2
-                        ),
-                io:format(standard_error, <<"~b	~s~n">>, [
-                    Result, lists:join(",", [Valve | NonZeroValves2])
-                ]),
-                Result
+                TotalFlow2 = TotalFlow + TimeLeft2 * Flow,
+                maximum_flow(
+                    FlowRates,
+                    Distances,
+                    [Valve | Visited],
+                    NotVisited2,
+                    TimeLeft2,
+                    TotalFlow2
+                )
             end,
-            NonZeroValves
+            NotVisited
         )
     ).
 

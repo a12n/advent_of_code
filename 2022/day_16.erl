@@ -35,7 +35,7 @@ main(1) ->
                         ok;
                     {Visited, NotVisited, TimeLeft, TotalFlow} when TotalFlow > MaxTotalFlow ->
                         io:format(standard_error, <<"~s ~b = ~b~n">>, [
-                            [Visited, $-, NotVisited], TimeLeft, TotalFlow
+                            [lists:reverse(Visited), $-, NotVisited], TimeLeft, TotalFlow
                         ]),
                         Loop(TotalFlow);
                     _ ->

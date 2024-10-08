@@ -63,6 +63,20 @@ eval(FlowRates, Distances, Valve, [NextValve | NonZeroValves], TimeLeft, TotalFl
     ),
     eval(FlowRates, Distances, NextValve, NonZeroValves, TimeLeft2, TotalFlow + TimeLeft2 * Flow).
 
+-spec for_each_perm(fun(), list()) -> ok.
+for_each_perm(Fun, List) -> for_each_perm(Fun, [], List).
+
+-spec for_each_perm(fun(), list(), list()) -> ok.
+for_each_perm(Fun, Perm, []) ->
+    Fun(Perm);
+for_each_perm(Fun, Perm, List) ->
+    lists:foreach(
+        fun(Elt) ->
+            for_each_perm(Fun, [Elt | Perm], lists:delete(Elt, List))
+        end,
+        List
+    ).
+
 -spec maximum_flow(flow_map(), distance_map(), [binary()], binary(), non_neg_integer()) ->
     non_neg_integer().
 maximum_flow(_, _, _, _, 0) ->

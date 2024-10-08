@@ -111,16 +111,16 @@ maximum_flow(FlowRates, Distances, Visited = [PrevValve | _], NotVisited, TimeLe
         fun erlang:max/2,
         0,
         lists:map(
-            fun(Valve) ->
-                Distance = maps:get(Valve, maps:get(PrevValve, Distances)),
-                Flow = maps:get(Valve, FlowRates),
-                NotVisited2 = lists:delete(Valve, NotVisited),
+            fun(NextValve) ->
+                Distance = maps:get(NextValve, maps:get(PrevValve, Distances)),
+                Flow = maps:get(NextValve, FlowRates),
+                NotVisited2 = lists:delete(NextValve, NotVisited),
                 TimeLeft2 = max(0, TimeLeft - Distance - 1),
                 TotalFlow2 = TotalFlow + TimeLeft2 * Flow,
                 maximum_flow(
                     FlowRates,
                     Distances,
-                    [Valve | Visited],
+                    [NextValve | Visited],
                     NotVisited2,
                     TimeLeft2,
                     TotalFlow2

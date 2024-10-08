@@ -28,15 +28,15 @@ main(1) ->
         spawn(fun() ->
             (fun Loop(MaxTotalFlow) ->
                 receive
-                    stop ->
-                        ok;
                     {Visited, NotVisited, TimeLeft, TotalFlow} when TotalFlow > MaxTotalFlow ->
                         io:format(standard_error, <<"~s	~b	~b~n">>, [
                             [lists:reverse(Visited), $-, NotVisited], TimeLeft, TotalFlow
                         ]),
                         Loop(TotalFlow);
-                    _ ->
-                        Loop(MaxTotalFlow)
+                    {_, _, _, _} ->
+                        Loop(MaxTotalFlow);
+                    {stop, From} ->
+                        From ! ok
                 end
             end)(
                 0
@@ -44,7 +44,10 @@ main(1) ->
         end)
     ),
     MaxFlow = maximum_flow(FlowRates, Distances, [<<"AA">>], NonZeroValves, 30, 0),
-    result_printer ! stop,
+    result_printer ! {stop, self()},
+    receive
+        ok -> ok
+    end,
     io:format(<<"~b~n">>, [MaxFlow]).
 
 -spec eval(flow_map(), distance_map(), [binary()], non_neg_integer()) -> non_neg_integer().

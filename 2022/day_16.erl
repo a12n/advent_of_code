@@ -30,7 +30,7 @@ main(1) ->
                 receive
                     {Visited, NotVisited, TimeLeft, TotalFlow} when TotalFlow > MaxTotalFlow ->
                         io:format(standard_error, <<"~s	~b	~b~n">>, [
-                            [lists:reverse(Visited), $-, NotVisited], TimeLeft, TotalFlow
+                            [lists:reverse(Visited), $_, NotVisited], TimeLeft, TotalFlow
                         ]),
                         Loop(TotalFlow);
                     {_, _, _, _} ->
@@ -87,7 +87,6 @@ maximum_flow(_, _, Visited, NotVisited, TimeLeft, TotalFlow) when NotVisited == 
     result_printer ! {Visited, NotVisited, TimeLeft, TotalFlow},
     TotalFlow;
 maximum_flow(FlowRates, Distances, Visited = [PrevValve | _], NotVisited, TimeLeft, TotalFlow) ->
-    %% DD BB JJ HH EE CC
     lists:foldl(
         fun erlang:max/2,
         0,

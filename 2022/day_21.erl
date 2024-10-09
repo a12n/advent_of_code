@@ -15,10 +15,12 @@ main(Part) ->
     %% Parse monkey definitions.
     MonkeyDescrs = lists:map(fun parse_monkey/1, io_ext:read_lines(standard_io)),
     io:format(standard_error, "MonkeyDescrs ~p~n", [MonkeyDescrs]),
-    case Part of
-        1 -> io:format(<<"~b~n">>, [eval_monkeys(MonkeyDescrs)]);
-        2 -> ok
-    end.
+    io:format(<<"~b~n">>, [
+        case Part of
+            1 -> eval_monkeys(MonkeyDescrs);
+            2 -> solve_monkeys(MonkeyDescrs)
+        end
+    ]).
 
 -spec parse_monkey(binary()) -> monkey_descr().
 parse_monkey(Line) ->
@@ -101,3 +103,12 @@ monkey(ID, {calculate, Fun, Left, Right}) ->
         {result, _, _} ->
             monkey(ID, {calculate, Fun, Left, Right})
     end.
+
+%%--------------------------------------------------------------------
+%% Solve for humn
+%%--------------------------------------------------------------------
+
+-spec solve_monkeys([monkey_descr()]) -> number().
+solve_monkeys(MonkeyDescrs) ->
+    %% TODO
+    0.

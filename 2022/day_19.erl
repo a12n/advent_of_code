@@ -23,19 +23,22 @@ main(1) ->
     io:format(standard_error, <<"Blueprints ~p~n">>, [Blueprints]),
     QualityLevels = lists:map(
         fun(Blueprint = #{id := ID}) ->
-            Resources = max_geodes(Blueprint, #{ore => 1}, #{}, 24),
-            io:format(standard_error, <<"ID ~p, Resources ~p~n">>, [ID, Resources]),
-            ID * maps:get(geode, Resources, 0)
+            MaxGeodes = max_geodes(Blueprint, #{ore => 1}, #{}, 24),
+            io:format(standard_error, <<"ID ~p, MaxGeodes ~p~n">>, [ID, MaxGeodes]),
+            ID * MaxGeodes
         end,
         Blueprints
     ),
     io:format(standard_error, <<"QualityLevels ~p~n">>, [QualityLevels]),
     io:format(<<"~b~n">>, [lists:sum(QualityLevels)]).
 
--spec max_geodes(blueprint(), resource_map(), resource_map(), non_neg_integer()) -> resource_map().
+-spec max_geodes(blueprint(), resource_map(), resource_map(), non_neg_integer()) ->
+    non_neg_integer().
+max_geodes(_, _, Inventory, 0) ->
+    maps:get(geode, Inventory, 0);
 max_geodes(Blueprint, Robots, Inventory, TimeLeft) ->
     %% TODO
-    Inventory.
+    0.
 
 -spec parse_blueprint(binary()) -> blueprint().
 parse_blueprint(Line) ->

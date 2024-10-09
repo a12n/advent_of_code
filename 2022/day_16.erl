@@ -50,35 +50,6 @@ main(1) ->
     end,
     io:format(<<"~b~n">>, [MaxFlow]).
 
--spec eval(flow_map(), distance_map(), [binary()], non_neg_integer()) -> non_neg_integer().
-eval(FlowRates, Distances, NonZeroValves, TimeLeft) ->
-    eval(FlowRates, Distances, <<"AA">>, NonZeroValves, TimeLeft, 0).
-
--spec eval(flow_map(), distance_map(), binary(), [binary()], non_neg_integer(), non_neg_integer()) ->
-    non_neg_integer().
-eval(_, _, _, NonZeroValves, TimeLeft, TotalFlow) when NonZeroValves == []; TimeLeft == 0 ->
-    TotalFlow;
-eval(FlowRates, Distances, Valve, [NextValve | NonZeroValves], TimeLeft, TotalFlow) ->
-    Distance = maps:get(NextValve, maps:get(Valve, Distances)),
-    Flow = maps:get(NextValve, FlowRates),
-    TimeLeft2 = max(0, TimeLeft - Distance - 1),
-    TotalFlow2 = TotalFlow + TimeLeft2 * Flow,
-    eval(FlowRates, Distances, NextValve, NonZeroValves, TimeLeft2, TotalFlow2).
-
--spec for_each_perm(fun(), list()) -> ok.
-for_each_perm(Fun, List) -> for_each_perm(Fun, [], List).
-
--spec for_each_perm(fun(), list(), list()) -> ok.
-for_each_perm(Fun, Perm, []) ->
-    Fun(Perm);
-for_each_perm(Fun, Perm, List) ->
-    lists:foreach(
-        fun(Elt) ->
-            for_each_perm(Fun, [Elt | Perm], lists:delete(Elt, List))
-        end,
-        List
-    ).
-
 -spec maximum_flow(
     flow_map(), distance_map(), [binary()], [binary()], non_neg_integer(), non_neg_integer()
 ) ->

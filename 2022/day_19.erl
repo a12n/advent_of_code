@@ -1,8 +1,9 @@
 -module(day_19).
 
--include_lib("eunit/include/eunit.hrl").
-
 -export([main/1]).
+
+-type resource() :: ore | clay | obsidian | geode.
+-type resource_map() :: #{resource() => non_neg_integer()}.
 
 -type ore_robot() :: #{ore := pos_integer()}.
 -type clay_robot() :: #{ore := pos_integer()}.
@@ -19,8 +20,22 @@
 -spec main(1..2) -> ok.
 main(1) ->
     Blueprints = lists:map(fun parse_blueprint/1, io_ext:read_lines(standard_io)),
-    ?debugFmt("Blueprints ~p", [Blueprints]),
-    ok.
+    io:format(standard_error, <<"Blueprints ~p~n">>, [Blueprints]),
+    QualityLevels = lists:map(
+        fun(Blueprint = #{id := ID}) ->
+            Resources = max_geodes(Blueprint, #{ore => 1}, #{}, 24),
+            io:format(standard_error, <<"ID ~p, Resources ~p~n">>, [ID, Resources]),
+            ID * maps:get(geode, Resources, 0)
+        end,
+        Blueprints
+    ),
+    io:format(standard_error, <<"QualityLevels ~p~n">>, [QualityLevels]),
+    io:format(<<"~b~n">>, [lists:sum(QualityLevels)]).
+
+-spec max_geodes(blueprint(), resource_map(), resource_map(), non_neg_integer()) -> resource_map().
+max_geodes(Blueprint, Robots, Inventory, TimeLeft) ->
+    %% TODO
+    Inventory.
 
 -spec parse_blueprint(binary()) -> blueprint().
 parse_blueprint(Line) ->

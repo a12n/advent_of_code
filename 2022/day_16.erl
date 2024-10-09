@@ -4,7 +4,7 @@
 
 -export([main/1]).
 
--type valve_id() :: binary().
+-type valve_id() :: non_neg_integer().
 -type adjacent_map() :: #{_Valve :: valve_id() => _AdjList :: [valve_id()]}.
 -type distance_map() :: #{
     _Valve :: valve_id() => #{_Valve2 :: valve_id() => _Dist :: non_neg_integer()}
@@ -15,7 +15,7 @@
 main(Part) ->
     _Table = ets:new(cache, [named_table]),
     {FlowRates, Distances} = parse_input(io_ext:read_lines(standard_io)),
-    NonZeroValves = lists:sort(maps:keys(maps:filter(fun(_, Flow) -> Flow > 0 end, FlowRates))),
+    NonZeroValves = lists:sort(maps:keys(FlowRates)),
     true = register(
         result_printer,
         spawn(fun() ->
@@ -48,11 +48,11 @@ main(Part) ->
         case Part of
             1 ->
                 maximum_flow(
-                    FlowRates, Distances, [<<"AA">>], NonZeroValves, 30
+                    FlowRates, Distances, [-1], NonZeroValves, 30
                 );
             2 ->
                 maximum_flow2(
-                    FlowRates, Distances, [<<"AA">>], [<<"AA">>], NonZeroValves, 26, 26
+                    FlowRates, Distances, [-1], [-1], NonZeroValves, 26, 26
                 )
         end,
     {ok, _} = timer:cancel(TimerRef),
@@ -267,8 +267,56 @@ parse_input(Lines) ->
             {#{}, #{}},
             Lines
         ),
-    Distances = filter_distances(FlowRates, distances(Adjacent), #{<<"AA">> => []}),
-    {FlowRates, Distances}.
+    NonZeroFlowRates = maps:filter(fun(_, Flow) -> Flow > 0 end, FlowRates),
+    io:format(standard_error, <<"NonZeroFlowRates ~p~n">>, [NonZeroFlowRates]),
+    %% Enumerate valves, replace string keys with integer indices.
+    ValveIndices = maps:from_list([
+        {Valve, Index}
+     || {Index, Valve} <- lists:enumerate(-1, lists:sort([<<"AA">> | maps:keys(NonZeroFlowRates)]))
+    ]),
+    io:format(standard_error, <<"ValveIndices ~p~n">>, [ValveIndices]),
+    %% Rename valves in flow rates.
+    NonZeroFlowRates2 = maps:fold(
+        fun(Valve, Flow, FlowRatesAns) ->
+            Index = maps:get(Valve, ValveIndices),
+            FlowRatesAns#{Index => Flow}
+        end,
+        #{},
+        NonZeroFlowRates
+    ),
+    %% Rename valves in distances, remove zero valves from the distances map.
+    Distances2 = maps:fold(
+        fun
+            (Valve, ValveDistances, DistancesAns) when
+                Valve == <<"AA">>; is_map_key(Valve, NonZeroFlowRates)
+            ->
+                Index = maps:get(Valve, ValveIndices),
+                DistancesAns#{
+                    Index => maps:fold(
+                        fun
+                            (NextValve, Distance, ValveDistancesAns) when
+                                Distance > 0, is_map_key(NextValve, NonZeroFlowRates)
+                            ->
+                                NextIndex = maps:get(NextValve, ValveIndices),
+                                ValveDistancesAns#{NextIndex => Distance};
+                            (_, _, ValveDistancesAns) ->
+                                %% Ignore distance from the valve to
+                                %% itself, or zero flow valve.
+                                ValveDistancesAns
+                        end,
+                        #{},
+                        ValveDistances
+                    )
+                };
+            (_, _, DistancesAns) ->
+                %% Ignore zero flow valve.
+                DistancesAns
+        end,
+        #{},
+        distances(Adjacent)
+    ),
+    %% Return structures with renamed valves.
+    {NonZeroFlowRates2, Distances2}.
 
 -ifdef(TEST).
 

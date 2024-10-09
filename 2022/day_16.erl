@@ -12,6 +12,7 @@
 
 -spec main(1..2) -> ok.
 main(Part) ->
+    _Table = ets:new(cache, [named_table]),
     {FlowRates, Adjacent} =
         lists:foldl(
             fun(Line, {FlowRates, Adjacent}) ->
@@ -68,6 +69,8 @@ maximum_flow(_, _, Opened, NotOpened, TimeLeft, TotalFlow) when NotOpened == [];
     result_printer ! {Opened, NotOpened, TimeLeft, TotalFlow},
     TotalFlow;
 maximum_flow(FlowRates, Distances, Opened = [PrevValve | _], NotOpened, TimeLeft, TotalFlow) ->
+    CacheKey = {PrevValve, NotOpened, TimeLeft},
+    ets:update_counter(cache, CacheKey, 1, {CacheKey, 1}),
     lists:foldl(
         fun erlang:max/2,
         0,
@@ -125,6 +128,8 @@ maximum_flow2(
     TimeLeftB,
     TotalFlow
 ) ->
+    CacheKey = {{PrevValveA, PrevValveB}, NotOpened, {TimeLeftA, TimeLeftB}},
+    ets:update_counter(cache, CacheKey, 1, {CacheKey, 1}),
     lists:foldl(
         fun erlang:max/2,
         0,

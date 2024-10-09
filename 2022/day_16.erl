@@ -45,8 +45,14 @@ main(Part) ->
     ),
     MaxFlow =
         case Part of
-            1 -> maximum_flow(FlowRates, Distances, [<<"AA">>], NonZeroValves, 30, 0);
-            2 -> 0
+            1 ->
+                maximum_flow(
+                    FlowRates, Distances, [<<"AA">>], NonZeroValves, 30, 0
+                );
+            2 ->
+                maximum_flow2(
+                    FlowRates, Distances, [<<"AA">>], [<<"AA">>], NonZeroValves, 26, 26, 0
+                )
         end,
     result_printer ! {stop, self()},
     receive
@@ -79,6 +85,81 @@ maximum_flow(FlowRates, Distances, Opened = [PrevValve | _], NotOpened, TimeLeft
                     NotOpened2,
                     TimeLeft2,
                     TotalFlow2
+                )
+            end,
+            NotOpened
+        )
+    ).
+
+-spec maximum_flow2(
+    flow_map(),
+    distance_map(),
+    [binary()],
+    [binary()],
+    [binary()],
+    non_neg_integer(),
+    non_neg_integer(),
+    non_neg_integer()
+) ->
+    non_neg_integer().
+maximum_flow2(_, _, OpenedA, OpenedB, NotOpened, TimeLeftA, TimeLeftB, TotalFlow) when
+    NotOpened == [] orelse (TimeLeftA == 0 andalso TimeLeftB == 0)
+->
+    result_printer ! {[OpenedA, $/, OpenedB], NotOpened, max(TimeLeftA, TimeLeftB), TotalFlow},
+    TotalFlow;
+maximum_flow2(
+    FlowRates, Distances, OpenedA, _OpenedB, NotOpened, TimeLeftA, _TimeLeftB = 0, TotalFlow
+) ->
+    maximum_flow(FlowRates, Distances, OpenedA, NotOpened, TimeLeftA, TotalFlow);
+maximum_flow2(
+    FlowRates, Distances, _OpenedA, OpenedB, NotOpened, _TimeLeftA = 0, TimeLeftB, TotalFlow
+) ->
+    maximum_flow(FlowRates, Distances, OpenedB, NotOpened, TimeLeftB, TotalFlow);
+maximum_flow2(
+    FlowRates,
+    Distances,
+    OpenedA = [PrevValveA | _],
+    OpenedB = [PrevValveB | _],
+    NotOpened,
+    TimeLeftA,
+    TimeLeftB,
+    TotalFlow
+) ->
+    lists:foldl(
+        fun erlang:max/2,
+        0,
+        lists:map(
+            fun(NextValveA) ->
+                DistanceA = maps:get(NextValveA, maps:get(PrevValveA, Distances)),
+                FlowA = maps:get(NextValveA, FlowRates),
+                OpenedA2 = [NextValveA | OpenedA],
+                NotOpened2 = lists:delete(NextValveA, NotOpened),
+                TimeLeftA2 = max(0, TimeLeftA - DistanceA - 1),
+                TotalFlowA = TimeLeftA2 * FlowA,
+                lists:foldl(
+                    fun erlang:max/2,
+                    0,
+                    lists:map(
+                        fun(NextValveB) ->
+                            DistanceB = maps:get(NextValveB, maps:get(PrevValveB, Distances)),
+                            FlowB = maps:get(NextValveB, FlowRates),
+                            OpenedB2 = [NextValveB | OpenedB],
+                            NotOpened3 = lists:delete(NextValveB, NotOpened2),
+                            TimeLeftB2 = max(0, TimeLeftB - DistanceB - 1),
+                            TotalFlowB = TimeLeftB2 * FlowB,
+                            maximum_flow2(
+                                FlowRates,
+                                Distances,
+                                OpenedA2,
+                                OpenedB2,
+                                NotOpened3,
+                                TimeLeftA2,
+                                TimeLeftB2,
+                                TotalFlow + TotalFlowA + TotalFlowB
+                            )
+                        end,
+                        NotOpened2
+                    )
                 )
             end,
             NotOpened

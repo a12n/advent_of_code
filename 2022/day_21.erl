@@ -89,69 +89,6 @@ solve({'/', N, M}, K) when is_integer(K) ->
     end.
 
 %%--------------------------------------------------------------------
-%% Monkey processes
-%%--------------------------------------------------------------------
-
--type monkey_state() ::
-    {yell, number()} | {calculate, operation(), number() | binary(), number() | binary()}.
-
--spec eval_monkeys([monkey_descr()]) -> ok.
-eval_monkeys(MonkeyDescrs) ->
-    %% Spawn monkey processes.
-    {ok, Group} = pg:start_link(),
-    pg:join(
-        monkeys,
-        [
-            self()
-            | lists:map(
-                fun
-                    ({ID, {Fun, Left, Right}}) ->
-                        spawn_link(fun() -> monkey(ID, {init, {calculate, Fun, Left, Right}}) end);
-                    ({ID, Number}) ->
-                        spawn_link(fun() -> monkey(ID, {init, {yell, Number}}) end)
-                end,
-                MonkeyDescrs
-            )
-        ]
-    ),
-    %% Awake all monkeys.
-    lists:foreach(fun(PID) -> PID ! init end, pg:get_local_members(monkeys)),
-    %% Wait result.
-    Result =
-        (fun WaitAns() ->
-            receive
-                {result, <<"root">>, Ans} -> Ans;
-                {result, _, _} -> WaitAns()
-            end
-        end)(),
-    exit(Group, normal),
-    Result.
-
--spec monkey(binary(), monkey_state() | {init, monkey_state()}) -> ok.
-monkey(ID, {init, State}) ->
-    receive
-        init -> monkey(ID, State);
-        _ -> monkey(ID, {init, State})
-    end;
-monkey(ID, {yell, Number}) ->
-    io:format(standard_error, <<"~s: yell ~p~n">>, [ID, Number]),
-    lists:foreach(fun(PID) -> PID ! {result, ID, Number} end, pg:get_local_members(monkeys));
-monkey(ID, {calculate, Fun, Left, Right}) when is_number(Left), is_number(Right) ->
-    io:format(standard_error, <<"~s: calculated, ~p ~p~n">>, [ID, Left, Right]),
-    monkey(ID, {yell, Fun(Left, Right)});
-monkey(ID, {calculate, Fun, Left, Right}) ->
-    receive
-        {result, Left, Number} ->
-            io:format(standard_error, <<"~s: received left ~p~n">>, [ID, Number]),
-            monkey(ID, {calculate, Fun, Number, Right});
-        {result, Right, Number} ->
-            io:format(standard_error, <<"~s: received right ~p~n">>, [ID, Number]),
-            monkey(ID, {calculate, Fun, Left, Number});
-        {result, _, _} ->
-            monkey(ID, {calculate, Fun, Left, Right})
-    end.
-
-%%--------------------------------------------------------------------
 %% Solve for humn
 %%--------------------------------------------------------------------
 

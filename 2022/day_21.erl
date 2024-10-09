@@ -3,50 +3,22 @@
 -export([main/1]).
 
 -type monkey_id() :: binary().
--type monkey_descr() ::
-    {
-        monkey_id(),
-        integer()
-        | {
-            fun((integer(), integer()) -> integer()),
-            monkey_id() | integer(),
-            monkey_id() | integer()
-        }
-    }.
+-type operation() :: fun((number(), number()) -> number()).
+-type monkey_descr() :: {
+    monkey_id(),
+    number()
+    | {operation(), monkey_id() | number(), monkey_id() | number()}
+}.
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
     %% Parse monkey definitions.
     MonkeyDescrs = lists:map(fun parse_monkey/1, io_ext:read_lines(standard_io)),
     io:format(standard_error, "MonkeyDescrs ~p~n", [MonkeyDescrs]),
-    %% Spawn monkey processes.
-    {ok, _} = pg:start_link(),
-    pg:join(
-        monkeys,
-        [
-            self()
-            | lists:map(
-                fun
-                    ({ID, {Fun, Left, Right}}) ->
-                        spawn_link(fun() -> monkey(ID, {init, {calculate, Fun, Left, Right}}) end);
-                    ({ID, Number}) ->
-                        spawn_link(fun() -> monkey(ID, {init, {yell, Number}}) end)
-                end,
-                MonkeyDescrs
-            )
-        ]
-    ),
-    %% Awake all monkeys.
-    lists:foreach(fun(PID) -> PID ! init end, pg:get_local_members(monkeys)),
-    %% Wait result.
-    io:format(<<"~b~n">>, [
-        (fun WaitAns() ->
-            receive
-                {result, <<"root">>, Ans} -> Ans;
-                {result, _, _} -> WaitAns()
-            end
-        end)()
-    ]).
+    case Part of
+        1 -> io:format(<<"~b~n">>, [eval_monkeys(MonkeyDescrs)]);
+        2 -> ok
+    end.
 
 -spec parse_monkey(binary()) -> monkey_descr().
 parse_monkey(Line) ->
@@ -71,9 +43,40 @@ parse_monkey(Line) ->
 %% Monkey processes
 %%--------------------------------------------------------------------
 
--type operation() :: fun((number(), number()) -> number()).
 -type monkey_state() ::
     {yell, number()} | {calculate, operation(), number() | binary(), number() | binary()}.
+
+-spec eval_monkeys([monkey_descr()]) -> ok.
+eval_monkeys(MonkeyDescrs) ->
+    %% Spawn monkey processes.
+    {ok, Group} = pg:start_link(),
+    pg:join(
+        monkeys,
+        [
+            self()
+            | lists:map(
+                fun
+                    ({ID, {Fun, Left, Right}}) ->
+                        spawn_link(fun() -> monkey(ID, {init, {calculate, Fun, Left, Right}}) end);
+                    ({ID, Number}) ->
+                        spawn_link(fun() -> monkey(ID, {init, {yell, Number}}) end)
+                end,
+                MonkeyDescrs
+            )
+        ]
+    ),
+    %% Awake all monkeys.
+    lists:foreach(fun(PID) -> PID ! init end, pg:get_local_members(monkeys)),
+    %% Wait result.
+    Result =
+        (fun WaitAns() ->
+            receive
+                {result, <<"root">>, Ans} -> Ans;
+                {result, _, _} -> WaitAns()
+            end
+        end)(),
+    exit(Group, normal),
+    Result.
 
 -spec monkey(binary(), monkey_state() | {init, monkey_state()}) -> ok.
 monkey(ID, {init, State}) ->

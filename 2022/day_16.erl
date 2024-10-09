@@ -22,7 +22,7 @@ main(Part) ->
             io_ext:read_lines(standard_io)
         ),
     Distances = filter_distances(FlowRates, distances(Adjacent), #{<<"AA">> => []}),
-    NonZeroValves = maps:keys(maps:filter(fun(_, Flow) -> Flow > 0 end, FlowRates)),
+    NonZeroValves = lists:sort(maps:keys(maps:filter(fun(_, Flow) -> Flow > 0 end, FlowRates))),
     true = register(
         result_printer,
         spawn(fun() ->

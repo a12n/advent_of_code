@@ -270,13 +270,12 @@ parse_input(Lines) ->
                     Index => maps:fold(
                         fun
                             (NextValve, Distance, ValveDistancesAns) when
-                                Distance > 0, is_map_key(NextValve, NonZeroFlowRates)
+                                is_map_key(NextValve, NonZeroFlowRates)
                             ->
                                 NextIndex = maps:get(NextValve, ValveIndices),
                                 ValveDistancesAns#{NextIndex => Distance};
                             (_, _, ValveDistancesAns) ->
-                                %% Ignore distance from the valve to
-                                %% itself, or zero flow valve.
+                                %% Ignore zero flow valve.
                                 ValveDistancesAns
                         end,
                         #{},

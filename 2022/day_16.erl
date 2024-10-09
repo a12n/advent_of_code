@@ -179,3 +179,94 @@ parse_valve(Line) ->
     ] =
         binary:split(Line, [<<" ">>, <<",">>, <<"=">>, <<";">>], [global, trim_all]),
     {Valve, binary_to_integer(FlowStr), AdjList}.
+
+-ifdef(TEST).
+
+-include_lib("eunit/include/eunit.hrl").
+
+distances_test() ->
+    ?assertEqual(
+        #{
+            a => #{
+                b => 1,
+                c => 2,
+                d => 1,
+                e => 2,
+                h => 5,
+                j => 2
+            },
+            b => #{
+                c => 1,
+                d => 2,
+                e => 3,
+                h => 6,
+                j => 3
+            },
+            c => #{
+                b => 1,
+                d => 1,
+                e => 2,
+                h => 5,
+                j => 4
+            },
+            d => #{
+                b => 2,
+                c => 1,
+                e => 1,
+                h => 4,
+                j => 3
+            },
+            e => #{
+                b => 3,
+                c => 2,
+                d => 1,
+                h => 3,
+                j => 4
+            },
+            h => #{
+                b => 6,
+                c => 5,
+                d => 4,
+                e => 3,
+                j => 7
+            },
+            j => #{
+                b => 3,
+                c => 4,
+                d => 3,
+                e => 4,
+                h => 7
+            }
+        },
+        filter_distances(
+            _FlowRates = #{
+                a => 0,
+                b => 13,
+                c => 2,
+                d => 20,
+                e => 3,
+                f => 0,
+                g => 0,
+                h => 22,
+                i => 0,
+                j => 21
+            },
+            distances(
+                _Adjacent = #{
+                    a => [d, i, b],
+                    b => [c, a],
+                    c => [d, b],
+                    d => [a, e, c],
+                    e => [d, f],
+                    f => [e, g],
+                    g => [f, h],
+                    h => [g],
+                    i => [a, j],
+                    j => [i]
+                }
+            ),
+            _Keep = #{a => []}
+        )
+    ).
+
+-endif.

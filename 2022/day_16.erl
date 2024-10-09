@@ -15,17 +15,11 @@
 main(Part) ->
     _Table = ets:new(cache, [named_table]),
     {FlowRates, Distances} = parse_input(io_ext:read_lines(standard_io)),
-    NonZeroValves = lists:sort(maps:keys(FlowRates)),
+    NotOpened = lists:sort(_Valves = maps:keys(FlowRates)),
     MaxFlow =
         case Part of
-            1 ->
-                maximum_flow(
-                    FlowRates, Distances, -1, NonZeroValves, 30
-                );
-            2 ->
-                maximum_flow2(
-                    FlowRates, Distances, -1, -1, NonZeroValves, 26, 26
-                )
+            1 -> maximum_flow(FlowRates, Distances, -1, NotOpened, 30);
+            2 -> maximum_flow2(FlowRates, Distances, -1, -1, NotOpened, 26, 26)
         end,
     io:format(<<"~b~n">>, [MaxFlow]).
 

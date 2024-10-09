@@ -11,7 +11,7 @@
 -type flow_map() :: #{_Valve :: binary() := _Flow :: non_neg_integer()}.
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
     {FlowRates, Adjacent} =
         lists:foldl(
             fun(Line, {FlowRates, Adjacent}) ->
@@ -43,7 +43,11 @@ main(1) ->
             )
         end)
     ),
-    MaxFlow = maximum_flow(FlowRates, Distances, [<<"AA">>], NonZeroValves, 30, 0),
+    MaxFlow =
+        case Part of
+            1 -> maximum_flow(FlowRates, Distances, [<<"AA">>], NonZeroValves, 30, 0);
+            2 -> 0
+        end,
     result_printer ! {stop, self()},
     receive
         ok -> ok

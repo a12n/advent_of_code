@@ -21,7 +21,7 @@ main(1) ->
             {#{}, #{}},
             io_ext:read_lines(standard_io)
         ),
-    Distances = distances(Adjacent),
+    Distances = filter_distances(FlowRates, distances(Adjacent)),
     NonZeroValves = maps:keys(maps:filter(fun(_, Flow) -> Flow > 0 end, FlowRates)),
     true = register(
         result_printer,
@@ -108,6 +108,29 @@ maximum_flow(FlowRates, Distances, Visited = [PrevValve | _], NotVisited, TimeLe
             end,
             NotVisited
         )
+    ).
+
+-spec filter_distances(flow_map(), distance_map()) -> distance_map().
+filter_distances(FlowRates, Distances) ->
+    maps:filtermap(
+        fun
+            (Valve, AdjDistances) when
+                Valve == <<"AA">>;
+                map_get(Valve, FlowRates) > 0
+            ->
+                {true,
+                    maps:filter(
+                        fun
+                            (AdjValve, _) when AdjValve == Valve -> false;
+                            (AdjValve, _) when map_get(AdjValve, FlowRates) > 0 -> true;
+                            (_, _) -> false
+                        end,
+                        AdjDistances
+                    )};
+            (_, _) ->
+                false
+        end,
+        Distances
     ).
 
 -spec distances(adjacent_map()) -> distance_map().

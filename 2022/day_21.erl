@@ -42,6 +42,30 @@ parse_monkey(Line) ->
     end.
 
 %%--------------------------------------------------------------------
+%% Expressions and equations.
+%%--------------------------------------------------------------------
+
+-type expr() :: binary() | integer() | {operation(), expr(), expr()}.
+-type expr_env() :: #{binary() => expr()}.
+-type operation() :: '*' | '+' | '-' | '/'.
+
+-spec eval(expr()) -> integer().
+eval(Expr) -> eval(Expr, #{}).
+
+-spec eval(expr(), expr_env()) -> integer().
+eval(N, _) when is_integer(N) -> N;
+eval(Var, Env) when is_binary(Var) -> eval(maps:get(Var, Env), Env);
+eval({Op, N, M}, _) when is_integer(N), is_integer(M) ->
+    case Op of
+        '*' -> N * M;
+        '+' -> N + M;
+        '-' -> N - M;
+        '/' -> N div M
+    end;
+eval({Op, N, M}, Env) when is_tuple(N); is_binary(N) -> eval({Op, eval(N, Env), M}, Env);
+eval({Op, N, M}, Env) when is_tuple(M); is_binary(M) -> eval({Op, N, eval(M, Env)}, Env).
+
+%%--------------------------------------------------------------------
 %% Monkey processes
 %%--------------------------------------------------------------------
 

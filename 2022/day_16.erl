@@ -265,7 +265,7 @@ parse_input(Lines) ->
                 {FlowRates#{Valve => Flow}, Adjacent#{Valve => AdjList}}
             end,
             {#{}, #{}},
-            io_ext:read_lines(standard_io)
+            Lines
         ),
     Distances = filter_distances(FlowRates, distances(Adjacent), #{<<"AA">> => []}),
     {FlowRates, Distances}.

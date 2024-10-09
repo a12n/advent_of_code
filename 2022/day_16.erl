@@ -139,14 +139,13 @@ distances(Adjacent) ->
 
 -spec valve_distances(binary(), adjacent_map()) -> #{binary() => non_neg_integer()}.
 valve_distances(SourceValve, Adjacent) ->
-    (fun Loop(Queue, Distances) ->
+    (fun Loop(Queue, Visited, Distances) ->
         try
             {{Dist, Valve}, Queue2} = gb_sets:take_smallest(Queue),
-            Distances2 = Distances#{Valve => Dist},
             AdjList = [
                 {Dist + 1, AdjValve}
              || AdjValve <- maps:get(Valve, Adjacent, []),
-                not maps:is_key(AdjValve, Distances2)
+                not gb_sets:is_element(AdjValve, Visited)
             ],
             Queue3 =
                 lists:foldl(
@@ -154,12 +153,21 @@ valve_distances(SourceValve, Adjacent) ->
                     Queue2,
                     AdjList
                 ),
-            Loop(Queue3, Distances2)
+            Visited2 =
+                lists:foldl(
+                    fun gb_sets:add_element/2,
+                    Visited,
+                    [AdjValve || {_, AdjValve} <- AdjList]
+                ),
+            Distances2 = Distances#{Valve => Dist},
+            Loop(Queue3, Visited2, Distances2)
         catch
             error:_ -> Distances
         end
     end)(
-        gb_sets:from_list([{0, SourceValve}]), #{}
+        gb_sets:from_list([{0, SourceValve}]),
+        gb_sets:from_list([SourceValve]),
+        #{}
     ).
 
 -spec parse_valve(binary()) -> {binary(), non_neg_integer(), [binary()]}.

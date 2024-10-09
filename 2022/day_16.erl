@@ -112,10 +112,6 @@ maximum_flow(FlowRates, Distances, Opened = [PrevValve | _], NotOpened, TimeLeft
     non_neg_integer()
 ) ->
     non_neg_integer().
-maximum_flow2(_, _, _OpenedA, _OpenedB, NotOpened, TimeLeftA, TimeLeftB) when
-    NotOpened == [] orelse (TimeLeftA == 0 andalso TimeLeftB == 0)
-->
-    0;
 maximum_flow2(
     FlowRates, Distances, OpenedA, _OpenedB, NotOpened, TimeLeftA, _TimeLeftB = 0
 ) ->

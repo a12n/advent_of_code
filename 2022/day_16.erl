@@ -28,9 +28,9 @@ main(Part) ->
         spawn(fun() ->
             (fun Loop(MaxTotalFlow) ->
                 receive
-                    {Visited, NotVisited, TimeLeft, TotalFlow} when TotalFlow > MaxTotalFlow ->
+                    {Opened, NotOpened, TimeLeft, TotalFlow} when TotalFlow > MaxTotalFlow ->
                         io:format(standard_error, <<"~s	~b	~b~n">>, [
-                            [lists:reverse(Visited), $_, NotVisited], TimeLeft, TotalFlow
+                            [lists:reverse(Opened), $_, NotOpened], TimeLeft, TotalFlow
                         ]),
                         Loop(TotalFlow);
                     {_, _, _, _} ->
@@ -58,10 +58,10 @@ main(Part) ->
     flow_map(), distance_map(), [binary()], [binary()], non_neg_integer(), non_neg_integer()
 ) ->
     non_neg_integer().
-maximum_flow(_, _, Visited, NotVisited, TimeLeft, TotalFlow) when NotVisited == []; TimeLeft == 0 ->
-    result_printer ! {Visited, NotVisited, TimeLeft, TotalFlow},
+maximum_flow(_, _, Opened, NotOpened, TimeLeft, TotalFlow) when NotOpened == []; TimeLeft == 0 ->
+    result_printer ! {Opened, NotOpened, TimeLeft, TotalFlow},
     TotalFlow;
-maximum_flow(FlowRates, Distances, Visited = [PrevValve | _], NotVisited, TimeLeft, TotalFlow) ->
+maximum_flow(FlowRates, Distances, Opened = [PrevValve | _], NotOpened, TimeLeft, TotalFlow) ->
     lists:foldl(
         fun erlang:max/2,
         0,
@@ -69,19 +69,19 @@ maximum_flow(FlowRates, Distances, Visited = [PrevValve | _], NotVisited, TimeLe
             fun(NextValve) ->
                 Distance = maps:get(NextValve, maps:get(PrevValve, Distances)),
                 Flow = maps:get(NextValve, FlowRates),
-                NotVisited2 = lists:delete(NextValve, NotVisited),
+                NotOpened2 = lists:delete(NextValve, NotOpened),
                 TimeLeft2 = max(0, TimeLeft - Distance - 1),
                 TotalFlow2 = TotalFlow + TimeLeft2 * Flow,
                 maximum_flow(
                     FlowRates,
                     Distances,
-                    [NextValve | Visited],
-                    NotVisited2,
+                    [NextValve | Opened],
+                    NotOpened2,
                     TimeLeft2,
                     TotalFlow2
                 )
             end,
-            NotVisited
+            NotOpened
         )
     ).
 

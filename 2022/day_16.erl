@@ -48,11 +48,11 @@ main(Part) ->
         case Part of
             1 ->
                 maximum_flow(
-                    FlowRates, Distances, [-1], NonZeroValves, 30
+                    FlowRates, Distances, -1, NonZeroValves, 30
                 );
             2 ->
                 maximum_flow2(
-                    FlowRates, Distances, [-1], [-1], NonZeroValves, 26, 26
+                    FlowRates, Distances, -1, -1, NonZeroValves, 26, 26
                 )
         end,
     {ok, _} = timer:cancel(TimerRef),
@@ -63,12 +63,12 @@ main(Part) ->
     io:format(<<"~b~n">>, [MaxFlow]).
 
 -spec maximum_flow(
-    flow_map(), distance_map(), [valve_id()], [valve_id()], non_neg_integer()
+    flow_map(), distance_map(), valve_id(), [valve_id()], non_neg_integer()
 ) ->
     non_neg_integer().
-maximum_flow(_, _, _Opened, NotOpened, TimeLeft) when NotOpened == []; TimeLeft == 0 ->
+maximum_flow(_, _, _, NotOpened, TimeLeft) when NotOpened == []; TimeLeft == 0 ->
     0;
-maximum_flow(FlowRates, Distances, Opened = [PrevValve | _], NotOpened, TimeLeft) ->
+maximum_flow(FlowRates, Distances, PrevValve, NotOpened, TimeLeft) ->
     CacheKey = {PrevValve, NotOpened, TimeLeft},
     case ets:lookup(cache, CacheKey) of
         [{_, TotalFlow}] ->
@@ -88,7 +88,7 @@ maximum_flow(FlowRates, Distances, Opened = [PrevValve | _], NotOpened, TimeLeft
                                 maximum_flow(
                                     FlowRates,
                                     Distances,
-                                    [NextValve | Opened],
+                                    NextValve,
                                     NotOpened2,
                                     TimeLeft2
                                 )
@@ -103,26 +103,26 @@ maximum_flow(FlowRates, Distances, Opened = [PrevValve | _], NotOpened, TimeLeft
 -spec maximum_flow2(
     flow_map(),
     distance_map(),
-    [valve_id()],
-    [valve_id()],
+    valve_id(),
+    valve_id(),
     [valve_id()],
     non_neg_integer(),
     non_neg_integer()
 ) ->
     non_neg_integer().
 maximum_flow2(
-    FlowRates, Distances, OpenedA, _OpenedB, NotOpened, TimeLeftA, _TimeLeftB = 0
+    FlowRates, Distances, ValveA, _ValveB, NotOpened, TimeLeftA, _TimeLeftB = 0
 ) ->
-    maximum_flow(FlowRates, Distances, OpenedA, NotOpened, TimeLeftA);
+    maximum_flow(FlowRates, Distances, ValveA, NotOpened, TimeLeftA);
 maximum_flow2(
-    FlowRates, Distances, _OpenedA, OpenedB, NotOpened, _TimeLeftA = 0, TimeLeftB
+    FlowRates, Distances, _ValveA, ValveB, NotOpened, _TimeLeftA = 0, TimeLeftB
 ) ->
-    maximum_flow(FlowRates, Distances, OpenedB, NotOpened, TimeLeftB);
+    maximum_flow(FlowRates, Distances, ValveB, NotOpened, TimeLeftB);
 maximum_flow2(
     FlowRates,
     Distances,
-    OpenedA = [PrevValveA | _],
-    OpenedB = [PrevValveB | _],
+    PrevValveA,
+    PrevValveB,
     NotOpened,
     TimeLeftA,
     TimeLeftB
@@ -140,7 +140,6 @@ maximum_flow2(
                         fun(NextValveA) ->
                             DistanceA = maps:get(NextValveA, maps:get(PrevValveA, Distances)),
                             FlowA = maps:get(NextValveA, FlowRates),
-                            OpenedA2 = [NextValveA | OpenedA],
                             NotOpened2 = lists:delete(NextValveA, NotOpened),
                             TimeLeftA2 = max(0, TimeLeftA - DistanceA - 1),
                             TimeLeftA2 * FlowA +
@@ -153,15 +152,14 @@ maximum_flow2(
                                                 NextValveB, maps:get(PrevValveB, Distances)
                                             ),
                                             FlowB = maps:get(NextValveB, FlowRates),
-                                            OpenedB2 = [NextValveB | OpenedB],
                                             NotOpened3 = lists:delete(NextValveB, NotOpened2),
                                             TimeLeftB2 = max(0, TimeLeftB - DistanceB - 1),
                                             TimeLeftB2 * FlowB +
                                                 maximum_flow2(
                                                     FlowRates,
                                                     Distances,
-                                                    OpenedA2,
-                                                    OpenedB2,
+                                                    NextValveA,
+                                                    NextValveB,
                                                     NotOpened3,
                                                     TimeLeftA2,
                                                     TimeLeftB2

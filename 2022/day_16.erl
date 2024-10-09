@@ -4,11 +4,12 @@
 
 -export([main/1]).
 
--type adjacent_map() :: #{_Valve :: binary() => _AdjList :: [binary()]}.
+-type valve_id() :: binary().
+-type adjacent_map() :: #{_Valve :: valve_id() => _AdjList :: [valve_id()]}.
 -type distance_map() :: #{
-    _Valve :: binary() => #{_Valve2 :: binary() => _Dist :: non_neg_integer()}
+    _Valve :: valve_id() => #{_Valve2 :: valve_id() => _Dist :: non_neg_integer()}
 }.
--type flow_map() :: #{_Valve :: binary() := _Flow :: non_neg_integer()}.
+-type flow_map() :: #{_Valve :: valve_id() := _Flow :: non_neg_integer()}.
 
 -spec main(1..2) -> ok.
 main(Part) ->
@@ -71,7 +72,7 @@ main(Part) ->
     io:format(<<"~b~n">>, [MaxFlow]).
 
 -spec maximum_flow(
-    flow_map(), distance_map(), [binary()], [binary()], non_neg_integer()
+    flow_map(), distance_map(), [valve_id()], [valve_id()], non_neg_integer()
 ) ->
     non_neg_integer().
 maximum_flow(_, _, _Opened, NotOpened, TimeLeft) when NotOpened == []; TimeLeft == 0 ->
@@ -111,9 +112,9 @@ maximum_flow(FlowRates, Distances, Opened = [PrevValve | _], NotOpened, TimeLeft
 -spec maximum_flow2(
     flow_map(),
     distance_map(),
-    [binary()],
-    [binary()],
-    [binary()],
+    [valve_id()],
+    [valve_id()],
+    [valve_id()],
     non_neg_integer(),
     non_neg_integer()
 ) ->
@@ -213,7 +214,7 @@ filter_distances(FlowRates, Distances, Keep) ->
 distances(Adjacent) ->
     maps:map(fun(Valve, _) -> valve_distances(Valve, Adjacent) end, Adjacent).
 
--spec valve_distances(binary(), adjacent_map()) -> #{binary() => non_neg_integer()}.
+-spec valve_distances(binary(), adjacent_map()) -> #{valve_id() => non_neg_integer()}.
 valve_distances(SourceValve, Adjacent) ->
     (fun Loop(Queue, Visited, Distances) ->
         try

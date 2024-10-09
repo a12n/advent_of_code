@@ -39,7 +39,7 @@ main(Part) ->
                     dump_cache ->
                         ets:foldl(
                             fun({Key, Value}, ok) ->
-                                ok = io:format(standard_error, <<"~p = ~b~n">>, [Key, Value])
+                                ok = io:format(standard_error, <<"~p	~b~n">>, [Key, Value])
                             end,
                             ok,
                             cache

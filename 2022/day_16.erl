@@ -16,34 +16,6 @@ main(Part) ->
     _Table = ets:new(cache, [named_table]),
     {FlowRates, Distances} = parse_input(io_ext:read_lines(standard_io)),
     NonZeroValves = lists:sort(maps:keys(FlowRates)),
-    true = register(
-        result_printer,
-        spawn(fun() ->
-            (fun Loop(MaxTotalFlow) ->
-                receive
-                    {Opened, NotOpened, TimeLeft, TotalFlow} when TotalFlow > MaxTotalFlow ->
-                        io:format(standard_error, <<"~s	~b	~b~n">>, [
-                            [lists:reverse(Opened), $_, NotOpened], TimeLeft, TotalFlow
-                        ]),
-                        Loop(TotalFlow);
-                    {_, _, _, _} ->
-                        Loop(MaxTotalFlow);
-                    dump_cache ->
-                        Info = ets:info(cache),
-                        io:format(standard_error, <<"cache: size ~b, memory ~b~n">>, [
-                            proplists:get_value(size, Info),
-                            proplists:get_value(memory, Info)
-                        ]),
-                        Loop(MaxTotalFlow);
-                    {stop, From} ->
-                        From ! ok
-                end
-            end)(
-                0
-            )
-        end)
-    ),
-    {ok, TimerRef} = timer:send_interval(1000, result_printer, dump_cache),
     MaxFlow =
         case Part of
             1 ->
@@ -55,11 +27,6 @@ main(Part) ->
                     FlowRates, Distances, -1, -1, NonZeroValves, 26, 26
                 )
         end,
-    {ok, _} = timer:cancel(TimerRef),
-    result_printer ! {stop, self()},
-    receive
-        ok -> ok
-    end,
     io:format(<<"~b~n">>, [MaxFlow]).
 
 -spec maximum_flow(
@@ -243,13 +210,11 @@ parse_input(Lines) ->
             Lines
         ),
     NonZeroFlowRates = maps:filter(fun(_, Flow) -> Flow > 0 end, FlowRates),
-    io:format(standard_error, <<"NonZeroFlowRates ~p~n">>, [NonZeroFlowRates]),
     %% Enumerate valves, replace string keys with integer indices.
     ValveIndices = maps:from_list([
         {Valve, Index}
      || {Index, Valve} <- lists:enumerate(-1, lists:sort([<<"AA">> | maps:keys(NonZeroFlowRates)]))
     ]),
-    io:format(standard_error, <<"ValveIndices ~p~n">>, [ValveIndices]),
     %% Rename valves in flow rates.
     NonZeroFlowRates2 = maps:fold(
         fun(Valve, Flow, FlowRatesAns) ->

@@ -78,28 +78,35 @@ maximum_flow(_, _, _Opened, NotOpened, TimeLeft) when NotOpened == []; TimeLeft 
     0;
 maximum_flow(FlowRates, Distances, Opened = [PrevValve | _], NotOpened, TimeLeft) ->
     CacheKey = {PrevValve, NotOpened, TimeLeft},
-    ets:update_counter(cache, CacheKey, 1, {CacheKey, 1}),
-    lists:foldl(
-        fun erlang:max/2,
-        0,
-        lists:map(
-            fun(NextValve) ->
-                Distance = maps:get(NextValve, maps:get(PrevValve, Distances)),
-                Flow = maps:get(NextValve, FlowRates),
-                NotOpened2 = lists:delete(NextValve, NotOpened),
-                TimeLeft2 = max(0, TimeLeft - Distance - 1),
-                TimeLeft2 * Flow +
-                    maximum_flow(
-                        FlowRates,
-                        Distances,
-                        [NextValve | Opened],
-                        NotOpened2,
-                        TimeLeft2
+    case ets:lookup(cache, CacheKey) of
+        [{_, TotalFlow}] ->
+            TotalFlow;
+        [] ->
+            TotalFlow =
+                lists:foldl(
+                    fun erlang:max/2,
+                    0,
+                    lists:map(
+                        fun(NextValve) ->
+                            Distance = maps:get(NextValve, maps:get(PrevValve, Distances)),
+                            Flow = maps:get(NextValve, FlowRates),
+                            NotOpened2 = lists:delete(NextValve, NotOpened),
+                            TimeLeft2 = max(0, TimeLeft - Distance - 1),
+                            TimeLeft2 * Flow +
+                                maximum_flow(
+                                    FlowRates,
+                                    Distances,
+                                    [NextValve | Opened],
+                                    NotOpened2,
+                                    TimeLeft2
+                                )
+                        end,
+                        NotOpened
                     )
-            end,
-            NotOpened
-        )
-    ).
+                ),
+            true = ets:insert(cache, {CacheKey, TotalFlow}),
+            TotalFlow
+    end.
 
 -spec maximum_flow2(
     flow_map(),
@@ -129,46 +136,55 @@ maximum_flow2(
     TimeLeftB
 ) ->
     CacheKey = {{PrevValveA, PrevValveB}, NotOpened, {TimeLeftA, TimeLeftB}},
-    ets:update_counter(cache, CacheKey, 1, {CacheKey, 1}),
-    lists:foldl(
-        fun erlang:max/2,
-        0,
-        lists:map(
-            fun(NextValveA) ->
-                DistanceA = maps:get(NextValveA, maps:get(PrevValveA, Distances)),
-                FlowA = maps:get(NextValveA, FlowRates),
-                OpenedA2 = [NextValveA | OpenedA],
-                NotOpened2 = lists:delete(NextValveA, NotOpened),
-                TimeLeftA2 = max(0, TimeLeftA - DistanceA - 1),
-                TimeLeftA2 * FlowA +
-                    lists:foldl(
-                        fun erlang:max/2,
-                        0,
-                        lists:map(
-                            fun(NextValveB) ->
-                                DistanceB = maps:get(NextValveB, maps:get(PrevValveB, Distances)),
-                                FlowB = maps:get(NextValveB, FlowRates),
-                                OpenedB2 = [NextValveB | OpenedB],
-                                NotOpened3 = lists:delete(NextValveB, NotOpened2),
-                                TimeLeftB2 = max(0, TimeLeftB - DistanceB - 1),
-                                TimeLeftB2 * FlowB +
-                                    maximum_flow2(
-                                        FlowRates,
-                                        Distances,
-                                        OpenedA2,
-                                        OpenedB2,
-                                        NotOpened3,
-                                        TimeLeftA2,
-                                        TimeLeftB2
+    case ets:lookup(cache, CacheKey) of
+        [{_, TotalFlow}] ->
+            TotalFlow;
+        [] ->
+            TotalFlow =
+                lists:foldl(
+                    fun erlang:max/2,
+                    0,
+                    lists:map(
+                        fun(NextValveA) ->
+                            DistanceA = maps:get(NextValveA, maps:get(PrevValveA, Distances)),
+                            FlowA = maps:get(NextValveA, FlowRates),
+                            OpenedA2 = [NextValveA | OpenedA],
+                            NotOpened2 = lists:delete(NextValveA, NotOpened),
+                            TimeLeftA2 = max(0, TimeLeftA - DistanceA - 1),
+                            TimeLeftA2 * FlowA +
+                                lists:foldl(
+                                    fun erlang:max/2,
+                                    0,
+                                    lists:map(
+                                        fun(NextValveB) ->
+                                            DistanceB = maps:get(
+                                                NextValveB, maps:get(PrevValveB, Distances)
+                                            ),
+                                            FlowB = maps:get(NextValveB, FlowRates),
+                                            OpenedB2 = [NextValveB | OpenedB],
+                                            NotOpened3 = lists:delete(NextValveB, NotOpened2),
+                                            TimeLeftB2 = max(0, TimeLeftB - DistanceB - 1),
+                                            TimeLeftB2 * FlowB +
+                                                maximum_flow2(
+                                                    FlowRates,
+                                                    Distances,
+                                                    OpenedA2,
+                                                    OpenedB2,
+                                                    NotOpened3,
+                                                    TimeLeftA2,
+                                                    TimeLeftB2
+                                                )
+                                        end,
+                                        NotOpened2
                                     )
-                            end,
-                            NotOpened2
-                        )
+                                )
+                        end,
+                        NotOpened
                     )
-            end,
-            NotOpened
-        )
-    ).
+                ),
+            true = ets:insert(cache, {CacheKey, TotalFlow}),
+            TotalFlow
+    end.
 
 -spec filter_distances(flow_map(), distance_map(), map()) -> distance_map().
 filter_distances(FlowRates, Distances, Keep) ->

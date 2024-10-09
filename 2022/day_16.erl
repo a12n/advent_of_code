@@ -14,16 +14,7 @@
 -spec main(1..2) -> ok.
 main(Part) ->
     _Table = ets:new(cache, [named_table]),
-    {FlowRates, Adjacent} =
-        lists:foldl(
-            fun(Line, {FlowRates, Adjacent}) ->
-                {Valve, Flow, AdjList} = parse_valve(Line),
-                {FlowRates#{Valve => Flow}, Adjacent#{Valve => AdjList}}
-            end,
-            {#{}, #{}},
-            io_ext:read_lines(standard_io)
-        ),
-    Distances = filter_distances(FlowRates, distances(Adjacent), #{<<"AA">> => []}),
+    {FlowRates, Distances} = parse_input(io_ext:read_lines(standard_io)),
     NonZeroValves = lists:sort(maps:keys(maps:filter(fun(_, Flow) -> Flow > 0 end, FlowRates))),
     true = register(
         result_printer,
@@ -264,6 +255,20 @@ parse_valve(Line) ->
     ] =
         binary:split(Line, [<<" ">>, <<",">>, <<"=">>, <<";">>], [global, trim_all]),
     {Valve, binary_to_integer(FlowStr), AdjList}.
+
+-spec parse_input([binary()]) -> {flow_map(), adjacent_map()}.
+parse_input(Lines) ->
+    {FlowRates, Adjacent} =
+        lists:foldl(
+            fun(Line, {FlowRates, Adjacent}) ->
+                {Valve, Flow, AdjList} = parse_valve(Line),
+                {FlowRates#{Valve => Flow}, Adjacent#{Valve => AdjList}}
+            end,
+            {#{}, #{}},
+            io_ext:read_lines(standard_io)
+        ),
+    Distances = filter_distances(FlowRates, distances(Adjacent), #{<<"AA">> => []}),
+    {FlowRates, Distances}.
 
 -ifdef(TEST).
 

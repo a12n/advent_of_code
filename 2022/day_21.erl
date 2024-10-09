@@ -27,10 +27,10 @@ main(1) ->
             self()
             | lists:map(
                 fun
+                    ({ID, {Fun, Left, Right}}) ->
+                        spawn_link(fun() -> monkey(ID, {init, {calculate, Fun, Left, Right}}) end);
                     ({ID, Number}) ->
-                        spawn_link(fun() -> monkey(ID, {init, {yell, Number}}) end);
-                    ({ID, Fun, Left, Right}) ->
-                        spawn_link(fun() -> monkey(ID, {init, {calculate, Fun, Left, Right}}) end)
+                        spawn_link(fun() -> monkey(ID, {init, {yell, Number}}) end)
                 end,
                 MonkeyDescrs
             )

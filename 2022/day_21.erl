@@ -2,14 +2,6 @@
 
 -export([main/1]).
 
--type monkey_id() :: binary().
--type operation() :: fun((number(), number()) -> number()).
--type monkey_descr() :: {
-    monkey_id(),
-    number()
-    | {operation(), monkey_id() | number(), monkey_id() | number()}
-}.
-
 -spec main(1..2) -> ok.
 main(Part) ->
     %% Parse monkey definitions.
@@ -22,7 +14,7 @@ main(Part) ->
         end
     ]).
 
--spec parse_monkey(binary()) -> monkey_descr().
+-spec parse_monkey(binary()) -> {binary(), expr()}.
 parse_monkey(Line) ->
     [ID | Descr] = binary:split(Line, [<<" ">>, <<":">>], [global, trim_all]),
     case Descr of

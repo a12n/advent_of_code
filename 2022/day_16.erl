@@ -37,13 +37,11 @@ main(Part) ->
                     {_, _, _, _} ->
                         Loop(MaxTotalFlow);
                     dump_cache ->
-                        ets:foldl(
-                            fun({Key, Value}, ok) ->
-                                ok = io:format(standard_error, <<"~b	~w~n">>, [Value, Key])
-                            end,
-                            ok,
-                            cache
-                        ),
+                        Info = ets:info(cache),
+                        io:format(standard_error, <<"cache: size ~b, memory ~b~n">>, [
+                            proplists:get_value(size, Info),
+                            proplists:get_value(memory, Info)
+                        ]),
                         Loop(MaxTotalFlow);
                     {stop, From} ->
                         From ! ok
@@ -53,6 +51,7 @@ main(Part) ->
             )
         end)
     ),
+    {ok, TimerRef} = timer:send_interval(1000, result_printer, dump_cache),
     MaxFlow =
         case Part of
             1 ->
@@ -64,7 +63,7 @@ main(Part) ->
                     FlowRates, Distances, [<<"AA">>], [<<"AA">>], NonZeroValves, 26, 26
                 )
         end,
-    result_printer ! dump_cache,
+    {ok, _} = timer:cancel(TimerRef),
     result_printer ! {stop, self()},
     receive
         ok -> ok

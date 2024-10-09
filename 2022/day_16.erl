@@ -36,6 +36,15 @@ main(Part) ->
                         Loop(TotalFlow);
                     {_, _, _, _} ->
                         Loop(MaxTotalFlow);
+                    dump_cache ->
+                        ets:foldl(
+                            fun({Key, Value}, ok) ->
+                                ok = io:format(standard_error, <<"~p = ~b~n">>, [Key, Value])
+                            end,
+                            ok,
+                            cache
+                        ),
+                        Loop(MaxTotalFlow);
                     {stop, From} ->
                         From ! ok
                 end
@@ -55,6 +64,7 @@ main(Part) ->
                     FlowRates, Distances, [<<"AA">>], [<<"AA">>], NonZeroValves, 26, 26, 0
                 )
         end,
+    result_printer ! dump_cache,
     result_printer ! {stop, self()},
     receive
         ok -> ok

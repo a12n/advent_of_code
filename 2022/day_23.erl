@@ -15,14 +15,14 @@ main(1) ->
     io:format(standard_error, "Grid =~n~s", [
         grids:to_iodata(Grid, grids:extent(Grid), #{blank => $.})
     ]),
-    Grid2 = disperse(Grid, 10),
+    {Grid2, _} = disperse(Grid, 10),
     Extent = grids:extent(Grid2),
     io:format(standard_error, "Grid2 =~n~s", [grids:to_iodata(Grid2, Extent, #{blank => $.})]),
     Area = grids:extent_area(Extent),
     io:format(standard_error, "Extent ~p, Area ~p~n", [Extent, Area]),
     io:format("~b~n", [Area - maps:size(Grid2)]).
 
--spec disperse(grids:grid(integer()), pos_integer()) -> grids:grid(integer()).
+-spec disperse(grids:grid(integer()), pos_integer()) -> {grids:grid(integer()), non_neg_integer()}.
 disperse(Grid0, NumRounds) ->
     NeighborDirs = [
         {Row, Col}
@@ -31,7 +31,7 @@ disperse(Grid0, NumRounds) ->
         not (Row == 0 andalso Col == 0)
     ],
     (fun
-        Loop(Grid, _, Round) when Round == NumRounds -> Grid;
+        Loop(Grid, _, Round) when Round == NumRounds -> {Grid, Round};
         Loop(Grid, Dirs, Round) ->
             Proposed = maps:fold(
                 fun(Pos, _, Proposed) ->
@@ -71,7 +71,7 @@ disperse(Grid0, NumRounds) ->
             case maps:size(Proposed) of
                 0 ->
                     %% No proposed moves, elves dispersed, return the resulting grid.
-                    Grid;
+                    {Grid, Round};
                 _ ->
                     %% Apply the proposed moves.
                     Grid2 = maps:fold(

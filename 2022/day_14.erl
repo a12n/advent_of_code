@@ -135,7 +135,8 @@ simulate_clogs(Rocks, GroundLevel, Source) ->
 -spec simulate1_clogs(rocks(), integer(), pos()) -> pos().
 simulate1_clogs(Rocks, GroundLevel, Sand = {Y, X}) ->
     %% io:format(standard_error, <<"~s~s">>, [
-    %%     ansi:cursor({position, {1, 1}}), grids:to_iodata(Rocks#{Sand => $o}, {0, 480}, {15, 520})
+    %%     ansi:cursor({position, {1, 1}}),
+    %%     grids:to_iodata(Rocks#{Sand => $o}, {{0, 480}, {15, 520}}, #{})
     %% ]),
     %% timer:sleep(50),
     DownY = Y + 1,

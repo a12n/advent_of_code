@@ -27,13 +27,18 @@ main(1) ->
         receive
             _ -> Loop()
         after 1000 ->
-            ets:foldl(
-                fun({Key, Value}, ok) ->
-                    io:format(standard_error, <<"~b	~w~n">>, [Value, Key])
-                end,
-                ok,
-                cache
-            ),
+            Info = ets:info(cache),
+            io:format(standard_error, <<"cache: size ~b, memory ~b~n">>, [
+                proplists:get_value(size, Info),
+                proplists:get_value(memory, Info)
+            ]),
+            %% ets:foldl(
+            %%     fun({Key, Value}, ok) ->
+            %%         io:format(standard_error, <<"~b	~w~n">>, [Value, Key])
+            %%     end,
+            %%     ok,
+            %%     cache
+            %% ),
             Loop()
         end
     end),
@@ -56,7 +61,6 @@ max_geodes(_, _, Inventory, TimeLeft = 0) ->
     maps:get(geode, Inventory, 0);
 max_geodes(Blueprint, Robots, Inventory, TimeLeft) ->
     CacheKey = {Robots, Inventory, TimeLeft},
-    ets:update_counter(cache, CacheKey, 1, {CacheKey, 1}),
     %% io:format(standard_error, <<"TimeLeft ~p, Robots ~p, Inventory ~p~n">>, [
     %%     TimeLeft, Robots, Inventory
     %% ]),

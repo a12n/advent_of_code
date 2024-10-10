@@ -9,6 +9,9 @@
 -type grid(Value) :: grid(pos_integer(), Value).
 -export_type([grid/1, grid/2]).
 
+-type format_opts() :: #{blank => char()}.
+-export_type([format_opts/0]).
+
 -export([
     add_pos/2,
     sub_pos/2,
@@ -93,12 +96,13 @@ from_lines(Lines) ->
         ]
     ).
 
--spec to_iodata(grid(char()), {pos_integer(), pos_integer()}) -> iodata().
-to_iodata(Grid, Size) -> to_iodata(Grid, _Min = {1, 1}, _Max = Size).
+-spec to_iodata(grid(integer(), char())) -> iodata().
+to_iodata(Grid) -> to_iodata(Grid, extent(Grid), #{}).
 
--spec to_iodata(grid(integer(), char()), pos(integer()), pos(integer())) -> iodata().
-to_iodata(Grid, {MinRow, MinCol}, {MaxRow, MaxCol}) ->
-    Blank = $\s,
+-spec to_iodata(grid(integer(), char()), {pos(integer()), pos(integer())}, format_opts()) ->
+    iodata().
+to_iodata(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Opts) ->
+    Blank = maps:get(blank, Opts, $\s),
     (fun
         Loop(Row, _) when Row == MaxRow + 1 -> "";
         Loop(Row, Col) when Col == MaxCol + 1 ->
@@ -108,11 +112,6 @@ to_iodata(Grid, {MinRow, MinCol}, {MaxRow, MaxCol}) ->
     end)(
         MinRow, MinCol
     ).
-
--spec to_iodata(grid(integer(), char())) -> iodata().
-to_iodata(Grid) ->
-    {MinPos, MaxPos} = extent(Grid),
-    to_iodata(Grid, MinPos, MaxPos).
 
 -spec find_values(term(), grid(term())) -> [pos()].
 find_values(Query, Grid) ->

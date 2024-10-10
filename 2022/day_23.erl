@@ -2,7 +2,6 @@
 -module(day_23).
 
 -export([main/1]).
--export([rotate/1]).
 
 -spec main(1..2) -> ok.
 main(Part) ->

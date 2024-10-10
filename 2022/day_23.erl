@@ -4,7 +4,7 @@
 -export([rotate/1]).
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
     Grid = maps:filter(
         fun
             (_, $#) -> true;
@@ -15,12 +15,22 @@ main(1) ->
     io:format(standard_error, "Grid =~n~s", [
         grids:to_iodata(Grid, grids:extent(Grid), #{blank => $.})
     ]),
-    {Grid2, _} = disperse(Grid, 10),
+    NumRounds =
+        case Part of
+            1 -> 10;
+            2 -> infinity
+        end,
+    {Grid2, Round} = disperse(Grid, NumRounds),
     Extent = grids:extent(Grid2),
     io:format(standard_error, "Grid2 =~n~s", [grids:to_iodata(Grid2, Extent, #{blank => $.})]),
-    Area = grids:extent_area(Extent),
-    io:format(standard_error, "Extent ~p, Area ~p~n", [Extent, Area]),
-    io:format("~b~n", [Area - maps:size(Grid2)]).
+    case Part of
+        1 ->
+            Area = grids:extent_area(Extent),
+            io:format(standard_error, "Extent ~p, Area ~p~n", [Extent, Area]),
+            io:format("~b~n", [Area - maps:size(Grid2)]);
+        2 ->
+            io:format("~b~n", [Round])
+    end.
 
 -spec disperse(grids:grid(integer()), pos_integer()) -> {grids:grid(integer()), non_neg_integer()}.
 disperse(Grid0, NumRounds) ->

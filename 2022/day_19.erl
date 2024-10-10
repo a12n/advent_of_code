@@ -20,10 +20,26 @@
 
 -spec main(1..2) -> ok.
 main(1) ->
+    _Table = ets:new(cache, [named_table]),
     Blueprints = lists:map(fun parse_blueprint/1, io_ext:read_lines(standard_io)),
     io:format(standard_error, <<"Blueprints ~p~n">>, [Blueprints]),
+    spawn_link(fun Loop() ->
+        receive
+            _ -> Loop()
+        after 1000 ->
+            ets:foldl(
+                fun({Key, Value}, ok) ->
+                    io:format(standard_error, <<"~b	~w~n">>, [Value, Key])
+                end,
+                ok,
+                cache
+            ),
+            Loop()
+        end
+    end),
     QualityLevels = lists:map(
         fun(Blueprint = #{id := ID}) ->
+            true = ets:delete_all_objects(cache),
             MaxGeodes = max_geodes(Blueprint, #{ore => 1}, #{}, 24),
             io:format(standard_error, <<"ID ~p, MaxGeodes ~p~n">>, [ID, MaxGeodes]),
             ID * MaxGeodes
@@ -36,41 +52,48 @@ main(1) ->
 -spec max_geodes(blueprint(), resource_map(), resource_map(), non_neg_integer()) ->
     non_neg_integer().
 max_geodes(_, _, Inventory, TimeLeft = 0) ->
-    io:format(standard_error, <<"TimeLeft ~p, Inventory ~p~n">>, [TimeLeft, Inventory]),
+    %% io:format(standard_error, <<"TimeLeft ~p, Inventory ~p~n">>, [TimeLeft, Inventory]),
     maps:get(geode, Inventory, 0);
-max_geodes(
-    Blueprint = #{
-        ore := OreRobot,
-        clay := ClayRobot,
-        obsidian := ObsidianRobot,
-        geode := GeodeRobot
-    },
-    Robots,
-    Inventory,
-    TimeLeft
-) ->
-    try
-        Inventory2 = subtract_resources(Inventory, GeodeRobot),
-        Robots2 = maps:update_with(geode, fun(Num) -> Num + 1 end, 1, Robots),
-        max(
-            max_geodes(Blueprint, Robots2, add_resources(Inventory2, Robots), TimeLeft - 1),
-            max_geodes(Blueprint, Robots, add_resources(Inventory, Robots), TimeLeft - 1)
-        )
-    catch
-        error:_ ->
-            0
+max_geodes(Blueprint, Robots, Inventory, TimeLeft) ->
+    CacheKey = {Robots, Inventory, TimeLeft},
+    ets:update_counter(cache, CacheKey, 1, {CacheKey, 1}),
+    %% io:format(standard_error, <<"TimeLeft ~p, Robots ~p, Inventory ~p~n">>, [
+    %%     TimeLeft, Robots, Inventory
+    %% ]),
+    case ets:lookup(cache, CacheKey) of
+        [{_, MaxGeodes}] ->
+            MaxGeodes;
+        [] ->
+            MaxGeodes =
+                lists:max([
+                    max_geodes(Blueprint, Robots, add_resources(Inventory, Robots), TimeLeft - 1)
+                    | lists:map(
+                        fun(Key) ->
+                            RobotCost = maps:get(Key, Blueprint),
+                            try
+                                Inventory2 = subtract_resources(Inventory, RobotCost),
+                                Inventory3 = add_resources(Inventory2, Robots),
+                                Robots2 = maps:update_with(Key, fun(N) -> N + 1 end, 1, Robots),
+                                max_geodes(Blueprint, Robots2, Inventory3, TimeLeft - 1)
+                            catch
+                                error:_ -> 0
+                            end
+                        end,
+                        [geode, obsidian, clay, ore]
+                    )
+                ]),
+            true = ets:insert(cache, {CacheKey, MaxGeodes}),
+            MaxGeodes
     end.
 
 -spec add_resources(resource_map(), resource_map()) -> resource_map().
 add_resources(Resources1, Resources2) ->
-    maps:merge_with(fun(_, Num1, Num2) -> Num1 + Num2 end, Resources1, Resources2).
+    maps:merge_with(fun(_, N, M) -> N + M end, Resources1, Resources2).
 
 -spec subtract_resources(resource_map(), resource_map()) -> resource_map().
 subtract_resources(Resources1, Resources2) ->
     maps:fold(
-        fun(Key, Num2, Ans) ->
-            maps:update_with(Key, fun(Num1) when Num1 > Num2 -> Num1 - Num2 end, Ans)
-        end,
+        fun(Key, M, Ans) -> maps:update_with(Key, fun(N) when N >= M -> N - M end, Ans) end,
         Resources1,
         Resources2
     ).

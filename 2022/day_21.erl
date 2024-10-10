@@ -5,12 +5,12 @@
 -spec main(1..2) -> ok.
 main(Part) ->
     %% Parse monkey definitions.
-    MonkeyDescrs = maps:from_list(lists:map(fun parse_monkey/1, io_ext:read_lines(standard_io))),
-    io:format(standard_error, "MonkeyDescrs ~p~n", [MonkeyDescrs]),
+    Env = maps:from_list(lists:map(fun parse_monkey/1, io_ext:read_lines(standard_io))),
+    io:format(standard_error, "Env = ~p.~n", [Env]),
     io:format(<<"~b~n">>, [
         case Part of
-            1 -> eval(maps:get(<<"root">>, MonkeyDescrs), MonkeyDescrs);
-            2 -> solve_monkeys(MonkeyDescrs)
+            1 -> eval(maps:get(<<"root">>, Env), Env);
+            2 -> solve_monkeys(Env)
         end
     ]).
 

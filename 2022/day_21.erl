@@ -54,6 +54,19 @@ eval({Op, N, M}, _) when is_integer(N), is_integer(M) ->
 eval({Op, N, M}, Env) when is_tuple(N); is_binary(N) -> eval({Op, eval(N, Env), M}, Env);
 eval({Op, N, M}, Env) when is_tuple(M); is_binary(M) -> eval({Op, N, eval(M, Env)}, Env).
 
+-spec expand(expr(), binary(), expr_env()) -> expr().
+expand(N, Var, Env) when is_binary(N) ->
+    case N == Var of
+        true -> N;
+        false -> expand(maps:get(N, Env), Var, Env)
+    end;
+expand(N, _, _) when is_integer(N) -> N;
+expand(Expr = {_, N, M}, _, Env) when is_integer(N), is_integer(M) -> eval(Expr, Env);
+expand({Op, N, M}, Var, Env) when is_binary(N) -> expand({Op, expand(N, Var, Env), M}, Var, Env);
+expand({Op, N, M}, Var, Env) when is_binary(M) -> expand({Op, N, expand(M, Var, Env)}, Var, Env);
+expand(Expr = {_, _, _}, _, _) ->
+    Expr.
+
 -spec solve(expr(), integer(), binary()) -> integer().
 solve(N, K, Var) when is_binary(N), N == Var, is_integer(K) -> K;
 solve({'+', N, M}, K, Var) when is_integer(K) ->

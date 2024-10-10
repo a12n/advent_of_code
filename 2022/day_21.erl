@@ -95,12 +95,3 @@ solve({'/', N, M}, K, Var) when is_integer(K) ->
         is_integer(N) -> solve(M, N div K, Var);
         is_integer(M) -> solve(N, M * K, Var)
     end.
-
-%%--------------------------------------------------------------------
-%% Solve for humn
-%%--------------------------------------------------------------------
-
--spec solve_monkeys([monkey_descr()]) -> number().
-solve_monkeys(MonkeyDescrs) ->
-    %% TODO
-    0.

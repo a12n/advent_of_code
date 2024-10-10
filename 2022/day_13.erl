@@ -1,3 +1,4 @@
+%% Distress Signal
 -module(day_13).
 
 -include_lib("eunit/include/eunit.hrl").

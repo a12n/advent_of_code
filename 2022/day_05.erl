@@ -1,3 +1,4 @@
+%% Supply Stacks
 -module(day_05).
 
 -type crate() :: char().

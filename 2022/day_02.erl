@@ -1,3 +1,4 @@
+%% Rock Paper Scissors
 -module(day_02).
 
 -type outcome() :: lose | draw | win.

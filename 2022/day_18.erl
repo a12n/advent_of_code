@@ -1,3 +1,4 @@
+%% Boiling Boulders
 -module(day_18).
 
 -export([main/1]).

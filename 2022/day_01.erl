@@ -1,3 +1,4 @@
+%% Calorie Counting
 -module(day_01).
 
 -type food() :: pos_integer().

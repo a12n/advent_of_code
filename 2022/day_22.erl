@@ -1,3 +1,4 @@
+%% Monkey Map
 -module(day_22).
 
 -export([main/1, parse_instructions/1]).

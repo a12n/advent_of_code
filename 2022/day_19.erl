@@ -1,3 +1,4 @@
+%% Not Enough Minerals
 -module(day_19).
 
 %% -export([main/1]).

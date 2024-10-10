@@ -1,3 +1,4 @@
+%% Camp Cleanup
 -module(day_04).
 
 -export([main/1]).

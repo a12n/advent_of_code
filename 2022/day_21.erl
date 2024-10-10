@@ -1,3 +1,4 @@
+%% Monkey Math
 -module(day_21).
 
 -export([main/1]).

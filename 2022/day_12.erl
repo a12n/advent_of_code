@@ -1,3 +1,4 @@
+%% Hill Climbing Algorithm
 -module(day_12).
 
 -export([main/1]).

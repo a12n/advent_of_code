@@ -1,3 +1,4 @@
+%% Rucksack Reorganization
 -module(day_03).
 
 -include_lib("eunit/include/eunit.hrl").

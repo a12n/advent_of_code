@@ -1,3 +1,4 @@
+%% Cathode-Ray Tube
 -module(day_10).
 
 -define(SCREEN_WIDTH, 40).

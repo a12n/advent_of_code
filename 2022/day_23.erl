@@ -1,3 +1,4 @@
+%% Unstable Diffusion
 -module(day_23).
 
 -export([main/1]).

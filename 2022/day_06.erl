@@ -1,3 +1,4 @@
+%% Tuning Trouble
 -module(day_06).
 
 -include_lib("eunit/include/eunit.hrl").

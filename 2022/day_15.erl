@@ -1,3 +1,4 @@
+%% Beacon Exclusion Zone
 -module(day_15).
 
 -include_lib("eunit/include/eunit.hrl").

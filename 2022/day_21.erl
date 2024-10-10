@@ -9,8 +9,15 @@ main(Part) ->
     io:format(standard_error, "Env = ~p.~n", [Env]),
     io:format(<<"~b~n">>, [
         case Part of
-            1 -> eval(maps:get(<<"root">>, Env), Env);
-            2 -> solve_monkeys(Env)
+            1 ->
+                eval(maps:get(<<"root">>, Env), Env);
+            2 ->
+                {_, Left, Right} = maps:get(<<"root">>, Env),
+                io:format(standard_error, <<"Left ~p, Right ~p~n">>, [Left, Right]),
+                Left2 = expand(Left, <<"humn">>, Env),
+                Right2 = expand(Right, <<"humn">>, Env),
+                io:format(standard_error, <<"Left ~p, Right ~p~n">>, [Left2, Right2]),
+                solve(Left2, Right2, <<"humn">>)
         end
     ]).
 

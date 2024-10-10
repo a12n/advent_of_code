@@ -13,10 +13,10 @@ main(Part) ->
             2 ->
                 {_, Left, Right} = maps:get(<<"root">>, Env),
                 io:format(standard_error, <<"Left ~p, Right ~p~n">>, [Left, Right]),
-                Left2 = expand(Left, <<"humn">>, Env),
-                Right2 = expand(Right, <<"humn">>, Env),
-                io:format(standard_error, <<"Left ~p, Right ~p~n">>, [Left2, Right2]),
-                solve(Left2, Right2, <<"humn">>)
+                Expr = expand(Left, <<"humn">>, Env),
+                Number = expand(Right, <<>>, Env),
+                io:format(standard_error, <<"Expr ~p, Number ~p~n">>, [Expr, Number]),
+                solve(Expr, Number, <<"humn">>)
         end
     ]).
 

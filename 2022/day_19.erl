@@ -1,6 +1,7 @@
 -module(day_19).
 
--export([main/1]).
+%% -export([main/1]).
+-compile([export_all]).
 
 -type resource() :: ore | clay | obsidian | geode.
 -type resource_map() :: #{resource() => non_neg_integer()}.
@@ -34,11 +35,45 @@ main(1) ->
 
 -spec max_geodes(blueprint(), resource_map(), resource_map(), non_neg_integer()) ->
     non_neg_integer().
-max_geodes(_, _, Inventory, 0) ->
+max_geodes(_, _, Inventory, TimeLeft = 0) ->
+    io:format(standard_error, <<"TimeLeft ~p, Inventory ~p~n">>, [TimeLeft, Inventory]),
     maps:get(geode, Inventory, 0);
-max_geodes(Blueprint, Robots, Inventory, TimeLeft) ->
-    %% TODO
-    0.
+max_geodes(
+    Blueprint = #{
+        ore := OreRobot,
+        clay := ClayRobot,
+        obsidian := ObsidianRobot,
+        geode := GeodeRobot
+    },
+    Robots,
+    Inventory,
+    TimeLeft
+) ->
+    try
+        Inventory2 = subtract_resources(Inventory, GeodeRobot),
+        Robots2 = maps:update_with(geode, fun(Num) -> Num + 1 end, 1, Robots),
+        max(
+            max_geodes(Blueprint, Robots2, add_resources(Inventory2, Robots), TimeLeft - 1),
+            max_geodes(Blueprint, Robots, add_resources(Inventory, Robots), TimeLeft - 1)
+        )
+    catch
+        error:_ ->
+            0
+    end.
+
+-spec add_resources(resource_map(), resource_map()) -> resource_map().
+add_resources(Resources1, Resources2) ->
+    maps:merge_with(fun(_, Num1, Num2) -> Num1 + Num2 end, Resources1, Resources2).
+
+-spec subtract_resources(resource_map(), resource_map()) -> resource_map().
+subtract_resources(Resources1, Resources2) ->
+    maps:fold(
+        fun(Key, Num2, Ans) ->
+            maps:update_with(Key, fun(Num1) when Num1 > Num2 -> Num1 - Num2 end, Ans)
+        end,
+        Resources1,
+        Resources2
+    ).
 
 -spec parse_blueprint(binary()) -> blueprint().
 parse_blueprint(Line) ->

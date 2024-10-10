@@ -32,7 +32,8 @@ main(Part) ->
             io:format("~b~n", [Round])
     end.
 
--spec disperse(grids:grid(integer()), pos_integer()) -> {grids:grid(integer()), non_neg_integer()}.
+-spec disperse(grids:grid(integer()), pos_integer() | infinity) ->
+    {grids:grid(integer()), non_neg_integer()}.
 disperse(Grid0, NumRounds) ->
     NeighborDirs = [
         {Row, Col}

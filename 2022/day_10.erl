@@ -25,7 +25,9 @@ main(Part) ->
             io:format(<<"~b~n">>, [lists:sum(SignalStrength)]);
         2 ->
             LitPixels = maps:from_list([{pixel_pos(Pos), $#} || Pos <- lit_pixels(Trace)]),
-            io:format(grids:to_iodata(LitPixels, {{1, 1}, {?SCREEN_HEIGHT, ?SCREEN_WIDTH}}, #{}))
+            io:format(
+                grids:to_iodata(LitPixels, {{1, 1}, {?SCREEN_HEIGHT, ?SCREEN_WIDTH}}, #{blank => $.})
+            )
     end.
 
 -spec cpu_trace([instruction()]) -> cpu_trace().

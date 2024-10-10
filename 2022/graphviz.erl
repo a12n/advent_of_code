@@ -57,6 +57,7 @@ to_iodata(Graph, GraphMap) ->
         <<"}\n">>
     ].
 
+%% https://graphviz.org/docs/attr-types/shape/
 -spec attrs_to_iodata(map()) -> iodata().
 attrs_to_iodata(Attrs) -> attrs_to_iodata(Attrs, ", ").
 

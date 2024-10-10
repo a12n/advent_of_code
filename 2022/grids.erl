@@ -28,6 +28,7 @@
     transpose/1,
     size/1,
     extent/1,
+    extent_area/1,
     move/2,
     intersects/2,
     intersects_line/2
@@ -159,6 +160,9 @@ extent(Grid) ->
         undefined,
         Grid
     ).
+
+-spec extent_area({pos(integer()), pos(integer())}) -> non_neg_integer().
+extent_area({{MinRow, MinCol}, {MaxRow, MaxCol}}) -> (MaxRow - MinRow + 1) * (MaxCol - MinCol + 1).
 
 -spec move(dir() | pos(integer()), grid(integer(), term())) -> grid(integer(), term()).
 move(Move = {_, _}, Grid) ->

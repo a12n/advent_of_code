@@ -41,9 +41,6 @@ parse_monkey(Line) ->
 -type expr_env() :: #{binary() => expr()}.
 -type operation() :: '*' | '+' | '-' | '/'.
 
--spec eval(expr()) -> integer().
-eval(Expr) -> eval(Expr, #{}).
-
 -spec eval(expr(), expr_env()) -> integer().
 eval(N, _) when is_integer(N) -> N;
 eval(Var, Env) when is_binary(Var) -> eval(maps:get(Var, Env), Env);

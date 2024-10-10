@@ -26,7 +26,7 @@
 
 -export([
     from_lines/1,
-    to_iodata/1, to_iodata/2, to_iodata/3,
+    to_iodata/1, to_iodata/3,
     find_values/2,
     transpose/1,
     size/1,

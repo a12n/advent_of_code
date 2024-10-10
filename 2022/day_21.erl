@@ -57,27 +57,27 @@ eval({Op, N, M}, _) when is_integer(N), is_integer(M) ->
 eval({Op, N, M}, Env) when is_tuple(N); is_binary(N) -> eval({Op, eval(N, Env), M}, Env);
 eval({Op, N, M}, Env) when is_tuple(M); is_binary(M) -> eval({Op, N, eval(M, Env)}, Env).
 
--spec solve(expr(), integer()) -> integer().
-solve(Var, K) when is_binary(Var), is_integer(K) -> K;
-solve({'+', N, M}, K) when is_integer(K) ->
+-spec solve(expr(), integer(), binary()) -> integer().
+solve(N, K, Var) when is_binary(N), N == Var, is_integer(K) -> K;
+solve({'+', N, M}, K, Var) when is_integer(K) ->
     if
-        is_integer(N) -> solve(M, K - N);
-        is_integer(M) -> solve(N, K - M)
+        is_integer(N) -> solve(M, K - N, Var);
+        is_integer(M) -> solve(N, K - M, Var)
     end;
-solve({'-', N, M}, K) when is_integer(K) ->
+solve({'-', N, M}, K, Var) when is_integer(K) ->
     if
-        is_integer(N) -> solve(M, -(K - N));
-        is_integer(M) -> solve(N, K + M)
+        is_integer(N) -> solve(M, -(K - N), Var);
+        is_integer(M) -> solve(N, K + M, Var)
     end;
-solve({'*', N, M}, K) when is_integer(K) ->
+solve({'*', N, M}, K, Var) when is_integer(K) ->
     if
-        is_integer(N) -> solve(M, K div N);
-        is_integer(M) -> solve(N, K div M)
+        is_integer(N) -> solve(M, K div N, Var);
+        is_integer(M) -> solve(N, K div M, Var)
     end;
-solve({'/', N, M}, K) when is_integer(K) ->
+solve({'/', N, M}, K, Var) when is_integer(K) ->
     if
-        is_integer(N) -> solve(M, N div K);
-        is_integer(M) -> solve(N, M * K)
+        is_integer(N) -> solve(M, N div K, Var);
+        is_integer(M) -> solve(N, M * K, Var)
     end.
 
 %%--------------------------------------------------------------------

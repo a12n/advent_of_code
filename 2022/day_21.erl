@@ -55,15 +55,14 @@ eval({Op, N, M}, Env) when is_tuple(N); is_binary(N) -> eval({Op, eval(N, Env), 
 eval({Op, N, M}, Env) when is_tuple(M); is_binary(M) -> eval({Op, N, eval(M, Env)}, Env).
 
 -spec expand(expr(), binary(), expr_env()) -> expr().
-expand(N, Var, Env) when is_binary(N) ->
-    case N == Var of
-        true -> N;
-        false -> expand(maps:get(N, Env), Var, Env)
-    end;
+expand(N, Var, _) when is_binary(N), N == Var -> N;
+expand(N, Var, Env) when is_binary(N) -> expand(maps:get(N, Env), Var, Env);
 expand(N, _, _) when is_integer(N) -> N;
 expand(Expr = {_, N, M}, _, Env) when is_integer(N), is_integer(M) -> eval(Expr, Env);
-expand({Op, N, M}, Var, Env) when is_binary(N) -> expand({Op, expand(N, Var, Env), M}, Var, Env);
-expand({Op, N, M}, Var, Env) when is_binary(M) -> expand({Op, N, expand(M, Var, Env)}, Var, Env);
+expand({Op, N, M}, Var, Env) when is_binary(N), N /= Var ->
+    expand({Op, expand(N, Var, Env), M}, Var, Env);
+expand({Op, N, M}, Var, Env) when is_binary(M), M /= Var ->
+    expand({Op, N, expand(M, Var, Env)}, Var, Env);
 expand(Expr = {_, _, _}, _, _) ->
     Expr.
 

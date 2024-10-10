@@ -17,7 +17,8 @@ main(Part) ->
     %%             fun(_, C) -> ansi:attrs({fg, {gray, 23 * (C - $a) div 25}}, C) end,
     %%             HeightMap
     %%         ),
-    %%         MapSize
+    %%         {{1, 1}, MapSize},
+    %%         #{}
     %%     )
     %% ]),
     io:format(<<"~b~n">>, [

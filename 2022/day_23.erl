@@ -42,7 +42,7 @@ disperse(Grid0, NumRounds) ->
         not (Row == 0 andalso Col == 0)
     ],
     (fun
-        Loop(Grid, _, Round) when Round == NumRounds -> {Grid, Round};
+        Loop(Grid, _, Round) when Round > NumRounds -> {Grid, Round};
         Loop(Grid, Dirs, Round) ->
             Proposed = maps:fold(
                 fun(Pos, _, Proposed) ->
@@ -101,7 +101,7 @@ disperse(Grid0, NumRounds) ->
                     Loop(Grid2, rotate(Dirs), Round + 1)
             end
     end)(
-        Grid0, lists:map(fun grids:dir_to_pos/1, [up, down, left, right]), 0
+        Grid0, lists:map(fun grids:dir_to_pos/1, [up, down, left, right]), 1
     ).
 
 -spec has_neighbor(grids:grid(integer()), grids:pos(integer()), [grids:pos(integer())]) ->

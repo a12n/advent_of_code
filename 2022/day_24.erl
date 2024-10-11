@@ -3,16 +3,6 @@
 
 -export([main/1]).
 
-%% -define(UP, 2#0100).
-%% -define(DOWN, 2#0010).
-%% -define(LEFT, 2#1000).
-%% -define(RIGHT, 2#0001).
-
-%% How to check intersections of the expedition with blizzards:
-%% - We're at minute T.
-%% - Move current expedition position up, left, right, and down -T positions.
-%% - Does this intersects with blizzards (they're really static in their map).
-
 -spec main(1..2) -> ok.
 main(1) ->
     {Blizzards, Extent, Begin, End} = parse_input(io_ext:read_lines(standard_io)),
@@ -29,6 +19,28 @@ main(1) ->
         )
     ]),
     ok.
+
+-spec intersects(
+    grids:grid(integer()), grids:extent(integer()), grids:pos(integer()), non_neg_integer()
+) -> boolean().
+intersects(Blizzards, _, Pos, 0) ->
+    maps:is_key(Pos, Blizzards);
+intersects(Blizzards, {{MinRow, MinCol}, {MaxRow, MaxCol}}, {Row, Col}, Time) ->
+    lists:any(
+        fun({Dir, Pos}) ->
+            %% Project positions back in time. E.g., if there is a
+            %% right moving blizzard at the current expedition
+            %% position, then it was at {CurrentRow, CurrentColumn -
+            %% Time} some time ago (modulo the grid size).
+            maps:get(Pos, Blizzards, undefined) == Dir
+        end,
+        [
+            {up, {indices:remap(Row + Time, MinRow, MaxRow), Col}},
+            {down, {indices:remap(Row - Time, MinRow, MaxRow), Col}},
+            {left, {Row, indices:remap(Col + Time, MinCol, MaxCol)}},
+            {right, {Row, indices:remap(Col - Time, MinCol, MaxCol)}}
+        ]
+    ).
 
 -spec parse_input([binary()]) ->
     {grids:grid(integer()), girds:extent(integer()), grids:pos(integer()), grids:pos(integer())}.

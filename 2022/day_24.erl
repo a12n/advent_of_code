@@ -16,6 +16,24 @@
 -spec main(1..2) -> ok.
 main(1) ->
     {Blizzards, Extent, Begin, End} = parse_input(io_ext:read_lines(standard_io)),
+    io:format(standard_error, "Extent ~p, Begin ~p, End ~p, Blizzards~n~ts", [
+        Extent,
+        Begin,
+        End,
+        grids:to_iodata(
+            maps:map(
+                fun
+                    (_, up) -> $↑;
+                    (_, left) -> $←;
+                    (_, right) -> $→;
+                    (_, down) -> $↓
+                end,
+                Blizzards
+            ),
+            Extent,
+            #{blank => $.}
+        )
+    ]),
     ok.
 
 -spec parse_input([binary()]) ->
@@ -46,10 +64,8 @@ parse_input(Lines) ->
         ),
     Begin = {MinRow, BeginCol},
     End = {MaxRow, EndCol},
-    io:format(standard_error, "Begin ~p, End ~p~n", [Begin, End]),
     %% Reduce extent as the borders are removed.
     Extent2 = {{MinRow + 1, MinCol + 1}, {MaxRow - 1, MaxCol - 1}},
-    io:format(standard_error, "Extent2 = ~p~n", [Extent2]),
     %% Filter grid, keep only blizzards. Convert to duplicate_bag ETS table.
     Blizzards = maps:filtermap(
         fun

@@ -21,6 +21,7 @@
     dir_to_pos/2,
     pos_to_dir/1,
     char_to_dir/1,
+    dir_to_char/1,
     rotate_dir/2
 ]).
 
@@ -75,6 +76,12 @@ char_to_dir($U) -> up;
 char_to_dir($D) -> down;
 char_to_dir($L) -> left;
 char_to_dir($R) -> right.
+
+-spec dir_to_char(dir()) -> char().
+dir_to_char(up) -> $↑;
+dir_to_char(left) -> $←;
+dir_to_char(right) -> $→;
+dir_to_char(down) -> $↓.
 
 -spec rotate_dir(cw | ccw, dir()) -> dir().
 rotate_dir(cw, up) -> right;

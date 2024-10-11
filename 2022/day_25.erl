@@ -1,6 +1,10 @@
 %% Full of Hot Air
 -module(day_25).
 
+-type snafu() :: nonempty_list(snafu_digit()).
+-type snafu_digit() :: $= | $- | $0 | $1 | $2.
+-type snafu_value() :: -2..2.
+
 -export([main/1]).
 
 -spec main(1..2) -> ok.

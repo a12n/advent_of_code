@@ -41,3 +41,26 @@ snafu_to_integer(SNAFU) when is_list(SNAFU) ->
 integer_to_snafu(N) ->
     %% TODO
     integer_to_list(N).
+
+-ifdef(TEST).
+
+-include_lib("eunit/include/eunit.hrl").
+
+snafu_to_integer_test() ->
+    ?assertEqual(1, snafu_to_integer("1")),
+    ?assertEqual(2, snafu_to_integer("2")),
+    ?assertEqual(3, snafu_to_integer("1=")),
+    ?assertEqual(4, snafu_to_integer("1-")),
+    ?assertEqual(5, snafu_to_integer("10")),
+    ?assertEqual(6, snafu_to_integer("11")),
+    ?assertEqual(7, snafu_to_integer("12")),
+    ?assertEqual(8, snafu_to_integer("2=")),
+    ?assertEqual(9, snafu_to_integer("2-")),
+    ?assertEqual(10, snafu_to_integer("20")),
+    ?assertEqual(15, snafu_to_integer("1=0")),
+    ?assertEqual(20, snafu_to_integer("1-0")),
+    ?assertEqual(2022, snafu_to_integer("1=11-2")),
+    ?assertEqual(12345, snafu_to_integer("1-0---0")),
+    ?assertEqual(314159265, snafu_to_integer("1121-1110-1=0")).
+
+-endif.

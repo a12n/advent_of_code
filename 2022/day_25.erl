@@ -80,6 +80,42 @@ digits_to_values(Digits) -> lists:map(fun digit_to_value/1, Digits).
 -spec values_to_digits(nonempty_list(snafu_value())) -> snafu().
 values_to_digits(Values) -> lists:map(fun value_to_digit/1, Values).
 
+-spec add_snafu(snafu(), snafu()) -> snafu().
+add_snafu(N = [_ | _], M = [_ | _]) ->
+    %% Compute the necessary padding to align N and M.
+    {PadN, PadM} =
+        case {length(N), length(M)} of
+            {LenN, LenM} when LenN > LenM -> {"", lists:duplicate(LenN - LenM, $0)};
+            {LenN, LenM} when LenN < LenM -> {lists:duplicate(LenM - LenN, $0), ""};
+            {Len, Len} -> {"", ""}
+        end,
+    %% Was adding starting from lower positions, reverse the resulting
+    %% list of values. Encode values as digits.
+    values_to_digits(
+        lists:reverse(
+            %% Add digits for each position, starting from the
+            %% lowest. Carry overflows/underflows.
+            add_snafu_rev_values(
+                %% Pad and align lists of digit values.
+                digits_to_values(lists:reverse(N, PadN)),
+                digits_to_values(lists:reverse(M, PadM)),
+                0
+            )
+        )
+    ).
+
+-spec add_snafu_rev_values([-2..2], [-2..2], -1..1) -> [-2..2].
+add_snafu_rev_values([], [], 0) ->
+    [];
+add_snafu_rev_values([], [], Carry) ->
+    [Carry];
+add_snafu_rev_values([Digit1 | Values1], [Digit2 | Values2], Carry) ->
+    case Digit1 + Digit2 + Carry of
+        Ans when Ans > 2 -> [(Ans - 5) | add_snafu_rev_values(Values1, Values2, 1)];
+        Ans when Ans < -2 -> [(Ans + 5) | add_snafu_rev_values(Values1, Values2, -1)];
+        Ans -> [Ans | add_snafu_rev_values(Values1, Values2, 0)]
+    end.
+
 -spec snafu_to_integer(snafu()) -> non_neg_integer().
 snafu_to_integer(N) ->
     {Values, _} = lists:mapfoldr(

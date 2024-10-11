@@ -50,7 +50,7 @@
 
 -spec main(1..2) -> ok.
 main(1) ->
-    Numbers = io_ext:read_lines(standard_io),
+    Numbers = lists:map(fun binary_to_list/1, io_ext:read_lines(standard_io)),
     lists:foreach(
         fun(SNAFU) ->
             io:format(standard_error, "~s	~b~n", [SNAFU, snafu_to_integer(SNAFU)])

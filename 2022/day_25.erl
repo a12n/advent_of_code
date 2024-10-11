@@ -124,11 +124,6 @@ snafu_to_integer(N) ->
     ),
     lists:sum(Values).
 
--spec integer_to_snafu(non_neg_integer()) -> string().
-integer_to_snafu(N) ->
-    %% TODO
-    integer_to_list(N).
-
 -ifdef(TEST).
 
 -include_lib("eunit/include/eunit.hrl").

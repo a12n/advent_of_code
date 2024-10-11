@@ -42,7 +42,8 @@ min_distance(Blizzards, Extent, Begin, End) ->
                 %% Filter invalid positions due to grid extent.
                 AdjacentList2 = [
                     NextPos
-                 || NextPos <- AdjacentList, grids:is_valid_pos(NextPos, Extent)
+                 || NextPos <- AdjacentList,
+                    grids:is_valid_pos(NextPos, Extent) orelse NextPos == End
                 ],
                 io:format(standard_error, "AdjacentList2 (is_valid_pos) ~p~n", [AdjacentList2]),
                 %% Filter invalid positions due to intersections with

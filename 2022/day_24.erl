@@ -8,16 +8,21 @@
 %% -define(LEFT, 2#1000).
 %% -define(RIGHT, 2#0001).
 
+%% How to check intersections of the expedition with blizzards:
+%% - We're at minute T.
+%% - Move current expedition position up, left, right, and down -T positions.
+%% - Does this intersects with blizzards (they're really static in their map).
+
 -spec main(1..2) -> ok.
 main(1) ->
     {Blizzards, Extent, Begin, End} = parse_input(io_ext:read_lines(standard_io)),
     ok.
 
-%% -spec move_blizzards(grids:grid(integer()), grids:extent(integer())) -> grids:grid(integer()).
-%% move_blizzards(Blizzards, Extent) ->
-%%     maps:fold(fun(Pos,Bits) ->
-%%
-%%               end, #{}, Blizzards).
+-spec move_blizzards(ets:table(), grids:extent(integer())) -> ok.
+move_blizzards(Blizzards, Extent) ->
+    maps:fold(fun(Pos,Bits) ->
+
+              end, #{}, Blizzards).
 
 -spec parse_input([binary()]) ->
     {ets:table(), girds:extent(integer()), grids:pos(integer()), grids:pos(integer())}.

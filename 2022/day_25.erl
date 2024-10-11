@@ -52,10 +52,7 @@
 main(1) ->
     Numbers = lists:map(fun binary_to_list/1, io_ext:read_lines(standard_io)),
     lists:foreach(
-        fun(SNAFU) ->
-            io:format(standard_error, "~s	~b~n", [SNAFU, snafu_to_integer(SNAFU)])
-        end,
-        Numbers
+        fun(N) -> io:format(standard_error, "~s	~b~n", [N, snafu_to_integer(N)]) end, Numbers
     ),
     Sum = lists:foldl(fun add_snafu/2, "0", Numbers),
     io:format(standard_error, "~s	~b~n", [Sum, snafu_to_integer(Sum)]),

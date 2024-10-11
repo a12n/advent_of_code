@@ -12,7 +12,7 @@ main(1) ->
         end,
         Numbers
     ),
-    ok.
+    io:format("~s~n", [integer_to_snafu(lists:sum(lists:map(fun snafu_to_integer/1, Numbers)))]).
 
 -spec snafu_to_integer(binary() | string()) -> integer().
 snafu_to_integer(SNAFU) when is_binary(SNAFU) -> snafu_to_integer(binary_to_list(SNAFU));
@@ -35,3 +35,8 @@ snafu_to_integer(SNAFU) when is_list(SNAFU) ->
         lists:reverse(SNAFU)
     ),
     lists:sum(Digits).
+
+-spec integer_to_snafu(integer()) -> string().
+integer_to_snafu(N) ->
+    %% TODO
+    integer_to_list(N).

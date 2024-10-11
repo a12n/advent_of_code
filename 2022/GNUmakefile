@@ -8,4 +8,4 @@ clean:
 	$(RM) $(MODULES)
 
 %.beam: %.erl
-	erlc -DTEST -Wall -o $@ $<
+	erlc +debug_info -DTEST -Wall -o $@ $<

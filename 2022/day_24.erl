@@ -21,17 +21,11 @@ main(1) ->
         Begin,
         End,
         grids:to_iodata(
-            maps:map(
-                fun
-                    (_, up) -> $↑;
-                    (_, left) -> $←;
-                    (_, right) -> $→;
-                    (_, down) -> $↓
-                end,
-                Blizzards
-            ),
+            maps:map(fun(_, Dir) -> grids:dir_to_char(Dir) end, Blizzards),
             Extent,
-            #{blank => $.}
+            #{
+                blank => $.
+            }
         )
     ]),
     ok.

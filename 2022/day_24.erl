@@ -18,12 +18,16 @@ main(1) ->
             }
         )
     ]),
-    io:format("~b~n", [min_distance(Blizzards, Extent, Begin, End)]).
+    io:format("~b~n", [min_distance(Blizzards, Extent, Begin, End, 0)]).
 
 -spec min_distance(
-    grids:grid(integer()), grids:extent(integer()), grids:pos(integer()), grids:pos(integer())
+    grids:grid(integer()),
+    grids:extent(integer()),
+    grids:pos(integer()),
+    grids:pos(integer()),
+    non_neg_integer()
 ) -> non_neg_integer().
-min_distance(Blizzards, Extent, Begin, End) ->
+min_distance(Blizzards, Extent, Begin, End, Time0) ->
     (fun Loop(Queue) ->
         case gb_sets:take_smallest(Queue) of
             {{Distance, _, End}, _} ->
@@ -68,7 +72,7 @@ min_distance(Blizzards, Extent, Begin, End) ->
                 )
         end
     end)(
-        gb_sets:from_list([{0, 0, Begin}])
+        gb_sets:from_list([{0, Time0, Begin}])
     ).
 
 -spec intersects(

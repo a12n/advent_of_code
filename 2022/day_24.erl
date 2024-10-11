@@ -4,7 +4,7 @@
 -export([main/1]).
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
     {Blizzards, Extent, Begin, End} = parse_input(io_ext:read_lines(standard_io)),
     io:format(standard_error, "Extent ~p, Begin ~p, End ~p, Blizzards~n~ts", [
         Extent,
@@ -18,8 +18,14 @@ main(1) ->
             }
         )
     ]),
-    {Distance, _} = min_distance(Blizzards, Extent, Begin, End, 0),
-    io:format("~b~n", [Distance]).
+    case Part of
+        1 ->
+            {Distance, _} = min_distance(Blizzards, Extent, Begin, End, 0),
+            io:format("~b~n", [Distance]);
+        2 ->
+            %% TODO
+            ok
+    end.
 
 -spec min_distance(
     grids:grid(integer()),

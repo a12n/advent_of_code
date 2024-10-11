@@ -57,8 +57,9 @@ main(1) ->
         end,
         Numbers
     ),
-    %% TODO: Addition in SNAFU?
-    io:format("~s~n", [integer_to_snafu(lists:sum(lists:map(fun snafu_to_integer/1, Numbers)))]).
+    Sum = lists:foldl(fun add_snafu/2, "0", Numbers),
+    io:format(standard_error, "~s	~b~n", [Sum, snafu_to_integer(Sum)]),
+    io:format("~s~n", [Sum]).
 
 -spec digit_to_value(snafu_digit()) -> snafu_value().
 digit_to_value($2) -> 2;

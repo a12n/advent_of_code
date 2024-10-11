@@ -18,6 +18,7 @@ day_module(Day) ->
 
 main(_Args) ->
     true = code:add_path(filename:dirname(escript:script_name())),
-    ok = io:setopts([binary, {encoding, utf8}]),
+    ok = io:setopts(standard_io, [binary, {encoding, unicode}]),
+    ok = io:setopts(standard_error, [{encoding, unicode}]),
     {Day, Part} = script_info(escript:script_name()),
     (day_module(Day)):main(Part).

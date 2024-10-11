@@ -107,11 +107,11 @@ add_snafu_rev_values([], [], 0) ->
     [];
 add_snafu_rev_values([], [], Carry) ->
     [Carry];
-add_snafu_rev_values([Digit1 | Values1], [Digit2 | Values2], Carry) ->
-    case Digit1 + Digit2 + Carry of
-        Ans when Ans > 2 -> [(Ans - 5) | add_snafu_rev_values(Values1, Values2, 1)];
-        Ans when Ans < -2 -> [(Ans + 5) | add_snafu_rev_values(Values1, Values2, -1)];
-        Ans -> [Ans | add_snafu_rev_values(Values1, Values2, 0)]
+add_snafu_rev_values([Value1 | List1], [Value2 | List2], Carry) ->
+    case Value1 + Value2 + Carry of
+        Ans when Ans > 2 -> [(Ans - 5) | add_snafu_rev_values(List1, List2, 1)];
+        Ans when Ans < -2 -> [(Ans + 5) | add_snafu_rev_values(List1, List2, -1)];
+        Ans -> [Ans | add_snafu_rev_values(List1, List2, 0)]
     end.
 
 -spec snafu_to_integer(snafu()) -> non_neg_integer().

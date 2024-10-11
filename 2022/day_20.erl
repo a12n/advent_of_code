@@ -3,7 +3,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
--export([main/1, index/2]).
+-export([main/1]).
 
 -spec main(1..2) -> ok.
 main(Part) ->
@@ -29,7 +29,7 @@ main(Part) ->
     Sum = lists:sum(
         lists:map(
             fun(Offset) ->
-                Pos = index(treaps:size(Numbers2), (ZeroPos - 1) + Offset) + 1,
+                Pos = indices:remap((ZeroPos - 1) + Offset, treaps:size(Numbers2)) + 1,
                 {_, Value} = treaps:nth(Pos, Numbers2),
                 io:format(standard_error, <<"[~p + ~p; ~p] = ~p~n">>, [ZeroPos, Offset, Pos, Value]),
                 Value
@@ -38,10 +38,6 @@ main(Part) ->
         )
     ),
     io:format(<<"~b~n">>, [Sum]).
-
--spec index(pos_integer(), integer()) -> non_neg_integer().
-index(N, I) when I < 0 -> N + (I rem N);
-index(N, I) -> I rem N.
 
 -spec mix(treaps:treap(), non_neg_integer()) -> treaps:treap().
 mix(Numbers, 0) ->
@@ -52,7 +48,7 @@ mix(Numbers, N) ->
             fun(I, Treap) ->
                 {value, Pos, _} = treaps:search(fun({J, _}) -> J == I end, Treap),
                 {Value = {_, Number}, Pri, Treap2} = treaps:take(Pos, Treap),
-                Pos2 = index(treaps:size(Treap2), (Pos - 1) + Number) + 1,
+                Pos2 = indices:remap((Pos - 1) + Number, treaps:size(Treap2)) + 1,
                 treaps:insert(Pos2, Value, Pri, Treap2)
             end,
             Numbers,

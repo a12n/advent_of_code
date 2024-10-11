@@ -18,7 +18,14 @@ main(1) ->
             }
         )
     ]),
-    ok.
+    io:format("~b~n", [min_distance(Blizzards, Extent, Begin, End)]).
+
+-spec min_distance(
+    grids:grid(integer()), grids:extent(integer()), grids:pos(integer()), grids:pos(integer())
+) -> non_neg_integer().
+min_distance(Blizzards, Extent, Begin, End) ->
+    %% TODO
+    0.
 
 -spec intersects(
     grids:grid(integer()), grids:extent(integer()), grids:pos(integer()), non_neg_integer()

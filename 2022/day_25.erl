@@ -60,27 +60,32 @@ main(1) ->
     %% TODO: Addition in SNAFU?
     io:format("~s~n", [integer_to_snafu(lists:sum(lists:map(fun snafu_to_integer/1, Numbers)))]).
 
--spec snafu_to_integer(binary() | string()) -> non_neg_integer().
-snafu_to_integer(SNAFU) when is_binary(SNAFU) -> snafu_to_integer(binary_to_list(SNAFU));
-snafu_to_integer(SNAFU) when is_list(SNAFU) ->
-    {Digits, _} = lists:mapfoldl(
-        fun(Digit5, Pow5) ->
-            {
-                Pow5 *
-                    case Digit5 of
-                        $2 -> 2;
-                        $1 -> 1;
-                        $0 -> 0;
-                        $- -> -1;
-                        $= -> -2
-                    end,
-                Pow5 * 5
-            }
-        end,
-        1,
-        lists:reverse(SNAFU)
+-spec digit_to_value(snafu_digit()) -> snafu_value().
+digit_to_value($2) -> 2;
+digit_to_value($1) -> 1;
+digit_to_value($0) -> 0;
+digit_to_value($-) -> -1;
+digit_to_value($=) -> -2.
+
+-spec value_to_digit(snafu_value()) -> snafu_digit().
+value_to_digit(-2) -> $=;
+value_to_digit(-1) -> $-;
+value_to_digit(0) -> $0;
+value_to_digit(1) -> $1;
+value_to_digit(2) -> $2.
+
+-spec digits_to_values(snafu()) -> nonempty_list(snafu_value()).
+digits_to_values(Digits) -> lists:map(fun digit_to_value/1, Digits).
+
+-spec values_to_digits(nonempty_list(snafu_value())) -> snafu().
+values_to_digits(Values) -> lists:map(fun value_to_digit/1, Values).
+
+-spec snafu_to_integer(snafu()) -> non_neg_integer().
+snafu_to_integer(N) ->
+    {Values, _} = lists:mapfoldr(
+        fun(Value, Pow5) -> {Value * Pow5, 5 * Pow5} end, 1, digits_to_values(N)
     ),
-    lists:sum(Digits).
+    lists:sum(Values).
 
 -spec integer_to_snafu(non_neg_integer()) -> string().
 integer_to_snafu(N) ->

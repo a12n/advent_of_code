@@ -5,6 +5,13 @@
 
 -spec main(1..2) -> ok.
 main(1) ->
+    Numbers = io_ext:read_lines(standard_io),
+    lists:foreach(
+        fun(SNAFU) ->
+            io:format(standard_error, "~s	~b~n", [SNAFU, snafu_to_integer(SNAFU)])
+        end,
+        Numbers
+    ),
     ok.
 
 -spec snafu_to_integer(binary() | string()) -> integer().

@@ -12,6 +12,7 @@ main(1) ->
         end,
         Numbers
     ),
+    %% TODO: Addition in SNAFU?
     io:format("~s~n", [integer_to_snafu(lists:sum(lists:map(fun snafu_to_integer/1, Numbers)))]).
 
 -spec snafu_to_integer(binary() | string()) -> non_neg_integer().

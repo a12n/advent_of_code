@@ -31,17 +31,20 @@ min_distance(Blizzards, Extent, Begin, End) ->
                 %% distance.
                 Distance;
             {{Distance, Time, Pos}, Queue2} ->
+                io:format(standard_error, "Distance ~p, Time ~p, Pos ~p~n", [Distance, Time, Pos]),
                 %% Enumerate all possible positions for the next move.
                 AdjacentList =
                     [
                         grids:add_pos(Pos, grids:dir_to_pos(Dir))
                      || Dir <- [up, down, left, right]
                     ],
+                io:format(standard_error, "AdjacentList (initial) ~p~n", [AdjacentList]),
                 %% Filter invalid positions due to grid extent.
                 AdjacentList2 = [
                     NextPos
                  || NextPos <- AdjacentList, grids:is_valid_pos(NextPos, Extent)
                 ],
+                io:format(standard_error, "AdjacentList2 (is_valid_pos) ~p~n", [AdjacentList2]),
                 %% Filter invalid positions due to intersections with
                 %% a blizzard. Also may try to wait in current
                 %% position.
@@ -50,6 +53,7 @@ min_distance(Blizzards, Extent, Begin, End) ->
                  || NextPos <- [Pos | AdjacentList2],
                     not intersects(Blizzards, Extent, NextPos, Time + 1)
                 ],
+                io:format(standard_error, "AdjacentList3 (not intersects) ~p~n", [AdjacentList3]),
                 %% Enqueue next states and continue.
                 Loop(
                     lists:foldl(

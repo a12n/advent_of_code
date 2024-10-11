@@ -19,7 +19,7 @@ main(1) ->
     ok.
 
 -spec parse_input([binary()]) ->
-    {ets:table(), girds:extent(integer()), grids:pos(integer()), grids:pos(integer())}.
+    {grids:grid(integer()), girds:extent(integer()), grids:pos(integer()), grids:pos(integer())}.
 parse_input(Lines) ->
     Grid = grids:from_lines(Lines),
     Extent = {{MinRow, MinCol}, {MaxRow, MaxCol}} = grids:extent(Grid),
@@ -51,22 +51,16 @@ parse_input(Lines) ->
     Extent2 = {{MinRow + 1, MinCol + 1}, {MaxRow - 1, MaxCol - 1}},
     io:format(standard_error, "Extent2 = ~p~n", [Extent2]),
     %% Filter grid, keep only blizzards. Convert to duplicate_bag ETS table.
-    Blizzards = ets:new(blizzards, [duplicate_bag]),
-    true = ets:insert(
-        Blizzards,
-        maps:to_list(
-            maps:filtermap(
-                fun
-                    (_, $#) -> false;
-                    (_, $.) -> false;
-                    (_, $^) -> {true, up};
-                    (_, $<) -> {true, left};
-                    (_, $>) -> {true, right};
-                    (_, $v) -> {true, down}
-                end,
-                Grid
-            )
-        )
+    Blizzards = maps:filtermap(
+        fun
+            (_, $#) -> false;
+            (_, $.) -> false;
+            (_, $^) -> {true, up};
+            (_, $<) -> {true, left};
+            (_, $>) -> {true, right};
+            (_, $v) -> {true, down}
+        end,
+        Grid
     ),
     %% Return result.
     {Blizzards, Extent2, Begin, End}.

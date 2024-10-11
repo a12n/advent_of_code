@@ -12,7 +12,7 @@
     add_pos/2,
     sub_pos/2,
     taxicab_distance/2,
-    is_valid_pos/3,
+    is_valid_pos/2,
     extent/1
 ]).
 
@@ -25,8 +25,8 @@ sub_pos({X1, Y1, Z1}, {X2, Y2, Z2}) -> {X1 - X2, Y1 - Y2, Z1 - Z2}.
 -spec taxicab_distance(pos(integer()), pos(integer())) -> non_neg_integer().
 taxicab_distance({X1, Y1, Z1}, {X2, Y2, Z2}) -> abs(X1 - X2) + abs(Y1 - Y2) + abs(Z1 - Z2).
 
--spec is_valid_pos(pos(integer()), pos(integer()), pos(integer())) -> boolean().
-is_valid_pos({X, Y, Z}, {MinX, MinY, MinZ}, {MaxX, MaxY, MaxZ}) ->
+-spec is_valid_pos(pos(integer()), {pos(integer()), pos(integer())}) -> boolean().
+is_valid_pos({X, Y, Z}, {{MinX, MinY, MinZ}, {MaxX, MaxY, MaxZ}}) ->
     X >= MinX andalso X =< MaxX andalso
         Y >= MinY andalso Y =< MaxY andalso
         Z >= MinZ andalso Z =< MaxZ.

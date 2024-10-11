@@ -3,18 +3,24 @@
 
 -export([main/1]).
 
+%% -define(UP, 2#0100).
+%% -define(DOWN, 2#0010).
+%% -define(LEFT, 2#1000).
+%% -define(RIGHT, 2#0001).
+
 -spec main(1..2) -> ok.
 main(1) ->
-    {Grid, Extent, Begin, End} = parse_input(io_ext:read_lines(standard_io)),
+    {Blizzards, Extent, Begin, End} = parse_input(io_ext:read_lines(standard_io)),
     ok.
 
+%% -spec move_blizzards(grids:grid(integer()), grids:extent(integer())) -> grids:grid(integer()).
+%% move_blizzards(Blizzards, Extent) ->
+%%     maps:fold(fun(Pos,Bits) ->
+%%
+%%               end, #{}, Blizzards).
+
 -spec parse_input([binary()]) ->
-    {
-        grids:grid(integer()),
-        {grids:pos(integer()), grids:pos(integer())},
-        grids:pos(integer()),
-        grids:pos(integer())
-    }.
+    {ets:table(), girds:extent(integer()), grids:pos(integer()), grids:pos(integer())}.
 parse_input(Lines) ->
     Grid = grids:from_lines(Lines),
     Extent = {{MinRow, MinCol}, {MaxRow, MaxCol}} = grids:extent(Grid),
@@ -42,35 +48,26 @@ parse_input(Lines) ->
     Begin = {MinRow, BeginCol},
     End = {MaxRow, EndCol},
     io:format(standard_error, "Begin ~p, End ~p~n", [Begin, End]),
-    %% Filter grid, keep only blizzards. Also reduce extent as the
-    %% borders are removed.
+    %% Reduce extent as the borders are removed.
     Extent2 = {{MinRow + 1, MinCol + 1}, {MaxRow - 1, MaxCol - 1}},
-    Grid2 = maps:filtermap(
-        fun
-            (_, $#) -> false;
-            (_, $.) -> false;
-            (_, $^) -> {true, up};
-            (_, $<) -> {true, left};
-            (_, $>) -> {true, right};
-            (_, $v) -> {true, down}
-        end,
-        Grid
-    ),
-    io:format(standard_error, "Extent2 = ~p, Grid2 =~n~s", [
-        Extent2,
-        grids:to_iodata(
-            maps:map(
+    io:format(standard_error, "Extent2 = ~p~n", [Extent2]),
+    %% Filter grid, keep only blizzards. Convert to duplicate_bag ETS table.
+    Blizzards = ets:new(blizzards, [duplicate_bag]),
+    true = ets:insert(
+        Blizzards,
+        maps:to_list(
+            maps:filtermap(
                 fun
-                    (_, up) -> "^";
-                    (_, left) -> "<";
-                    (_, right) -> ">";
-                    (_, down) -> "v"
+                    (_, $#) -> false;
+                    (_, $.) -> false;
+                    (_, $^) -> {true, up};
+                    (_, $<) -> {true, left};
+                    (_, $>) -> {true, right};
+                    (_, $v) -> {true, down}
                 end,
-                Grid2
-            ),
-            Extent2,
-            #{blank => $.}
+                Grid
+            )
         )
-    ]),
+    ),
     %% Return result.
-    {Grid2, Extent2, Begin, End}.
+    {Blizzards, Extent2, Begin, End}.

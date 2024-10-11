@@ -92,7 +92,7 @@ add_snafu(N = [_ | _], M = [_ | _]) ->
     values_to_digits(
         lists:reverse(
             %% Add digits for each position, starting from the
-            %% lowest. Carry overflows/underflows.
+            %% lowest. Carry overflows/underflows to higher positions.
             add_snafu_rev_values(
                 %% Pad and align lists of digit values.
                 digits_to_values(lists:reverse(N, PadN)),
@@ -102,7 +102,7 @@ add_snafu(N = [_ | _], M = [_ | _]) ->
         )
     ).
 
--spec add_snafu_rev_values([-2..2], [-2..2], -1..1) -> [-2..2].
+-spec add_snafu_rev_values([snafu_value()], [snafu_value()], -1..1) -> [snafu_value()].
 add_snafu_rev_values([], [], 0) ->
     [];
 add_snafu_rev_values([], [], Carry) ->

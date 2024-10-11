@@ -23,8 +23,10 @@ main(Part) ->
             {Distance, _} = min_distance(Blizzards, Extent, Begin, End, 0),
             io:format("~b~n", [Distance]);
         2 ->
-            %% TODO
-            ok
+            {_, Time1} = min_distance(Blizzards, Extent, Begin, End, 0),
+            {_, Time2} = min_distance(Blizzards, Extent, End, Begin, Time1),
+            {_, Time3} = min_distance(Blizzards, Extent, Begin, End, Time2),
+            io:format("~b~n", [Time3])
     end.
 
 -spec min_distance(

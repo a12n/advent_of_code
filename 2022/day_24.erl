@@ -18,7 +18,8 @@ main(1) ->
             }
         )
     ]),
-    io:format("~b~n", [min_distance(Blizzards, Extent, Begin, End, 0)]).
+    {Distance, _} = min_distance(Blizzards, Extent, Begin, End, 0),
+    io:format("~b~n", [Distance]).
 
 -spec min_distance(
     grids:grid(integer()),
@@ -26,14 +27,14 @@ main(1) ->
     grids:pos(integer()),
     grids:pos(integer()),
     non_neg_integer()
-) -> non_neg_integer().
+) -> {non_neg_integer(), non_neg_integer()}.
 min_distance(Blizzards, Extent, Begin, End, Time0) ->
     (fun Loop(Queue) ->
         case gb_sets:take_smallest(Queue) of
-            {{Distance, _, End}, _} ->
+            {{Distance, Time, End}, _} ->
                 %% Reached the end position, return the minimum
-                %% distance.
-                Distance;
+                %% distance and the time.
+                {Distance, Time};
             {{Distance, Time, Pos}, Queue2} ->
                 io:format(standard_error, "Distance ~p, Time ~p, Pos ~p~n", [Distance, Time, Pos]),
                 %% Enumerate all possible positions for the next move.

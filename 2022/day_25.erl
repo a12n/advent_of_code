@@ -132,6 +132,16 @@ integer_to_snafu(N) ->
 
 -include_lib("eunit/include/eunit.hrl").
 
+add_snafu_test() ->
+    %% 3 + 4 = 7
+    ?assertEqual("12", add_snafu("1=", "1-")),
+    %% 6 + 8 = 14
+    ?assertEqual("1=-", add_snafu("11", "2=")),
+    %% 2022 + 12345 = 14367
+    ?assertEqual("10=00=2", add_snafu("1=11-2", "1-0---0")),
+    %% 1747 + 906 = 2653
+    ?assertEqual("1-111=", add_snafu("1=-0-2", "12111")).
+
 snafu_to_integer_test() ->
     ?assertEqual(1, snafu_to_integer("1")),
     ?assertEqual(2, snafu_to_integer("2")),

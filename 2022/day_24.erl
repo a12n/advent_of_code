@@ -26,9 +26,17 @@ main(1) ->
 min_distance(Blizzards, Extent, Begin, End) ->
     (fun Loop(Queue) ->
         case gb_sets:take_smallest(Queue) of
-            {{Distance, _, Pos}, _} when Pos == End -> Distance;
+            {{Distance, _, End}, _} ->
+                %% Reached the end position, return the minimum
+                %% distance.
+                Distance;
             {{Distance, Time, Pos}, Queue2} ->
-                %% TODO
+                %% TODO:
+                %% Enumerate all possible positions for the next move.
+                %% Filter invalid positions due to grid extent.
+                %% Filter invalid positions due to intersections with a blizzard.
+                %% Enqueue next positions.
+                %% Loop.
                 Loop(Queue2)
         end
     end)(

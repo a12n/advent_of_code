@@ -18,12 +18,6 @@ main(1) ->
     {Blizzards, Extent, Begin, End} = parse_input(io_ext:read_lines(standard_io)),
     ok.
 
--spec move_blizzards(ets:table(), grids:extent(integer())) -> ok.
-move_blizzards(Blizzards, Extent) ->
-    maps:fold(fun(Pos,Bits) ->
-
-              end, #{}, Blizzards).
-
 -spec parse_input([binary()]) ->
     {ets:table(), girds:extent(integer()), grids:pos(integer()), grids:pos(integer())}.
 parse_input(Lines) ->

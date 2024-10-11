@@ -24,8 +24,16 @@ main(1) ->
     grids:grid(integer()), grids:extent(integer()), grids:pos(integer()), grids:pos(integer())
 ) -> non_neg_integer().
 min_distance(Blizzards, Extent, Begin, End) ->
-    %% TODO
-    0.
+    (fun Loop(Queue) ->
+        case gb_sets:take_smallest(Queue) of
+            {{Distance, _, Pos}, _} when Pos == End -> Distance;
+            {{Distance, Time, Pos}, Queue2} ->
+                %% TODO
+                Loop(Queue2)
+        end
+    end)(
+        gb_sets:from_list([{0, 0, Begin}])
+    ).
 
 -spec intersects(
     grids:grid(integer()), grids:extent(integer()), grids:pos(integer()), non_neg_integer()

@@ -3,7 +3,8 @@
 -type dir() :: up | down | left | right.
 -type pos() :: pos(pos_integer()).
 -type pos(Integer) :: {Integer, Integer}.
--export_type([dir/0, pos/0, pos/1]).
+-type extent(Integer) :: {pos(Integer), pos(Integer)}.
+-export_type([dir/0, pos/0, pos/1, extent/1]).
 
 -type grid(Integer, Value) :: #{pos(Integer) := Value}.
 -type grid(Value) :: grid(pos_integer(), Value).
@@ -106,7 +107,7 @@ from_lines(Lines) ->
 -spec to_iodata(grid(integer(), char())) -> iodata().
 to_iodata(Grid) -> to_iodata(Grid, extent(Grid), #{}).
 
--spec to_iodata(grid(integer(), char()), {pos(integer()), pos(integer())}, format_opts()) ->
+-spec to_iodata(grid(integer(), char()), extent(integer()), format_opts()) ->
     iodata().
 to_iodata(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Opts) ->
     Blank = maps:get(blank, Opts, $\s),
@@ -151,7 +152,7 @@ size(Grid) ->
         Grid
     ).
 
--spec extent(grid(integer(), term())) -> {pos(integer()), pos(integer())} | undefined.
+-spec extent(grid(integer(), term())) -> extent(integer()) | undefined.
 extent(Grid) ->
     maps:fold(
         fun
@@ -167,7 +168,7 @@ extent(Grid) ->
         Grid
     ).
 
--spec extent_area({pos(integer()), pos(integer())}) -> non_neg_integer().
+-spec extent_area(extent(integer())) -> non_neg_integer().
 extent_area({{MinRow, MinCol}, {MaxRow, MaxCol}}) -> (MaxRow - MinRow + 1) * (MaxCol - MinCol + 1).
 
 -spec move(dir() | pos(integer()), grid(integer(), term())) -> grid(integer(), term()).

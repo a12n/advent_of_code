@@ -45,7 +45,7 @@ there_and(HeightMap, MapSize, StartPos, EndPos) ->
                         grids:add_pos(Pos, grids:dir_to_pos(Dir))
                      || Dir <- [up, left, right, down]
                     ],
-                    grids:is_valid_pos(AdjPos, MapSize),
+                    grids:is_valid_pos(AdjPos, {{1, 1}, MapSize}),
                     not gb_sets:is_member(AdjPos, Seen),
                     (maps:get(AdjPos, HeightMap) - Height) < 2
                 ],
@@ -84,7 +84,7 @@ back_again(HeightMap, MapSize, StartPos, EndChar) ->
                     grids:add_pos(Pos, grids:dir_to_pos(Dir))
                  || Dir <- [up, left, right, down]
                 ],
-                grids:is_valid_pos(AdjPos, MapSize),
+                grids:is_valid_pos(AdjPos, {{1, 1}, MapSize}),
                 not gb_sets:is_member(AdjPos, Seen),
                 (maps:get(AdjPos, HeightMap) - Height) > -2
             ],

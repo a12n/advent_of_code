@@ -31,13 +31,36 @@ min_distance(Blizzards, Extent, Begin, End) ->
                 %% distance.
                 Distance;
             {{Distance, Time, Pos}, Queue2} ->
-                %% TODO:
                 %% Enumerate all possible positions for the next move.
+                AdjacentList =
+                    [
+                        grids:add_pos(Pos, grids:dir_to_pos(Dir))
+                     || Dir <- [up, down, left, right]
+                    ],
                 %% Filter invalid positions due to grid extent.
-                %% Filter invalid positions due to intersections with a blizzard.
-                %% Enqueue next positions.
-                %% Loop.
-                Loop(Queue2)
+                AdjacentList2 = [
+                    NextPos
+                 || NextPos <- AdjacentList, grids:is_valid_pos(NextPos, Extent)
+                ],
+                %% Filter invalid positions due to intersections with
+                %% a blizzard. Also may try to wait in current
+                %% position.
+                AdjacentList3 = [
+                    NextPos
+                 || NextPos <- [Pos | AdjacentList2],
+                    not intersects(Blizzards, Extent, NextPos, Time + 1)
+                ],
+                %% Enqueue next states and continue.
+                Loop(
+                    lists:foldl(
+                        fun gb_sets:add_element/2,
+                        Queue2,
+                        [
+                            {Distance + 1, Time + 1, NextPos}
+                         || NextPos <- AdjacentList3
+                        ]
+                    )
+                )
         end
     end)(
         gb_sets:from_list([{0, 0, Begin}])

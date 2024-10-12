@@ -72,30 +72,6 @@ simulate(MoveMap, Pos0, Dir0, Instructions) ->
         Pos0, Dir0, Instructions
     ).
 
--spec parse([binary()]) -> {grids:grid(), grids:pos(), [instruction()]}.
-parse(Lines) ->
-    Grid = maps:filtermap(
-        fun
-            (_, $.) -> true;
-            (_, $#) -> true;
-            (_, $\s) -> false
-        end,
-        grids:from_lines(lists:droplast(Lines))
-    ),
-    StartCol = (fun Loop(Col) ->
-        case maps:find({1, Col}, Grid) of
-            {ok, $.} -> Col;
-            _ -> Loop(Col + 1)
-        end
-    end)(
-        1
-    ),
-    {
-        grid_to_move_map(Grid),
-        {1, StartCol},
-        parse_instructions(lists:last(Lines))
-    }.
-
 -spec parse_instructions(binary()) -> [instruction()].
 parse_instructions(Line) ->
     (fun

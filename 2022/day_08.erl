@@ -50,7 +50,7 @@ max_height(Dir, Pos, HeightGrid, GridSize) ->
         [{_, MaxHeight}] ->
             MaxHeight;
         [] ->
-            Pos2 = grid_position:add(Pos, grid_position:from_direction(Dir)),
+            Pos2 = grids:add_pos(Pos, grids:dir_to_pos(Dir)),
             MaxHeight = max(
                 max_height(Dir, Pos2, HeightGrid, GridSize),
                 maps:get(Pos2, HeightGrid)
@@ -85,7 +85,7 @@ viewing_distance(right, {_, Col}, _, {_, NumCols}, _) when Col >= NumCols -> 0;
 viewing_distance(up, {Row, _}, _, _, _) when Row =< 1 -> 0;
 viewing_distance(down, {Row, _}, _, {NumRows, _}, _) when Row >= NumRows -> 0;
 viewing_distance(Dir, Pos, HeightGrid, GridSize, Height) ->
-    Pos2 = grid_position:add(Pos, grid_position:from_direction(Dir)),
+    Pos2 = grids:add_pos(Pos, grids:dir_to_pos(Dir)),
     case maps:get(Pos2, HeightGrid) of
         Height2 when Height2 < Height ->
             1 + viewing_distance(Dir, Pos2, HeightGrid, GridSize, Height);

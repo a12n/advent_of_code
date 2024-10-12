@@ -83,7 +83,8 @@ split(N, #treap_node{value = Value, left = Left, right = Right, priority = Pri})
                         value = Value,
                         left = Left,
                         right = Part1,
-                        priority = Pri
+                        priority = Pri,
+                        size = 0
                     }
                 ),
                 Part2
@@ -97,7 +98,8 @@ split(N, #treap_node{value = Value, left = Left, right = Right, priority = Pri})
                         value = Value,
                         left = Part2,
                         right = Right,
-                        priority = Pri
+                        priority = Pri,
+                        size = 0
                     }
                 )
             }

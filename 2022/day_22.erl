@@ -6,6 +6,9 @@
 -type instruction() :: pos_integer() | ccw | cw.
 -type move_map() :: #{grids:pos() => #{grids:dir() => grids:pos()}}.
 
+-define(OPEN, $.).
+-define(WALL, $#).
+
 -spec main(1..2) -> ok.
 main(1) ->
     {MoveMap, Start, Instructions} = parse(io_ext:read_lines(standard_io)),
@@ -25,6 +28,23 @@ password({Row, Col}, Dir) ->
             left -> 2;
             up -> 3
         end.
+
+-spec parse_input([binary()]) ->
+    {grids:grid(?OPEN | ?WALL), grids:extent(), grids:pos(), nonempty_list(instruction())}.
+parse_input(Lines) ->
+    Grid = maps:filter(
+        fun
+            (_, ?OPEN) -> true;
+            (_, ?WALL) -> true;
+            (_, _) -> false
+        end,
+        grids:from_lines(lists:droplast(Lines))
+    ),
+    Extent = {{_, MinCol}, {_, MaxCol}} = grids:extent(Grid),
+    [StartCol | _] = lists:dropwhile(
+        fun(Col) -> maps:get({1, Col}, Grid, $\s) /= ?OPEN end, lists:seq(MinCol, MaxCol)
+    ),
+    {Grid, Extent, {1, StartCol}, parse_instructions(lists:last(Lines))}.
 
 -spec simulate(move_map(), grids:pos(), grids:dir(), [instruction()]) -> {grids:pos(), grids:dir()}.
 simulate(MoveMap, Pos0, Dir0, Instructions) ->

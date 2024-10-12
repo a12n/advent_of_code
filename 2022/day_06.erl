@@ -19,10 +19,9 @@ main(Part) ->
     ]).
 
 -spec find_marker(binary(), pos_integer()) -> pos_integer().
-find_marker(Signal, N) ->
-    find_marker(Signal, N, 0, #{}).
+find_marker(Signal, N) -> find_marker(Signal, N, 0, #{}).
 
--spec find_marker(string(), pos_integer(), non_neg_integer(), freq_maps:t(byte())) -> pos_integer().
+-spec find_marker(binary(), pos_integer(), non_neg_integer(), freq_maps:t(byte())) -> pos_integer().
 find_marker(Signal, N, I, Freqs) ->
     case maps:size(Freqs) of
         M when M == N ->

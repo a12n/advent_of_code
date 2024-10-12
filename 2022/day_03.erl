@@ -4,7 +4,7 @@
 -include_lib("eunit/include/eunit.hrl").
 
 -type item() :: 1..26 | 27..52.
--type compartment() :: #{item() := non_neg_integer()}.
+-type compartment() :: #{item() => non_neg_integer()}.
 -type rucksack() :: {compartment(), compartment()}.
 
 -export([main/1]).
@@ -81,8 +81,7 @@ char_to_item(C) when C >= $A, C =< $Z -> C - $A + 27.
 %% Part 2 functions.
 %%--------------------------------------------------------------------
 
--spec groups_of_three(nonempty_list(rucksack())) ->
-    nonempty_list({rucksack(), rucksack(), rucksack()}).
+-spec groups_of_three([rucksack()]) -> [{rucksack(), rucksack(), rucksack()}].
 groups_of_three([]) ->
     [];
 groups_of_three([Elf1, Elf2, Elf3 | Rucksacks]) ->

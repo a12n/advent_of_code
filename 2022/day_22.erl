@@ -12,17 +12,19 @@ main(1) ->
     io:format(standard_error, "MoveMap ~p~n", [MoveMap]),
     io:format(standard_error, "Start ~p~n", [Start]),
     io:format(standard_error, "Instructions ~p~n", [Instructions]),
-    {{Row, Col}, Dir} = simulate(MoveMap, Start, right, Instructions),
-    io:format(standard_error, "Finish ~p, Dir ~p~n", [{Row, Col}, Dir]),
-    Password =
-        1000 * Row + 4 * Col +
-            case Dir of
-                right -> 0;
-                down -> 1;
-                left -> 2;
-                up -> 3
-            end,
-    io:format(<<"~b~n">>, [Password]).
+    {Finish, FinishDir} = simulate(MoveMap, Start, right, Instructions),
+    io:format(standard_error, "Finish ~p, FinishDir ~p~n", [Finish, FinishDir]),
+    io:format(<<"~b~n">>, [password(Finish, FinishDir)]).
+
+-spec password(grids:pos(), grids:dir()) -> non_neg_integer().
+password({Row, Col}, Dir) ->
+    1000 * Row + 4 * Col +
+        case Dir of
+            right -> 0;
+            down -> 1;
+            left -> 2;
+            up -> 3
+        end.
 
 -spec simulate(move_map(), grids:pos(), grids:dir(), [instruction()]) -> {grids:pos(), grids:dir()}.
 simulate(MoveMap, Pos0, Dir0, Instructions) ->

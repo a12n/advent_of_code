@@ -85,7 +85,7 @@ simulate(MoveMap, Pos0, Dir0, Instructions) ->
         Pos0, Dir0, Instructions
     ).
 
--spec grid_to_move_map(grids:grid()) -> move_map().
+-spec grid_to_move_map(grids:grid(?OPEN | ?WALL)) -> move_map().
 grid_to_move_map(Grid) ->
     {{MinRow, MinCol}, {MaxRow, MaxCol}} = grids:extent(Grid),
     FirstNonBlank = fun Loop(Pos, Off) ->

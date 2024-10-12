@@ -60,17 +60,17 @@ parse(Lines) ->
         end,
         grids:from_lines(lists:droplast(Lines))
     ),
-    Start = (fun Loop(Pos) ->
-        case maps:find(Pos, Grid) of
-            {ok, $.} -> Pos;
-            _ -> Loop(grids:add_pos(Pos, grids:dir_to_pos(right)))
+    StartCol = (fun Loop(Col) ->
+        case maps:find({1, Col}, Grid) of
+            {ok, $.} -> Col;
+            _ -> Loop(Col + 1)
         end
     end)(
-        {1, 1}
+        1
     ),
     {
         grid_to_move_map(Grid),
-        Start,
+        {1, StartCol},
         parse_instructions(lists:last(Lines))
     }.
 

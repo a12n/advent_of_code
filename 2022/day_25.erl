@@ -53,62 +53,6 @@ main(1) ->
     Numbers = lists:map(fun binary_to_list/1, io_ext:read_lines(standard_io)),
     io:format("~s~n", [integer_to_snafu(lists:sum(lists:map(fun snafu_to_integer/1, Numbers)))]).
 
--spec digit_to_value(snafu_digit()) -> snafu_value().
-digit_to_value($2) -> 2;
-digit_to_value($1) -> 1;
-digit_to_value($0) -> 0;
-digit_to_value($-) -> -1;
-digit_to_value($=) -> -2.
-
--spec value_to_digit(snafu_value()) -> snafu_digit().
-value_to_digit(-2) -> $=;
-value_to_digit(-1) -> $-;
-value_to_digit(0) -> $0;
-value_to_digit(1) -> $1;
-value_to_digit(2) -> $2.
-
--spec digits_to_values(snafu()) -> nonempty_list(snafu_value()).
-digits_to_values(Digits) -> lists:map(fun digit_to_value/1, Digits).
-
--spec values_to_digits(nonempty_list(snafu_value())) -> snafu().
-values_to_digits(Values) -> lists:map(fun value_to_digit/1, Values).
-
--spec add_snafu(snafu(), snafu()) -> snafu().
-add_snafu(N = [_ | _], M = [_ | _]) ->
-    %% Compute the necessary padding to align N and M.
-    {PadN, PadM} =
-        case {length(N), length(M)} of
-            {LenN, LenM} when LenN > LenM -> {"", lists:duplicate(LenN - LenM, $0)};
-            {LenN, LenM} when LenN < LenM -> {lists:duplicate(LenM - LenN, $0), ""};
-            {Len, Len} -> {"", ""}
-        end,
-    %% Was adding starting from lower positions, reverse the resulting
-    %% list of values. Encode values as digits.
-    values_to_digits(
-        lists:reverse(
-            %% Add digits for each position, starting from the
-            %% lowest. Carry overflows/underflows to higher positions.
-            add_snafu_rev_values(
-                %% Pad and align lists of digit values.
-                digits_to_values(lists:reverse(N, PadN)),
-                digits_to_values(lists:reverse(M, PadM)),
-                0
-            )
-        )
-    ).
-
--spec add_snafu_rev_values([snafu_value()], [snafu_value()], -1..1) -> [snafu_value()].
-add_snafu_rev_values([], [], 0) ->
-    [];
-add_snafu_rev_values([], [], Carry) ->
-    [Carry];
-add_snafu_rev_values([Value1 | List1], [Value2 | List2], Carry) ->
-    case Value1 + Value2 + Carry of
-        Ans when Ans > 2 -> [(Ans - 5) | add_snafu_rev_values(List1, List2, 1)];
-        Ans when Ans < -2 -> [(Ans + 5) | add_snafu_rev_values(List1, List2, -1)];
-        Ans -> [Ans | add_snafu_rev_values(List1, List2, 0)]
-    end.
-
 -spec snafu_to_integer(snafu()) -> non_neg_integer().
 snafu_to_integer(N = [_ | _]) ->
     {Ans, _} = lists:foldr(
@@ -119,6 +63,13 @@ snafu_to_integer(N = [_ | _]) ->
         N
     ),
     Ans.
+
+-spec digit_to_value(snafu_digit()) -> snafu_value().
+digit_to_value($2) -> 2;
+digit_to_value($1) -> 1;
+digit_to_value($0) -> 0;
+digit_to_value($-) -> -1;
+digit_to_value($=) -> -2.
 
 -spec integer_to_snafu(non_neg_integer()) -> snafu().
 integer_to_snafu(0) -> "0";
@@ -162,32 +113,5 @@ snafu_to_integer_test_() ->
 
 integer_to_snafu_test_() ->
     lists:map(fun({N, M}) -> ?_assertEqual(M, integer_to_snafu(N)) end, test_numbers()).
-
-add_snafu_test() ->
-    %% 3 + 4 = 7
-    ?assertEqual("12", add_snafu("1=", "1-")),
-    %% 6 + 8 = 14
-    ?assertEqual("1=-", add_snafu("11", "2=")),
-    %% 2022 + 12345 = 14367
-    ?assertEqual("10=00=2", add_snafu("1=11-2", "1-0---0")),
-    %% 1747 + 906 = 2653
-    ?assertEqual("1-111=", add_snafu("1=-0-2", "12111")).
-
-snafu_to_integer_test() ->
-    ?assertEqual(1, snafu_to_integer("1")),
-    ?assertEqual(2, snafu_to_integer("2")),
-    ?assertEqual(3, snafu_to_integer("1=")),
-    ?assertEqual(4, snafu_to_integer("1-")),
-    ?assertEqual(5, snafu_to_integer("10")),
-    ?assertEqual(6, snafu_to_integer("11")),
-    ?assertEqual(7, snafu_to_integer("12")),
-    ?assertEqual(8, snafu_to_integer("2=")),
-    ?assertEqual(9, snafu_to_integer("2-")),
-    ?assertEqual(10, snafu_to_integer("20")),
-    ?assertEqual(15, snafu_to_integer("1=0")),
-    ?assertEqual(20, snafu_to_integer("1-0")),
-    ?assertEqual(2022, snafu_to_integer("1=11-2")),
-    ?assertEqual(12345, snafu_to_integer("1-0---0")),
-    ?assertEqual(314159265, snafu_to_integer("1121-1110-1=0")).
 
 -endif.

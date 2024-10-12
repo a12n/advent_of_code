@@ -31,7 +31,6 @@
     from_lines/1,
     to_iodata/1, to_iodata/3,
     find_values/2,
-    transpose/1,
     size/1,
     extent/1,
     extent_area/1,
@@ -130,16 +129,6 @@ find_values(Query, Grid) ->
             (_, _, List) -> List
         end,
         [],
-        Grid
-    ).
-
--spec transpose(grid(term())) -> grid(term()).
-transpose(Grid) ->
-    maps:fold(
-        fun(Pos, Value, Result) ->
-            maps:update(grid_pos:transpose(Pos), Value, Result)
-        end,
-        #{},
         Grid
     ).
 

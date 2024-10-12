@@ -138,6 +138,31 @@ integer_to_snafu(N, Ans) ->
 
 -include_lib("eunit/include/eunit.hrl").
 
+test_numbers() ->
+    [
+        {1, "1"},
+        {2, "2"},
+        {3, "1="},
+        {4, "1-"},
+        {5, "10"},
+        {6, "11"},
+        {7, "12"},
+        {8, "2="},
+        {9, "2-"},
+        {10, "20"},
+        {15, "1=0"},
+        {20, "1-0"},
+        {2022, "1=11-2"},
+        {12345, "1-0---0"},
+        {314159265, "1121-1110-1=0"}
+    ].
+
+snafu_to_integer_test_() ->
+    lists:map(fun({N, M}) -> ?_assertEqual(N, snafu_to_integer(M)) end, test_numbers()).
+
+integer_to_snafu_test_() ->
+    lists:map(fun({N, M}) -> ?_assertEqual(M, integer_to_snafu(N)) end, test_numbers()).
+
 add_snafu_test() ->
     %% 3 + 4 = 7
     ?assertEqual("12", add_snafu("1=", "1-")),

@@ -8,7 +8,7 @@
 }).
 
 -record(dir_entry, {
-    size :: non_neg_integer(),
+    size :: non_neg_integer() | undefined,
     children = #{} :: #{binary() := #dir_entry{} | #file_entry{}}
 }).
 
@@ -97,11 +97,10 @@ update_size(Dir = #dir_entry{size = undefined, children = Children}) ->
     Dir#dir_entry{size = Size, children = Children2};
 update_size(Dir = #dir_entry{size = Size}) when is_integer(Size) -> Dir.
 
--spec filtermap_entries(fun((entry()) -> boolean() | {true, term()}), entry()) -> [term()].
+-spec filtermap_entries(fun((entry()) -> {true, term()} | false), entry()) -> [term()].
 filtermap_entries(Pred, File = #file_entry{}) ->
     case Pred(File) of
         {true, Value} -> [Value];
-        true -> [File];
         false -> []
     end;
 filtermap_entries(Pred, Dir = #dir_entry{children = Children}) ->
@@ -115,6 +114,5 @@ filtermap_entries(Pred, Dir = #dir_entry{children = Children}) ->
     ),
     case Pred(Dir) of
         {true, Value} -> [Value | SubEntries];
-        true -> [Dir | SubEntries];
         false -> SubEntries
     end.

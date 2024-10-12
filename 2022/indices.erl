@@ -2,7 +2,7 @@
 
 -export([remap/2, remap/3]).
 
--spec remap(pos_integer(), integer()) -> non_neg_integer().
+-spec remap(integer(), pos_integer()) -> non_neg_integer().
 remap(I, N) when I < 0 ->
     case I rem N of
         0 -> 0;

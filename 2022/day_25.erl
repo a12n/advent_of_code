@@ -51,12 +51,7 @@
 -spec main(1..2) -> ok.
 main(1) ->
     Numbers = lists:map(fun binary_to_list/1, io_ext:read_lines(standard_io)),
-    lists:foreach(
-        fun(N) -> io:format(standard_error, "~s	~b~n", [N, snafu_to_integer(N)]) end, Numbers
-    ),
-    Sum = lists:foldl(fun add_snafu/2, "0", Numbers),
-    io:format(standard_error, "~s	~b~n", [Sum, snafu_to_integer(Sum)]),
-    io:format("~s~n", [Sum]).
+    io:format("~s~n", [integer_to_snafu(lists:sum(lists:map(fun snafu_to_integer/1, Numbers)))]).
 
 -spec digit_to_value(snafu_digit()) -> snafu_value().
 digit_to_value($2) -> 2;
@@ -124,6 +119,21 @@ snafu_to_integer(N = [_ | _]) ->
         N
     ),
     Ans.
+
+-spec integer_to_snafu(non_neg_integer()) -> snafu().
+integer_to_snafu(N) when N >= 0 -> integer_to_snafu(N, "").
+
+-spec integer_to_snafu(non_neg_integer(), string()) -> snafu().
+integer_to_snafu(0, "") ->
+    "0";
+integer_to_snafu(0, Ans) ->
+    Ans;
+integer_to_snafu(N, Ans) ->
+    case N rem 5 of
+        K when K < 3 -> integer_to_snafu(N div 5, [K + $0 | Ans]);
+        3 -> integer_to_snafu(N div 5 + 1, [$= | Ans]);
+        4 -> integer_to_snafu(N div 5 + 1, [$- | Ans])
+    end.
 
 -ifdef(TEST).
 

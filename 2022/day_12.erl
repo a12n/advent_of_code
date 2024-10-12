@@ -10,17 +10,19 @@ main(Part) ->
     [EndPos] = grids:find_values($E, HeightMap0),
     HeightMap = HeightMap0#{StartPos := $a, EndPos := $z},
     MapSize = grids:size(HeightMap),
-    %% io:format([
-    %%     ansi:erase(display),
-    %%     ansi:cursor({position, {1, 1}}),
-    %%     grids:to_iodata(
-    %%         maps:map(
-    %%             fun(_, C) -> ansi:attrs({fg, {gray, 23 * (C - $a) div 25}}, C) end,
-    %%             HeightMap
-    %%         ),
-    %%         {{1, 1}, MapSize},
-    %%         #{}
-    %%     )
+    %% io:format(standard_error, "~s", [
+    %%     [
+    %%         ansi:erase(display),
+    %%         ansi:cursor({position, {1, 1}}),
+    %%         grids:to_iodata(
+    %%             maps:map(
+    %%                 fun(_, C) -> ansi:attrs({fg, {gray, 23 * (C - $a) div 25}}, C) end,
+    %%                 HeightMap
+    %%             ),
+    %%             {{1, 1}, MapSize},
+    %%             #{}
+    %%         )
+    %%     ]
     %% ]),
     io:format(<<"~b~n">>, [
         case Part of

@@ -3,8 +3,9 @@
 -type dir() :: up | down | left | right.
 -type pos() :: pos(pos_integer()).
 -type pos(Integer) :: {Integer, Integer}.
+-type extent() :: extent(pos_integer()).
 -type extent(Integer) :: {pos(Integer), pos(Integer)}.
--export_type([dir/0, pos/0, pos/1, extent/1]).
+-export_type([dir/0, pos/0, pos/1, extent/0, extent/1]).
 
 -type grid(Integer, Value) :: #{pos(Integer) := Value}.
 -type grid(Value) :: grid(pos_integer(), Value).

@@ -10,13 +10,18 @@
 -define(WALL, $#).
 
 -spec main(1..2) -> ok.
-main(1) ->
+main(Part) ->
     {Grid, Extent, Start, Instructions} = parse_input(io_ext:read_lines(standard_io)),
     io:format(standard_error, "Start ~p, Extent ~p~n", [Start, Extent]),
     io:format(standard_error, "Instructions ~p~n", [Instructions]),
-    {Finish, FinishDir} = simulate(grid_to_move_map(Grid), Start, right, Instructions),
-    io:format(standard_error, "Finish ~p, FinishDir ~p~n", [Finish, FinishDir]),
-    io:format("~b~n", [password(Finish, FinishDir)]).
+    case Part of
+        1 ->
+            {Finish, FinishDir} = simulate(grid_to_move_map(Grid), Start, right, Instructions),
+            io:format(standard_error, "Finish ~p, FinishDir ~p~n", [Finish, FinishDir]),
+            io:format("~b~n", [password(Finish, FinishDir)]);
+        2 ->
+            ok
+    end.
 
 -spec password(grids:pos(), grids:dir()) -> non_neg_integer().
 password({Row, Col}, Dir) ->

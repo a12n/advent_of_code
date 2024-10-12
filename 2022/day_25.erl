@@ -121,16 +121,15 @@ snafu_to_integer(N = [_ | _]) ->
     Ans.
 
 -spec integer_to_snafu(non_neg_integer()) -> snafu().
-integer_to_snafu(N) when N >= 0 -> integer_to_snafu(N, "").
+integer_to_snafu(0) -> "0";
+integer_to_snafu(N) when N > 0 -> integer_to_snafu(N, "").
 
 -spec integer_to_snafu(non_neg_integer(), string()) -> snafu().
-integer_to_snafu(0, "") ->
-    "0";
 integer_to_snafu(0, Ans) ->
     Ans;
 integer_to_snafu(N, Ans) ->
     case N rem 5 of
-        K when K < 3 -> integer_to_snafu(N div 5, [K + $0 | Ans]);
+        M when M < 3 -> integer_to_snafu(N div 5, [M + $0 | Ans]);
         3 -> integer_to_snafu(N div 5 + 1, [$= | Ans]);
         4 -> integer_to_snafu(N div 5 + 1, [$- | Ans])
     end.

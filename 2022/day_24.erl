@@ -103,7 +103,7 @@ intersects(Blizzards, {{MinRow, MinCol}, {MaxRow, MaxCol}}, {Row, Col}, Time) ->
     ).
 
 -spec parse_input([binary()]) ->
-    {grids:grid(integer()), girds:extent(integer()), grids:pos(integer()), grids:pos(integer())}.
+    {grids:grid(integer()), grids:extent(integer()), grids:pos(integer()), grids:pos(integer())}.
 parse_input(Lines) ->
     Grid = grids:from_lines(Lines),
     Extent = {{MinRow, MinCol}, {MaxRow, MaxCol}} = grids:extent(Grid),

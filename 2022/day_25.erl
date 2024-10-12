@@ -115,11 +115,15 @@ add_snafu_rev_values([Value1 | List1], [Value2 | List2], Carry) ->
     end.
 
 -spec snafu_to_integer(snafu()) -> non_neg_integer().
-snafu_to_integer(N) ->
-    {Values, _} = lists:mapfoldr(
-        fun(Value, Pow5) -> {Value * Pow5, 5 * Pow5} end, 1, digits_to_values(N)
+snafu_to_integer(N = [_ | _]) ->
+    {Ans, _} = lists:foldr(
+        fun(Digit, {Ans, Pow5}) ->
+            {Ans + digit_to_value(Digit) * Pow5, 5 * Pow5}
+        end,
+        {0, 1},
+        N
     ),
-    lists:sum(Values).
+    Ans.
 
 -ifdef(TEST).
 

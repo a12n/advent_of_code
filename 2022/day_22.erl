@@ -217,6 +217,13 @@ cube_wrapping(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Edges) when
                     fun(FromSide, {ToFace, ToSide, Order}, Wrapping2) ->
                         FromPos = grids:extent_side(face_extent(FaceSize, FromFace), FromSide),
                         ToPos = grids:extent_side(face_extent(FaceSize, ToFace), ToSide),
+                        FromPos2 =
+                            lists:map(
+                                fun(Pos) ->
+                                    grids:add_pos(Pos, grids:dir_to_pos(FromSide))
+                                end,
+                                FromPos
+                            ),
                         ToPos2 =
                             case Order of
                                 reverse -> lists:reverse(ToPos);
@@ -227,7 +234,7 @@ cube_wrapping(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Edges) when
                                 maps:put({FromP, FromSide}, {ToP, grids:neg_dir(ToSide)}, Wrapping3)
                             end,
                             Wrapping2,
-                            lists:zip(FromPos, ToPos2)
+                            lists:zip(FromPos2, ToPos2)
                         )
                     end,
                     Wrapping,

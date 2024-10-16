@@ -19,7 +19,7 @@ main(Part) ->
         Grid,
         case Part of
             1 -> plain_wrapping(Grid, Extent);
-            2 -> cube_wrapping(Grid, Extent)
+            2 -> cube_wrapping(Grid)
         end,
         Start,
         right,
@@ -167,12 +167,9 @@ filter_wrapping(Grid, Wrapping) ->
 %% Cube wrapping rules.
 %%--------------------------------------------------------------------
 
--spec cube_wrapping(grids:grid(?OPEN | ?WALL), grids:extent()) -> wrapping().
-cube_wrapping(Grid, Extent) -> cube_wrapping(Grid, Extent, edges(Grid)).
-
 %% XXX: Manually crafted to work only for a few specific nets of a cube.
--spec cube_wrapping(grids:grid(?OPEN | ?WALL), grids:extent(), #{edge() => []}) -> wrapping().
-cube_wrapping(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Edges) ->
+-spec cube_wrapping(grids:grid(?OPEN | ?WALL)) -> wrapping().
+cube_wrapping(Grid) ->
     {FaceSize, FaceGluing} =
         case maps:size(Grid) div 6 of
             4 * 4 ->

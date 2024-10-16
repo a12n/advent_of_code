@@ -122,30 +122,46 @@ plain_wrapping(Grid, Extent) -> plain_wrapping(Grid, Extent, edges(Grid)).
 
 -spec plain_wrapping(grids:grid(?OPEN | ?WALL), grids:extent(), #{edge() => []}) -> wrapping().
 plain_wrapping(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Edges) ->
-    maps:filtermap(
-        fun({{Row, Col}, EdgeDir}, []) ->
-            WrapPos =
-                first_non_blank(
-                    Grid,
-                    case EdgeDir of
-                        left -> {Row, MaxCol};
-                        right -> {Row, MinCol};
-                        up -> {MaxRow, Col};
-                        down -> {MinRow, Col}
-                    end,
-                    grids:dir_to_pos(EdgeDir)
-                ),
-            case maps:get(WrapPos, Grid) of
-                ?OPEN -> {true, {WrapPos, EdgeDir}};
-                ?WALL -> false
-            end
-        end,
-        Edges
+    filter_wrapping(
+        Grid,
+        maps:map(
+            fun({{Row, Col}, EdgeDir}, []) ->
+                WrapPos =
+                    first_non_blank(
+                        Grid,
+                        case EdgeDir of
+                            left -> {Row, MaxCol};
+                            right -> {Row, MinCol};
+                            up -> {MaxRow, Col};
+                            down -> {MinRow, Col}
+                        end,
+                        grids:dir_to_pos(EdgeDir)
+                    ),
+                {WrapPos, EdgeDir}
+            end,
+            Edges
+        )
     ).
 
 -spec first_non_blank(grids:grid(), grids:pos(), grids:pos()) -> grids:pos().
 first_non_blank(Grid, Pos, _) when is_map_key(Pos, Grid) -> Pos;
 first_non_blank(Grid, Pos, Incr) -> first_non_blank(Grid, grids:add_pos(Pos, Incr), Incr).
+
+%% @doc
+%% Keep only wrapping positions which lead to ?OPEN positions.
+%% @end
+-spec filter_wrapping(grids:grid(?OPEN | ?WALL), wrapping()) -> wrapping().
+filter_wrapping(Grid, Wrapping) ->
+    maps:filter(
+        fun({NextPos, Dir}, {WrapPos, _}) ->
+            Pos = grids:add_pos(NextPos, grids:dir_to_pos(grids:neg_dir(Dir))),
+            case Grid of
+                #{Pos := ?OPEN, WrapPos := ?OPEN} -> true;
+                _Other -> false
+            end
+        end,
+        Wrapping
+    ).
 
 %%--------------------------------------------------------------------
 %% Cube wrapping rules.

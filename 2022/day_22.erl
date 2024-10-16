@@ -179,6 +179,12 @@ cube_wrapping(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Edges) ->
 %% Set of grid edges (from ?OPEN positions).
 %%--------------------------------------------------------------------
 
+-spec face_extent(pos_integer(), grids:pos()) -> grids:extent().
+face_extent(FaceSize, {FaceRow, FaceCol}) ->
+    MinPos = {(FaceRow - 1) * FaceSize + 1, (FaceCol - 1) * FaceSize + 1},
+    MaxPos = {FaceRow * FaceSize, FaceCol * FaceSize},
+    {MinPos, MaxPos}.
+
 -spec edges(grids:grid(?OPEN | ?WALL)) -> #{edge() => []}.
 edges(Grid) ->
     maps:fold(

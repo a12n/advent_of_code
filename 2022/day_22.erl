@@ -170,8 +170,83 @@ filter_wrapping(Grid, Wrapping) ->
 -spec cube_wrapping(grids:grid(?OPEN | ?WALL), grids:extent()) -> wrapping().
 cube_wrapping(Grid, Extent) -> cube_wrapping(Grid, Extent, edges(Grid)).
 
+%% XXX: Manually crafted to work only for a few specific nets of a cube.
 -spec cube_wrapping(grids:grid(?OPEN | ?WALL), grids:extent(), #{edge() => []}) -> wrapping().
-cube_wrapping(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Edges) ->
+cube_wrapping(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Edges) when
+    %% Sample input, configuration:
+    %% ... ... 1,3 ...
+    %% 2,1 2,2 2,3 ...
+    %% ... ... 3,3 3,4
+    (map_size(Grid) div 6) == (4 * 4)
+->
+    FaceSize = 4,
+    FaceGluing =
+        #{
+            {1, 3} => #{
+                up => {{2, 1}, up, reverse},
+                left => {{2, 2}, up, forward},
+                right => {{3, 4}, right, reverse}
+            },
+            {2, 1} => #{
+                up => {{1, 3}, up, reverse},
+                left => {{3, 4}, down, reverse},
+                down => {{3, 3}, down, reverse}
+            },
+            {2, 2} => #{
+                up => {{1, 3}, left, forward},
+                down => {{3, 3}, left, reverse}
+            },
+            {2, 3} => #{
+                right => {{3, 4}, up, reverse}
+            },
+            {3, 3} => #{
+                left => {{2, 2}, down, reverse},
+                down => {{2, 1}, down, reverse}
+            },
+            {3, 4} => #{
+                up => {{2, 3}, right, reverse},
+                right => {{1, 3}, right, reverse},
+                down => {{2, 1}, left, reverse}
+            }
+        },
+    filter_wrapping(
+        Grid,
+        maps:fold(
+            fun(FromFace, Gluing, Wrapping) ->
+                maps:fold(
+                    fun(FromSide, {ToFace, ToSide, Order}, Wrapping2) ->
+                        FromPos = grids:extent_side(face_extent(FaceSize, FromFace), FromSide),
+                        ToPos = grids:extent_side(face_extent(FaceSize, ToFace), ToSide),
+                        ToPos2 =
+                            case Order of
+                                reverse -> lists:reverse(ToPos);
+                                forward -> ToPos
+                            end,
+                        lists:foldl(
+                            fun({FromP, ToP}, Wrapping3) ->
+                                maps:put({FromP, FromSide}, {ToP, grids:neg_dir(ToSide)}, Wrapping3)
+                            end,
+                            Wrapping2,
+                            lists:zip(FromPos, ToPos2)
+                        )
+                    end,
+                    Wrapping,
+                    Gluing
+                )
+            end,
+            #{},
+            FaceGluing
+        )
+    );
+cube_wrapping(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Edges) when
+    %% Puzzle input, configuration:
+    %% ... 1,2 1,3
+    %% ... 2,2 ...
+    %% 3,1 3,2 ...
+    %% 4,1 ... ...
+    (map_size(Grid) div 6) == (50 * 50)
+->
+    FaceSize = 50,
     %% TODO
     #{}.
 

@@ -34,6 +34,7 @@
     size/1,
     extent/1,
     extent_area/1,
+    extent_side/2,
     move/2,
     intersects/2,
     intersects_line/2
@@ -160,6 +161,15 @@ extent(Grid) ->
 
 -spec extent_area(extent(integer())) -> non_neg_integer().
 extent_area({{MinRow, MinCol}, {MaxRow, MaxCol}}) -> (MaxRow - MinRow + 1) * (MaxCol - MinCol + 1).
+
+-spec extent_side(extent(integer()), dir()) -> [pos(integer())].
+extent_side({{MinRow, MinCol}, {MaxRow, MaxCol}}, Side) ->
+    case Side of
+        up -> [{MinRow, Col} || Col <- lists:seq(MinCol, MaxCol)];
+        left -> [{Row, MinCol} || Row <- lists:seq(MinRow, MaxRow)];
+        right -> [{Row, MaxCol} || Row <- lists:seq(MinRow, MaxRow)];
+        down -> [{MaxRow, Col} || Col <- lists:seq(MinCol, MaxCol)]
+    end.
 
 -spec move(dir() | pos(integer()), grid(integer(), term())) -> grid(integer(), term()).
 move(Move = {_, _}, Grid) ->

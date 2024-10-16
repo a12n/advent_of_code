@@ -172,43 +172,51 @@ cube_wrapping(Grid, Extent) -> cube_wrapping(Grid, Extent, edges(Grid)).
 
 %% XXX: Manually crafted to work only for a few specific nets of a cube.
 -spec cube_wrapping(grids:grid(?OPEN | ?WALL), grids:extent(), #{edge() => []}) -> wrapping().
-cube_wrapping(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Edges) when
-    %% Sample input, configuration:
-    %% ... ... 1,3 ...
-    %% 2,1 2,2 2,3 ...
-    %% ... ... 3,3 3,4
-    (map_size(Grid) div 6) == (4 * 4)
-->
-    FaceSize = 4,
-    FaceGluing =
-        #{
-            {1, 3} => #{
-                up => {{2, 1}, up, reverse},
-                left => {{2, 2}, up, forward},
-                right => {{3, 4}, right, reverse}
-            },
-            {2, 1} => #{
-                up => {{1, 3}, up, reverse},
-                left => {{3, 4}, down, reverse},
-                down => {{3, 3}, down, reverse}
-            },
-            {2, 2} => #{
-                up => {{1, 3}, left, forward},
-                down => {{3, 3}, left, reverse}
-            },
-            {2, 3} => #{
-                right => {{3, 4}, up, reverse}
-            },
-            {3, 3} => #{
-                left => {{2, 2}, down, reverse},
-                down => {{2, 1}, down, reverse}
-            },
-            {3, 4} => #{
-                up => {{2, 3}, right, reverse},
-                right => {{1, 3}, right, reverse},
-                down => {{2, 1}, left, reverse}
-            }
-        },
+cube_wrapping(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Edges) ->
+    {FaceSize, FaceGluing} =
+        case maps:size(Grid) div 6 of
+            4 * 4 ->
+                %% Sample input, configuration:
+                %% ... ... 1,3 ...
+                %% 2,1 2,2 2,3 ...
+                %% ... ... 3,3 3,4
+                {4, #{
+                    {1, 3} => #{
+                        up => {{2, 1}, up, reverse},
+                        left => {{2, 2}, up, forward},
+                        right => {{3, 4}, right, reverse}
+                    },
+                    {2, 1} => #{
+                        up => {{1, 3}, up, reverse},
+                        left => {{3, 4}, down, reverse},
+                        down => {{3, 3}, down, reverse}
+                    },
+                    {2, 2} => #{
+                        up => {{1, 3}, left, forward},
+                        down => {{3, 3}, left, reverse}
+                    },
+                    {2, 3} => #{
+                        right => {{3, 4}, up, reverse}
+                    },
+                    {3, 3} => #{
+                        left => {{2, 2}, down, reverse},
+                        down => {{2, 1}, down, reverse}
+                    },
+                    {3, 4} => #{
+                        up => {{2, 3}, right, reverse},
+                        right => {{1, 3}, right, reverse},
+                        down => {{2, 1}, left, reverse}
+                    }
+                }};
+            50 * 50 ->
+                %% Puzzle input, configuration:
+                %% ... 1,2 1,3
+                %% ... 2,2 ...
+                %% 3,1 3,2 ...
+                %% 4,1 ... ...
+                %% TODO
+                {50, #{}}
+        end,
     filter_wrapping(
         Grid,
         maps:fold(
@@ -244,18 +252,7 @@ cube_wrapping(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Edges) when
             #{},
             FaceGluing
         )
-    );
-cube_wrapping(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Edges) when
-    %% Puzzle input, configuration:
-    %% ... 1,2 1,3
-    %% ... 2,2 ...
-    %% 3,1 3,2 ...
-    %% 4,1 ... ...
-    (map_size(Grid) div 6) == (50 * 50)
-->
-    FaceSize = 50,
-    %% TODO
-    #{}.
+    ).
 
 %%--------------------------------------------------------------------
 %% Set of grid edges (from ?OPEN positions).

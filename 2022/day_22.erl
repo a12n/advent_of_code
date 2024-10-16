@@ -1,10 +1,9 @@
 %% Monkey Map
 -module(day_22).
 
--export([main/1, parse_instructions/1]).
+-export([main/1]).
 
 -type instruction() :: pos_integer() | ccw | cw.
--type move_map() :: #{grids:pos() => #{grids:dir() => grids:pos()}}.
 -type edge() :: {grids:pos(integer()), grids:dir()}.
 -type wrapping() :: #{edge() => edge()}.
 
@@ -16,24 +15,22 @@ main(Part) ->
     {Grid, Extent, Start, Instructions} = parse_input(io_ext:read_lines(standard_io)),
     io:format(standard_error, "Start ~p, Extent ~p~n", [Start, Extent]),
     io:format(standard_error, "Instructions ~p~n", [Instructions]),
-    case Part of
-        1 ->
-            {Finish, FinishDir} = simulate(grid_to_move_map(Grid), Start, right, Instructions),
-            io:format(standard_error, "Finish ~p, FinishDir ~p~n", [Finish, FinishDir]),
-            io:format("~b~n", [password(Finish, FinishDir)]);
-        2 ->
-            ok
-    end.
+    {Finish, FinishDir} = walk(
+        Grid,
+        case Part of
+            1 -> plain_wrapping(Grid, Extent);
+            2 -> cube_wrapping(Grid, Extent)
+        end,
+        Start,
+        right,
+        Instructions
+    ),
+    io:format(standard_error, "Finish ~p, FinishDir ~p~n", [Finish, FinishDir]),
+    io:format("~b~n", [password(Finish, FinishDir)]).
 
--spec password(grids:pos(), grids:dir()) -> non_neg_integer().
-password({Row, Col}, Dir) ->
-    1000 * Row + 4 * Col +
-        case Dir of
-            right -> 0;
-            down -> 1;
-            left -> 2;
-            up -> 3
-        end.
+%%--------------------------------------------------------------------
+%% Parse input.
+%%--------------------------------------------------------------------
 
 -spec parse_input([binary()]) ->
     {grids:grid(?OPEN | ?WALL), grids:extent(), grids:pos(), nonempty_list(instruction())}.
@@ -66,72 +63,131 @@ parse_instructions(Line) ->
         Line, 0
     ).
 
--spec simulate(move_map(), grids:pos(), grids:dir(), [instruction()]) -> {grids:pos(), grids:dir()}.
-simulate(MoveMap, Pos0, Dir0, Instructions) ->
-    (fun
-        Loop(Pos, Dir, []) ->
-            %% No more instructions, return position and direction.
-            {Pos, Dir};
-        Loop(Pos, Dir, [Rotate | NextInstructions]) when Rotate == ccw; Rotate == cw ->
-            %% Rotate direction.
-            Loop(Pos, grids:rotate_dir(Rotate, Dir), NextInstructions);
-        Loop(Pos, Dir, [0 | NextInstructions]) ->
-            %% Moved in a direction, next instruction.
-            Loop(Pos, Dir, NextInstructions);
-        Loop(Pos, Dir, [N | NextInstructions]) when N > 0 ->
-            %% Try moving to a direction.
-            case MoveMap of
-                #{Pos := #{Dir := Pos2}} ->
-                    %% There's a next position, do move.
-                    Loop(Pos2, Dir, [(N - 1) | NextInstructions]);
-                _NoMove ->
-                    %% No next position from here, go to the next instruction.
-                    Loop(Pos, Dir, NextInstructions)
+%%--------------------------------------------------------------------
+%% Grid walking and password functions.
+%%--------------------------------------------------------------------
+
+-spec password(grids:pos(), grids:dir()) -> non_neg_integer().
+password({Row, Col}, Dir) ->
+    1000 * Row + 4 * Col +
+        case Dir of
+            right -> 0;
+            down -> 1;
+            left -> 2;
+            up -> 3
+        end.
+
+-spec walk(grids:grid(?OPEN | ?WALL), wrapping(), grids:pos(), grids:dir(), [instruction()]) ->
+    {grids:pos(), grids:dir()}.
+walk(_, _, Pos, Dir, []) ->
+    %% No more instructions, the result is current position and
+    %% direction.
+    {Pos, Dir};
+walk(Grid, Wrapping, Pos, Dir, [Rotate | Instructions]) when Rotate == ccw; Rotate == cw ->
+    %% Next instruction is rotation. Rotate the direction.
+    walk(Grid, Wrapping, Pos, grids:rotate_dir(Rotate, Dir), Instructions);
+walk(Grid, Wrapping, Pos, Dir, [0 | Instructions]) ->
+    %% Completed the move in a direction, next instruction.
+    walk(Grid, Wrapping, Pos, Dir, Instructions);
+walk(Grid, Wrapping, Pos, Dir, [N | Instructions]) when N > 0 ->
+    %% Moving in a direction, try taking the next step.
+    NextPos = grids:add_pos(Pos, grids:dir_to_pos(Dir)),
+    case Grid of
+        #{NextPos := ?OPEN} ->
+            %% Next position is available, do move.
+            walk(Grid, Wrapping, NextPos, Dir, [(N - 1) | Instructions]);
+        #{NextPos := ?WALL} ->
+            %% Next position is blocked, go to the next instruction.
+            walk(Grid, Wrapping, Pos, Dir, Instructions);
+        _NoMove ->
+            %% Went past an edge of the grid, try to wrap around to
+            %% some other edge.
+            case Wrapping of
+                #{{NextPos, Dir} := {WrapPos, WrapDir}} ->
+                    %% The wrap around position is available, do move.
+                    walk(Grid, Wrapping, WrapPos, WrapDir, [(N - 1) | Instructions]);
+                _NoWrap ->
+                    %% The wrap around position is blocked, go to the
+                    %% next instruction.
+                    walk(Grid, Wrapping, Pos, Dir, Instructions)
             end
-    end)(
-        Pos0, Dir0, Instructions
+    end.
+
+%%--------------------------------------------------------------------
+%% Plain wrapping rules.
+%%--------------------------------------------------------------------
+
+-spec plain_wrapping(grids:grid(?OPEN | ?WALL), grids:extent()) -> wrapping().
+plain_wrapping(Grid, Extent) -> plain_wrapping(Grid, Extent, edges(Grid)).
+
+-spec plain_wrapping(grids:grid(?OPEN | ?WALL), grids:extent(), #{edge() => []}) -> wrapping().
+plain_wrapping(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Edges) ->
+    maps:filtermap(
+        fun({{Row, Col}, EdgeDir}, []) ->
+            WrapPos =
+                first_non_blank(
+                    Grid,
+                    case EdgeDir of
+                        left -> {Row, MaxCol};
+                        right -> {Row, MinCol};
+                        up -> {MaxRow, Col};
+                        down -> {MinRow, Col}
+                    end,
+                    grids:dir_to_pos(EdgeDir)
+                ),
+            case maps:get(WrapPos, Grid) of
+                ?OPEN -> {true, {WrapPos, EdgeDir}};
+                ?WALL -> false
+            end
+        end,
+        Edges
     ).
 
--spec grid_to_move_map(grids:grid(?OPEN | ?WALL)) -> move_map().
-grid_to_move_map(Grid) ->
-    {{MinRow, MinCol}, {MaxRow, MaxCol}} = grids:extent(Grid),
-    FirstNonBlank = fun Loop(Pos, Off) ->
-        case maps:find(Pos, Grid) of
-            {ok, $.} -> Pos;
-            {ok, $#} -> undefined;
-            error -> Loop(grids:add_pos(Pos, Off), Off)
-        end
-    end,
-    Next = fun(Dir, Pos = {Row, Col}) ->
-        Off = grids:dir_to_pos(Dir),
-        Pos2 = grids:add_pos(Pos, Off),
-        case maps:find(Pos2, Grid) of
-            {ok, $.} -> Pos2;
-            {ok, $#} -> undefined;
-            error when Dir == left -> FirstNonBlank({Row, MaxCol}, Off);
-            error when Dir == right -> FirstNonBlank({Row, MinCol}, Off);
-            error when Dir == up -> FirstNonBlank({MaxRow, Col}, Off);
-            error when Dir == down -> FirstNonBlank({MinRow, Col}, Off)
-        end
-    end,
-    maps:filtermap(
+-spec first_non_blank(grids:grid(), grids:pos(), grids:pos()) -> grids:pos().
+first_non_blank(Grid, Pos, _) when is_map_key(Pos, Grid) -> Pos;
+first_non_blank(Grid, Pos, Incr) -> first_non_blank(Grid, grids:add_pos(Pos, Incr), Incr).
+
+%%--------------------------------------------------------------------
+%% Cube wrapping rules.
+%%--------------------------------------------------------------------
+
+-spec cube_wrapping(grids:grid(?OPEN | ?WALL), grids:extent()) -> wrapping().
+cube_wrapping(Grid, Extent) -> cube_wrapping(Grid, Extent, edges(Grid)).
+
+-spec cube_wrapping(grids:grid(?OPEN | ?WALL), grids:extent(), #{edge() => []}) -> wrapping().
+cube_wrapping(Grid, {{MinRow, MinCol}, {MaxRow, MaxCol}}, Edges) ->
+    %% TODO
+    #{}.
+
+%%--------------------------------------------------------------------
+%% Set of grid edges (from ?OPEN positions).
+%%--------------------------------------------------------------------
+
+-spec edges(grids:grid(?OPEN | ?WALL)) -> #{edge() => []}.
+edges(Grid) ->
+    maps:fold(
         fun
-            (Pos, $.) ->
-                {true,
-                    maps:filter(
-                        fun
-                            (_, {_, _}) -> true;
-                            (_, undefined) -> false
-                        end,
-                        #{
-                            up => Next(up, Pos),
-                            left => Next(left, Pos),
-                            right => Next(right, Pos),
-                            down => Next(down, Pos)
-                        }
-                    )};
-            (_, $#) ->
-                false
+            (_, ?WALL, Edges) ->
+                Edges;
+            (Pos, ?OPEN, Edges) ->
+                lists:foldl(
+                    fun
+                        ({EdgePos, _}, Edges) when is_map_key(EdgePos, Grid) ->
+                            %% The adjacent position is still in the
+                            %% grid. Don't update the set of edges.
+                            Edges;
+                        (Edge, Edges) ->
+                            %% The adjacent position is outside of the
+                            %% grid. Add to edges.
+                            maps:put(Edge, [], Edges)
+                    end,
+                    Edges,
+                    [
+                        {grids:add_pos(Pos, grids:dir_to_pos(Dir)), Dir}
+                     || Dir <- [up, left, right, down]
+                    ]
+                )
         end,
+        #{},
         Grid
     ).

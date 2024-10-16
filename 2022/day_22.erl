@@ -5,6 +5,8 @@
 
 -type instruction() :: pos_integer() | ccw | cw.
 -type move_map() :: #{grids:pos() => #{grids:dir() => grids:pos()}}.
+-type edge() :: {grids:pos(integer()), grids:dir()}.
+-type wrapping() :: #{edge() => edge()}.
 
 -define(OPEN, $.).
 -define(WALL, $#).

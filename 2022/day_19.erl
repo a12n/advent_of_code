@@ -34,7 +34,7 @@
 
 -spec main(1..2) -> ok.
 main(Part) ->
-    AllBlueprints = lists:map(fun parse_blueprint/1, io_ext:read_lines(standard_io)),
+    AllBlueprints = lists:map(fun parse_blueprint2/1, io_ext:read_lines(standard_io)),
     MainPID = self(),
     {Blueprints, TimeLeft} =
         case Part of
@@ -42,14 +42,16 @@ main(Part) ->
             2 -> {lists_ext:take(3, AllBlueprints), 32}
         end,
     lists:foreach(
-        fun(Blueprint = #{id := ID}) ->
+        fun(Blueprint = #blueprint{id = ID}) ->
+            MaxRobots = max_robots(Blueprint),
+            io:format(standard_error, "Blueprint ~p, MaxRobots ~p, TimeLeft ~p~n", [
+                Blueprint, MaxRobots, TimeLeft
+            ]),
             spawn_link(fun() ->
                 Table = ets:new(cache, [private]),
-                MaxRobots = max_resource_consumption(Blueprint),
-                io:format(standard_error, "Blueprint ~p, MaxRobots ~p, TimeLeft ~p~n", [
-                    Blueprint, MaxRobots, TimeLeft
-                ]),
-                MaxGeodes = max_geodes(Blueprint, Table, MaxRobots, #{ore => 1}, #{}, TimeLeft),
+                MaxGeodes = max_geodes2(
+                    Blueprint, Table, MaxRobots, #resources{ore = 1}, #resources{}, TimeLeft
+                ),
                 io:format(standard_error, <<"ID ~p, MaxGeodes ~p~n">>, [ID, MaxGeodes]),
                 MainPID ! {ID, MaxGeodes}
             end)

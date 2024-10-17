@@ -25,11 +25,11 @@
     geode = 0 :: non_neg_integer() | infinity
 }).
 -record(blueprint, {
-    id :: integer(),
     ore :: #resources{},
     clay :: #resources{},
     obsidian :: #resources{},
-    geode :: #resources{}
+    geode :: #resources{},
+    id :: integer()
 }).
 
 -spec main(1..2) -> ok.
@@ -149,24 +149,10 @@ max_geodes(Blueprint, Cache, MaxRobots, Robots, Inventory, TimeLeft) ->
 max_geodes2(_, _, _, _, #resources{geode = Geode}, _TimeLeft = 0) ->
     Geode;
 max_geodes2(
-    Blueprint = #blueprint{
-        ore = OreCost,
-        clay = ClayCost,
-        obsidian = ObsidianCost,
-        geode = GeodeCost
-    },
+    Blueprint,
     Cache,
-    MaxRobots = #resources{
-        ore = MaxOreRobots,
-        clay = MaxClayRobots,
-        obsidian = MaxObsidianRobots
-    },
-    Robots = #resources{
-        ore = OreRobots,
-        clay = ClayRobots,
-        obsidian = ObsidianRobots,
-        geode = GeodeRobots
-    },
+    MaxRobots,
+    Robots,
     Inventory,
     TimeLeft
 ) ->
@@ -185,54 +171,26 @@ max_geodes2(
                         Robots,
                         add_resources2(Inventory, Robots),
                         TimeLeft - 1
-                    ),
-                    %% Try to build ore robot.
-                    try
-                        true = (OreRobots < MaxOreRobots),
-                        Inventory2 = subtract_resources2(Inventory, OreCost),
-                        Inventory3 = add_resources2(Inventory2, Robots),
-                        Robots2 = Robots#resources{ore = OreRobots + 1},
-                        max_geodes2(
-                            Blueprint, Cache, MaxRobots, Robots2, Inventory3, TimeLeft - 1
-                        )
-                    catch
-                        error:_ -> 0
-                    end,
-                    %% Try to build clay robot.
-                    try
-                        true = (ClayRobots < MaxClayRobots),
-                        Inventory2 = subtract_resources2(Inventory, ClayCost),
-                        Inventory3 = add_resources2(Inventory2, Robots),
-                        Robots2 = Robots#resources{clay = ClayRobots + 1},
-                        max_geodes2(
-                            Blueprint, Cache, MaxRobots, Robots2, Inventory3, TimeLeft - 1
-                        )
-                    catch
-                        error:_ -> 0
-                    end,
-                    %% Try to build obsidian robot.
-                    try
-                        true = (ObsidianRobots < MaxObsidianRobots),
-                        Inventory2 = subtract_resources2(Inventory, ObsidianCost),
-                        Inventory3 = add_resources2(Inventory2, Robots),
-                        Robots2 = Robots#resources{obsidian = ObsidianRobots + 1},
-                        max_geodes2(
-                            Blueprint, Cache, MaxRobots, Robots2, Inventory3, TimeLeft - 1
-                        )
-                    catch
-                        error:_ -> 0
-                    end,
-                    %% Try to build geode robot.
-                    try
-                        Inventory2 = subtract_resources2(Inventory, GeodeCost),
-                        Inventory3 = add_resources2(Inventory2, Robots),
-                        Robots2 = Robots#resources{geode = GeodeRobots + 1},
-                        max_geodes2(
-                            Blueprint, Cache, MaxRobots, Robots2, Inventory3, TimeLeft - 1
-                        )
-                    catch
-                        error:_ -> 0
-                    end
+                    )
+                    | [
+                        %% Try to build a robot.
+                        try
+                            NumRobots = element(I, Robots),
+                            true = (NumRobots < element(I, MaxRobots)),
+                            Cost = element(I, Blueprint),
+                            Inventory2 = subtract_resources2(Inventory, Cost),
+                            Inventory3 = add_resources2(Inventory2, Robots),
+                            Robots2 = setelement(I, Robots, NumRobots + 1),
+                            max_geodes2(
+                                Blueprint, Cache, MaxRobots, Robots2, Inventory3, TimeLeft - 1
+                            )
+                        catch
+                            error:_ -> 0
+                        end
+                     || I <- [
+                            #resources.ore, #resources.clay, #resources.obsidian, #resources.geode
+                        ]
+                    ]
                 ]),
             true = ets:insert(Cache, {CacheKey, MaxGeodes}),
             MaxGeodes

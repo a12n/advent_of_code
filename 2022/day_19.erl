@@ -1,8 +1,7 @@
 %% Not Enough Minerals
 -module(day_19).
 
-%% -export([main/1]).
--compile([export_all]).
+-export([main/1]).
 
 -type resource() :: ore | clay | obsidian | geode.
 -type resource_map() :: #{resource() => non_neg_integer()}.
@@ -20,89 +19,53 @@
 }.
 
 -spec main(1..2) -> ok.
-main(2) ->
-    io:format("~s~n", [
-        graphviz:to_iodata(
-            #{
-                <<"Ore Robot">> => #{
-                    adjacent => #{<<"Ore">> => <<"A">>},
-                    shape => box
-                },
-                <<"Clay Robot">> => #{
-                    adjacent => #{<<"Clay">> => <<"B">>},
-                    shape => box
-                },
-                <<"Obsidian Robot">> => #{
-                    adjacent => #{<<"Obsidian">> => <<"C">>},
-                    shape => box
-                },
-                <<"Geode Robot">> => #{
-                    adjacent => #{<<"Geode">> => <<"D">>},
-                    shape => box
-                },
-
-                <<"Ore">> => #{
-                    adjacent => #{
-                        <<"Ore Robot">> => 4,
-                        <<"Clay Robot">> => 2,
-                        <<"Obsidian Robot">> => 3,
-                        <<"Geode Robot">> => 2
-                    }
-                },
-                <<"Clay">> => #{adjacent => #{<<"Obsidian Robot">> => 14}},
-                <<"Obsidian">> => #{adjacent => #{<<"Geode Robot">> => 7}}
-            },
-            #{label => "Sample Blueprint 1"}
-        )
-    ]);
-main(1) ->
-    Blueprints = lists:map(fun parse_blueprint/1, io_ext:read_lines(standard_io)),
+main(Part) ->
+    AllBlueprints = lists:map(fun parse_blueprint/1, io_ext:read_lines(standard_io)),
     MainPID = self(),
+    {Blueprints, TimeLeft} =
+        case Part of
+            1 -> {AllBlueprints, 24};
+            2 -> {lists_ext:take(3, AllBlueprints), 32}
+        end,
     lists:foreach(
         fun(Blueprint = #{id := ID}) ->
             spawn_link(fun() ->
                 Table = ets:new(cache, [private]),
                 MaxRobots = max_resource_consumption(Blueprint),
-                io:format(standard_error, "Blueprint ~p, MaxRobots ~p~n", [Blueprint, MaxRobots]),
-                MaxGeodes = max_geodes(Blueprint, Table, MaxRobots, #{ore => 1}, #{}, 24),
+                io:format(standard_error, "Blueprint ~p, MaxRobots ~p, TimeLeft ~p~n", [
+                    Blueprint, MaxRobots, TimeLeft
+                ]),
+                MaxGeodes = max_geodes(Blueprint, Table, MaxRobots, #{ore => 1}, #{}, TimeLeft),
                 io:format(standard_error, <<"ID ~p, MaxGeodes ~p~n">>, [ID, MaxGeodes]),
-                MainPID ! (ID * MaxGeodes)
+                MainPID ! {ID, MaxGeodes}
             end)
         end,
         Blueprints
     ),
-    QualityLevels = lists:map(
-        fun(_) ->
-            receive
-                QualityLevel -> QualityLevel
-            end
+    Answer =
+        case Part of
+            1 ->
+                lists:foldl(
+                    fun(_, Sum) ->
+                        receive
+                            {ID, MaxGeodes} -> (ID * MaxGeodes) + Sum
+                        end
+                    end,
+                    0,
+                    Blueprints
+                );
+            2 ->
+                lists:foldl(
+                    fun(_, Product) ->
+                        receive
+                            {_, MaxGeodes} -> MaxGeodes * Product
+                        end
+                    end,
+                    1,
+                    Blueprints
+                )
         end,
-        Blueprints
-    ),
-
-    %% Table = ets:new(cache, [public]),
-    %% spawn_link(fun Loop() ->
-    %%     receive
-    %%         _ -> Loop()
-    %%     after 1000 ->
-    %%         Info = ets:info(Table),
-    %%         io:format(standard_error, <<"cache: size ~b, memory ~b~n">>, [
-    %%             proplists:get_value(size, Info),
-    %%             proplists:get_value(memory, Info)
-    %%         ]),
-    %%         %% ets:foldl(
-    %%         %%     fun({Key, Value}, ok) ->
-    %%         %%         io:format(standard_error, <<"~b	~w~n">>, [Value, Key])
-    %%         %%     end,
-    %%         %%     ok,
-    %%         %%     cache
-    %%         %% ),
-    %%         Loop()
-    %%     end
-    %% end),
-
-    io:format(standard_error, <<"QualityLevels ~p~n">>, [QualityLevels]),
-    io:format(<<"~b~n">>, [lists:sum(QualityLevels)]).
+    io:format(standard_error, "~b~n", [Answer]).
 
 -spec max_resource_consumption(blueprint()) -> resource_map().
 max_resource_consumption(Blueprint) ->
@@ -118,14 +81,10 @@ max_resource_consumption(Blueprint) ->
     blueprint(), ets:table(), resource_map(), resource_map(), resource_map(), non_neg_integer()
 ) ->
     non_neg_integer().
-max_geodes(_, _, _, _, Inventory, TimeLeft = 0) ->
-    %% io:format(standard_error, <<"TimeLeft ~p, Inventory ~p~n">>, [TimeLeft, Inventory]),
+max_geodes(_, _, _, _, Inventory, _TimeLeft = 0) ->
     maps:get(geode, Inventory, 0);
-max_geodes(Blueprint = #{id := ID}, Cache, MaxRobots, Robots, Inventory, TimeLeft) ->
+max_geodes(Blueprint, Cache, MaxRobots, Robots, Inventory, TimeLeft) ->
     CacheKey = {Robots, Inventory, TimeLeft},
-    %% io:format(standard_error, <<"TimeLeft ~p, Robots ~p, Inventory ~p~n">>, [
-    %%     TimeLeft, Robots, Inventory
-    %% ]),
     case ets:lookup(Cache, CacheKey) of
         [{_, MaxGeodes}] ->
             MaxGeodes;

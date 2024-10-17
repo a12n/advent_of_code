@@ -81,7 +81,7 @@ main(Part) ->
                     Blueprints
                 )
         end,
-    io:format(standard_error, "~b~n", [Answer]).
+    io:format("~b~n", [Answer]).
 
 -spec max_resource_consumption(blueprint()) -> resource_map().
 max_resource_consumption(Blueprint) ->

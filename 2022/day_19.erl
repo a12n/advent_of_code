@@ -111,12 +111,18 @@ max_geodes(Blueprint, Cache, MaxNeeded, Robots = #{geode := GeodeRobots}, Invent
 -spec add_resources(resources(), resources()) -> resources().
 add_resources(Resources1, Resources2) -> map_resources(fun erlang:'+'/2, Resources1, Resources2).
 
+-spec mul_resources(resources(), non_neg_integer()) -> resources().
+mul_resources(Resources, M) -> map_resources(fun(N) -> N * M end, Resources).
+
 -spec subtract_resources(resources(), resources()) -> resources().
 subtract_resources(Resources1, Resources2) ->
     map_resources(fun(N, M) when N >= M -> N - M end, Resources1, Resources2).
 
 -spec max_resources(resources(), resources()) -> resources().
 max_resources(Resources1, Resources2) -> map_resources(fun max/2, Resources1, Resources2).
+
+-spec min_resources(resources(), resources()) -> resources().
+min_resources(Resources1, Resources2) -> map_resources(fun min/2, Resources1, Resources2).
 
 -spec map_resources(fun((non_neg_integer()) -> non_neg_integer()), resources()) -> resources().
 map_resources(Fun, #{ore := Ore, clay := Clay, obsidian := Obsidian}) ->

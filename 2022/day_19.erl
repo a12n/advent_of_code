@@ -109,29 +109,28 @@ max_geodes(Blueprint, Cache, MaxNeeded, Robots = #{geode := GeodeRobots}, Invent
     end.
 
 -spec add_resources(resources(), resources()) -> resources().
-add_resources(
-    #{ore := Ore1, clay := Clay1, obsidian := Obsidian1},
-    #{ore := Ore2, clay := Clay2, obsidian := Obsidian2}
-) ->
-    #{
-        ore => Ore1 + Ore2,
-        clay => Clay1 + Clay2,
-        obsidian => Obsidian1 + Obsidian2
-    }.
+add_resources(Resources1, Resources2) -> map_resources(fun erlang:'+'/2, Resources1, Resources2).
 
 -spec subtract_resources(resources(), resources()) -> resources().
-subtract_resources(
-    #{ore := Ore1, clay := Clay1, obsidian := Obsidian1},
-    #{ore := Ore2, clay := Clay2, obsidian := Obsidian2}
-) when Ore1 >= Ore2, Clay1 >= Clay2, Obsidian1 >= Obsidian2 ->
-    #{ore => Ore1 - Ore2, clay => Clay1 - Clay2, obsidian => Obsidian1 - Obsidian2}.
+subtract_resources(Resources1, Resources2) ->
+    map_resources(fun(N, M) when N >= M -> N - M end, Resources1, Resources2).
 
 -spec max_resources(resources(), resources()) -> resources().
-max_resources(
+max_resources(Resources1, Resources2) -> map_resources(fun max/2, Resources1, Resources2).
+
+-spec map_resources(fun((non_neg_integer()) -> non_neg_integer()), resources()) -> resources().
+map_resources(Fun, #{ore := Ore, clay := Clay, obsidian := Obsidian}) ->
+    #{ore => Fun(Ore), clay => Fun(Clay), obsidian => Fun(Obsidian)}.
+
+-spec map_resources(
+    fun((non_neg_integer(), non_neg_integer()) -> non_neg_integer()), resources(), resources()
+) -> resources().
+map_resources(
+    Fun,
     #{ore := Ore1, clay := Clay1, obsidian := Obsidian1},
     #{ore := Ore2, clay := Clay2, obsidian := Obsidian2}
 ) ->
-    #{ore => max(Ore1, Ore2), clay => max(Clay1, Clay2), obsidian => max(Obsidian1, Obsidian2)}.
+    #{ore => Fun(Ore1, Ore2), clay => Fun(Clay1, Clay2), obsidian => Fun(Obsidian1, Obsidian2)}.
 
 -spec parse_blueprint(binary()) -> blueprint().
 parse_blueprint(Line) ->

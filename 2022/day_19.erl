@@ -20,7 +20,7 @@
 
 -spec main(1..2) -> ok.
 main(Part) ->
-    AllBlueprints = lists:map(fun parse_blueprint2/1, io_ext:read_lines(standard_io)),
+    AllBlueprints = lists:map(fun parse_blueprint/1, io_ext:read_lines(standard_io)),
     MainPID = self(),
     {Blueprints, TimeLeft} =
         case Part of
@@ -35,7 +35,7 @@ main(Part) ->
             ]),
             spawn_link(fun() ->
                 Table = ets:new(cache, [private]),
-                MaxGeodes = max_geodes2(
+                MaxGeodes = max_geodes(
                     Blueprint, Table, MaxRobots, #resources{ore = 1}, #resources{}, TimeLeft
                 ),
                 io:format(standard_error, <<"ID ~p, MaxGeodes ~p~n">>, [ID, MaxGeodes]),
@@ -76,9 +76,9 @@ max_robots(#blueprint{
     obsidian = Obsidian,
     geode = Geode
 }) ->
-    (max_resources2(
-        max_resources2(
-            max_resources2(
+    (max_resources(
+        max_resources(
+            max_resources(
                 Ore,
                 Clay
             ),
@@ -89,13 +89,13 @@ max_robots(#blueprint{
         geode = infinity
     }.
 
--spec max_geodes2(
+-spec max_geodes(
     #blueprint{}, ets:table(), #resources{}, #resources{}, #resources{}, non_neg_integer()
 ) ->
     non_neg_integer().
-max_geodes2(_, _, _, _, #resources{geode = Geode}, _TimeLeft = 0) ->
+max_geodes(_, _, _, _, #resources{geode = Geode}, _TimeLeft = 0) ->
     Geode;
-max_geodes2(
+max_geodes(
     Blueprint,
     Cache,
     MaxRobots,
@@ -111,12 +111,12 @@ max_geodes2(
             MaxGeodes =
                 lists:max([
                     %% Don't produce any robots.
-                    max_geodes2(
+                    max_geodes(
                         Blueprint,
                         Cache,
                         MaxRobots,
                         Robots,
-                        add_resources2(Inventory, Robots),
+                        add_resources(Inventory, Robots),
                         TimeLeft - 1
                     )
                     | [
@@ -125,10 +125,10 @@ max_geodes2(
                             NumRobots = element(I, Robots),
                             true = (NumRobots < element(I, MaxRobots)),
                             Cost = element(I, Blueprint),
-                            Inventory2 = subtract_resources2(Inventory, Cost),
-                            Inventory3 = add_resources2(Inventory2, Robots),
+                            Inventory2 = subtract_resources(Inventory, Cost),
+                            Inventory3 = add_resources(Inventory2, Robots),
                             Robots2 = setelement(I, Robots, NumRobots + 1),
-                            max_geodes2(
+                            max_geodes(
                                 Blueprint, Cache, MaxRobots, Robots2, Inventory3, TimeLeft - 1
                             )
                         catch
@@ -143,8 +143,8 @@ max_geodes2(
             MaxGeodes
     end.
 
--spec add_resources2(#resources{}, #resources{}) -> #resources{}.
-add_resources2(
+-spec add_resources(#resources{}, #resources{}) -> #resources{}.
+add_resources(
     #resources{ore = Ore1, clay = Clay1, obsidian = Obsidian1, geode = Geode1},
     #resources{ore = Ore2, clay = Clay2, obsidian = Obsidian2, geode = Geode2}
 ) ->
@@ -155,8 +155,8 @@ add_resources2(
         geode = Geode1 + Geode2
     }.
 
--spec subtract_resources2(#resources{}, #resources{}) -> #resources{}.
-subtract_resources2(
+-spec subtract_resources(#resources{}, #resources{}) -> #resources{}.
+subtract_resources(
     #resources{ore = Ore1, clay = Clay1, obsidian = Obsidian1, geode = Geode1},
     #resources{ore = Ore2, clay = Clay2, obsidian = Obsidian2, geode = Geode2}
 ) when
@@ -172,8 +172,8 @@ subtract_resources2(
         geode = Geode1 - Geode2
     }.
 
--spec max_resources2(#resources{}, #resources{}) -> #resources{}.
-max_resources2(
+-spec max_resources(#resources{}, #resources{}) -> #resources{}.
+max_resources(
     #resources{ore = Ore1, clay = Clay1, obsidian = Obsidian1, geode = Geode1},
     #resources{ore = Ore2, clay = Clay2, obsidian = Obsidian2, geode = Geode2}
 ) ->
@@ -184,8 +184,8 @@ max_resources2(
         geode = max(Geode1, Geode2)
     }.
 
--spec parse_blueprint2(binary()) -> #blueprint{}.
-parse_blueprint2(Line) ->
+-spec parse_blueprint(binary()) -> #blueprint{}.
+parse_blueprint(Line) ->
     [
         <<"Blueprint">>,
         ID,

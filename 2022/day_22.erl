@@ -228,6 +228,8 @@ edges(Grid) ->
 %%                             ░░░→░░D░░░░░░|░░░→░░D░░░░░░
 -spec cube_wrapping(grids:grid(?OPEN | ?WALL)) -> wrapping().
 cube_wrapping(Grid) ->
+    Forward = fun(List) -> List end,
+    Reverse = fun lists:reverse/1,
     {FaceSize, FaceGluing} =
         case maps:size(Grid) div 6 of
             4 * 4 ->
@@ -237,30 +239,30 @@ cube_wrapping(Grid) ->
                 %% ... ... 3,3 3,4
                 {4, #{
                     {1, 3} => #{
-                        up => {{2, 1}, up, reverse},
-                        left => {{2, 2}, up, forward},
-                        right => {{3, 4}, right, reverse}
+                        up => {{2, 1}, up, Reverse},
+                        left => {{2, 2}, up, Forward},
+                        right => {{3, 4}, right, Reverse}
                     },
                     {2, 1} => #{
-                        up => {{1, 3}, up, reverse},
-                        left => {{3, 4}, down, reverse},
-                        down => {{3, 3}, down, reverse}
+                        up => {{1, 3}, up, Reverse},
+                        left => {{3, 4}, down, Reverse},
+                        down => {{3, 3}, down, Reverse}
                     },
                     {2, 2} => #{
-                        up => {{1, 3}, left, forward},
-                        down => {{3, 3}, left, reverse}
+                        up => {{1, 3}, left, Forward},
+                        down => {{3, 3}, left, Reverse}
                     },
                     {2, 3} => #{
-                        right => {{3, 4}, up, reverse}
+                        right => {{3, 4}, up, Reverse}
                     },
                     {3, 3} => #{
-                        left => {{2, 2}, down, reverse},
-                        down => {{2, 1}, down, reverse}
+                        left => {{2, 2}, down, Reverse},
+                        down => {{2, 1}, down, Reverse}
                     },
                     {3, 4} => #{
-                        up => {{2, 3}, right, reverse},
-                        right => {{1, 3}, right, reverse},
-                        down => {{2, 1}, left, reverse}
+                        up => {{2, 3}, right, Reverse},
+                        right => {{1, 3}, right, Reverse},
+                        down => {{2, 1}, left, Reverse}
                     }
                 }};
             50 * 50 ->
@@ -272,30 +274,30 @@ cube_wrapping(Grid) ->
                 %% TODO
                 {50, #{
                     {1, 2} => #{
-                        up => {{4, 1}, left, forward},
-                        left => {{3, 1}, left, reverse}
+                        up => {{4, 1}, left, Forward},
+                        left => {{3, 1}, left, Reverse}
                     },
                     {1, 3} => #{
-                        up => {{4, 1}, down, forward},
-                        right => {{3, 2}, right, reverse},
-                        down => {{2, 2}, right, forward}
+                        up => {{4, 1}, down, Forward},
+                        right => {{3, 2}, right, Reverse},
+                        down => {{2, 2}, right, Forward}
                     },
                     {2, 2} => #{
-                        left => {{3, 1}, up, forward},
-                        right => {{1, 3}, down, forward}
+                        left => {{3, 1}, up, Forward},
+                        right => {{1, 3}, down, Forward}
                     },
                     {3, 1} => #{
-                        up => {{2, 2}, left, forward},
-                        left => {{1, 2}, left, reverse}
+                        up => {{2, 2}, left, Forward},
+                        left => {{1, 2}, left, Reverse}
                     },
                     {3, 2} => #{
-                        right => {{1, 3}, right, reverse},
-                        down => {{4, 1}, right, forward}
+                        right => {{1, 3}, right, Reverse},
+                        down => {{4, 1}, right, Forward}
                     },
                     {4, 1} => #{
-                        left => {{1, 2}, up, forward},
-                        right => {{3, 2}, down, forward},
-                        down => {{1, 3}, up, forward}
+                        left => {{1, 2}, up, Forward},
+                        right => {{3, 2}, down, Forward},
+                        down => {{1, 3}, up, Forward}
                     }
                 }}
         end,
@@ -304,27 +306,26 @@ cube_wrapping(Grid) ->
         maps:fold(
             fun(FromFace, Gluing, Wrapping) ->
                 maps:fold(
-                    fun(FromSide, {ToFace, ToSide, Order}, Wrapping2) ->
-                        FromPos = grids:extent_side(face_extent(FaceSize, FromFace), FromSide),
-                        ToPos = grids:extent_side(face_extent(FaceSize, ToFace), ToSide),
-                        FromPos2 =
-                            lists:map(
-                                fun(Pos) ->
-                                    grids:add_pos(Pos, grids:dir_to_pos(FromSide))
-                                end,
-                                FromPos
-                            ),
-                        ToPos2 =
-                            case Order of
-                                reverse -> lists:reverse(ToPos);
-                                forward -> ToPos
+                    fun(FromSide, {ToFace, ToSide, MaybeReverse}, Wrapping2) ->
+                        FromPosList = lists:map(
+                            fun(Pos) ->
+                                %% Shift "from" edge positions to be
+                                %% just outside of the grid.
+                                grids:add_pos(Pos, grids:dir_to_pos(FromSide))
                             end,
+                            grids:extent_side(face_extent(FaceSize, FromFace), FromSide)
+                        ),
+                        ToPosList = MaybeReverse(
+                            grids:extent_side(face_extent(FaceSize, ToFace), ToSide)
+                        ),
                         lists:foldl(
-                            fun({FromP, ToP}, Wrapping3) ->
-                                maps:put({FromP, FromSide}, {ToP, grids:neg_dir(ToSide)}, Wrapping3)
+                            fun({FromPos, ToPos}, Wrapping3) ->
+                                maps:put(
+                                    {FromPos, FromSide}, {ToPos, grids:neg_dir(ToSide)}, Wrapping3
+                                )
                             end,
                             Wrapping2,
-                            lists:zip(FromPos2, ToPos2)
+                            lists:zip(FromPosList, ToPosList)
                         )
                     end,
                     Wrapping,

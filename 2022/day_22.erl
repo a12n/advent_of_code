@@ -212,7 +212,34 @@ cube_wrapping(Grid) ->
                 %% 3,1 3,2 ...
                 %% 4,1 ... ...
                 %% TODO
-                {50, #{}}
+                {50, #{
+                    {1, 2} => #{
+                        up => {{4, 1}, left, forward},
+                        left => {{3, 1}, left, reverse}
+                    },
+                    {1, 3} => #{
+                        up => {{4, 1}, down, forward},
+                        right => {{3, 2}, right, reverse},
+                        down => {{2, 2}, right, forward}
+                    },
+                    {2, 2} => #{
+                        left => {{3, 1}, up, forward},
+                        right => {{1, 3}, down, forward}
+                    },
+                    {3, 1} => #{
+                        up => {{2, 2}, left, forward},
+                        left => {{1, 2}, left, reverse}
+                    },
+                    {3, 2} => #{
+                        right => {{1, 3}, right, reverse},
+                        down => {{4, 1}, right, forward}
+                    },
+                    {4, 1} => #{
+                        left => {{1, 2}, up, forward},
+                        right => {{3, 2}, down, forward},
+                        down => {{1, 3}, up, forward}
+                    }
+                }}
         end,
     filter_wrapping(
         Grid,

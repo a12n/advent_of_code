@@ -3,27 +3,13 @@
 
 -export([main/1]).
 
--type resource() :: ore | clay | obsidian | geode.
--type resource_map() :: #{resource() => non_neg_integer()}.
-
--type ore_robot() :: #{ore := pos_integer()}.
--type clay_robot() :: #{ore := pos_integer()}.
--type obsidian_robot() :: #{ore := pos_integer(), clay := pos_integer()}.
--type geode_robot() :: #{ore := pos_integer(), obsidian := pos_integer()}.
--type blueprint() :: #{
-    id := integer(),
-    ore := ore_robot(),
-    clay := clay_robot(),
-    obsidian := obsidian_robot(),
-    geode := geode_robot()
-}.
-
 -record(resources, {
     ore = 0 :: non_neg_integer(),
     clay = 0 :: non_neg_integer(),
     obsidian = 0 :: non_neg_integer(),
     geode = 0 :: non_neg_integer() | infinity
 }).
+
 -record(blueprint, {
     ore :: #resources{},
     clay :: #resources{},
@@ -83,16 +69,6 @@ main(Part) ->
         end,
     io:format("~b~n", [Answer]).
 
--spec max_resource_consumption(blueprint()) -> resource_map().
-max_resource_consumption(Blueprint) ->
-    lists:foldl(
-        fun(Map1, Map2) ->
-            maps:merge_with(fun(_, Value1, Value2) -> max(Value1, Value2) end, Map1, Map2)
-        end,
-        #{},
-        [maps:get(Resource, Blueprint, #{}) || Resource <- [ore, clay, obsidian, geode]]
-    ).
-
 -spec max_robots(#blueprint{}) -> #resources{}.
 max_robots(#blueprint{
     ore = Ore,
@@ -112,53 +88,6 @@ max_robots(#blueprint{
     ))#resources{
         geode = infinity
     }.
-
--spec max_geodes(
-    blueprint(), ets:table(), resource_map(), resource_map(), resource_map(), non_neg_integer()
-) ->
-    non_neg_integer().
-max_geodes(_, _, _, _, Inventory, _TimeLeft = 0) ->
-    maps:get(geode, Inventory, 0);
-max_geodes(Blueprint, Cache, MaxRobots, Robots, Inventory, TimeLeft) ->
-    CacheKey = {Robots, Inventory, TimeLeft},
-    case ets:lookup(Cache, CacheKey) of
-        [{_, MaxGeodes}] ->
-            MaxGeodes;
-        [] ->
-            MaxGeodes =
-                lists:max([
-                    max_geodes(
-                        Blueprint,
-                        Cache,
-                        MaxRobots,
-                        Robots,
-                        add_resources(Inventory, Robots),
-                        TimeLeft - 1
-                    )
-                    | lists:map(
-                        fun(Key) ->
-                            RobotCost = maps:get(Key, Blueprint),
-                            try
-                                Inventory2 = subtract_resources(Inventory, RobotCost),
-                                Inventory3 = add_resources(Inventory2, Robots),
-                                Robots2 = maps:update_with(Key, fun(N) -> N + 1 end, 1, Robots),
-                                max_geodes(
-                                    Blueprint, Cache, MaxRobots, Robots2, Inventory3, TimeLeft - 1
-                                )
-                            catch
-                                error:_ -> 0
-                            end
-                        end,
-                        [
-                            Resource
-                         || Resource <- [geode, obsidian, clay, ore],
-                            maps:get(Resource, Robots, 0) < maps:get(Resource, MaxRobots, infinity)
-                        ]
-                    )
-                ]),
-            true = ets:insert(Cache, {CacheKey, MaxGeodes}),
-            MaxGeodes
-    end.
 
 -spec max_geodes2(
     #blueprint{}, ets:table(), #resources{}, #resources{}, #resources{}, non_neg_integer()
@@ -214,10 +143,6 @@ max_geodes2(
             MaxGeodes
     end.
 
--spec add_resources(resource_map(), resource_map()) -> resource_map().
-add_resources(Resources1, Resources2) ->
-    maps:merge_with(fun(_, N, M) -> N + M end, Resources1, Resources2).
-
 -spec add_resources2(#resources{}, #resources{}) -> #resources{}.
 add_resources2(
     #resources{ore = Ore1, clay = Clay1, obsidian = Obsidian1, geode = Geode1},
@@ -229,14 +154,6 @@ add_resources2(
         obsidian = Obsidian1 + Obsidian2,
         geode = Geode1 + Geode2
     }.
-
--spec subtract_resources(resource_map(), resource_map()) -> resource_map().
-subtract_resources(Resources1, Resources2) ->
-    maps:fold(
-        fun(Key, M, Ans) -> maps:update_with(Key, fun(N) when N >= M -> N - M end, Ans) end,
-        Resources1,
-        Resources2
-    ).
 
 -spec subtract_resources2(#resources{}, #resources{}) -> #resources{}.
 subtract_resources2(
@@ -265,54 +182,6 @@ max_resources2(
         clay = max(Clay1, Clay2),
         obsidian = max(Obsidian1, Obsidian2),
         geode = max(Geode1, Geode2)
-    }.
-
--spec parse_blueprint(binary()) -> blueprint().
-parse_blueprint(Line) ->
-    [
-        <<"Blueprint">>,
-        ID,
-        <<"ore">>,
-        OreCostOre,
-        <<"ore">>,
-        <<"clay">>,
-        ClayCostOre,
-        <<"ore">>,
-        <<"obsidian">>,
-        ObsidianCostOre,
-        <<"ore">>,
-        ObsidianCostClay,
-        <<"clay">>,
-        <<"geode">>,
-        GeodeCostOre,
-        <<"ore">>,
-        GeodeCostObsidian,
-        <<"obsidian">>
-    ] = binary:split(
-        Line,
-        [
-            <<" ">>,
-            <<".">>,
-            <<":">>,
-            <<"Each">>,
-            <<"and">>,
-            <<"costs">>,
-            <<"robot">>
-        ],
-        [global, trim_all]
-    ),
-    #{
-        id => binary_to_integer(ID),
-        ore => #{ore => binary_to_integer(OreCostOre)},
-        clay => #{ore => binary_to_integer(ClayCostOre)},
-        obsidian => #{
-            ore => binary_to_integer(ObsidianCostOre),
-            clay => binary_to_integer(ObsidianCostClay)
-        },
-        geode => #{
-            ore => binary_to_integer(GeodeCostOre),
-            obsidian => binary_to_integer(GeodeCostObsidian)
-        }
     }.
 
 -spec parse_blueprint2(binary()) -> #blueprint{}.

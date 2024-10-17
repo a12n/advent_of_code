@@ -166,27 +166,24 @@ filter_wrapping(Grid, Wrapping) ->
 -spec edges(grids:grid(?OPEN | ?WALL)) -> #{edge() => []}.
 edges(Grid) ->
     maps:fold(
-        fun
-            (_, ?WALL, Edges) ->
-                Edges;
-            (Pos, ?OPEN, Edges) ->
-                lists:foldl(
-                    fun
-                        ({EdgePos, _}, Edges) when is_map_key(EdgePos, Grid) ->
-                            %% The adjacent position is still in the
-                            %% grid. Don't update the set of edges.
-                            Edges;
-                        (Edge, Edges) ->
-                            %% The adjacent position is outside of the
-                            %% grid. Add to edges.
-                            maps:put(Edge, [], Edges)
-                    end,
-                    Edges,
-                    [
-                        {grids:add_pos(Pos, grids:dir_to_pos(Dir)), Dir}
-                     || Dir <- [up, left, right, down]
-                    ]
-                )
+        fun(Pos, _, Edges) ->
+            lists:foldl(
+                fun
+                    ({EdgePos, _}, Edges2) when is_map_key(EdgePos, Grid) ->
+                        %% The adjacent position is still in the
+                        %% grid. Don't update the set of edges.
+                        Edges2;
+                    (Edge, Edges2) ->
+                        %% The adjacent position is outside of the
+                        %% grid. Add to edges.
+                        maps:put(Edge, [], Edges2)
+                end,
+                Edges,
+                [
+                    {grids:add_pos(Pos, grids:dir_to_pos(Dir)), Dir}
+                 || Dir <- [up, left, right, down]
+                ]
+            )
         end,
         #{},
         Grid

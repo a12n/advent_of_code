@@ -18,6 +18,20 @@
     geode := geode_robot()
 }.
 
+-record(resources, {
+    ore = 0 :: non_neg_integer(),
+    clay = 0 :: non_neg_integer(),
+    obsidian = 0 :: non_neg_integer(),
+    geode = 0 :: non_neg_integer() | infinity
+}).
+-record(blueprint, {
+    id :: integer(),
+    ore :: #resources{},
+    clay :: #resources{},
+    obsidian :: #resources{},
+    geode :: #resources{}
+}).
+
 -spec main(1..2) -> ok.
 main(Part) ->
     AllBlueprints = lists:map(fun parse_blueprint/1, io_ext:read_lines(standard_io)),

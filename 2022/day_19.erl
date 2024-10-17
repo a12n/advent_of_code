@@ -91,9 +91,25 @@ max_resource_consumption(Blueprint) ->
         [maps:get(Resource, Blueprint, #{}) || Resource <- [ore, clay, obsidian, geode]]
     ).
 
--spec max_resource_consumption2(blueprint()) -> resource_map().
-max_resource_consumption2(#blueprint{ore = Ore, clay = Clay, obsidian = Obsidian, geode = Geode}) ->
-    max_resources2(max_resources2(max_resources2(Ore, Clay), Obsidian), Geode).
+-spec max_robots(#blueprint{}) -> #resources{}.
+max_robots(#blueprint{
+    ore = Ore,
+    clay = Clay,
+    obsidian = Obsidian,
+    geode = Geode
+}) ->
+    (max_resources2(
+        max_resources2(
+            max_resources2(
+                Ore,
+                Clay
+            ),
+            Obsidian
+        ),
+        Geode
+    ))#resources{
+        geode = infinity
+    }.
 
 -spec max_geodes(
     blueprint(), ets:table(), resource_map(), resource_map(), resource_map(), non_neg_integer()

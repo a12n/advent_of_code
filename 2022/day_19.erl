@@ -70,6 +70,7 @@ max_geodes(_, _, _, _, _, _TimeLeft = 0) ->
     0;
 max_geodes(Blueprint, Cache, MaxNeeded, Robots = #{geode := GeodeRobots}, Inventory, TimeLeft) ->
     CacheKey = {Robots, Inventory, TimeLeft},
+    MaxNeededTotal = mul_resources(MaxNeeded, TimeLeft),
     case ets:lookup(Cache, CacheKey) of
         [{_, MaxGeodes}] ->
             MaxGeodes;
@@ -83,7 +84,7 @@ max_geodes(Blueprint, Cache, MaxNeeded, Robots = #{geode := GeodeRobots}, Invent
                             Cache,
                             MaxNeeded,
                             Robots,
-                            add_resources(Inventory, Robots),
+                            min_resources(add_resources(Inventory, Robots), MaxNeededTotal),
                             TimeLeft - 1
                         )
                         | [
@@ -96,7 +97,12 @@ max_geodes(Blueprint, Cache, MaxNeeded, Robots = #{geode := GeodeRobots}, Invent
                                 Inventory3 = add_resources(Inventory2, Robots),
                                 Robots2 = Robots#{Key := NumRobots + 1},
                                 max_geodes(
-                                    Blueprint, Cache, MaxNeeded, Robots2, Inventory3, TimeLeft - 1
+                                    Blueprint,
+                                    Cache,
+                                    MaxNeeded,
+                                    Robots2,
+                                    min_resources(Inventory3, MaxNeededTotal),
+                                    TimeLeft - 1
                                 )
                             catch
                                 error:_ -> 0

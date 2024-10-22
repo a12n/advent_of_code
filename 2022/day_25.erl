@@ -48,7 +48,7 @@
 %%     |     |   1 |   - |   1 |   1 |   1 |   =
 %% "1-111="
 
--spec main(1..2) -> ok.
+-spec main(1) -> ok.
 main(1) ->
     Numbers = lists:map(fun binary_to_list/1, io_ext:read_lines(standard_io)),
     io:format("~s~n", [integer_to_snafu(lists:sum(lists:map(fun snafu_to_integer/1, Numbers)))]).

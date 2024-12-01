@@ -28,5 +28,6 @@ project Advent is
    end Compiler;
 
    for Main use (
+      "day_01_1", "day_01_2"
    );
 end Advent;

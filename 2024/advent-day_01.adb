@@ -5,9 +5,8 @@ package body Advent.Day_01 is
    package Number_Text_IO is new Ada.Text_IO.Integer_IO (Number);
 
    use Number_Text_IO;
-   use Number_Vectors;
 
-   procedure Get_Input (Left, Right : out Vector) is
+   procedure Get_Input (Left, Right : out Number_Vectors.Vector) is
       N : Number;
    begin
       Left.Clear;

@@ -4,9 +4,7 @@ with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Advent.Day_01; use Advent.Day_01;
 
 procedure Day_01_2 is
-   use Number_Vectors;
-
-   Left, Right : Vector;
+   Left, Right : Number_Vectors.Vector;
    Frequencies : array (Number) of Natural := [others => 0];
    Similarity  : Natural                   := 0;
 begin

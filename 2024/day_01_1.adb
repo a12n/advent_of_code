@@ -6,13 +6,12 @@ with Advent.Day_01; use Advent.Day_01;
 procedure Day_01_1 is
    package Number_Vectors_Sorting is new Number_Vectors.Generic_Sorting;
 
-   use Number_Vectors;
    use Number_Vectors_Sorting;
 
    function Distance (N, M : Number) return Natural is
      (if N > M then N - M else M - N);
 
-   Left, Right    : Vector;
+   Left, Right    : Number_Vectors.Vector;
    Total_Distance : Natural := 0;
 begin
    Get_Input (Left, Right);

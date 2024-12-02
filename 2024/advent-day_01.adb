@@ -10,7 +10,9 @@ package body Advent.Day_01 is
       N : Number;
    begin
       Left.Clear;
+      Left.Reserve_Capacity (1_000);
       Right.Clear;
+      Right.Reserve_Capacity (1_000);
       loop
          Get (N);
          Left.Append (N);

@@ -30,6 +30,6 @@ project Advent is
    for Main use (
       "day_01_1", "day_01_2",
       "day_02_1", "day_02_2",
-      "day_03_1"
+      "day_03_1", "day_03_2"
    );
 end Advent;

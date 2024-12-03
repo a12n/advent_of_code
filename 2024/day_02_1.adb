@@ -8,7 +8,7 @@ procedure Day_02_1 is
    Num_Safe : Natural := 0;
 
    function Is_Safe (Levels : Level_Vectors.Vector) return Boolean is
-      (Is_Monotone (Levels, 1, 3) or Is_Monotone (Levels, -3, -1));
+      (Is_Monotone (Levels, 1, 3, False) or Is_Monotone (Levels, -3, -1, False));
 begin
    loop
       Get_Input_Entry (Levels);

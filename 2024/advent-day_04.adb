@@ -42,19 +42,30 @@ package body Advent.Day_04 is
       return Letters;
    end Input;
 
-   function Is_X_MAS (Letters : Word_Search; Origin : Position) return Boolean
-   is
+   function Is_X_MAS (Letters : Word_Search; Pos : Position) return Boolean is
    begin
-      if Origin (1) <= Letters'First (1) or Origin (1) >= Letters'Last (1) or
-        Origin (2) <= Letters'First (2) or Origin (2) >= Letters'Last (2)
+      if Pos (1) <= Letters'First (1) or Pos (1) >= Letters'Last (1) or
+        Pos (2) <= Letters'First (2) or Pos (2) >= Letters'Last (2)
       then
          return False;
       end if;
-      if Letters (Origin (1), Origin (2)) /= 'A' then
+
+      if Letters (Pos (1), Pos (2)) /= 'A' then
          return False;
       end if;
-      --  TODO
-      return False;
+
+      declare
+         Up_Left    : Character renames Letters (Pos (1) - 1, Pos (2) - 1);
+         Up_Right   : Character renames Letters (Pos (1) - 1, Pos (2) + 1);
+         Down_Left  : Character renames Letters (Pos (1) + 1, Pos (2) - 1);
+         Down_Right : Character renames Letters (Pos (1) + 1, Pos (2) + 1);
+      begin
+         return
+           ((Up_Left = 'M' and Down_Right = 'S') or
+            (Up_Left = 'S' and Down_Right = 'M')) and
+           ((Up_Right = 'M' and Down_Left = 'S') or
+            (Up_Right = 'S' and Down_Left = 'M'));
+      end;
    end Is_X_MAS;
 
    function Num_Words

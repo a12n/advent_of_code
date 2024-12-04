@@ -19,7 +19,7 @@ package Advent.Day_04 is
 
    function Input (File : File_Type) return Word_Search;
 
-   function Is_X_MAS (Letters : Word_Search; Origin : Position) return Boolean;
+   function Is_X_MAS (Letters : Word_Search; Pos : Position) return Boolean;
 
    function Num_Words
      (Letters : Word_Search; Word : String; Origin : Position)

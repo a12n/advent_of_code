@@ -8,7 +8,7 @@ procedure Day_04_1 is
 begin
    for Row in Letters'Range (1) loop
       for Col in Letters'Range (2) loop
-         Total := Total + Num_Words (Letters, "XMAS", Row, Col);
+         Total := Total + Num_Words (Letters, "XMAS", Position'(Row, Col));
       end loop;
    end loop;
    Put (Total, 0);

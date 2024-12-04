@@ -1,4 +1,36 @@
 package body Advent.Day_04 is
+   function "*" (V : Offset; N : Integer) return Offset is
+     [V (1) * N, V (2) * N];
+
+   function "+" (P : Position; V : Offset) return Position is
+     [P (1) + V (1), P (2) + V (2)];
+
+   function Has_Word
+     (Letters : Word_Search; Word : String; Origin : Position; Dir : Offset)
+      return Boolean
+   is
+      Pos  : Position          := Origin;
+      Stop : constant Position := Origin + Dir * (Word'Length - 1);
+   begin
+      --  Put_Line
+      --    (Standard_Error,
+      --     "Has_Word(Origin" & Origin'Image & ", Word " & Word'Image & ", Dir " &
+      --     Dir'Image & ", Stop " & Stop'Image);
+      if Stop (1) not in Letters'Range (1) or Stop (2) not in Letters'Range (2)
+      then
+         return False;
+      end if;
+
+      for I in Word'Range loop
+         if Word (I) /= Letters (Pos (1), Pos (2)) then
+            return False;
+         end if;
+         Pos := Pos + Dir;
+      end loop;
+
+      return True;
+   end Has_Word;
+
    function Input (File : File_Type) return Word_Search is
       Line    : constant String := Get_Line (File);
       Letters : Word_Search (1 .. Line'Length, 1 .. Line'Length);
@@ -14,47 +46,24 @@ package body Advent.Day_04 is
       return Letters;
    end Input;
 
-   function Has_Word
-     (Letters   : Word_Search; Word : String; Row, Col : Positive;
-      Direction : Direction_Type) return Boolean
-   is
-   begin
-      if Word'Length = 0 then
-         return True;
-      end if;
-      if Letters (Row, Col) /= Word (Word'First) then
-         return False;
-      end if;
-      if Row + Direction (1) not in Letters'Range (1) or
-        Col + Direction (2) not in Letters'Range (2)
-      then
-         return False;
-      end if;
-      return
-        Has_Word
-          (Letters, Word (Word'First + 1 .. Word'Last), Row + Direction (1),
-           Col + Direction (2), Direction);
-   end Has_Word;
-
    function Num_Words
-     (Letters : Word_Search; Word : String; Row, Col : Positive) return Natural
+     (Letters : Word_Search; Word : String; Origin : Position) return Natural
    is
+      N : Natural := 0;
    begin
-      if Word'Length = 0 or Word (Word'First) /= Letters (Row, Col) then
-         return 0;
-      end if;
-      return N : Natural := 0 do
-         for Vert in -1 .. 1 loop
-            for Horiz in -1 .. 1 loop
-               if Vert /= 0 or Horiz /= 0 then
-                  if Has_Word
-                      (Letters, Word, Row, Col, Direction_Type'(Vert, Horiz))
-                  then
-                     N := N + 1;
-                  end if;
+      for Vert in -1 .. 1 loop
+         for Horiz in -1 .. 1 loop
+            if Vert /= 0 or Horiz /= 0 then
+               if Has_Word (Letters, Word, Origin, Offset'(Vert, Horiz)) then
+                  Put_Line
+                    (Standard_Error,
+                     "At" & Origin'Image & ", Offset" &
+                     Offset'(Vert, Horiz)'Image);
+                  N := N + 1;
                end if;
-            end loop;
+            end if;
          end loop;
-      end return;
+      end loop;
+      return N;
    end Num_Words;
 end Advent.Day_04;

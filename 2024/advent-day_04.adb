@@ -12,10 +12,6 @@ package body Advent.Day_04 is
       Pos  : Position          := Origin;
       Stop : constant Position := Origin + Dir * (Word'Length - 1);
    begin
-      --  Put_Line
-      --    (Standard_Error,
-      --     "Has_Word(Origin" & Origin'Image & ", Word " & Word'Image & ", Dir " &
-      --     Dir'Image & ", Stop " & Stop'Image);
       if Stop (1) not in Letters'Range (1) or Stop (2) not in Letters'Range (2)
       then
          return False;
@@ -55,10 +51,6 @@ package body Advent.Day_04 is
          for Horiz in -1 .. 1 loop
             if Vert /= 0 or Horiz /= 0 then
                if Has_Word (Letters, Word, Origin, Offset'(Vert, Horiz)) then
-                  Put_Line
-                    (Standard_Error,
-                     "At" & Origin'Image & ", Offset" &
-                     Offset'(Vert, Horiz)'Image);
                   N := N + 1;
                end if;
             end if;

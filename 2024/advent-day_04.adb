@@ -42,6 +42,21 @@ package body Advent.Day_04 is
       return Letters;
    end Input;
 
+   function Is_X_MAS (Letters : Word_Search; Origin : Position) return Boolean
+   is
+   begin
+      if Origin (1) <= Letters'First (1) or Origin (1) >= Letters'Last (1) or
+        Origin (2) <= Letters'First (2) or Origin (2) >= Letters'Last (2)
+      then
+         return False;
+      end if;
+      if Letters (Origin (1), Origin (2)) /= 'A' then
+         return False;
+      end if;
+      --  TODO
+      return False;
+   end Is_X_MAS;
+
    function Num_Words
      (Letters : Word_Search; Word : String; Origin : Position) return Natural
    is

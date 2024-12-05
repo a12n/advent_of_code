@@ -7,7 +7,7 @@ package body Advent.Day_05 is
    begin
       for I in Pages'First .. Pages'Last - 1 loop
          for J in I + 1 .. Pages'Last loop
-            if not Order (Pages (I), Pages (J)) then
+            if Order (Pages (I), Pages (J)) = False then
                return False;
             end if;
          end loop;
@@ -29,7 +29,7 @@ package body Advent.Day_05 is
    end Input_Pages;
 
    function Input_Precedence (File : File_Type) return Precedence is
-      Result : Precedence := [others => [others => False]];
+      Result : Precedence := [others => [others => Unknown]];
    begin
       loop
          declare
@@ -48,10 +48,12 @@ package body Advent.Day_05 is
       --  before C.
       for A in Result'Range (1) loop
          for B in Result'Range (2) loop
-            if Result (A, B) then
+            if Result (A, B) = True then
+               Result (B, A) := False;
                for C in Result'Range (2) loop
-                  if Result (B, C) then
+                  if Result (B, C) = True then
                      Result (A, C) := True;
+                     Result (C, A) := False;
                   end if;
                end loop;
             end if;

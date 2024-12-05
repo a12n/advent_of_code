@@ -42,6 +42,7 @@ package body Advent.Day_05 is
             Get (Line, Before, Stop);
             Get (Line (Stop + 2 .. Line'Last), After, Stop);
             Result (Before, After) := True;
+            Result (After, Before) := False;
          end;
       end loop;
 
@@ -50,7 +51,6 @@ package body Advent.Day_05 is
       for A in Result'Range (1) loop
          for B in Result'Range (2) loop
             if Result (A, B) = True then
-               Result (B, A) := False;
                for C in Result'Range (2) loop
                   if Result (B, C) = True then
                      Result (A, C) := True;

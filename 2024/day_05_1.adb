@@ -13,8 +13,12 @@ begin
       begin
          Put_Line (Standard_Error, Pages'Image);
          if In_Order (Order, Pages) then
-            Put_Line (Standard_Error, True'Image);
-            Sum := Sum + Pages (Pages'First + (Pages'Last - Pages'First) / 2);
+            declare
+               Mid : constant Positive := Pages'First + (Pages'Last - Pages'First) / 2;
+            begin
+               Put_Line (Standard_Error, True'Image & Mid'Image & Pages (Mid)'Image);
+               Sum := Sum + Pages (Mid);
+            end;
          end if;
       end;
    end loop;

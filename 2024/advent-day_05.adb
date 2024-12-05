@@ -7,7 +7,6 @@ package body Advent.Day_05 is
    begin
       for I in Pages'First .. Pages'Last - 1 loop
          for J in I + 1 .. Pages'Last loop
-            Put_Line (Standard_Error, Pages (I)'Image & Pages (J)'Image & ' ' & Order (Pages (I), Pages (J))'Image);
             if Order (Pages (I), Pages (J)) = False then
                return False;
             end if;
@@ -50,18 +49,4 @@ package body Advent.Day_05 is
       end loop;
       return Result;
    end Input_Precedence;
-
-   procedure Put_Image (Buffer : in out Root_Buffer_Type'Class; Order : in Precedence) is
-   begin
-      for I in Order'Range (1) loop
-         for J in Order'Range (2) loop
-            case Order (I, J) is
-               when Unknown => Buffer.Put ("_");
-               when False => Buffer.Put ("F");
-               when True => Buffer.Put ("T");
-            end case;
-         end loop;
-         Buffer.Put ("" & ASCII.LF);
-      end loop;
-   end Put_Image;
 end Advent.Day_05;

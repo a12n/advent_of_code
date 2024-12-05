@@ -3,6 +3,12 @@ with Ada.Strings.Fixed;
 with Ada.Strings.Maps; use Ada.Strings.Maps;
 
 package body Advent.Day_05 is
+   function In_Order (Order : Precedence; Pages : Page_Array) return Boolean is
+   begin
+      --  TODO
+      return False;
+   end In_Order;
+
    function Input_Pages (File : File_Type) return Page_Array is
       Line : constant String := Get_Line (File);
       N : constant Positive := Ada.Strings.Fixed.Count (Line, To_Set (',')) + 1;

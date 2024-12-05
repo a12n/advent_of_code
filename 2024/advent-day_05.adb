@@ -3,11 +3,12 @@ with Ada.Strings.Fixed;
 with Ada.Strings.Maps;    use Ada.Strings.Maps;
 
 package body Advent.Day_05 is
-   function In_Order (Order : Precedence; Pages : Page_Array) return Boolean is
+   function In_Order (Before : Precedence; Pages : Page_Array) return Boolean
+   is
    begin
       for I in Pages'First .. Pages'Last - 1 loop
          for J in I + 1 .. Pages'Last loop
-            if not Order (Pages (I), Pages (J)) then
+            if not Before (Pages (I), Pages (J)) then
                return False;
             end if;
          end loop;
@@ -34,18 +35,18 @@ package body Advent.Day_05 is
    begin
       loop
          declare
-            Line          : constant String := Get_Line (File);
-            Before, After : Page_Number;
-            Stop          : Positive;
+            Line : constant String := Get_Line (File);
+            A, B : Page_Number;
+            Stop : Positive;
          begin
             exit when Line'Length = 0;
-            Get (Line, Before, Stop);
-            Get (Line (Stop + 2 .. Line'Last), After, Stop);
-            --  if Result (Before, After) = False or Result (After, Before) = True then
+            Get (Line, A, Stop);
+            Get (Line (Stop + 2 .. Line'Last), B, Stop);
+            --  if Result (A, B) = False or Result (B, A) = True then
             --     raise Constraint_Error;
             --  end if;
-            Result (Before, After) := True;
-            Result (After, Before) := False;
+            Result (A, B) := True;
+            Result (B, A) := False;
          end;
       end loop;
       return Result;

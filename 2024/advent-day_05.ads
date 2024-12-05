@@ -5,7 +5,7 @@ package Advent.Day_05 is
    type Precedence is array (Page_Number, Page_Number) of Boolean;
    type Page_Array is array (Positive range <>) of Page_Number;
 
-   function In_Order (Order : Precedence; Pages : Page_Array) return Boolean;
+   function In_Order (Before : Precedence; Pages : Page_Array) return Boolean;
    function Input_Pages (File : File_Type) return Page_Array;
    function Input_Precedence (File : File_Type) return Precedence;
 end Advent.Day_05;

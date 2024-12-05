@@ -31,6 +31,21 @@ package body Advent.Day_05 is
             Result (Before, After) := True;
          end;
       end loop;
+
+      --  If page A goes before B and B goes before C, then A goes
+      --  before C.
+      for A in Result'Range (1) loop
+         for B in Result'Range (2) loop
+            if Result (A, B) then
+               for C in Result'Range (2) loop
+                  if Result (B, C) then
+                     Result (A, C) := True;
+                  end if;
+               end loop;
+            end if;
+         end loop;
+      end loop;
+
       return Result;
    end Input_Precedence;
 end Advent.Day_05;

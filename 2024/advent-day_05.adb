@@ -7,7 +7,7 @@ package body Advent.Day_05 is
    begin
       for I in Pages'First .. Pages'Last - 1 loop
          for J in I + 1 .. Pages'Last loop
-            if Order (Pages (I), Pages (J)) = False then
+            if not Order (Pages (I), Pages (J)) then
                return False;
             end if;
          end loop;
@@ -29,7 +29,7 @@ package body Advent.Day_05 is
    end Input_Pages;
 
    function Input_Precedence (File : File_Type) return Precedence is
-      Result : Precedence := [others => [others => Unknown]];
+      Result : Precedence := [others => [others => False]];
    begin
       loop
          declare
@@ -40,9 +40,9 @@ package body Advent.Day_05 is
             exit when Line'Length = 0;
             Get (Line, Before, Stop);
             Get (Line (Stop + 2 .. Line'Last), After, Stop);
-            if Result (Before, After) = False or Result (After, Before) = True then
-               raise Constraint_Error;
-            end if;
+            --  if Result (Before, After) = False or Result (After, Before) = True then
+            --     raise Constraint_Error;
+            --  end if;
             Result (Before, After) := True;
             Result (After, Before) := False;
          end;

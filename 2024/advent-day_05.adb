@@ -5,8 +5,14 @@ with Ada.Strings.Maps; use Ada.Strings.Maps;
 package body Advent.Day_05 is
    function In_Order (Order : Precedence; Pages : Page_Array) return Boolean is
    begin
-      --  TODO
-      return False;
+      for I in Pages'First .. Pages'Last - 1 loop
+         for J in I + 1 .. Pages'Last loop
+            if not Order (Pages (I), Pages (J)) then
+               return False;
+            end if;
+         end loop;
+      end loop;
+      return True;
    end In_Order;
 
    function Input_Pages (File : File_Type) return Page_Array is

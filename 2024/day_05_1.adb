@@ -11,9 +11,9 @@ begin
       declare
          Pages : constant Page_Array := Input_Pages (Standard_Input);
       begin
-         Put (Standard_Error, Pages'Image);
+         Put_Line (Standard_Error, Pages'Image);
          if In_Order (Order, Pages) then
-            Put (Standard_Error, True'Image);
+            Put_Line (Standard_Error, True'Image);
             Sum := Sum + Pages (Pages'First + (Pages'Last - Pages'First) / 2);
          end if;
       end;

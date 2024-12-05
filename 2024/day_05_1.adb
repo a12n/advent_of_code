@@ -1,10 +1,10 @@
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Ada.Text_IO; use Ada.Text_IO;
-with Advent.Day_05; use Advent.Day_05;
+with Ada.Text_IO;         use Ada.Text_IO;
+with Advent.Day_05;       use Advent.Day_05;
 
 procedure Day_05_1 is
    Order : constant Precedence := Input_Precedence (Standard_Input);
-   Sum   : Natural := 0;
+   Sum   : Natural             := 0;
 begin
    loop
       declare
@@ -15,7 +15,8 @@ begin
          end if;
       end;
    end loop;
-exception when End_Error =>
-   Put (Sum, 0);
-   New_Line;
+exception
+   when End_Error =>
+      Put (Sum, 0);
+      New_Line;
 end Day_05_1;

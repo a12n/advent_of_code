@@ -1,6 +1,6 @@
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Ada.Strings.Fixed;
-with Ada.Strings.Maps; use Ada.Strings.Maps;
+with Ada.Strings.Maps;    use Ada.Strings.Maps;
 
 package body Advent.Day_05 is
    function In_Order (Order : Precedence; Pages : Page_Array) return Boolean is
@@ -16,10 +16,11 @@ package body Advent.Day_05 is
    end In_Order;
 
    function Input_Pages (File : File_Type) return Page_Array is
-      Line : constant String := Get_Line (File);
-      N : constant Positive := Ada.Strings.Fixed.Count (Line, To_Set (',')) + 1;
+      Line  : constant String   := Get_Line (File);
+      N     : constant Positive :=
+        Ada.Strings.Fixed.Count (Line, To_Set (',')) + 1;
       Pages : Page_Array (1 .. N);
-      Start : Positive := Line'First;
+      Start : Positive          := Line'First;
    begin
       for I in Pages'Range loop
          Get (Line (Start .. Line'Last), Pages (I), Start);
@@ -33,9 +34,9 @@ package body Advent.Day_05 is
    begin
       loop
          declare
-            Line : constant String := Get_Line (File);
+            Line          : constant String := Get_Line (File);
             Before, After : Page_Number;
-            Stop : Positive;
+            Stop          : Positive;
          begin
             exit when Line'Length = 0;
             Get (Line, Before, Stop);

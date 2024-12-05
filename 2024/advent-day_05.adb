@@ -7,6 +7,7 @@ package body Advent.Day_05 is
    begin
       for I in Pages'First .. Pages'Last - 1 loop
          for J in I + 1 .. Pages'Last loop
+            Put_Line (Standard_Error, Pages (I)'Image & Pages (J)'Image & ' ' & Order (Pages (I), Pages (J))'Image);
             if Order (Pages (I), Pages (J)) = False then
                return False;
             end if;

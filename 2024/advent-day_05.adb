@@ -31,7 +31,7 @@ package body Advent.Day_05 is
    end Input_Pages;
 
    function Input_Precedence (File : File_Type) return Precedence is
-      Result : Precedence := [others => [others => False]];
+      Before : Precedence := [others => [others => False]];
    begin
       loop
          declare
@@ -42,13 +42,13 @@ package body Advent.Day_05 is
             exit when Line'Length = 0;
             Get (Line, A, Stop);
             Get (Line (Stop + 2 .. Line'Last), B, Stop);
-            --  if Result (A, B) = False or Result (B, A) = True then
+            --  if Before (A, B) = False or Before (B, A) = True then
             --     raise Constraint_Error;
             --  end if;
-            Result (A, B) := True;
-            Result (B, A) := False;
+            Before (A, B) := True;
+            Before (B, A) := False;
          end;
       end loop;
-      return Result;
+      return Before;
    end Input_Precedence;
 end Advent.Day_05;

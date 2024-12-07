@@ -6,11 +6,14 @@ package Advent.Day_06 is
    type Visited_Map is array (Positive range <>, Positive range <>) of Boolean;
 
    type Direction is (Down, Left, Right, Up);
-   type Position is array (1 .. 2) of Positive;
+   type Position is array (1 .. 2) of Integer;
 
    function Input
      (File : in File_Type; Guard : out Position; Guard_Dir : out Direction)
-      return Obstruction_Map;
+      return Obstruction_Map with
+     Post =>
+      Guard (1) in Input'Result'Range (1) and
+      Guard (2) in Input'Result'Range (2);
 
    function Walk
      (Obstructions : Obstruction_Map; Guard : Position; Guard_Dir : Direction)

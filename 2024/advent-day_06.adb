@@ -72,26 +72,22 @@ package body Advent.Day_06 is
 
       Visited : Visited_Map (Obstructions'Range (1), Obstructions'Range (2)) :=
         [others => [others => False]];
-      Pos     : Position := Guard;
+      Current : Position := Guard;
+      Next    : Position;
       Dir     : Direction := Guard_Dir;
    begin
       Put_Line (Standard_Error, "Obstructions" & Obstructions'Image);
       loop
-         declare
-            Next : constant Position := Advance (Pos, Dir);
-         begin
-            Put_Line
-              (Standard_Error, "Pos " & Pos'Image & ", Dir " & Dir'Image);
-            Visited (Pos (1), Pos (2)) := True;
-            if Obstructions (Next (1), Next (2)) then
-               Dir := Rotate (Dir);
-            else
-               Pos := Next;
-            end if;
-         exception
-            when Constraint_Error =>
-               return Visited;
-         end;
+         Visited (Current (1), Current (2)) := True;
+         Next                               := Advance (Current, Dir);
+         exit when Next (1) not in Visited'Range (1) or
+           Next (2) not in Visited'Range (2);
+         if Obstructions (Next (1), Next (2)) then
+            Dir := Rotate (Dir);
+         else
+            Current := Next;
+         end if;
       end loop;
+      return Visited;
    end Walk;
 end Advent.Day_06;

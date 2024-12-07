@@ -4,7 +4,8 @@ package body Advent.Day_06 is
       return Obstruction_Map
    is
       Line         : constant String := Get_Line (File);
-      Obstructions : Obstruction_Map (Line'Range, Line'Range);
+      Obstructions : Obstruction_Map (Line'Range, Line'Range) :=
+        [others => [others => False]];
 
       procedure Process (Row, Col : Positive; Char : Character) is
       begin

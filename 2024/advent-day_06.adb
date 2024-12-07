@@ -76,7 +76,6 @@ package body Advent.Day_06 is
       Next    : Position;
       Dir     : Direction := Guard_Dir;
    begin
-      Put_Line (Standard_Error, "Obstructions" & Obstructions'Image);
       loop
          Visited (Current (1), Current (2)) := True;
          Next                               := Advance (Current, Dir);

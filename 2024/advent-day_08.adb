@@ -45,8 +45,6 @@ package body Advent.Day_08 is
    is
       Positions : constant Position_Array :=
         Antenna_Positions (Antennas, Frequency);
-      P, Q      : Position;
-      V         : Offset;
    begin
       for I in Positions'Range loop
          for J in I + 1 .. Positions'Last loop
@@ -55,8 +53,14 @@ package body Advent.Day_08 is
                P : constant Position := Positions (I) - V;
                Q : constant Position := Positions (J) + V;
             begin
-               --  TODO
-               null;
+               if P (1) in Antinodes'Range (1) and P (2) in Antinodes'Range (2)
+               then
+                  Antinodes (P (1), P (2)) := True;
+               end if;
+               if Q (1) in Antinodes'Range (1) and Q (2) in Antinodes'Range (2)
+               then
+                  Antinodes (Q (1), Q (2)) := True;
+               end if;
             end;
          end loop;
       end loop;

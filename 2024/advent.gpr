@@ -33,6 +33,7 @@ project Advent is
       "day_03_1", "day_03_2",
       "day_04_1", "day_04_2",
       "day_05_1", "day_05_2",
-      "day_06_1", "day_06_2"
+      "day_06_1", "day_06_2",
+      "day_08_1", "day_08_2"
    );
 end Advent;

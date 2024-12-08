@@ -45,19 +45,20 @@ package body Advent.Day_06 is
    is
       Visited : Boolean_Grid (Blocked'Range (1), Blocked'Range (2)) :=
         [others => [others => False]];
-      Current : Position := Guard;
-      Next    : Position;
-      Dir     : Direction := Guard_Dir;
+
+      Pos  : Position  := Guard;
+      Next : Position;
+      Dir  : Direction := Guard_Dir;
    begin
       loop
          Visited (Current (1), Current (2)) := True;
-         Next                               := Current + To_Offset (Dir);
+         Next                               := Pos + To_Offset (Dir);
          exit when Next (1) not in Visited'Range (1) or
            Next (2) not in Visited'Range (2);
          if Blocked (Next (1), Next (2)) then
             Dir := Rotate (CW, Dir);
          else
-            Current := Next;
+            Pos := Next;
          end if;
       end loop;
       return Visited;

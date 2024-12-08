@@ -1,9 +1,10 @@
-with Ada.Text_IO;         use Ada.Text_IO;
-with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Advent.Day_07;       use Advent.Day_07;
+with Ada.Text_IO;   use Ada.Text_IO;
+with Advent.Day_07; use Advent.Day_07;
 
 procedure Day_07_1 is
-   Total : Natural := 0;
+   use Number_Text_IO;
+
+   Total : Number := 0;
 begin
    loop
       declare
@@ -13,7 +14,10 @@ begin
          Put_Line (Standard_Error, "Test " & Test'Image);
          Put_Line (Standard_Error, "Numbers " & Numbers'Image);
          if Valid (Test, Numbers) then
+            Put_Line (Standard_Error, "Valid " & True'Image);
             Total := Total + Test;
+         else
+            Put_Line (Standard_Error, "Valid " & False'Image);
          end if;
       end;
    end loop;

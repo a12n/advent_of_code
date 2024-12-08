@@ -51,8 +51,8 @@ package body Advent.Day_06 is
       Dir  : Direction := Guard_Dir;
    begin
       loop
-         Visited (Current (1), Current (2)) := True;
-         Next                               := Pos + To_Offset (Dir);
+         Visited (Pos (1), Pos (2)) := True;
+         Next                       := Pos + To_Offset (Dir);
          exit when Next (1) not in Visited'Range (1) or
            Next (2) not in Visited'Range (2);
          if Blocked (Next (1), Next (2)) then

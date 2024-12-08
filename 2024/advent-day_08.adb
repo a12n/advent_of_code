@@ -1,9 +1,21 @@
 package body Advent.Day_08 is
    function Input (File : File_Type) return Antenna_Map is
-      Empty : Antenna_Map (0 .. 1, 0 .. 1);
+      Line : constant String := Get_Line (File);
+
+      Antennas : Antenna_Map (Line'Range, Line'Range) :=
+        [others => [others => '.']];
    begin
-      --  TODO
-      return Empty;
+      for Col in Line'Range loop
+         --  FIXME: Antenna range check.
+         Antennas (1, Col) := Line (Col);
+      end loop;
+      for Row in 2 .. Antennas'Last (1) loop
+         for Col in Antennas'Range (2) loop
+            --  FIXME: Antenna range check.
+            Get (File, Antennas (Row, Col));
+         end loop;
+      end loop;
+      return Antennas;
    end Input;
 
    function Number_Antinodes

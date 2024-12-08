@@ -74,12 +74,10 @@ package body Advent.Day_08 is
       for I in Positions'Range loop
          for J in I + 1 .. Positions'Last loop
             declare
-               V : constant Offset   := Positions (J) - Positions (I);
-               P : constant Position := Positions (I) + V;
-               Q : constant Position := Positions (J) - V;
+               V : constant Offset := Positions (J) - Positions (I);
             begin
-               Mark (P);
-               Mark (Q);
+               Mark (Positions (I) + V * 1);
+               Mark (Positions (I) + V * (-2));
             end;
          end loop;
       end loop;

@@ -10,7 +10,6 @@ procedure Day_08_1 is
 
    Total : Natural := 0;
 begin
-   Put_Line (Standard_Error, Antennas'Image);
    for A in Antenna'('0') .. Antenna'('9') loop
       Mark_Antinodes (Antinodes, Antennas, A);
    end loop;
@@ -20,7 +19,6 @@ begin
    for A in Antenna'('A') .. Antenna'('Z') loop
       Mark_Antinodes (Antinodes, Antennas, A);
    end loop;
-   Put_Line (Standard_Error, Antinodes'Image);
 
    for Row in Antinodes'Range (1) loop
       for Col in Antinodes'Range (2) loop

@@ -1,10 +1,11 @@
 package body Advent.Day_06 is
    function Input
      (File : in File_Type; Guard : out Position; Guard_Dir : out Direction)
-      return Obstruction_Map
+      return Boolean_Grid
    is
-      Line         : constant String := Get_Line (File);
-      Obstructions : Obstruction_Map (Line'Range, Line'Range) :=
+      Line : constant String := Get_Line (File);
+
+      Blocked : Boolean_Grid (Line'Range, Line'Range) :=
         [others => [others => False]];
 
       procedure Process (Pos : Position; Char : Character) is
@@ -13,7 +14,7 @@ package body Advent.Day_06 is
             when '.' =>
                null;
             when '#' =>
-               Obstructions (Pos (1), Pos (2)) := True;
+               Blocked (Pos (1), Pos (2)) := True;
             when '^' =>
                Guard     := Pos;
                Guard_Dir := Up;
@@ -25,8 +26,8 @@ package body Advent.Day_06 is
       for Col in Line'Range loop
          Process ([1, Col], Line (Col));
       end loop;
-      for Row in 2 .. Obstructions'Last (1) loop
-         for Col in Obstructions'Range (2) loop
+      for Row in 2 .. Blocked'Last (1) loop
+         for Col in Blocked'Range (2) loop
             declare
                Next : Character;
             begin
@@ -35,14 +36,14 @@ package body Advent.Day_06 is
             end;
          end loop;
       end loop;
-      return Obstructions;
+      return Blocked;
    end Input;
 
    function Walk
-     (Obstructions : Obstruction_Map; Guard : Position; Guard_Dir : Direction)
-      return Visited_Map
+     (Blocked : Boolean_Grid; Guard : Position; Guard_Dir : Direction)
+      return Boolean_Grid
    is
-      Visited : Visited_Map (Obstructions'Range (1), Obstructions'Range (2)) :=
+      Visited : Boolean_Grid (Blocked'Range (1), Blocked'Range (2)) :=
         [others => [others => False]];
       Current : Position := Guard;
       Next    : Position;
@@ -53,7 +54,7 @@ package body Advent.Day_06 is
          Next                               := Current + To_Offset (Dir);
          exit when Next (1) not in Visited'Range (1) or
            Next (2) not in Visited'Range (2);
-         if Obstructions (Next (1), Next (2)) then
+         if Blocked (Next (1), Next (2)) then
             Dir := Rotate (CW, Dir);
          else
             Current := Next;

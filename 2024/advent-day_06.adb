@@ -39,6 +39,41 @@ package body Advent.Day_06 is
       return Blocked;
    end Input;
 
+   function Loop_Obstructions (Path : Polygonal_Chain) return Position_Array is
+   begin
+      if Path'Length < 5 then
+         --  At least 4 lines (5 points) are needed to introduce a
+         --  loop.
+         return Position_Array'[];
+      end if;
+
+      declare
+         A : Position renames Path (1);
+         B : Position renames Path (2);
+         C : Position renames Path (3);
+         D : Position renames Path (4);
+         E : Position renames Path (5);
+      begin
+         if Is_Horizontal_Line (A, B) and Is_Vertical_Line (B, C) and
+           Is_Horizontal_Line (C, D) and Is_Vertical_Line (D, E) and
+           A (2) <= E (2)
+         then
+            return
+              Position_Array'[[A (1) - 1, E (2)]] &
+              Loop_Obstructions (Path (2 .. Path'Last));
+         elsif Is_Vertical_Line (A, B) and Is_Horizontal_Line (B, C) and
+           Is_Vertical_Line (C, D) and Is_Horizontal_Line (D, E) and
+           A (1) >= E (1)
+         then
+            return
+              Position_Array'[[E (1), A (2) - 1]] &
+              Loop_Obstructions (Path (2 .. Path'Last));
+         else
+            return Loop_Obstructions (Path (2 .. Path'Last));
+         end if;
+      end;
+   end Loop_Obstructions;
+
    function Walk
      (Blocked : Boolean_Grid; Guard : Position; Guard_Dir : Direction)
       return Boolean_Grid
@@ -91,39 +126,4 @@ package body Advent.Day_06 is
    begin
       return Polygonal_Chain'[Guard] & Build_Path (Guard, Guard_Dir);
    end Walk;
-
-   function Loop_Obstructions (Path : Polygonal_Chain) return Position_Array is
-   begin
-      if Path'Length < 5 then
-         --  At least 4 lines (5 points) are needed to introduce a
-         --  loop.
-         return Position_Array'[];
-      end if;
-
-      declare
-         A : Position renames Path (1);
-         B : Position renames Path (2);
-         C : Position renames Path (3);
-         D : Position renames Path (4);
-         E : Position renames Path (5);
-      begin
-         if Is_Horizontal_Line (A, B) and Is_Vertical_Line (B, C) and
-           Is_Horizontal_Line (C, D) and Is_Vertical_Line (D, E) and
-           A (2) <= E (2)
-         then
-            return
-              Position_Array'[[A (1) - 1, E (2)]] &
-              Loop_Obstructions (Path (2 .. Path'Last));
-         elsif Is_Vertical_Line (A, B) and Is_Horizontal_Line (B, C) and
-           Is_Vertical_Line (C, D) and Is_Horizontal_Line (D, E) and
-           A (1) >= E (1)
-         then
-            return
-              Position_Array'[[E (1), A (2) - 1]] &
-              Loop_Obstructions (Path (2 .. Path'Last));
-         else
-            return Loop_Obstructions (Path (2 .. Path'Last));
-         end if;
-      end;
-   end Loop_Obstructions;
 end Advent.Day_06;

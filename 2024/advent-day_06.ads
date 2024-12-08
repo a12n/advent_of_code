@@ -15,6 +15,8 @@ package Advent.Day_06 is
       Guard (2) in Input'Result'Range (2) and
       not Input'Result (Guard (1), Guard (2));
 
+   function Loop_Obstructions (Path : Polygonal_Chain) return Position_Array;
+
    function Walk
      (Blocked : Boolean_Grid; Guard : Position; Guard_Dir : Direction)
       return Boolean_Grid with
@@ -28,6 +30,4 @@ package Advent.Day_06 is
      Pre =>
       Guard (1) in Blocked'Range (1) and Guard (2) in Blocked'Range (2) and
       not Blocked (Guard (1), Guard (2));
-
-   function Loop_Obstructions (Path : Polygonal_Chain) return Position_Array;
 end Advent.Day_06;

@@ -48,11 +48,11 @@ package body Advent.Day_06 is
       end if;
 
       declare
-         A : Position renames Path (1);
-         B : Position renames Path (2);
-         C : Position renames Path (3);
-         D : Position renames Path (4);
-         E : Position renames Path (5);
+         A : Position renames Path (Path'First);
+         B : Position renames Path (Path'First + 1);
+         C : Position renames Path (Path'First + 2);
+         D : Position renames Path (Path'First + 3);
+         E : Position renames Path (Path'First + 4);
       begin
          if Is_Horizontal_Line (A, B) and Is_Vertical_Line (B, C) and
            Is_Horizontal_Line (C, D) and Is_Vertical_Line (D, E) and
@@ -60,16 +60,16 @@ package body Advent.Day_06 is
          then
             return
               Position_Array'[[A (1) - 1, E (2)]] &
-              Loop_Obstructions (Path (2 .. Path'Last));
+              Loop_Obstructions (Path (Path'First + 1 .. Path'Last));
          elsif Is_Vertical_Line (A, B) and Is_Horizontal_Line (B, C) and
            Is_Vertical_Line (C, D) and Is_Horizontal_Line (D, E) and
            A (1) >= E (1)
          then
             return
               Position_Array'[[E (1), A (2) - 1]] &
-              Loop_Obstructions (Path (2 .. Path'Last));
+              Loop_Obstructions (Path (Path'First + 1 .. Path'Last));
          else
-            return Loop_Obstructions (Path (2 .. Path'Last));
+            return Loop_Obstructions (Path (Path'First + 1 .. Path'Last));
          end if;
       end;
    end Loop_Obstructions;

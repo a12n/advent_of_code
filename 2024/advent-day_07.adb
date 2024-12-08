@@ -24,4 +24,10 @@ package body Advent.Day_07 is
       Get (Line (Line'First .. Colon - 1), Test, Last);
       return Input_Numbers (Line (Colon + 1 .. Line'Last));
    end Input_Entry;
+
+   function Valid (Test : Number; Operands : Number_Array) return Boolean is
+   begin
+      --  TODO
+      return False;
+   end Valid;
 end Advent.Day_07;

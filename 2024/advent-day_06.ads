@@ -29,7 +29,5 @@ package Advent.Day_06 is
       Guard (1) in Blocked'Range (1) and Guard (2) in Blocked'Range (2) and
       not Blocked (Guard (1), Guard (2));
 
-   function Loop_Obstructions
-     (Path : Polygonal_Chain) return Position_Array with
-     Pre => Path'Length > 0;
+   function Loop_Obstructions (Path : Polygonal_Chain) return Position_Array;
 end Advent.Day_06;

@@ -14,9 +14,10 @@ package Advent.Day_08 is
    function Input (File : File_Type) return Antenna_Map;
 
    procedure Mark_Antinodes
-     (Antinodes : in out Antinode_Map; Antennas : in Antenna_Map);
+     (Antinodes : in out Antinode_Map; Antennas : in Antenna_Map;
+      Resonant  : in     Boolean);
 
    procedure Mark_Antinodes
      (Antinodes : in out Antinode_Map; Antennas : in Antenna_Map;
-      Frequency : in Antenna);
+      Resonant  : in     Boolean; Frequency : in Antenna);
 end Advent.Day_08;

@@ -1,6 +1,7 @@
 with Ada.Text_IO;         use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Advent.Day_06;       use Advent.Day_06;
+with Advent.Grids;        use Advent.Grids;
 
 procedure Day_06_1 is
    Guard        : Position;

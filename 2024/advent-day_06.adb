@@ -7,15 +7,15 @@ package body Advent.Day_06 is
       Obstructions : Obstruction_Map (Line'Range, Line'Range) :=
         [others => [others => False]];
 
-      procedure Process (Row, Col : Positive; Char : Character) is
+      procedure Process (Pos : Position; Char : Character) is
       begin
          case Char is
             when '.' =>
                null;
             when '#' =>
-               Obstructions (Row, Col) := True;
+               Obstructions (Pos (1), Pos (2)) := True;
             when '^' =>
-               Guard     := [Row, Col];
+               Guard     := Pos;
                Guard_Dir := Up;
             when others =>
                raise Constraint_Error;
@@ -23,7 +23,7 @@ package body Advent.Day_06 is
       end Process;
    begin
       for Col in Line'Range loop
-         Process (1, Col, Line (Col));
+         Process ([1, Col], Line (Col));
       end loop;
       for Row in 2 .. Obstructions'Last (1) loop
          for Col in Obstructions'Range (2) loop
@@ -31,7 +31,7 @@ package body Advent.Day_06 is
                Next : Character;
             begin
                Get (File, Next);
-               Process (Row, Col, Next);
+               Process ([Row, Col], Next);
             end;
          end loop;
       end loop;

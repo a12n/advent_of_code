@@ -1,12 +1,10 @@
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO;  use Ada.Text_IO;
+with Advent.Grids; use Advent.Grids;
 
 package Advent.Day_06 is
    type Obstruction_Map is
      array (Positive range <>, Positive range <>) of Boolean;
    type Visited_Map is array (Positive range <>, Positive range <>) of Boolean;
-
-   type Direction is (Down, Left, Right, Up);
-   type Position is array (1 .. 2) of Integer;
 
    function Input
      (File : in File_Type; Guard : out Position; Guard_Dir : out Direction)

@@ -4,7 +4,6 @@ with Advent.Grids; use Advent.Grids;
 package Advent.Day_06 is
    type Boolean_Grid is
      array (Positive range <>, Positive range <>) of Boolean;
-   type Visited_Map is array (Positive range <>, Positive range <>) of Boolean;
    type Polygonal_Chain is array (Positive range <>) of Position;
 
    function Input

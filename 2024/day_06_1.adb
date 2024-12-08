@@ -10,7 +10,7 @@ procedure Day_06_1 is
    Blocked : constant Boolean_Grid := Input (Standard_Input, Guard, Guard_Dir);
    Visited : constant Boolean_Grid := Walk (Blocked, Guard, Guard_Dir);
 
-   Num_Visited  : Natural                  := 0;
+   Num_Visited : Natural := 0;
 begin
    for Row in Visited'Range (1) loop
       for Col in Visited'Range (2) loop

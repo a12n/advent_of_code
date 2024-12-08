@@ -91,4 +91,10 @@ package body Advent.Day_06 is
    begin
       return Polygonal_Chain'[Guard] & Build_Path (Guard, Guard_Dir);
    end Walk;
+
+   function Loop_Obstructions (Path : Polygonal_Chain) return Position_Array is
+   begin
+      --  TODO
+      return Position_Array'[];
+   end Loop_Obstructions;
 end Advent.Day_06;

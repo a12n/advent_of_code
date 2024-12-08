@@ -10,16 +10,7 @@ procedure Day_08_1 is
 
    Total : Natural := 0;
 begin
-   for A in Antenna'('0') .. Antenna'('9') loop
-      Mark_Antinodes (Antinodes, Antennas, A);
-   end loop;
-   for A in Antenna'('a') .. Antenna'('z') loop
-      Mark_Antinodes (Antinodes, Antennas, A);
-   end loop;
-   for A in Antenna'('A') .. Antenna'('Z') loop
-      Mark_Antinodes (Antinodes, Antennas, A);
-   end loop;
-
+   Mark_Antinodes (Antinodes, Antennas);
    for Row in Antinodes'Range (1) loop
       for Col in Antinodes'Range (2) loop
          if Antinodes (Row, Col) then

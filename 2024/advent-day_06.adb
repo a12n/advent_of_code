@@ -63,4 +63,32 @@ package body Advent.Day_06 is
       end loop;
       return Visited;
    end Walk;
+
+   function Walk
+     (Blocked : Boolean_Grid; Guard : Position; Guard_Dir : Direction)
+      return Polygonal_Chain
+   is
+      function Build_Path
+        (Pos : Position; Dir : Direction) return Polygonal_Chain
+      is
+         Next : Position;
+      begin
+         loop
+            Next := Pos + To_Offset (Dir);
+            if Next (1) not in Blocked'Range (1) or
+              Next (2) not in Blocked'Range (2)
+            then
+               return [Pos];
+            end if;
+            if Blocked (Next (1), Next (2)) then
+               return
+                 Polygonal_Chain'[Pos] & Build_Path (Pos, Rotate (CW, Dir));
+            else
+               return Build_Path (Next, Dir);
+            end if;
+         end loop;
+      end Build_Path;
+   begin
+      return Polygonal_Chain'[Guard] & Build_Path (Guard, Guard_Dir);
+   end Walk;
 end Advent.Day_06;

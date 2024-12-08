@@ -21,4 +21,12 @@ package Advent.Day_06 is
       Guard (1) in Blocked'Range (1) and
       Guard (2) in Blocked'Range (2) and
       not Blocked (Guard (1), Guard (2));
+
+   function Walk
+     (Blocked : Boolean_Grid; Guard : Position; Guard_Dir : Direction)
+      return Polygonal_Chain with
+     Pre =>
+      Guard (1) in Blocked'Range (1) and
+      Guard (2) in Blocked'Range (2) and
+      not Blocked (Guard (1), Guard (2));
 end Advent.Day_06;

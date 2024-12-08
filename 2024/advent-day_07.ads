@@ -8,6 +8,4 @@ package Advent.Day_07 is
 
    function Input_Entry
      (File : in File_Type; Test : out Number) return Number_Array;
-
-   function Valid (Test : Number; Operands : Number_Array) return Boolean;
 end Advent.Day_07;

@@ -24,34 +24,4 @@ package body Advent.Day_07 is
       Get (Line (Line'First .. Colon - 1), Test, Last);
       return Input_Numbers (Line (Colon + 1 .. Line'Last));
    end Input_Entry;
-
-   function Valid (Test : Number; Operands : Number_Array) return Boolean is
-   begin
-      case Operands'Length is
-         when 0 =>
-            return False;
-         when 1 =>
-            return Test = Operands (Operands'First);
-         when others =>
-            if Operands (Operands'First) > Test then
-               return False;
-            end if;
-            declare
-               A : Number renames Operands (Operands'First);
-               B : Number renames Operands (Operands'First + 1);
-               S : constant Number := A + B;
-               P : constant Number := A * B;
-            begin
-               return
-                 Valid
-                   (Test,
-                    Number_Array'[S] &
-                    Operands (Operands'First + 2 .. Operands'Last))
-                 or else Valid
-                   (Test,
-                    Number_Array'[P] &
-                    Operands (Operands'First + 2 .. Operands'Last));
-            end;
-      end case;
-   end Valid;
 end Advent.Day_07;

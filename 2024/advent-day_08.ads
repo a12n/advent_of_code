@@ -8,9 +8,12 @@ package Advent.Day_08 is
        Static_Predicate => Antenna /= '.';
    type Antenna_Map is
      array (Positive range <>, Positive range <>) of Maybe_Antenna;
+   type Antinode_Map is
+     array (Positive range <>, Positive range <>) of Boolean;
 
    function Input (File : File_Type) return Antenna_Map;
 
-   function Number_Antinodes
-     (Antennas : Antenna_Map; Frequency : Antenna) return Natural;
+   procedure Mark_Antinodes
+     (Antinodes : in out Antinode_Map; Antennas : in Antenna_Map;
+      Frequency : in     Antenna);
 end Advent.Day_08;

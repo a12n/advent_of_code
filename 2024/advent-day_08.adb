@@ -39,11 +39,26 @@ package body Advent.Day_08 is
       return Iterate ([Antennas'First (1), Antennas'First (2)]);
    end Antenna_Positions;
 
-   function Number_Antinodes
-     (Antennas : Antenna_Map; Frequency : Antenna) return Natural
+   procedure Mark_Antinodes
+     (Antinodes : in out Antinode_Map; Antennas : in Antenna_Map;
+      Frequency : in     Antenna)
    is
+      Positions : constant Position_Array :=
+        Antenna_Positions (Antennas, Frequency);
+      P, Q      : Position;
+      V         : Offset;
    begin
-      --  TODO
-      return 0;
-   end Number_Antinodes;
+      for I in Positions'Range loop
+         for J in I + 1 .. Positions'Last loop
+            declare
+               V : constant Offset   := Positions (J) - Positions (I);
+               P : constant Position := Positions (I) - V;
+               Q : constant Position := Positions (J) + V;
+            begin
+               --  TODO
+               null;
+            end;
+         end loop;
+      end loop;
+   end Mark_Antinodes;
 end Advent.Day_08;

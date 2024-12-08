@@ -20,4 +20,8 @@ package Advent.Grids is
 
    function "+" (P : Position; V : Offset) return Position is
      [P (1) + V (1), P (2) + V (2)];
+   function "-" (P : Position; V : Offset) return Position is
+     [P (1) - V (1), P (2) - V (2)];
+   function "-" (P, Q : Position) return Offset is
+     [Q (1) - P (1), Q (2) - P (2)];
 end Advent.Grids;

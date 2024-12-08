@@ -48,6 +48,9 @@ package body Advent.Day_06 is
          return Position_Array'[];
       end if;
 
+      --  XXX: It's not enough to check whether a new obstruction
+      --  leads the guard to the A-B line only. It may lead the guard
+      --  to one of the previous lines in the list.
       declare
          A : Position renames Path (Path'First);
          B : Position renames Path (Path'First + 1);

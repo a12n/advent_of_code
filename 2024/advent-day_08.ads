@@ -20,4 +20,6 @@ package Advent.Day_08 is
    procedure Mark_Antinodes
      (Antinodes : in out Antinode_Map; Antennas : in Antenna_Map;
       Resonant  : in     Boolean; Frequency : in Antenna);
+
+   function Number_Antinodes (Antinodes : Antinode_Map) return Natural;
 end Advent.Day_08;

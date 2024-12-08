@@ -84,4 +84,17 @@ package body Advent.Day_08 is
          end loop;
       end loop;
    end Mark_Antinodes;
+
+   function Number_Antinodes (Antinodes : Antinode_Map) return Natural is
+      N : Natural := 0;
+   begin
+      for Row in Antinodes'Range (1) loop
+         for Col in Antinodes'Range (2) loop
+            if Antinodes (Row, Col) then
+               N := N + 1;
+            end if;
+         end loop;
+      end loop;
+      return N;
+   end Number_Antinodes;
 end Advent.Day_08;

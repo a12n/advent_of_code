@@ -27,53 +27,30 @@ package body Advent.Day_07 is
 
    function Valid (Test : Number; Operands : Number_Array) return Boolean is
    begin
-      Put_Line (Standard_Error, "Operands " & Operands'Image);
       case Operands'Length is
          when 0 =>
             return False;
          when 1 =>
             return Test = Operands (Operands'First);
          when others =>
+            if Operands (Operands'First) > Test then
+               return False;
+            end if;
             declare
                A : Number renames Operands (Operands'First);
                B : Number renames Operands (Operands'First + 1);
-               C : Number;
+               S : constant Number := A + B;
+               P : constant Number := A * B;
             begin
-               if A > Test then
-                  return False;
-               end if;
-
-               begin
-                  C := A + B;
-                  if C <= Test
-                    and then Valid
-                      (Test,
-                       Number_Array'[C] &
-                       Operands (Operands'First + 2 .. Operands'Last))
-                  then
-                     return True;
-                  end if;
-               exception
-                  when Constraint_Error =>
-                     null;
-               end;
-
-               begin
-                  C := A * B;
-                  if C <= Test
-                    and then Valid
-                      (Test,
-                       Number_Array'[C] &
-                       Operands (Operands'First + 2 .. Operands'Last))
-                  then
-                     return True;
-                  end if;
-               exception
-                  when Constraint_Error =>
-                     null;
-               end;
-
-               return False;
+               return
+                 Valid
+                   (Test,
+                    Number_Array'[S] &
+                    Operands (Operands'First + 2 .. Operands'Last))
+                 or else Valid
+                   (Test,
+                    Number_Array'[P] &
+                    Operands (Operands'First + 2 .. Operands'Last));
             end;
       end case;
    end Valid;

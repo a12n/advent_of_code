@@ -11,13 +11,8 @@ begin
          Test    : Number;
          Numbers : constant Number_Array := Input_Entry (Standard_Input, Test);
       begin
-         Put_Line (Standard_Error, "Test " & Test'Image);
-         Put_Line (Standard_Error, "Numbers " & Numbers'Image);
          if Valid (Test, Numbers) then
-            Put_Line (Standard_Error, "Valid " & True'Image);
             Total := Total + Test;
-         else
-            Put_Line (Standard_Error, "Valid " & False'Image);
          end if;
       end;
    end loop;

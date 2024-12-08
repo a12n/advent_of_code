@@ -45,22 +45,25 @@ package body Advent.Day_08 is
    is
       Positions : constant Position_Array :=
         Antenna_Positions (Antennas, Frequency);
+
+      procedure Mark (Pos : Position) is
+      begin
+         Antinodes (Pos (1), Pos (2)) := True;
+      exception
+         when Constraint_Error =>
+            --  Position is out of bounds of the map.
+            null;
+      end Mark;
    begin
       for I in Positions'Range loop
          for J in I + 1 .. Positions'Last loop
             declare
                V : constant Offset   := Positions (J) - Positions (I);
-               P : constant Position := Positions (I) - V;
-               Q : constant Position := Positions (J) + V;
+               P : constant Position := Positions (I) + V;
+               Q : constant Position := Positions (J) - V;
             begin
-               if P (1) in Antinodes'Range (1) and P (2) in Antinodes'Range (2)
-               then
-                  Antinodes (P (1), P (2)) := True;
-               end if;
-               if Q (1) in Antinodes'Range (1) and Q (2) in Antinodes'Range (2)
-               then
-                  Antinodes (Q (1), Q (2)) := True;
-               end if;
+               Mark (P);
+               Mark (Q);
             end;
          end loop;
       end loop;

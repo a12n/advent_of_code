@@ -78,8 +78,19 @@ package body Advent.Day_08 is
                V      : constant Offset := Positions (J) - Positions (I);
                Unused : Boolean;
             begin
-               Unused := Mark (Positions (I) + V * (-2));
-               Unused := Mark (Positions (I) + V * 1);
+               if Resonant then
+                  --  Multiples for range (-∞, 0].
+                  for N in reverse Integer'First .. 0 loop
+                     exit when not Mark (Positions (I) + V * N);
+                  end loop;
+                  --  Multiples for range [1, ∞).
+                  for N in Positive'Range loop
+                     exit when not Mark (Positions (I) + V * N);
+                  end loop;
+               else
+                  Unused := Mark (Positions (I) + V * (-2));
+                  Unused := Mark (Positions (I) + V * 1);
+               end if;
             end;
          end loop;
       end loop;

@@ -42,34 +42,6 @@ package body Advent.Day_06 is
      (Obstructions : Obstruction_Map; Guard : Position; Guard_Dir : Direction)
       return Visited_Map
    is
-      function Advance (Pos : Position; Dir : Direction) return Position is
-      begin
-         case Dir is
-            when Down =>
-               return [Pos (1) + 1, Pos (2)];
-            when Left =>
-               return [Pos (1), Pos (2) - 1];
-            when Right =>
-               return [Pos (1), Pos (2) + 1];
-            when Up =>
-               return [Pos (1) - 1, Pos (2)];
-         end case;
-      end Advance;
-
-      function Rotate (Dir : Direction) return Direction is
-      begin
-         case Dir is
-            when Down =>
-               return Left;
-            when Left =>
-               return Up;
-            when Right =>
-               return Down;
-            when Up =>
-               return Right;
-         end case;
-      end Rotate;
-
       Visited : Visited_Map (Obstructions'Range (1), Obstructions'Range (2)) :=
         [others => [others => False]];
       Current : Position := Guard;
@@ -78,11 +50,11 @@ package body Advent.Day_06 is
    begin
       loop
          Visited (Current (1), Current (2)) := True;
-         Next                               := Advance (Current, Dir);
+         Next                               := Current + To_Offset (Dir);
          exit when Next (1) not in Visited'Range (1) or
            Next (2) not in Visited'Range (2);
          if Obstructions (Next (1), Next (2)) then
-            Dir := Rotate (Dir);
+            Dir := Rotate (CW, Dir);
          else
             Current := Next;
          end if;

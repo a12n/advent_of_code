@@ -9,7 +9,9 @@ procedure Day_06_2 is
 
    Blocked : constant Boolean_Grid := Input (Standard_Input, Guard, Guard_Dir);
    Path    : constant Polygonal_Chain := Walk (Blocked, Guard, Guard_Dir);
+   Added   : constant Position_Array  := Loop_Obstructions (Path);
 begin
-   Put (Loop_Obstructions (Path)'Length, 0);
+   Put_Line (Standard_Error, Added'Image);
+   Put (Added'Length, 0);
    New_Line;
 end Day_06_2;

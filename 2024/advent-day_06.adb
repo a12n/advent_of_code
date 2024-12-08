@@ -40,6 +40,7 @@ package body Advent.Day_06 is
    end Input;
 
    function Loop_Obstructions (Path : Polygonal_Chain) return Position_Array is
+      X : Position := [-1, -1];
    begin
       if Path'Length < 5 then
          --  At least 4 lines (5 points) are needed to introduce a
@@ -55,23 +56,31 @@ package body Advent.Day_06 is
          E : Position renames Path (Path'First + 4);
       begin
          if Is_Horizontal_Line (A, B) and Is_Vertical_Line (B, C) and
-           Is_Horizontal_Line (C, D) and Is_Vertical_Line (D, E) and
-           A (2) <= E (2)
+           Is_Horizontal_Line (C, D) and Is_Vertical_Line (D, E)
          then
-            return
-              Position_Array'[[A (1) - 1, E (2)]] &
-              Loop_Obstructions (Path (Path'First + 1 .. Path'Last));
+            if E (1) <= A (1) and A (1) <= D (1) then
+               X := [A (1) - 1, E (2)];
+            elsif E (1) >= A (1) and A (1) >= D (1) then
+               X := [A (1) + 1, E (2)];
+            end if;
          elsif Is_Vertical_Line (A, B) and Is_Horizontal_Line (B, C) and
-           Is_Vertical_Line (C, D) and Is_Horizontal_Line (D, E) and
-           A (1) >= E (1)
+           Is_Vertical_Line (C, D) and Is_Horizontal_Line (D, E)
          then
-            return
-              Position_Array'[[E (1), A (2) - 1]] &
-              Loop_Obstructions (Path (Path'First + 1 .. Path'Last));
-         else
-            return Loop_Obstructions (Path (Path'First + 1 .. Path'Last));
+            if E (2) <= A (2) and A (2) <= D (2) then
+               X := [E (1), A (2) - 1];
+            elsif E (2) >= A (2) and A (2) >= D (2) then
+               X := [E (1), A (2) + 1];
+            end if;
          end if;
       end;
+
+      if X (1) > 0 and X (2) > 0 then
+         return
+           Position_Array'[X] &
+           Loop_Obstructions (Path (Path'First + 1 .. Path'Last));
+      else
+         return Loop_Obstructions (Path (Path'First + 1 .. Path'Last));
+      end if;
    end Loop_Obstructions;
 
    function Walk

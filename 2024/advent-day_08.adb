@@ -62,22 +62,24 @@ package body Advent.Day_08 is
       Positions : constant Position_Array :=
         Antenna_Positions (Antennas, Frequency);
 
-      procedure Mark (Pos : Position) is
+      function Mark (Pos : Position) return Boolean is
       begin
          Antinodes (Pos (1), Pos (2)) := True;
+         return True;
       exception
          when Constraint_Error =>
             --  Position is out of bounds of the map.
-            null;
+            return False;
       end Mark;
    begin
       for I in Positions'Range loop
          for J in I + 1 .. Positions'Last loop
             declare
-               V : constant Offset := Positions (J) - Positions (I);
+               V      : constant Offset := Positions (J) - Positions (I);
+               Unused : Boolean;
             begin
-               Mark (Positions (I) + V * 1);
-               Mark (Positions (I) + V * (-2));
+               Unused := Mark (Positions (I) + V * (-2));
+               Unused := Mark (Positions (I) + V * 1);
             end;
          end loop;
       end loop;

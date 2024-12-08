@@ -43,6 +43,22 @@ package body Advent.Day_08 is
      (Antinodes : in out Antinode_Map; Antennas : in Antenna_Map;
       Frequency : in     Antenna)
    is
+   begin
+      for A in Antenna'('0') .. Antenna'('9') loop
+         Mark_Antinodes (Antinodes, Antennas, A);
+      end loop;
+      for A in Antenna'('a') .. Antenna'('z') loop
+         Mark_Antinodes (Antinodes, Antennas, A);
+      end loop;
+      for A in Antenna'('A') .. Antenna'('Z') loop
+         Mark_Antinodes (Antinodes, Antennas, A);
+      end loop;
+   end Mark_Antinodes;
+
+   procedure Mark_Antinodes
+     (Antinodes : in out Antinode_Map; Antennas : in Antenna_Map;
+      Frequency : in Antenna)
+   is
       Positions : constant Position_Array :=
         Antenna_Positions (Antennas, Frequency);
 

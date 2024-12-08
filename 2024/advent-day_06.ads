@@ -5,6 +5,7 @@ package Advent.Day_06 is
    type Obstruction_Map is
      array (Positive range <>, Positive range <>) of Boolean;
    type Visited_Map is array (Positive range <>, Positive range <>) of Boolean;
+   type Polygonal_Chain is array (Positive range <>) of Position;
 
    function Input
      (File : in File_Type; Guard : out Position; Guard_Dir : out Direction)

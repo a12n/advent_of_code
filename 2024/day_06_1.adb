@@ -4,11 +4,12 @@ with Advent.Day_06;       use Advent.Day_06;
 with Advent.Grids;        use Advent.Grids;
 
 procedure Day_06_1 is
-   Guard        : Position;
-   Guard_Dir    : Direction;
-   Obstructions : constant Obstruction_Map :=
-     Input (Standard_Input, Guard, Guard_Dir);
-   Visited : constant Visited_Map     := Walk (Obstructions, Guard, Guard_Dir);
+   Guard     : Position;
+   Guard_Dir : Direction;
+
+   Blocked : constant Boolean_Grid := Input (Standard_Input, Guard, Guard_Dir);
+   Visited : constant Boolean_Grid := Walk (Blocked, Guard, Guard_Dir);
+
    Num_Visited  : Natural                  := 0;
 begin
    for Row in Visited'Range (1) loop

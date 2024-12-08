@@ -5,7 +5,6 @@ package Advent.Day_06 is
    type Boolean_Grid is
      array (Positive range <>, Positive range <>) of Boolean;
    type Polygonal_Chain is array (Positive range <>) of Position;
-   type Position_Array is array (Positive range <>) of Position;
 
    function Input
      (File : in File_Type; Guard : out Position; Guard_Dir : out Direction)

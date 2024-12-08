@@ -2,6 +2,7 @@ package Advent.Grids is
    type Direction is (Down, Left, Right, Up);
    type Rotation is (CW, CCW);
    type Position is array (1 .. 2) of Integer;
+   type Position_Array is array (Positive range <>) of Position;
    type Offset is array (1 .. 2) of Integer;
 
    Rotate : constant array (Rotation, Direction) of Direction :=

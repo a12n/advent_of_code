@@ -16,5 +16,9 @@ package Advent.Day_09 is
 
    type Block_Array is array (Positive range <>) of Block;
 
+   function Checksum (Blocks : Block_Array) return Natural;
+
    function Input (File : File_Type) return Block_Array;
+
+   procedure Rearrange (Blocks : in out Block_Array);
 end Advent.Day_09;

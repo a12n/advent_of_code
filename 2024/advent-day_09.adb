@@ -1,6 +1,12 @@
 package body Advent.Day_09 is
    package Block_Size_Text_IO is new Ada.Text_IO.Integer_IO (Block_Size);
 
+   function Checksum (Blocks : Block_Array) return Natural is
+   begin
+      --  TODO
+      return 0;
+   end Checksum;
+
    function Input (File : File_Type) return Block_Array is
       use Block_Size_Text_IO;
       Line   : constant String := Get_Line (File);
@@ -26,4 +32,10 @@ package body Advent.Day_09 is
       end loop;
       return Blocks;
    end Input;
+
+   procedure Rearrange (Blocks : in out Block_Array) is
+   begin
+      --  TODO
+      null;
+   end Rearrange;
 end Advent.Day_09;

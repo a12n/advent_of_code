@@ -6,9 +6,8 @@ package body Advent.Day_09 is
       Pos : Natural       := 0;
       I   : Natural       := Blocks'First;
    begin
-      loop
-         Put_Line (Standard_Error, "I " & I'Image);
-         if not Blocks (I).Space then
+      for I in Blocks'Range loop
+         if not Space_Block (Blocks (I).ID) then
             declare
                ID   : constant Natural := Natural (Blocks (I).ID);
                Size : constant Natural := Natural (Blocks (I).Size);
@@ -21,39 +20,22 @@ package body Advent.Day_09 is
                Pos := Pos + Size;
             end;
          end if;
-         I := Natural (Blocks (I).Next);
-         exit when I = 0;
       end loop;
       return Sum;
    end Checksum;
 
-   function Input (File : File_Type) return Block_Array is
-      use Block_Size_Text_IO;
-      Line   : constant String := Get_Line (File);
-      Blocks : Block_Array (Line'Range);
-      Unused : Positive;
+   function Checksum (Blocks : ID_Array) return Checksum_Type is
+      Sum : Checksum_Type := 0;
    begin
-      Blocks (Blocks'First).ID    := 0;
-      Blocks (Blocks'First).Space := False;
-      for I in Line'Range loop
-         Get (Line (I .. I), Blocks (I).Size, Unused);
-         if I > Line'First then
-            if Blocks (I - 1).Space then
-               Blocks (I).Space := False;
-               if I > Line'First + 1 then
-                  Blocks (I).ID := Blocks (I - 2).ID + 1;
-               end if;
-            else
-               Blocks (I).Space := True;
-            end if;
-            Blocks (I).Previous := Link_Type (I - 1);
-            Blocks (I - 1).Next := Link_Type (I);
+      for I in Blocks'Range loop
+         if File_Block (Blocks (I)) then
+            Sum := Sum + Checksum_Type (Natural (Blocks (I)) * (I - 1));
          end if;
       end loop;
-      return Blocks;
-   end Input;
+      return Sum;
+   end Checksum;
 
-   function Input (File : File_Type) return Block_Size_Array is
+   function Input (File : File_Type) return Size_Array is
       function Parse (Char : Character) return Natural is
       begin
          case Char is
@@ -64,15 +46,16 @@ package body Advent.Day_09 is
          end case;
       end Parse;
 
-      Line   : constant String := Get_Line (File);
-      Blocks : Block_Size_Array (Line'Range);
+      Line  : constant String := Get_Line (File);
+      Sizes : Size_Array (Line'Range);
    begin
       for I in Line'Range loop
-         Blocks (I) := Parse (Line (I));
+         Sizes (I) := Parse (Line (I));
       end loop;
-      return Blocks;
+      return Sizes;
    end Input;
 
+   --  TODO
    procedure Rearrange (Blocks : in out Block_Array) is
       First_Space : Natural := Blocks'First;
       Last_File   : Natural := Blocks'Last;
@@ -142,47 +125,7 @@ package body Advent.Day_09 is
       end loop;
    end Rearrange;
 
-   --  function Input (File : File_Type) return Block_Array2 is
-   --     Line   : constant String := Get_Line (File);
-   --     Blocks : Block_Array2 (1 .. Line'Length * 9);
-   --     I      : Positive        := Blocks'First;
-   --     Unused : Positive;
-   --  begin
-   --     null;
-   --  end Input;
-
-   --  function Rearrange (Blocks : Block_Array2) return Index_Array with
-   --    Post => Rearrange'Result'Length = Blocks'Length;
-   --  function Checksum
-   --    (Blocks : Block_Array2; Indices : Index_Array) return Checksum_Type with
-   --    Pre => Blocks'Length = Indices'Length;
-
-   function To_Blocks (Block_Sizes : Block_Size_Array) return Block_Array2 is
-      Blocks : Block_Array2 (1 .. Block_Sizes'Reduce ("+", 0));
-      Pos : Positive := Block_Sizes'First;
-      ID  : Block_ID := 0;
-   begin
-      for I in Block_Sizes'Range loop
-         declare
-            Space : constant Boolean := I mod 2 = 0;
-         begin
-            for J in 1 .. Block_Sizes (I) loop
-               if Space then
-                  Blocks (Pos) := -1;
-               else
-                  Blocks (Pos) := ID;
-               end if;
-               Pos := Pos + 1;
-            end loop;
-            if not Space then
-               ID := ID + 1;
-            end if;
-         end;
-      end loop;
-      return Blocks;
-   end To_Blocks;
-
-   procedure Rearrange (Blocks : in out Block_Array2) is
+   procedure Rearrange (Blocks : in out ID_Array) is
       I : Positive := Blocks'First;
       J : Positive := Blocks'Last;
    begin
@@ -202,14 +145,48 @@ package body Advent.Day_09 is
       end loop;
    end Rearrange;
 
-   function Checksum (Blocks : Block_Array2) return Checksum_Type is
-      Sum : Checksum_Type := 0;
+   function To_Blocks (Sizes : Size_Array) return Block_Array is
+      Blocks : Block_Array (Sizes'Range);
+      ID     : Block_ID := 0;
    begin
-      for I in Blocks'Range loop
-         if Is_File (Blocks (I)) then
-            Sum := Sum + Checksum_Type (Natural (Blocks (I)) * (I - 1));
-         end if;
+      for I in Sizes'Range loop
+         declare
+            Space : constant Boolean := I mod 2 = 0;
+         begin
+            if Space then
+               Blocks(I) := (-1, Sizes (I));
+            else
+               Blocks(I) := (ID, Sizes (I));
+            end if;
+            if not Space then
+               ID := ID + 1;
+            end if;
+         end;
       end loop;
-      return Sum;
-   end Checksum;
+   end To_Blocks;
+
+   function To_Blocks (Sizes : Size_Array) return ID_Array is
+      Blocks : ID_Array (1 .. Sizes'Reduce ("+", 0));
+      Pos    : Positive := Sizes'First;
+      ID     : Block_ID := 0;
+   begin
+      for I in Sizes'Range loop
+         declare
+            Space : constant Boolean := I mod 2 = 0;
+         begin
+            for J in 1 .. Sizes (I) loop
+               if Space then
+                  Blocks (Pos) := -1;
+               else
+                  Blocks (Pos) := ID;
+               end if;
+               Pos := Pos + 1;
+            end loop;
+            if not Space then
+               ID := ID + 1;
+            end if;
+         end;
+      end loop;
+      return Blocks;
+   end To_Blocks;
 end Advent.Day_09;

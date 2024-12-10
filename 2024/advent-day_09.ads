@@ -1,45 +1,35 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 package Advent.Day_09 is
-   type ID_Type is range 0 .. 20_000;
+   type Block_ID is range -1 .. 20_000 with Size => 16;
    type Block_Size is range 0 .. 9;
-   type Block_Size_Array is array (Positive range <>) of Natural;
-   type Link_Type is range 0 .. 20_000;
-   type Checksum_Type is range 0 .. 2**64;
 
    type Block is record
-      ID       : ID_Type;
-      Space    : Boolean;
-      Size     : Block_Size;
-      Next     : Link_Type := 0;
-      Previous : Link_Type := 0;
+      ID   : Block_ID;
+      Size : Block_Size;
    end record with
-     Size => 64;
-   type Block_Array is array (Positive range <>) of Block;
+     Size => 32;
 
-   package Block_Size_Text_IO is new Ada.Text_IO.Integer_IO (Block_Size);
+   type Block_Array is array (Positive range <>) of Block;
+   type ID_Array is array (Positive range <>) of Block_ID;
+   type Size_Array is array (Positive range <>) of Natural;
+
+   type Checksum_Type is range 0 .. 2**64;
+
    package Checksum_Text_IO is new Ada.Text_IO.Integer_IO (Checksum_Type);
 
    function Checksum (Blocks : Block_Array) return Checksum_Type;
+   function Checksum (Blocks : ID_Array) return Checksum_Type;
 
-   function Input (File : File_Type) return Block_Array;
-   function Input (File : File_Type) return Block_Size_Array;
+   function File_Block (Block : Block_ID) return Boolean is (Block /= -1);
+
+   function Input (File : File_Type) return Size_Array;
 
    procedure Rearrange (Blocks : in out Block_Array);
+   procedure Rearrange (Blocks : in out ID_Array);
 
-   type Block_ID is range -1 .. 20_000 with
-     Size => 16;
-   type Block_Array2 is array (Positive range <>) of Block_ID;
-   type Index_Array is array (Positive range <>) of Natural;
+   function Space_Block (Block : Block_ID) return Boolean is (Block = -1);
 
-   function Is_File (Block : Block_ID) return Boolean is (Block >= 0);
-   function Is_Space (Block : Block_ID) return Boolean is (Block < 0);
-   function To_Blocks (Block_Sizes : Block_Size_Array) return Block_Array2;
-   --  function Input (File : File_Type) return Block_Array2;
-   procedure Rearrange (Blocks : in out Block_Array2);
-   function Checksum (Blocks : Block_Array2) return Checksum_Type;
-   --  function Checksum
-   --    (Blocks : Block_Array2; Indices : Index_Array) return Checksum_Type with
-   --    Pre => Blocks'Length = Indices'Length;
-
+   function To_Blocks (Sizes : Size_Array) return Block_Array;
+   function To_Blocks (Sizes : Size_Array) return ID_Array;
 end Advent.Day_09;

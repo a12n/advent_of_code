@@ -53,6 +53,26 @@ package body Advent.Day_09 is
       return Blocks;
    end Input;
 
+   function Input (File : File_Type) return Block_Size_Array is
+      function Parse (Char : Character) return Natural is
+      begin
+         case Char is
+            when '0' .. '9' =>
+               return Character'Pos (Char) - Character'Pos ('0');
+            when others =>
+               raise Constraint_Error;
+         end case;
+      end Parse;
+
+      Line   : constant String := Get_Line (File);
+      Blocks : Block_Size_Array (Line'Range);
+   begin
+      for I in Line'Range loop
+         Blocks (I) := Parse (Line (I));
+      end loop;
+      return Blocks;
+   end Input;
+
    procedure Rearrange (Blocks : in out Block_Array) is
       First_Space : Natural := Blocks'First;
       Last_File   : Natural := Blocks'Last;
@@ -124,16 +144,42 @@ package body Advent.Day_09 is
 
    --  function Input (File : File_Type) return Block_Array2 is
    --     Line   : constant String := Get_Line (File);
-   --     Blocks : Block_Array2 (1 .. Line'Length*9);
+   --     Blocks : Block_Array2 (1 .. Line'Length * 9);
+   --     I      : Positive        := Blocks'First;
    --     Unused : Positive;
-   --
    --  begin
+   --     null;
    --  end Input;
-   --
+
    --  function Rearrange (Blocks : Block_Array2) return Index_Array with
    --    Post => Rearrange'Result'Length = Blocks'Length;
    --  function Checksum
    --    (Blocks : Block_Array2; Indices : Index_Array) return Checksum_Type with
    --    Pre => Blocks'Length = Indices'Length;
+
+   function To_Blocks (Block_Sizes : Block_Size_Array) return Block_Array2 is
+      Blocks : Block_Array2(1 .. Block_Sizes'Reduce("+", 0));
+      Pos : Positive := Block_Sizes'First;
+      ID  : Block_ID := 0;
+   begin
+      for I in Block_Sizes'Range loop
+         declare
+            Space : Boolean := I mod 2 = 0;
+         begin
+            for J in 1 .. Block_Sizes (I) loop
+               if Space then
+                  Blocks (Pos) := -1;
+               else
+                  Blocks (Pos) := ID;
+               end if;
+               Pos := Pos + 1;
+            end loop;
+            if not Space then
+               ID := ID + 1;
+            end if;
+         end;
+      end loop;
+      return Blocks;
+   end To_Blocks;
 
 end Advent.Day_09;

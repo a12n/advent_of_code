@@ -19,7 +19,7 @@ package Advent.Day_09 is
    package Block_Size_Text_IO is new Ada.Text_IO.Integer_IO (Block_Size);
    package Checksum_Text_IO is new Ada.Text_IO.Integer_IO (Checksum_Type);
 
-   function Checksum (Blocks : Block_Array) return Natural;
+   function Checksum (Blocks : Block_Array) return Checksum_Type;
 
    function Input (File : File_Type) return Block_Array;
 

@@ -1,10 +1,10 @@
 package body Advent.Day_09 is
-   function Checksum (Blocks : Block_Array) return Natural is
+   function Checksum (Blocks : Block_Array) return Checksum_Type is
       function Triangular (N : Natural) return Natural is (N * (N + 1) / 2);
 
-      Sum : Natural := 0;
-      Pos : Natural := 0;
-      I   : Natural := Blocks'First;
+      Sum : Checksum_Type := 0;
+      Pos : Natural       := 0;
+      I   : Natural       := Blocks'First;
    begin
       loop
          Put_Line (Standard_Error, "I " & I'Image);
@@ -14,7 +14,10 @@ package body Advent.Day_09 is
                Size : constant Natural := Natural (Blocks (I).Size);
             begin
                --  ID * (N + 0) + ID * (N + 1) + ID * (N + 2) + … + ID * (N + Size - 1)
-               Sum := Sum + ID * (Pos * (Size - 1) + Triangular (Size - 1));
+               Sum :=
+                 Sum +
+                 Checksum_Type
+                   (ID * (Pos * (Size - 1) + Triangular (Size - 1)));
                Pos := Pos + Size;
             end;
          end if;

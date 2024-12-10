@@ -126,22 +126,22 @@ package body Advent.Day_09 is
       end Number_Blocks;
 
       Blocks : Block_Array (1 .. Number_Blocks (Sizes));
-      Pos    : Positive := Blocks'First;
+      Next   : Positive := Blocks'First;
       ID     : Block_ID := 0;
    begin
       for I in Sizes'Range loop
          if File_Index (I) then
-            Blocks (Pos) := (ID, Block_Size (Sizes (I)));
-            Pos          := Pos + 1;
-            ID           := ID + 1;
+            Blocks (Next) := (ID, Block_Size (Sizes (I)));
+            Next          := Next + 1;
+            ID            := ID + 1;
          elsif Sizes (I) > 0 then
-            Blocks (Pos) := (-1, Block_Size (Sizes (I)));
-            Pos          := Pos + 1;
+            Blocks (Next) := (-1, Block_Size (Sizes (I)));
+            Next          := Next + 1;
             --  Allocate additional `Sizes (I) - 1` empty space
             --  blocks, to be able to use these on `I` space splits.
             for K in 2 .. Sizes (I) loop
-               Blocks (Pos) := (-1, 0);
-               Pos          := Pos + 1;
+               Blocks (Next) := (-1, 0);
+               Next          := Next + 1;
             end loop;
          end if;
       end loop;
@@ -150,17 +150,17 @@ package body Advent.Day_09 is
 
    function To_Blocks (Sizes : Size_Array) return ID_Array is
       Blocks : ID_Array (1 .. Sizes'Reduce ("+", 0));
-      Pos    : Positive := Sizes'First;
+      Next   : Positive := Sizes'First;
       ID     : Block_ID := 0;
    begin
       for I in Sizes'Range loop
          for J in 1 .. Sizes (I) loop
             if File_Index (I) then
-               Blocks (Pos) := ID;
+               Blocks (Next) := ID;
             else
-               Blocks (Pos) := -1;
+               Blocks (Next) := -1;
             end if;
-            Pos := Pos + 1;
+            Next := Next + 1;
          end loop;
          if File_Index (I) then
             ID := ID + 1;

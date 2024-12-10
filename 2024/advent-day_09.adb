@@ -101,6 +101,11 @@ package body Advent.Day_09 is
       end loop;
    end Rearrange;
 
+   function Space_Index (I : Positive) return Boolean is
+   begin
+      return I mod 2 = 0;
+   end Space_Index;
+
    function To_Blocks (Sizes : Size_Array) return Block_Array is
       Blocks : Block_Array (Sizes'Range);
       ID     : Block_ID := 0;
@@ -110,18 +115,12 @@ package body Advent.Day_09 is
       --  a file move.
    begin
       for I in Sizes'Range loop
-         declare
-            Space : constant Boolean := I mod 2 = 0;
-         begin
-            if Space then
-               Blocks (I) := (-1, Block_Size (Sizes (I)));
-            else
-               Blocks (I) := (ID, Block_Size (Sizes (I)));
-            end if;
-            if not Space then
-               ID := ID + 1;
-            end if;
-         end;
+         if Space_Index (I) then
+            Blocks (I) := (-1, Block_Size (Sizes (I)));
+         else
+            Blocks (I) := (ID, Block_Size (Sizes (I)));
+            ID         := ID + 1;
+         end if;
       end loop;
       return Blocks;
    end To_Blocks;
@@ -132,21 +131,17 @@ package body Advent.Day_09 is
       ID     : Block_ID := 0;
    begin
       for I in Sizes'Range loop
-         declare
-            Space : constant Boolean := I mod 2 = 0;
-         begin
-            for J in 1 .. Sizes (I) loop
-               if Space then
-                  Blocks (Pos) := -1;
-               else
-                  Blocks (Pos) := ID;
-               end if;
-               Pos := Pos + 1;
-            end loop;
-            if not Space then
-               ID := ID + 1;
+         for J in 1 .. Sizes (I) loop
+            if Space_Index (I) then
+               Blocks (Pos) := -1;
+            else
+               Blocks (Pos) := ID;
             end if;
-         end;
+            Pos := Pos + 1;
+         end loop;
+         if not Space_Index (I) then
+            ID := ID + 1;
+         end if;
       end loop;
       return Blocks;
    end To_Blocks;

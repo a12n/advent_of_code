@@ -32,13 +32,12 @@ package Advent.Day_09 is
    type Block_Array2 is array (Positive range <>) of Block_ID;
    type Index_Array is array (Positive range <>) of Natural;
 
+   function Is_File (Block : Block_ID) return Boolean is (Block >= 0);
+   function Is_Space (Block : Block_ID) return Boolean is (Block < 0);
    function To_Blocks (Block_Sizes : Block_Size_Array) return Block_Array2;
-
-   --  function Is_File (Block : Block_ID) return Boolean is (Block >= 0);
-   --  function Is_Space (Block : Block_ID) return Boolean is (Block < 0);
    --  function Input (File : File_Type) return Block_Array2;
-   --  function Rearrange (Blocks : Block_Array2) return Index_Array with
-   --    Post => Rearrange'Result'Length = Blocks'Length;
+   procedure Rearrange (Blocks : in out Block_Array2);
+   function Checksum (Blocks : Block_Array2) return Checksum_Type;
    --  function Checksum
    --    (Blocks : Block_Array2; Indices : Index_Array) return Checksum_Type with
    --    Pre => Blocks'Length = Indices'Length;

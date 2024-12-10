@@ -182,4 +182,34 @@ package body Advent.Day_09 is
       return Blocks;
    end To_Blocks;
 
+   procedure Rearrange (Blocks : in out Block_Array2) is
+      I : Positive := Blocks'First;
+      J : Positive := Blocks'Last;
+   begin
+      loop
+         while I in Blocks'Range and then Is_File (Blocks (I)) loop
+            I := I + 1;
+         end loop;
+
+         while J in Blocks'Range and then Is_Space (Blocks (J)) loop
+            J := J - 1;
+         end loop;
+
+         exit when I >= J;
+
+         Blocks (I) := Blocks (J);
+         Blocks (J) := -1;
+      end loop;
+   end Rearrange;
+
+   function Checksum (Blocks : Block_Array2) return Checksum_Type is
+      Sum : Checksum_Type := 0;
+   begin
+      for I in Blocks'Range loop
+         if Is_File (Blocks (I)) then
+            Sum := Sum + Checksum_Type (Natural (Blocks (I)) * (I - 1));
+         end if;
+      end loop;
+      return Sum;
+   end Checksum;
 end Advent.Day_09;

@@ -72,7 +72,7 @@ package body Advent.Day_09 is
          if Blocks (I).Size >= Blocks (J).Size then
             Blocks (I).ID   := Blocks (J).ID;
             Blocks (I).Size := Blocks (J).Size;
-            Blocks (J).ID := -1;
+            Blocks (J).ID   := -1;
             --  TODO: Small space gap left after the file block.
          else
             --  Can't move file, skip.

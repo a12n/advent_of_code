@@ -107,19 +107,37 @@ package body Advent.Day_09 is
    end File_Index;
 
    function To_Blocks (Sizes : Size_Array) return Block_Array is
-      Blocks : Block_Array (Sizes'Range);
+      function Number_Blocks (Sizes : Size_Array) return Natural is
+         N : Natural := 0;
+      begin
+         for I in Sizes'Range loop
+            if File_Index (I) then
+               N := N + 1;
+            else
+               N := N + Sizes (I);
+            end if;
+         end loop;
+         return N;
+      end Number_Blocks;
+
+      Blocks : Block_Array (1 .. Number_Blocks (Sizes));
+      Pos    : Positive := Blocks'First;
       ID     : Block_ID := 0;
-      --  TODO: Allocate additional 8 space blocks of size 0 after
-      --  each space block. This would allow to use these dormant
-      --  blocks for file moves, when there's a gap in the space after
-      --  a file move.
    begin
       for I in Sizes'Range loop
          if File_Index (I) then
-            Blocks (I) := (ID, Block_Size (Sizes (I)));
-            ID         := ID + 1;
-         else
-            Blocks (I) := (-1, Block_Size (Sizes (I)));
+            Blocks (Pos) := (ID, Block_Size (Sizes (I)));
+            Pos          := Pos + 1;
+            ID           := ID + 1;
+         elsif Sizes (I) > 0 then
+            Blocks (Pos) := (-1, Block_Size (Sizes (I)));
+            Pos          := Pos + 1;
+            --  Allocate additional `Sizes (I) - 1` empty space
+            --  blocks, to be able to use these on `I` space splits.
+            for K in 2 .. Sizes (I) loop
+               Blocks (Pos) := (-1, 0);
+               Pos          := Pos + 1;
+            end loop;
          end if;
       end loop;
       return Blocks;

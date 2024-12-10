@@ -16,6 +16,7 @@ package Advent.Day_09 is
      Size => 64;
    type Block_Array is array (Positive range <>) of Block;
 
+
    package Block_Size_Text_IO is new Ada.Text_IO.Integer_IO (Block_Size);
    package Checksum_Text_IO is new Ada.Text_IO.Integer_IO (Checksum_Type);
 
@@ -24,4 +25,18 @@ package Advent.Day_09 is
    function Input (File : File_Type) return Block_Array;
 
    procedure Rearrange (Blocks : in out Block_Array);
+
+   --  type Block_ID is range -1 .. 20_000 with
+   --    Size => 16;
+   --  type Block_Array2 is array (Positive range <>) of Block_ID;
+   --  type Index_Array is array (Positive range <>) of Natural;
+   --
+   --  function Is_File (Block : Block_ID) return Boolean is (Block >= 0);
+   --  function Is_Space (Block : Block_ID) return Boolean is (Block < 0);
+   --  function Input (File : File_Type) return Block_Array2;
+   --  function Rearrange (Blocks : Block_Array2) return Index_Array with
+   --    Post => Rearrange'Result'Length = Blocks'Length;
+   --  function Checksum
+   --    (Blocks : Block_Array2; Indices : Index_Array) return Checksum_Type with
+   --    Pre => Blocks'Length = Indices'Length;
 end Advent.Day_09;

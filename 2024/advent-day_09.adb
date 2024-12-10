@@ -4,7 +4,6 @@ package body Advent.Day_09 is
 
       Sum : Checksum_Type := 0;
       Pos : Natural       := 0;
-      I   : Natural       := Blocks'First;
    begin
       for I in Blocks'Range loop
          if not Space_Block (Blocks (I).ID) then
@@ -130,11 +129,11 @@ package body Advent.Day_09 is
       J : Positive := Blocks'Last;
    begin
       loop
-         while I in Blocks'Range and then Is_File (Blocks (I)) loop
+         while I in Blocks'Range and then File_Block (Blocks (I)) loop
             I := I + 1;
          end loop;
 
-         while J in Blocks'Range and then Is_Space (Blocks (J)) loop
+         while J in Blocks'Range and then Space_Block (Blocks (J)) loop
             J := J - 1;
          end loop;
 
@@ -154,15 +153,16 @@ package body Advent.Day_09 is
             Space : constant Boolean := I mod 2 = 0;
          begin
             if Space then
-               Blocks(I) := (-1, Sizes (I));
+               Blocks (I) := (-1, Block_Size (Sizes (I)));
             else
-               Blocks(I) := (ID, Sizes (I));
+               Blocks (I) := (ID, Block_Size (Sizes (I)));
             end if;
             if not Space then
                ID := ID + 1;
             end if;
          end;
       end loop;
+      return Blocks;
    end To_Blocks;
 
    function To_Blocks (Sizes : Size_Array) return ID_Array is

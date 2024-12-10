@@ -1,7 +1,8 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 package Advent.Day_09 is
-   type Block_ID is range -1 .. 20_000 with Size => 16;
+   type Block_ID is range -1 .. 20_000 with
+     Size => 16;
    type Block_Size is range 0 .. 9;
 
    type Block is record

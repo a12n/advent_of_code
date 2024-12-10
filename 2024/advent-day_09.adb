@@ -158,13 +158,13 @@ package body Advent.Day_09 is
    --    Pre => Blocks'Length = Indices'Length;
 
    function To_Blocks (Block_Sizes : Block_Size_Array) return Block_Array2 is
-      Blocks : Block_Array2(1 .. Block_Sizes'Reduce("+", 0));
+      Blocks : Block_Array2 (1 .. Block_Sizes'Reduce ("+", 0));
       Pos : Positive := Block_Sizes'First;
       ID  : Block_ID := 0;
    begin
       for I in Block_Sizes'Range loop
          declare
-            Space : Boolean := I mod 2 = 0;
+            Space : constant Boolean := I mod 2 = 0;
          begin
             for J in 1 .. Block_Sizes (I) loop
                if Space then

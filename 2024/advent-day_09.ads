@@ -4,6 +4,7 @@ package Advent.Day_09 is
    type ID_Type is range 0 .. 20_000;
    type Block_Size is range 0 .. 9;
    type Link_Type is range 0 .. 20_000;
+   type Checksum_Type is range 0 .. 2**64;
 
    type Block is record
       ID       : ID_Type;
@@ -16,6 +17,7 @@ package Advent.Day_09 is
    type Block_Array is array (Positive range <>) of Block;
 
    package Block_Size_Text_IO is new Ada.Text_IO.Integer_IO (Block_Size);
+   package Checksum_Text_IO is new Ada.Text_IO.Integer_IO (Checksum_Type);
 
    function Checksum (Blocks : Block_Array) return Natural;
 

@@ -101,10 +101,10 @@ package body Advent.Day_09 is
       end loop;
    end Rearrange;
 
-   function Space_Index (I : Positive) return Boolean is
+   function File_Index (I : Positive) return Boolean is
    begin
-      return I mod 2 = 0;
-   end Space_Index;
+      return I mod 2 /= 0;
+   end File_Index;
 
    function To_Blocks (Sizes : Size_Array) return Block_Array is
       Blocks : Block_Array (Sizes'Range);
@@ -115,11 +115,11 @@ package body Advent.Day_09 is
       --  a file move.
    begin
       for I in Sizes'Range loop
-         if Space_Index (I) then
-            Blocks (I) := (-1, Block_Size (Sizes (I)));
-         else
+         if File_Index (I) then
             Blocks (I) := (ID, Block_Size (Sizes (I)));
             ID         := ID + 1;
+         else
+            Blocks (I) := (-1, Block_Size (Sizes (I)));
          end if;
       end loop;
       return Blocks;
@@ -132,14 +132,14 @@ package body Advent.Day_09 is
    begin
       for I in Sizes'Range loop
          for J in 1 .. Sizes (I) loop
-            if Space_Index (I) then
-               Blocks (Pos) := -1;
-            else
+            if File_Index (I) then
                Blocks (Pos) := ID;
+            else
+               Blocks (Pos) := -1;
             end if;
             Pos := Pos + 1;
          end loop;
-         if not Space_Index (I) then
+         if File_Index (I) then
             ID := ID + 1;
          end if;
       end loop;

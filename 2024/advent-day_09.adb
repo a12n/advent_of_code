@@ -55,28 +55,33 @@ package body Advent.Day_09 is
    end Input;
 
    procedure Rearrange (Blocks : in out Block_Array) is
-      I : Positive := Blocks'First;
-      J : Positive := Blocks'Last;
    begin
-      loop
-         while I in Blocks'Range and then File_Block (Blocks (I).ID) loop
-            I := I + 1;
-         end loop;
-
-         while J in Blocks'Range and then Space_Block (Blocks (J).ID) loop
-            J := J - 1;
-         end loop;
-
-         exit when I >= J;
-
-         if Blocks (I).Size >= Blocks (J).Size then
-            Blocks (I).ID   := Blocks (J).ID;
-            Blocks (I).Size := Blocks (J).Size;
-            Blocks (J).ID   := -1;
-            --  TODO: Small space gap left after the file block.
-         else
-            --  Can't move file, skip.
-            J := J - 1;
+      for J in reverse Blocks'Range loop
+         if File_Block (Blocks (J).ID) then
+            for I in Blocks'First .. J - 1 loop
+               if Space_Block (Blocks (I).ID)
+                 and then Blocks (I).Size >= Blocks (J).Size
+               then
+                  declare
+                     Size_Left : constant Block_Size :=
+                       Blocks (I).Size - Blocks (J).Size;
+                  begin
+                     --  Swap J file block and I space block.
+                     Blocks (I).ID   := Blocks (J).ID;
+                     Blocks (I).Size := Blocks (J).Size;
+                     Blocks (J).ID   := -1;
+                     --  Make next dormant space block available for the
+                     --  I space size left.
+                     if not Space_Block (Blocks (I + 1).ID) or
+                       Blocks (I + 1).Size /= 0
+                     then
+                        raise Constraint_Error;
+                     end if;
+                     Blocks (I + 1).Size := Size_Left;
+                  end;
+                  exit;
+               end if;
+            end loop;
          end if;
       end loop;
    end Rearrange;

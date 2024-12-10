@@ -6,7 +6,7 @@ package body Advent.Day_09 is
       Pos : Natural       := 0;
    begin
       for I in Blocks'Range loop
-         if not Space_Block (Blocks (I).ID) then
+         if File_Block (Blocks (I).ID) then
             declare
                ID   : constant Natural := Natural (Blocks (I).ID);
                Size : constant Natural := Natural (Blocks (I).Size);
@@ -14,11 +14,10 @@ package body Advent.Day_09 is
                --  ID * (N + 0) + ID * (N + 1) + ID * (N + 2) + … + ID * (N + Size - 1)
                Sum :=
                  Sum +
-                 Checksum_Type
-                   (ID * (Pos * (Size - 1) + Triangular (Size - 1)));
-               Pos := Pos + Size;
+                 Checksum_Type ((ID * (Pos * Size + Triangular (Size - 1))));
             end;
          end if;
+         Pos := Pos + Natural (Blocks (I).Size);
       end loop;
       return Sum;
    end Checksum;

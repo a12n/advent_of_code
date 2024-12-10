@@ -104,6 +104,10 @@ package body Advent.Day_09 is
    function To_Blocks (Sizes : Size_Array) return Block_Array is
       Blocks : Block_Array (Sizes'Range);
       ID     : Block_ID := 0;
+      --  TODO: Allocate additional 8 space blocks of size 0 after
+      --  each space block. This would allow to use these dormant
+      --  blocks for file moves, when there's a gap in the space after
+      --  a file move.
    begin
       for I in Sizes'Range loop
          declare

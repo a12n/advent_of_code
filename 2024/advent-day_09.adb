@@ -1,6 +1,4 @@
 package body Advent.Day_09 is
-   package Block_Size_Text_IO is new Ada.Text_IO.Integer_IO (Block_Size);
-
    function Checksum (Blocks : Block_Array) return Natural is
       function Triangular (N : Natural) return Natural is (N * (N + 1) / 2);
 

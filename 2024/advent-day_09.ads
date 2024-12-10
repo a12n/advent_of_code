@@ -13,8 +13,9 @@ package Advent.Day_09 is
       Previous : Link_Type := 0;
    end record with
      Size => 64;
-
    type Block_Array is array (Positive range <>) of Block;
+
+   package Block_Size_Text_IO is new Ada.Text_IO.Integer_IO (Block_Size);
 
    function Checksum (Blocks : Block_Array) return Natural;
 

@@ -55,6 +55,7 @@ package body Advent.Day_09 is
 
    procedure Rearrange (Blocks : in out Block_Array) is
    begin
+      --  TODO: Look up available spaces faster?
       for J in reverse Blocks'Range loop
          if File_Block (Blocks (J).ID) then
             for I in Blocks'First .. J - 1 loop

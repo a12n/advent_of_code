@@ -71,12 +71,9 @@ package body Advent.Day_09 is
                      Blocks (J).ID   := -1;
                      --  Make next dormant space block available for the
                      --  I space size left.
-                     if not Space_Block (Blocks (I + 1).ID) or
-                       Blocks (I + 1).Size /= 0
-                     then
-                        raise Constraint_Error;
+                     if Space_Block (Blocks (I + 1).ID) and Blocks (I + 1).Size = 0 then
+                        Blocks (I + 1).Size := Size_Left;
                      end if;
-                     Blocks (I + 1).Size := Size_Left;
                   end;
                   exit;
                end if;

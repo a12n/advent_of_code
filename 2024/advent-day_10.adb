@@ -26,6 +26,29 @@ package body Advent.Day_10 is
       return Map;
    end Input;
 
+   function Number_Trails (Map : Height_Map; Pos : Position) return Natural is
+   begin
+      Put_Line (Standard_Error, Pos'Image);
+      if Map (Pos (1), Pos (2)) = 9 then
+         Put_Line (Standard_Error, Height'Image (9));
+         return 1;
+      end if;
+      declare
+         N    : Natural := 0;
+         Next : Position;
+      begin
+         for Dir in To_Offset'Range loop
+            Next := Pos + To_Offset (Dir);
+            if Next (1) in Map'Range (1) and then Next (2) in Map'Range (2)
+              and then Map (Next (1), Next (2)) = Map (Pos (1), Pos (2)) + 1
+            then
+               N := N + Number_Trails (Map, Next);
+            end if;
+         end loop;
+         return N;
+      end;
+   end Number_Trails;
+
    function Peaks (Map : Height_Map; Pos : Position) return Peak_Map is
       Peaks : Peak_Map (Map'Range (1), Map'Range (2)) :=
         [others => [others => False]];

@@ -1,6 +1,6 @@
 package body Advent.Day_11 is
    function Number_Stones
-     (Splitter : in out Stone_Splitter; Stone : Stone_Type; Times : Natural)
+     (Splitter : in out Stone_Splitter; Stone : Stone_Type; Blinks : Natural)
       return Natural
    is
       function Number_Digits (Stone : Stone_Type) return Positive is
@@ -14,12 +14,12 @@ package body Advent.Day_11 is
          return M;
       end Number_Digits;
    begin
-      if Times = 0 then
+      if Blinks = 0 then
          return 0;
       end if;
 
       if Stone = 0 then
-         return Number_Stones (Splitter, 1, Times - 1);
+         return Number_Stones (Splitter, 1, Blinks - 1);
       end if;
 
       declare
@@ -27,10 +27,11 @@ package body Advent.Day_11 is
       begin
          if N mod 2 = 0 then
             return
-              Number_Stones (Splitter, Stone / (10**(N / 2)), Times - 1) +
-              Number_Stones (Splitter, Stone mod (10**(N / 2)), Times - 1) + 1;
+              Number_Stones (Splitter, Stone / (10**(N / 2)), Blinks - 1) +
+              Number_Stones (Splitter, Stone mod (10**(N / 2)), Blinks - 1) +
+              1;
          else
-            return Number_Stones (Splitter, Stone * 2_024, Times - 1);
+            return Number_Stones (Splitter, Stone * 2_024, Blinks - 1);
          end if;
       end;
    end Number_Stones;

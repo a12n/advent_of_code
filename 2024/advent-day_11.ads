@@ -8,7 +8,7 @@ package Advent.Day_11 is
    package Stone_Text_IO is new Ada.Text_IO.Integer_IO (Stone_Type);
 
    function Number_Stones
-     (Splitter : in out Stone_Splitter; Stone : Stone_Type; Times : Natural)
+     (Splitter : in out Stone_Splitter; Stone : Stone_Type; Blinks : Natural)
       return Natural;
 private
    --  type State is record

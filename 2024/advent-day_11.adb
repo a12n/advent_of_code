@@ -1,40 +1,37 @@
 package body Advent.Day_11 is
-   function Number_Digits (N : Number) return Positive;
-
-   procedure Blink
-     (Count : in out Natural; N : in Number; Times : in Natural := 1)
+   function Number_Stones
+     (Splitter : in out Stone_Splitter; Stone : Stone_Type; Times : Natural)
+      return Natural
    is
+      function Number_Digits (Stone : Stone_Type) return Positive is
+         N : Stone_Type := Stone;
+         M : Positive   := 1;
+      begin
+         while N > 9 loop
+            N := N / 10;
+            M := M + 1;
+         end loop;
+         return M;
+      end Number_Digits;
    begin
       if Times = 0 then
-         return;
+         return 0;
       end if;
 
-      if N = 0 then
-         Blink (Count, 1, Times - 1);
-         return;
+      if Stone = 0 then
+         return Number_Stones (Splitter, 1, Times - 1);
       end if;
 
       declare
-         K : constant Positive := Number_Digits (N);
+         N : constant Positive := Number_Digits (Stone);
       begin
-         if K mod 2 = 0 then
-            Blink (Count, N / (10**(K / 2)), Times - 1);
-            Count := Count + 1;
-            Blink (Count, N mod (10**(K / 2)), Times - 1);
+         if N mod 2 = 0 then
+            return
+              Number_Stones (Splitter, Stone / (10**(N / 2)), Times - 1) +
+              Number_Stones (Splitter, Stone mod (10**(N / 2)), Times - 1) + 1;
          else
-            Blink (Count, N * 2_024, Times - 1);
+            return Number_Stones (Splitter, Stone * 2_024, Times - 1);
          end if;
       end;
-   end Blink;
-
-   function Number_Digits (N : Number) return Positive is
-      M : Number   := N;
-      K : Positive := 1;
-   begin
-      while M > 9 loop
-         M := M / 10;
-         K := K + 1;
-      end loop;
-      return K;
-   end Number_Digits;
+   end Number_Stones;
 end Advent.Day_11;

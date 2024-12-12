@@ -1,4 +1,15 @@
 package body Advent.Day_11 is
+   function "<" (A, B : State) return Boolean is
+   begin
+      if A.Stone < B.Stone then
+         return True;
+      elsif A.Stone > B.Stone then
+         return False;
+      else
+         return A.Blinks < B.Blinks;
+      end if;
+   end "<";
+
    function Number_Stones
      (Splitter : in out Stone_Splitter; Stone : Stone_Type; Blinks : Natural)
       return Natural

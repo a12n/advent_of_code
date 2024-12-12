@@ -1,4 +1,4 @@
-with Ada.Containers.Hashed_Maps;
+with Ada.Containers.Ordered_Maps;
 with Ada.Text_IO; use Ada.Text_IO;
 
 package Advent.Day_11 is
@@ -11,18 +11,19 @@ package Advent.Day_11 is
      (Splitter : in out Stone_Splitter; Stone : Stone_Type; Blinks : Natural)
       return Natural;
 private
-   --  type State is record
-   --     Stone  : Stone_Type;
-   --     Blinks : Positive;
-   --  end record;
-   --
-   --  package State_Hashed_Map is new Ada.Containers.Hashed_Maps
-   --    (Key_Type => State, Element_Type => Natural);
-   --
-   --  use State_Hashed_Map;
+   type State is record
+      Stone  : Stone_Type;
+      Blinks : Positive;
+   end record;
+
+   function "<" (A, B : State) return Boolean;
+
+   package State_Maps is new Ada.Containers.Ordered_Maps
+     (Key_Type => State, Element_Type => Count_Type);
+
+   use State_Maps;
 
    type Stone_Splitter is record
-      --  Cache : Map := Empty_Map;
-      null;
+      Cache : Map;
    end record;
 end Advent.Day_11;

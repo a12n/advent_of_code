@@ -24,26 +24,35 @@ package body Advent.Day_11 is
          end loop;
          return M;
       end Number_Digits;
+
+      Position : Cursor;
+      Count    : Natural;
+      K        : Positive;
    begin
       if Blinks = 0 then
          return 0;
       end if;
 
-      if Stone = 0 then
-         return Number_Stones (Splitter, 1, Blinks - 1);
+      Position := Splitter.Cache.Find ((Stone, Blinks));
+      if Position /= No_Element then
+         return Position.Element;
       end if;
 
-      declare
-         N : constant Positive := Number_Digits (Stone);
-      begin
-         if N mod 2 = 0 then
-            return
-              Number_Stones (Splitter, Stone / (10**(N / 2)), Blinks - 1) +
-              Number_Stones (Splitter, Stone mod (10**(N / 2)), Blinks - 1) +
+      if Stone = 0 then
+         Count := Number_Stones (Splitter, 1, Blinks - 1);
+      else
+         K := Number_Digits (Stone);
+         if K mod 2 = 0 then
+            Count :=
+              Number_Stones (Splitter, Stone / (10**(K / 2)), Blinks - 1) +
+              Number_Stones (Splitter, Stone mod (10**(K / 2)), Blinks - 1) +
               1;
          else
-            return Number_Stones (Splitter, Stone * 2_024, Blinks - 1);
+            Count := Number_Stones (Splitter, Stone * 2_024, Blinks - 1);
          end if;
-      end;
+      end if;
+
+      Splitter.Cache.Insert ((Stone, Blinks), Count);
+      return Count;
    end Number_Stones;
 end Advent.Day_11;

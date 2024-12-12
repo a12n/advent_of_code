@@ -12,7 +12,7 @@ package body Advent.Day_11 is
 
    function Number_Stones
      (Splitter : in out Stone_Splitter; Stone : Stone_Type; Blinks : Natural)
-      return Natural
+      return Count_Type
    is
       function Number_Digits (Stone : Stone_Type) return Positive is
          N : Stone_Type := Stone;
@@ -26,7 +26,7 @@ package body Advent.Day_11 is
       end Number_Digits;
 
       Position : Cursor;
-      Count    : Natural;
+      Count    : Count_Type;
       K        : Positive;
    begin
       if Blinks = 0 then

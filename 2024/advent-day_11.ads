@@ -2,14 +2,15 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Text_IO; use Ada.Text_IO;
 
 package Advent.Day_11 is
-   type Stone_Splitter is limited private;
+   type Count_Type is range 0 .. 2**64;
    type Stone_Type is range 0 .. 2**64;
+   type Stone_Splitter is limited private;
 
    package Stone_Text_IO is new Ada.Text_IO.Integer_IO (Stone_Type);
 
    function Number_Stones
      (Splitter : in out Stone_Splitter; Stone : Stone_Type; Blinks : Natural)
-      return Natural;
+      return Count_Type;
 private
    type State is record
       Stone  : Stone_Type;

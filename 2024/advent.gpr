@@ -9,6 +9,7 @@ project Advent is
          "-gnat2022",
          "-gnatW8",
          "-gnatX",
+         "-gnata",
          "-gnatf",
          "-march=native",
          -- Warning modes

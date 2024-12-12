@@ -1,20 +1,20 @@
 package body Advent.Day_12 is
    function Input (File : File_Type) return Garden is
-      Line  : constant String := Get_Line (File);
-      Plots : Garden (Line'Range, Line'Range);
+      Line   : constant String := Get_Line (File);
+      Plants : Garden (Line'Range, Line'Range);
    begin
       for Col in Line'Range loop
-         Plots (1, Col) := Line (Col);
+         Plants (1, Col) := Line (Col);
       end loop;
-      for Row in Plots'First (1) + 1 .. Plots'Last (1) loop
-         for Col in Plots'Range (2) loop
-            Get (File, Plots (Row, Col));
+      for Row in Plants'First (1) + 1 .. Plants'Last (1) loop
+         for Col in Plants'Range (2) loop
+            Get (File, Plants (Row, Col));
          end loop;
       end loop;
-      return Plots;
+      return Plants;
    end Input;
 
-   function Total_Price(Plots:Garden) return Natural is
+   function Total_Price (Plants : Garden) return Natural is
    begin
       --  TODO
       return 0;

@@ -10,27 +10,26 @@ package body Advent.Day_10 is
          end case;
       end Parse;
 
-      Line : constant String := Get_Line (File);
-      Map  : Height_Map (Line'Range, Line'Range);
-      Next : Character;
+      Line    : constant String := Get_Line (File);
+      Heights : Height_Map (Line'Range, Line'Range);
+      Next    : Character;
    begin
       for I in Line'Range loop
-         Map (1, I) := Parse (Line (I));
+         Heights (1, I) := Parse (Line (I));
       end loop;
-      for I in 2 .. Map'Last (1) loop
-         for J in Map'Range (2) loop
+      for I in 2 .. Heights'Last (1) loop
+         for J in Heights'Range (2) loop
             Get (File, Next);
-            Map (I, J) := Parse (Next);
+            Heights (I, J) := Parse (Next);
          end loop;
       end loop;
-      return Map;
+      return Heights;
    end Input;
 
-   function Number_Trails (Map : Height_Map; Pos : Position) return Natural is
+   function Number_Trails (Heights : Height_Map; Pos : Position) return Natural
+   is
    begin
-      Put_Line (Standard_Error, Pos'Image);
-      if Map (Pos (1), Pos (2)) = 9 then
-         Put_Line (Standard_Error, Height'Image (9));
+      if Heights (Pos (1), Pos (2)) = 9 then
          return 1;
       end if;
       declare
@@ -39,26 +38,30 @@ package body Advent.Day_10 is
       begin
          for Dir in To_Offset'Range loop
             Next := Pos + To_Offset (Dir);
-            if Next (1) in Map'Range (1) and then Next (2) in Map'Range (2)
-              and then Map (Next (1), Next (2)) = Map (Pos (1), Pos (2)) + 1
+            if Next (1) in Heights'Range (1)
+              and then Next (2) in Heights'Range (2)
+              and then Heights (Next (1), Next (2)) =
+                Heights (Pos (1), Pos (2)) + 1
             then
-               N := N + Number_Trails (Map, Next);
+               N := N + Number_Trails (Heights, Next);
             end if;
          end loop;
          return N;
       end;
    end Number_Trails;
 
-   function Peaks (Map : Height_Map; Pos : Position) return Peak_Map is
-      Peaks : Peak_Map (Map'Range (1), Map'Range (2)) :=
+   function Peaks (Heights : Height_Map; Pos : Position) return Peak_Map is
+      Peaks : Peak_Map (Heights'Range (1), Heights'Range (2)) :=
         [others => [others => False]];
 
       procedure Hike (Pos : Position) is
       begin
-         if Pos (1) not in Map'Range (1) or Pos (2) not in Map'Range (2) then
+         if Pos (1) not in Heights'Range (1) or
+           Pos (2) not in Heights'Range (2)
+         then
             return;
          end if;
-         if Map (Pos (1), Pos (2)) = 9 then
+         if Heights (Pos (1), Pos (2)) = 9 then
             Peaks (Pos (1), Pos (2)) := True;
             return;
          end if;
@@ -66,8 +69,12 @@ package body Advent.Day_10 is
             declare
                Next : constant Position := Pos + To_Offset (Dir);
             begin
-               if Next (1) in Map'Range (1) and Next (2) in Map'Range (2) then
-                  if Map (Next (1), Next (2)) = Map (Pos (1), Pos (2)) + 1 then
+               if Next (1) in Heights'Range (1) and
+                 Next (2) in Heights'Range (2)
+               then
+                  if Heights (Next (1), Next (2)) =
+                    Heights (Pos (1), Pos (2)) + 1
+                  then
                      Hike (Next);
                   end if;
                end if;

@@ -1,5 +1,4 @@
 with Ada.Text_IO;  use Ada.Text_IO;
-with Advent.Grids; use Advent.Grids;
 
 package Advent.Day_13 is
    --  Button A: X+94, Y+34
@@ -18,10 +17,26 @@ package Advent.Day_13 is
    --
    --  Maybe infeasible.
 
+   type Push_Count is record
+      A, B : Natural range 0 .. 100;
+   end record;
+
+   type Offset is record
+      X, Y : Natural range 0 .. 100;
+   end record;
+
+   type Position is record
+      X, Y : Natural range 0 .. 30_000;
+   end record;
+
    type Claw_Machine is record
       A, B  : Offset;
       Prize : Position;
    end record;
 
+   function Cost (Pushes : Push_Count) return Natural is
+     (3 * Pushes.A + Pushes.B);
    function Input_Entry (File : File_Type) return Claw_Machine;
+   function Solution
+     (Machine : in Claw_Machine; Pushes : out Push_Count) return Boolean;
 end Advent.Day_13;

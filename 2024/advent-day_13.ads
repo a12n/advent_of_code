@@ -1,3 +1,6 @@
+with Ada.Text_IO;  use Ada.Text_IO;
+with Advent.Grids; use Advent.Grids;
+
 package Advent.Day_13 is
    --  Button A: X+94, Y+34
    --  Button B: X+22, Y+67
@@ -14,4 +17,11 @@ package Advent.Day_13 is
    --  min Cost
    --
    --  Maybe infeasible.
+
+   type Claw_Machine is record
+      A, B  : Offset;
+      Prize : Position;
+   end record;
+
+   function Input_Entry (File : File_Type) return Claw_Machine;
 end Advent.Day_13;

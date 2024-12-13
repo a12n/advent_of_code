@@ -2,10 +2,10 @@ with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
 package body Advent.Day_13 is
    function Input_Entry (File : File_Type) return Claw_Machine is
-      A_Line     : constant String := Get_Line (File);
-      B_Line     : constant String := Get_Line (File);
-      Prize_Line : constant String := Get_Line (File);
-      Start      : Positive        := 1;
+      A_Line     : String   := Get_Line (File);
+      B_Line     : String   := Get_Line (File);
+      Prize_Line : String   := Get_Line (File);
+      Start      : Positive := 1;
       Machine    : Claw_Machine;
 
       procedure Replace_Non_Digits (Line : in out String) is
@@ -23,6 +23,14 @@ package body Advent.Day_13 is
       then
          raise Constraint_Error;
       end if;
+
+      --  Skip next empty line.
+      begin
+         Skip_Line (File);
+      exception
+         when End_Error =>
+            null;
+      end;
 
       Replace_Non_Digits (A_Line);
       Replace_Non_Digits (B_Line);

@@ -2,11 +2,18 @@ with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
 package body Advent.Day_13 is
    function Input_Entry (File : File_Type) return Claw_Machine is
-      A_Line     : String   := Get_Line (File);
-      B_Line     : String   := Get_Line (File);
-      Prize_Line : String   := Get_Line (File);
-      Start      : Positive := 1;
-      Machine    : Claw_Machine;
+      package Offset_Text_IO is new Ada.Text_IO.Integer_IO (Offset);
+      package Position_Text_IO is new Ada.Text_IO.Integer_IO (Position);
+
+      use Offset_Text_IO;
+      use Position_Text_IO;
+
+      A_Line     : String := Get_Line (File);
+      B_Line     : String := Get_Line (File);
+      Prize_Line : String := Get_Line (File);
+
+      Start   : Positive := 1;
+      Machine : Claw_Machine;
 
       procedure Replace_Non_Digits (Line : in out String) is
       begin
@@ -53,8 +60,12 @@ package body Advent.Day_13 is
    begin
       for N in 0 .. 100 loop
          for M in 0 .. 100 loop
-            if Machine.A.X * N + Machine.B.X * M = Machine.Prize.X and
-              Machine.A.Y * N + Machine.B.Y * M = Machine.Prize.Y
+            if Position (Machine.A.X) * Position (N) +
+              Position (Machine.B.X) * Position (M) =
+              Machine.Prize.X and
+              Position (Machine.A.Y) * Position (N) +
+                  Position (Machine.B.Y) * Position (M) =
+                Machine.Prize.Y
             then
                if Cost ((N, M)) < Min_Cost then
                   Min_Cost := Cost ((N, M));
@@ -65,4 +76,39 @@ package body Advent.Day_13 is
       end loop;
       return Min_Cost /= Natural'Last;
    end Solution;
+
+   function Solution2
+     (Machine : in Claw_Machine; Pushes : out Push_Count) return Boolean
+   is
+      function "/" (N, M : Position) return Position is
+      begin
+         if N mod M /= 0 then
+            Put_Line (Standard_Error, N'Image & "/" & M'Image);
+            raise Constraint_Error;
+         end if;
+         return N / M;
+      end "/";
+
+      P_y : Position renames Machine.Prize.Y;
+      P_x : Position renames Machine.Prize.X;
+      A_x : Offset renames Machine.A.X;
+      A_y : Offset renames Machine.A.Y;
+      B_x : Offset renames Machine.B.X;
+      B_y : Offset renames Machine.B.Y;
+   begin
+      Pushes.A :=
+        Natural
+          ((P_y - (Position (B_y) * P_x) / Position (B_x)) /
+           (Position (A_y) -
+            (Position (B_y) * Position (A_x)) / Position (B_x)));
+      Pushes.B :=
+        Natural
+          ((P_y - (Position (A_y) * P_x) / Position (A_x)) /
+           (Position (B_y) +
+            (Position (A_y) * Position (B_x)) / Position (A_x)));
+      return True;
+   exception
+      when Constraint_Error =>
+         return False;
+   end Solution2;
 end Advent.Day_13;

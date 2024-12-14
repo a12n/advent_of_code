@@ -98,59 +98,76 @@ package body Advent.Day_06 is
       --        same direction and there are no obstructions between P
       --        and start of the Q?
 
-         --  case Line_Direction (Path (I), Path (I - 1)) is
-         --     when Left =>
-         --        --  Find a line going up, with Line_Col > This_End_Col of the segment.
-         --        --  If this Line_Row < This_End_Row, there must be no
-         --        --  obstructions on the way from this segment to the
-         --        --  start of this line. Add obstruction on position
-         --        --  (This_End_Row,Line_Col-1).
-         --        null;
-         --     when Right =>
-         --        --  Find a line going down, with Line_Col < This_End_Col.
-         --        null;
-         --     when Down =>
-         --        null;
-         --     when Up =>
-         --        --  Find a line going right, with Line_Row >
-         --        --  This_Begin_Row and Line_Row < This_End_Row.
-         --        null;
-         --  end case;
+      --  case Line_Direction (Path (I), Path (I - 1)) is
+      --     when Left =>
+      --        --  Find a line going up, with Line_Col > This_End_Col of the segment.
+      --        --  If this Line_Row < This_End_Row, there must be no
+      --        --  obstructions on the way from this segment to the
+      --        --  start of this line. Add obstruction on position
+      --        --  (This_End_Row,Line_Col-1).
+      --        null;
+      --     when Right =>
+      --        --  Find a line going down, with Line_Col < This_End_Col.
+      --        null;
+      --     when Down =>
+      --        null;
+      --     when Up =>
+      --        --  Find a line going right, with Line_Row >
+      --        --  This_Begin_Row and Line_Row < This_End_Row.
+      --        null;
+      --  end case;
 
-      for I in Path'First + 3 .. Path'Last loop
-         declare
-            A : Position renames Path (I - 1);
-            B : Position renames Path (I);
-         begin
-            case Line_Direction (A, B) is
-               when Left =>
+      for I in Path'First + 4 .. Path'Last loop
+         for J in Path'First + 1 .. I - 3 loop
+            declare
+               --  This line.
+               A        : Position renames Path (I - 1);
+               B        : Position renames Path (I);
+               This_Dir : constant Direction := Line_Direction (A, B);
+
+               --  One of the previous lines.
+               C        : Position renames Path (J - 1);
+               D        : Position renames Path (J);
+               Pred_Dir : constant Direction := Line_Direction (C, D);
+
+               --  Renames points and values of the current line.
+               This_Begin_Row : Integer renames A (1);
+               This_End_Row   : Integer renames B (1);
+               This_Begin_Col : Integer renames A (2);
+               This_End_Col   : Integer renames B (2);
+               This_Row       : Integer renames This_Begin_Row;
+               This_Col       : Integer renames This_Begin_Col;
+
+               --  Renames points and values of a predecessor line.
+               Pred_Begin_Row : Integer renames C (1);
+               Pred_End_Row   : Integer renames D (1);
+               Pred_Begin_Col : Integer renames C (2);
+               Pred_End_Col   : Integer renames D (2);
+               Pred_Row       : Integer renames Pred_Begin_Row;
+               Pred_Col       : Integer renames Pred_Begin_Col;
+            begin
+               if This_Dir = Down and Pred_Dir = Left then
+                  --  TODO
                   null;
-               when Right =>
+               elsif This_Dir = Left and Pred_Dir = Up then
+                  --  TODO
                   null;
-               when Down =>
+               elsif This_Dir = Right and Pred_Dir = Down then
+                  --  TODO
                   null;
-               when Up =>
-                  for J in Path'First + 1 .. I - 3 loop
-                     declare
-                        C : Position renames Path (J - 1);
-                        D : Position renames Path (J);
-                     begin
-                        if Line_Direction (C, D) = Right and
-                          C (1) in A (1) - 1 .. B (1) + 1 and D (2) > A (2)
-                        then
-                           if C (2) <= A (2) or
-                             (for all Col in A (2) + 1 .. C (2) - 1 =>
-                                not Blocked (C (1), Col))
-                           then
-                              Put_Line
-                                (Standard_Error,
-                                 Position'(C (1) - 1, A (2))'Image);
-                           end if;
-                        end if;
-                     end;
-                  end loop;
-            end case;
-         end;
+               elsif This_Dir = Up and Pred_Dir = Right and
+                 Pred_Row in This_End_Row + 1 .. This_Begin_Row - 1 and
+                 Pred_End_Col > This_Col and
+                 (Pred_Begin_Col <= This_Col or
+                  (for all Col in This_Col + 1 .. Pred_Begin_Col - 1 =>
+                     not Blocked (Pred_Row, Col)))
+               then
+                  Put_Line
+                    (Standard_Error, Position'(Pred_Row - 1, This_Col)'Image);
+                  N := N + 1;
+               end if;
+            end;
+         end loop;
       end loop;
 
       return N;

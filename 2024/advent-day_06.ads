@@ -16,6 +16,9 @@ package Advent.Day_06 is
 
    function Loop_Obstructions (Path : Polygonal_Chain) return Position_Array;
 
+   function Number_Loops
+     (Blocked : Boolean_Grid; Path : Polygonal_Chain) return Natural;
+
    function Walk
      (Blocked : Boolean_Grid; Guard : Position; Guard_Dir : Direction)
       return Boolean_Grid with

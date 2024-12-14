@@ -18,6 +18,8 @@ package Advent.Grids is
    function Is_Vertical_Line (P, Q : Position) return Boolean is
      (P (2) = Q (2) and P (1) /= Q (1));
 
+   function Line_Direction (P, Q : Position) return Direction;
+
    function "*" (V : Offset; N : Integer) return Offset is
      [V (1) * N, V (2) * N];
    function "+" (P : Position; V : Offset) return Position is

@@ -9,5 +9,15 @@ procedure Day_15_2 is
 begin
    Put_Line (Standard_Error, "Robot_Pos" & Robot_Pos'Image);
    Put_Line (Standard_Error, "Warehouse" & Warehouse'Image);
+
+   for I in Positive'Range loop
+      begin
+         Robot_Pos := Move (Warehouse, Robot_Pos, Get_Move (Standard_Input));
+      exception
+         when End_Error =>
+            exit;
+      end;
+   end loop;
+
    --  TODO
 end Day_15_2;

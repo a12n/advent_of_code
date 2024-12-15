@@ -71,8 +71,10 @@ package body Advent.Day_06 is
       Dir  : Direction := Guard_Dir;
       Pos  : Position  := Guard_Pos;
       Next : Position;
+
+      Added : Blocked_Map (Blocked'Range (1), Blocked'Range (2)) :=
+        [others => [others => False]];
    begin
-      Number_Loops := 0;
       loop
          if not Visited (Pos (1), Pos (2), Dir) then
             Visited (Pos (1), Pos (2), Dir) := True;
@@ -97,10 +99,19 @@ package body Advent.Day_06 is
             exception
                when Loop_Error =>
                   Put_Line (Standard_Error, Next'Image);
-                  Number_Loops := Number_Loops + 1;
+                  Added (Next (1), Next (2)) := True;
             end;
             Pos := Next;
          end if;
+      end loop;
+
+      Number_Loops := 0;
+      for Row in Added'Range (1) loop
+         for Col in Added'Range (2) loop
+            if Added (Row, Col) then
+               Number_Loops := Number_Loops + 1;
+            end if;
+         end loop;
       end loop;
    end Walk;
 

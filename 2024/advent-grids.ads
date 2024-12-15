@@ -22,6 +22,8 @@ package Advent.Grids is
 
    function "*" (V : Offset; N : Integer) return Offset is
      [V (1) * N, V (2) * N];
+   function "+" (U, V : Offset) return Offset is
+     [U (1) + V (1), U (2) + V (2)];
    function "+" (P : Position; V : Offset) return Position is
      [P (1) + V (1), P (2) + V (2)];
    function "-" (P : Position; V : Offset) return Position is

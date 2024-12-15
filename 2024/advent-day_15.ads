@@ -9,6 +9,8 @@ package Advent.Day_15 is
    type Warehouse_Map is
      array (Positive range <>, Positive range <>) of Character;
 
+   function GPS_Coordinate (Pos : Position) return Natural is
+     (100 * (Pos (1) - 1) + (Pos (2) - 1));
    function Get_Move (File : File_Type) return Direction;
    function Get_Warehouse
      (File : File_Type; Robot : out Position) return Warehouse_Map;

@@ -157,9 +157,17 @@ package body Advent.Day_06 is
                     (Standard_Error, Position'(Pred_Row + 1, This_Col)'Image);
                   --  FIXME: Duplicate potential obstruction positions?
                   N := N + 1;
-               elsif This_Dir = Left and Pred_Dir = Up then
-                  --  TODO
-                  null;
+               elsif This_Dir = Left and Pred_Dir = Up and
+                 Pred_Col in This_End_Col + 1 .. This_Begin_Col - 1 and
+                 Pred_End_Row < This_Row and
+                 (Pred_Begin_Row >= This_Row or
+                  (for all Row in Pred_Begin_Row + 1 .. This_Row - 1 =>
+                     not Blocked (Row, Pred_Col)))
+               then
+                  Put_Line
+                    (Standard_Error, Position'(This_Row, Pred_Col - 1)'Image);
+                  --  FIXME: Duplicates?
+                  N := N + 1;
                elsif This_Dir = Right and Pred_Dir = Down and
                  Pred_Col in This_Begin_Col + 1 .. This_End_Col - 1 and
                  Pred_End_Row > This_Row and

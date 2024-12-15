@@ -58,32 +58,57 @@ package body Advent.Day_15 is
    end Get_Warehouse;
 
    function Move
-     (Warehouse : in out Warehouse_Map; Pos : in out Position; Dir : Direction)
-      return Boolean
+     (Warehouse : in out Warehouse_Map; Pos : Position; Dir : Direction)
+      return Position
    is
       Next      : Position := Pos + To_Offset (Dir);
       This_Tile : Tile renames Warehouse (Pos (1), Pos (2));
       Next_Tile : Tile renames Warehouse (Next (1), Next (2));
    begin
+      --  Put_Line
+      --    (Standard_Error,
+      --     "Pos " & Pos'Image & ", Dir " & Dir'Image & ", Next " & Next'Image);
+      --  Put_Line (Standard_Error, "This " & This_Tile'Image);
       case Next_Tile is
          when Box =>
-            if Move (Warehouse, Next, Dir) then
+            --  Put_Line (Standard_Error, "Next " & Next_Tile'Image);
+            if Move (Warehouse, Next, Dir) /= Next then
                Next_Tile := This_Tile;
                This_Tile := Empty;
-               Pos       := Next;
-               return True;
+               return Next;
             else
-               return False;
+               return Pos;
             end if;
          when Empty =>
+            --  Put_Line (Standard_Error, "Next " & Next_Tile'Image);
             Next_Tile := This_Tile;
             This_Tile := Empty;
-            Pos       := Next;
-            return True;
+            return Next;
          when Wall =>
-            return False;
+            --  Put_Line (Standard_Error, "Next " & Next_Tile'Image);
+            return Pos;
          when others =>
+            --  Put_Line (Standard_Error, "Next " & Next_Tile'Image);
             raise Constraint_Error;
       end case;
    end Move;
+
+   procedure Print (File : File_Type; Warehouse : Warehouse_Map) is
+   begin
+      for Row in Warehouse'Range (1) loop
+         for Col in Warehouse'Range (2) loop
+            case Warehouse (Row, Col) is
+               when Empty =>
+                  Put (File, " ");
+               when Wall =>
+                  Put (File, "#");
+               when Box =>
+                  Put (File, "O");
+               when Robot =>
+                  Put (File, "@");
+            end case;
+         end loop;
+         New_Line (File);
+      end loop;
+   end Print;
 end Advent.Day_15;

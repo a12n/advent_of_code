@@ -95,7 +95,7 @@ package body Advent.Day_06 is
                  [others => [others => [others => False]]];
             begin
                Blocked2 (Next (1), Next (2)) := True;
-               Walk (Blocked2, Pos, Dir, Visited2);
+               Walk (Blocked2, Guard_Pos, Guard_Dir, Visited2);
             exception
                when Loop_Error =>
                   Put_Line (Standard_Error, Next'Image);

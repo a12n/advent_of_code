@@ -26,7 +26,7 @@ begin
    begin
       for Row in Warehouse'Range (1) loop
          for Col in Warehouse'Range (2) loop
-            if Warehouse (Row, Col) = Box_Tile then
+            if Warehouse (Row, Col) = Box then
                Sum := Sum + GPS_Coordinate ([Row, Col]);
             end if;
          end loop;

@@ -18,19 +18,24 @@ package body Advent.Day_15 is
    end Get_Move;
 
    function Get_Warehouse
-     (File : File_Type; Robot : out Position) return Warehouse_Map
+     (File : File_Type; Robot_Pos : out Position) return Warehouse_Map
    is
-      Line      : constant String := Get_Line (File);
-      Warehouse : Warehouse_Map (Line'Range, Line'Range);
+      Line      : constant String                        := Get_Line (File);
+      Warehouse : Warehouse_Map (Line'Range, Line'Range) :=
+        [others => [others => Wall]];
 
       procedure Process (Pos : Position; Char : Character) is
       begin
          case Char is
-            when Wall_Tile | '.' | Box_Tile =>
-               Warehouse (Pos (1), Pos (2)) := Char;
-            when Robot_Tile =>
-               Warehouse (Pos (1), Pos (2)) := '.';
-               Robot                        := Pos;
+            when '.' =>
+               Warehouse (Pos (1), Pos (2)) := Empty;
+            when '#' =>
+               Warehouse (Pos (1), Pos (2)) := Wall;
+            when 'O' =>
+               Warehouse (Pos (1), Pos (2)) := Box;
+            when '@' =>
+               Warehouse (Pos (1), Pos (2)) := Robot;
+               Robot_Pos                    := Pos;
             when others =>
                raise Constraint_Error;
          end case;

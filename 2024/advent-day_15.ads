@@ -14,4 +14,7 @@ package Advent.Day_15 is
    function Get_Move (File : File_Type) return Direction;
    function Get_Warehouse
      (File : File_Type; Robot : out Position) return Warehouse_Map;
+   function Move
+     (Warehouse : in out Warehouse_Map; Pos : in out Position; Dir : Direction)
+      return Boolean;
 end Advent.Day_15;

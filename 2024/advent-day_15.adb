@@ -51,4 +51,12 @@ package body Advent.Day_15 is
       end loop;
       return Warehouse;
    end Get_Warehouse;
+
+   function Move
+     (Warehouse : in out Warehouse_Map; Pos : in out Position; Dir : Direction)
+      return Boolean is
+   begin
+      --  TODO
+      return False;
+   end Move;
 end Advent.Day_15;

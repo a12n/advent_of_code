@@ -8,7 +8,7 @@ procedure Day_15_2 is
      Widen (Get_Warehouse (Standard_Input, Robot_Pos), Robot_Pos);
 begin
    Put_Line (Standard_Error, "Robot_Pos" & Robot_Pos'Image);
-   Put_Line (Standard_Error, "Warehouse" & Warehouse'Image);
+   Print (Standard_Error, Warehouse);
 
    for I in Positive'Range loop
       begin

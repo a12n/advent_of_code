@@ -26,6 +26,12 @@ package Advent.Day_15 is
      Pre =>
       Pos (1) in Warehouse'Range (1) and Pos (2) in Warehouse'Range (2) and
       Warehouse (Pos (1), Pos (2)) in Box .. Robot;
+   function Move
+     (Warehouse : in out Wide_Warehouse_Map; Pos : Position; Dir : Direction)
+      return Position with
+     Pre =>
+      Pos (1) in Warehouse'Range (1) and Pos (2) in Warehouse'Range (2) and
+      Warehouse (Pos (1), Pos (2)) in Box .. Box_Right;
 
    procedure Print (File : File_Type; Warehouse : Warehouse_Map);
    procedure Print (File : File_Type; Warehouse : Wide_Warehouse_Map);

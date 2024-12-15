@@ -93,6 +93,15 @@ package body Advent.Day_15 is
       end case;
    end Move;
 
+   function Move
+     (Warehouse : in out Wide_Warehouse_Map; Pos : Position; Dir : Direction)
+      return Position
+   is
+   begin
+      --  TODO
+      return Pos;
+   end Move;
+
    procedure Print (File : File_Type; Warehouse : Warehouse_Map) is
    begin
       for Row in Warehouse'Range (1) loop

@@ -150,9 +150,79 @@ package body Advent.Day_12 is
    end Flood_Fill;
 
    function Number_Sides (Polygon : Visited_Map) return Positive is
+      N     : Natural := 0;
+      Sides :
+        array (Direction, Polygon'Range (1), Polygon'Range (2)) of Natural :=
+        [others => [others => [others => 0]]];
    begin
-      --  TODO
-      return 4;
+      --  From Up
+      for Col in Polygon'Range (2) loop
+         for Row in Polygon'Range (1) loop
+            if Polygon (Row, Col) and Edge (Polygon, Row, Col, Up) then
+               if Col = Polygon'First (2) or else Sides (Up, Row, Col - 1) = 0
+               then
+                  N                    := N + 1;
+                  Sides (Up, Row, Col) := N;
+               else
+                  Sides (Up, Row, Col) := Sides (Up, Row, Col - 1);
+               end if;
+            end if;
+         end loop;
+      end loop;
+      Put_Line (Standard_Error, "Sides up" & Sides'Image);
+
+      --  From Left
+      for Row in Polygon'Range (1) loop
+         for Col in Polygon'Range (2) loop
+            if Polygon (Row, Col) and Edge (Polygon, Row, Col, Left) then
+               if Row = Polygon'First (1)
+                 or else Sides (Left, Row - 1, Col) = 0
+               then
+                  N                      := N + 1;
+                  Sides (Left, Row, Col) := N;
+               else
+                  Sides (Left, Row, Col) := Sides (Left, Row - 1, Col);
+               end if;
+            end if;
+         end loop;
+      end loop;
+      Put_Line (Standard_Error, "Sides left" & Sides'Image);
+
+      --  From Right
+      for Row in Polygon'Range (1) loop
+         for Col in reverse Polygon'Range (2) loop
+            if Polygon (Row, Col) and Edge (Polygon, Row, Col, Right) then
+               if Row = Polygon'First (1)
+                 or else Sides (Right, Row - 1, Col) = 0
+               then
+                  N                       := N + 1;
+                  Sides (Right, Row, Col) := N;
+               else
+                  Sides (Right, Row, Col) := Sides (Right, Row - 1, Col);
+               end if;
+            end if;
+         end loop;
+      end loop;
+      Put_Line (Standard_Error, "Sides right" & Sides'Image);
+
+      --  From Down
+      for Col in Polygon'Range (2) loop
+         for Row in reverse Polygon'Range (1) loop
+            if Polygon (Row, Col) and Edge (Polygon, Row, Col, Down) then
+               if Col = Polygon'First (2)
+                 or else Sides (Down, Row, Col - 1) = 0
+               then
+                  N                      := N + 1;
+                  Sides (Down, Row, Col) := N;
+               else
+                  Sides (Down, Row, Col) := Sides (Down, Row, Col - 1);
+               end if;
+            end if;
+         end loop;
+      end loop;
+      Put_Line (Standard_Error, "Sides down" & Sides'Image);
+
+      return N;
    end Number_Sides;
 
    function Input (File : File_Type) return Garden is

@@ -146,9 +146,17 @@ package body Advent.Day_06 is
                Pred_Row       : Integer renames Pred_Begin_Row;
                Pred_Col       : Integer renames Pred_Begin_Col;
             begin
-               if This_Dir = Down and Pred_Dir = Left then
-                  --  TODO
-                  null;
+               if This_Dir = Down and Pred_Dir = Left and
+                 Pred_Row in This_Begin_Row + 1 .. This_End_Row - 1 and
+                 Pred_End_Col < This_Col and
+                 (Pred_Begin_Col >= This_Col or
+                  (for all Col in Pred_Begin_Col + 1 .. This_Col - 1 =>
+                     not Blocked (Pred_Row, Col)))
+               then
+                  Put_Line
+                    (Standard_Error, Position'(Pred_Row + 1, This_Col)'Image);
+                  --  FIXME: Duplicate potential obstruction positions?
+                  N := N + 1;
                elsif This_Dir = Left and Pred_Dir = Up then
                   --  TODO
                   null;
@@ -164,6 +172,7 @@ package body Advent.Day_06 is
                then
                   Put_Line
                     (Standard_Error, Position'(Pred_Row - 1, This_Col)'Image);
+                  --  FIXME: Duplicates?
                   N := N + 1;
                end if;
             end;

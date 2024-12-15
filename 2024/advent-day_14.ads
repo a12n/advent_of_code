@@ -19,12 +19,12 @@ package Advent.Day_14 is
       Y : Integer;
    end record;
 
-   type Robot is record
+   type Robot_Type is record
       P : Position;
       V : Velocity;
    end record;
 
-   type Robot_Array is array (Positive range <>) of Robot;
+   type Robot_Array is array (Positive range <>) of Robot_Type;
 
    function Input (File : File_Type) return Robot_Array;
 end Advent.Day_14;

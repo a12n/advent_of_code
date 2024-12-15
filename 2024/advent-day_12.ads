@@ -1,4 +1,5 @@
 with Ada.Text_IO; use Ada.Text_IO;
+with Advent.Grids; use Advent.Grids;
 
 package Advent.Day_12 is
    subtype Plant_Type is Character range 'A' .. 'Z';
@@ -16,6 +17,11 @@ package Advent.Day_12 is
       Plants'Last (2) = Visited'Last (2) and not Visited (Row, Col);
 
    procedure Copy (Dest : in out Visited_Map; Source : Visited_Map);
+
+   function Edge
+     (Polygon : Visited_Map; Row, Col : Positive; Side : Direction)
+      return Boolean with
+     Pre => Row in Polygon'Range (1) and Col in Polygon'Range (2);
 
    function Flood_Fill
      (Plants : Garden; Row, Col : Positive) return Visited_Map;

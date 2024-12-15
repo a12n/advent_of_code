@@ -63,6 +63,23 @@ package body Advent.Day_12 is
       end loop;
    end Copy;
 
+   function Edge
+     (Polygon : Visited_Map; Row, Col : Positive; Side : Direction)
+      return Boolean
+   is
+   begin
+      case Side is
+         when Up =>
+            return Row = Polygon'First (1) or else not Polygon (Row - 1, Col);
+         when Left =>
+            return Col = Polygon'First (2) or else not Polygon (Row, Col - 1);
+         when Right =>
+            return Col = Polygon'Last (2) or else not Polygon (Row, Col + 1);
+         when Down =>
+            return Row = Polygon'Last (1) or else not Polygon (Row + 1, Col);
+      end case;
+   end Edge;
+
    function Flood_Fill
      (Plants : Garden; Row, Col : Positive) return Visited_Map
    is

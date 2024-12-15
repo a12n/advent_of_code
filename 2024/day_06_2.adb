@@ -4,12 +4,18 @@ with Advent.Day_06;       use Advent.Day_06;
 with Advent.Grids;        use Advent.Grids;
 
 procedure Day_06_2 is
-   Guard     : Position;
+   Guard_Pos : Position;
    Guard_Dir : Direction;
 
-   Blocked : constant Boolean_Grid := Input (Standard_Input, Guard, Guard_Dir);
-   Path    : constant Polygonal_Chain := Walk (Blocked, Guard, Guard_Dir);
+   Blocked : constant Blocked_Map :=
+     Input (Standard_Input, Guard_Pos, Guard_Dir);
+
+   Visited      :
+     Visited_Map (Blocked'Range (1), Blocked'Range (2), Direction'Range) :=
+     [others => [others => [others => False]]];
+   Number_Loops : Natural;
 begin
-   Put (Number_Loops (Blocked, Path), 0);
+   Walk (Blocked, Guard_Pos, Guard_Dir, Visited, Number_Loops);
+   Put (Number_Loops, 0);
    New_Line;
 end Day_06_2;

@@ -23,6 +23,8 @@ package Advent.Day_14 is
 
    type Robot_Array is array (Positive range <>) of Robot_Type;
 
+   function Distance (P, Q : Position) return Natural;
+   function Distance (Robots : Robot_Array) return Natural;
    function Input (File : File_Type) return Robot_Array;
    procedure Print (File : File_Type; Robots : Robot_Array);
    procedure Simulate (Robots : in out Robot_Array; Time : Positive);

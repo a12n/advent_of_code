@@ -1,6 +1,24 @@
 with Ada.Integer_Text_IO;
 
 package body Advent.Day_14 is
+   function Distance (P, Q : Position) return Natural is
+   begin
+      return
+        abs (Integer (P.X) - Integer (Q.X)) +
+        abs (Integer (P.Y) - Integer (Q.Y));
+   end Distance;
+
+   function Distance (Robots : Robot_Array) return Natural is
+      Total : Natural := 0;
+   begin
+      for I in Robots'First .. Robots'Last - 1 loop
+         for J in I + 1 .. Robots'Last loop
+            Total := Total + Distance (Robots (I).P, Robots (J).P);
+         end loop;
+      end loop;
+      return Total;
+   end Distance;
+
    function Input (File : File_Type) return Robot_Array is
       package X_Position_Text_IO is new Ada.Text_IO.Modular_IO (X_Position);
       package Y_Position_Text_IO is new Ada.Text_IO.Modular_IO (Y_Position);

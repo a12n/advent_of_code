@@ -39,4 +39,14 @@ package body Advent.Day_14 is
    begin
       return Input_Line (Robot_Array'[]);
    end Input;
+
+   procedure Simulate (Robots : in out Robot_Array; Time : Positive) is
+   begin
+      for I in Robots'Range loop
+         Robots (I).P.X :=
+           X_Position'Mod (Integer (@) + Robots (I).V.X * Time);
+         Robots (I).P.Y :=
+           Y_Position'Mod (Integer (@) + Robots (I).V.Y * Time);
+      end loop;
+   end Simulate;
 end Advent.Day_14;

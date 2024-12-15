@@ -27,4 +27,5 @@ package Advent.Day_14 is
    type Robot_Array is array (Positive range <>) of Robot_Type;
 
    function Input (File : File_Type) return Robot_Array;
+   procedure Simulate (Robots : in out Robot_Array; Time : Positive);
 end Advent.Day_14;

@@ -132,6 +132,12 @@ package body Advent.Day_12 is
       return Visited;
    end Flood_Fill;
 
+   function Number_Sides (Polygon : Visited_Map) return Positive is
+   begin
+      --  TODO
+      return 4;
+   end Number_Sides;
+
    function Input (File : File_Type) return Garden is
       Line   : constant String := Get_Line (File);
       Plants : Garden (Line'Range, Line'Range);

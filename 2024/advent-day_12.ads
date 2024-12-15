@@ -26,5 +26,7 @@ package Advent.Day_12 is
      (Plants : Garden; Row, Col : Positive; Area, Perimeter : out Natural)
       return Visited_Map;
 
+   function Number_Sides (Polygon : Visited_Map) return Positive;
+
    function Input (File : File_Type) return Garden;
 end Advent.Day_12;

@@ -17,11 +17,7 @@ begin
                Put_Line
                  (Standard_Error,
                   "Polygon" & Polygon'Image & ", Area " & Area'Image);
-               for I in Polygon'Range (1) loop
-                  for J in Polygon'Range (2) loop
-                     Visited (I, J) := Visited (I, J) or Polygon (I, J);
-                  end loop;
-               end loop;
+               Copy (Visited, Polygon);
             end;
          end if;
       end loop;

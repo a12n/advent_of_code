@@ -48,6 +48,21 @@ package body Advent.Day_12 is
       Flood_Fill (Row, Col);
    end Analyze;
 
+   procedure Copy (Dest : in out Visited_Map; Source : Visited_Map) is
+   begin
+      for Row in
+        Positive'Max (Source'First (1), Dest'First (1)) ..
+          Positive'Min (Source'Last (1), Dest'Last (1))
+      loop
+         for Col in
+           Positive'Max (Source'First (2), Dest'First (2)) ..
+             Positive'Min (Source'Last (2), Dest'Last (2))
+         loop
+            Dest (Row, Col) := Dest (Row, Col) or Source (Row, Col);
+         end loop;
+      end loop;
+   end Copy;
+
    function Flood_Fill
      (Plants : Garden; Row, Col : Positive) return Visited_Map
    is

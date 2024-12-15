@@ -15,6 +15,8 @@ package Advent.Day_12 is
       Plants'First (2) = Visited'First (2) and
       Plants'Last (2) = Visited'Last (2) and not Visited (Row, Col);
 
+   procedure Copy (Dest : in out Visited_Map; Source : Visited_Map);
+
    function Flood_Fill
      (Plants : Garden; Row, Col : Positive) return Visited_Map;
    function Flood_Fill

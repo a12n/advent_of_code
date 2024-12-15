@@ -169,7 +169,6 @@ package body Advent.Day_12 is
             end if;
          end loop;
       end loop;
-      Put_Line (Standard_Error, "Sides up" & Sides'Image);
 
       --  From Left
       for Row in Polygon'Range (1) loop
@@ -186,7 +185,6 @@ package body Advent.Day_12 is
             end if;
          end loop;
       end loop;
-      Put_Line (Standard_Error, "Sides left" & Sides'Image);
 
       --  From Right
       for Row in Polygon'Range (1) loop
@@ -203,7 +201,6 @@ package body Advent.Day_12 is
             end if;
          end loop;
       end loop;
-      Put_Line (Standard_Error, "Sides right" & Sides'Image);
 
       --  From Down
       for Col in Polygon'Range (2) loop
@@ -220,7 +217,9 @@ package body Advent.Day_12 is
             end if;
          end loop;
       end loop;
-      Put_Line (Standard_Error, "Sides down" & Sides'Image);
+
+      --  Put_Line (Standard_Error, "Polygon" & Polygon'Image);
+      --  Put_Line (Standard_Error, "Sides" & Sides'Image);
 
       return N;
    end Number_Sides;

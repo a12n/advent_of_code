@@ -17,10 +17,10 @@ begin
                  Flood_Fill (Plants, Row, Col, Area);
                N       : constant Positive    := Number_Sides (Polygon);
             begin
-               Put_Line
-                 (Standard_Error,
-                  "Polygon" & Polygon'Image & ", Area " & Area'Image &
-                  ", Sides " & N'Image);
+               --  Put_Line
+               --    (Standard_Error,
+               --     "Polygon" & Polygon'Image & ", Area " & Area'Image &
+               --     ", Sides " & N'Image);
                Copy (Visited, Polygon);
                Price := Price + Area * N;
             end;

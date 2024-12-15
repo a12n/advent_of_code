@@ -54,8 +54,13 @@ package body Advent.Day_15 is
 
    function Move
      (Warehouse : in out Warehouse_Map; Pos : in out Position; Dir : Direction)
-      return Boolean is
+      return Boolean
+   is
+      Next : constant Position := Pos + To_Offset (Dir);
    begin
+      if Warehouse (Next (1), Next (2)) = Wall_Tile then
+         return False;
+      end if;
       --  TODO
       return False;
    end Move;

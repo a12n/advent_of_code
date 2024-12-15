@@ -111,4 +111,38 @@ package body Advent.Day_15 is
          New_Line (File);
       end loop;
    end Print;
+
+   function Widen
+     (Warehouse : Warehouse_Map; Robot_Pos : out Position)
+      return Wide_Warehouse_Map
+   is
+      Wide_Warehouse :
+        Wide_Warehouse_Map
+          (Warehouse'Range (1), Warehouse'First (2) .. 2 * Warehouse'Last (2));
+   begin
+      for Row in Warehouse'Range (1) loop
+         for Col in Warehouse'Range (2) loop
+            declare
+               This_Tile   : Tile renames Warehouse (Row, Col);
+               Wide_Tile_1 :
+                 Wide_Tile renames Wide_Warehouse (Row, 2 * Col - 1);
+               Wide_Tile_2 : Wide_Tile renames Wide_Warehouse (Row, 2 * Col);
+            begin
+               case This_Tile is
+                  when Empty | Wall =>
+                     Wide_Tile_1 := This_Tile;
+                     Wide_Tile_2 := This_Tile;
+                  when Box =>
+                     Wide_Tile_1 := Box_Left;
+                     Wide_Tile_2 := Box_Right;
+                  when Robot =>
+                     Robot_Pos   := [Row, 2 * Col - 1];
+                     Wide_Tile_1 := Robot;
+                     Wide_Tile_2 := Empty;
+               end case;
+            end;
+         end loop;
+      end loop;
+      return Wide_Warehouse;
+   end Widen;
 end Advent.Day_15;

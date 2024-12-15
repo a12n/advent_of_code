@@ -40,6 +40,19 @@ package body Advent.Day_14 is
       return Input_Line (Robot_Array'[]);
    end Input;
 
+   procedure Print (File : File_Type; Robots : Robot_Array) is
+      Lines :
+        array (Y_Position) of String (1 .. Positive (X_Position'Last) + 1) :=
+        [others => [others => ' ']];
+   begin
+      for I in Robots'Range loop
+         Lines (Robots (I).P.Y) (Integer (Robots (I).P.X) + 1) := '#';
+      end loop;
+      for I in Lines'Range loop
+         Put_Line (File, Lines (I));
+      end loop;
+   end Print;
+
    procedure Simulate (Robots : in out Robot_Array; Time : Positive) is
    begin
       for I in Robots'Range loop

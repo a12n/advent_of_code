@@ -8,5 +8,14 @@ procedure Day_15_1 is
 begin
    Put_Line (Standard_Error, Robot_Pos'Image);
    Put_Line (Standard_Error, Warehouse'Image);
-   --  TODO
+   loop
+      declare
+         Move : constant Direction := Get_Move (Standard_Input);
+      begin
+         Put_Line (Standard_Error, Move'Image);
+      end;
+   end loop;
+exception
+   when End_Error =>
+      null;
 end Day_15_1;

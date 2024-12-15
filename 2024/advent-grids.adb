@@ -3,19 +3,15 @@ package body Advent.Grids is
    begin
       if Is_Horizontal_Line (P, Q) then
          if Q (2) > P (2) then
-            --  Left to right
             return Right;
          else
-            --  Right to left;
             return Left;
          end if;
       elsif Is_Vertical_Line (P, Q) then
          if Q (1) > P (1) then
-            --  Down to up
-            return Up;
-         else
-            --  Up to down
             return Down;
+         else
+            return Up;
          end if;
       else
          raise Constraint_Error;

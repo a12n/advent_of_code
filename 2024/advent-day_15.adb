@@ -26,9 +26,9 @@ package body Advent.Day_15 is
       procedure Process (Pos : Position; Char : Character) is
       begin
          case Char is
-            when '#' | '.' | 'O' =>
+            when Wall_Tile | '.' | Box_Tile =>
                Warehouse (Pos (1), Pos (2)) := Char;
-            when '@' =>
+            when Robot_Tile =>
                Warehouse (Pos (1), Pos (2)) := '.';
                Robot                        := Pos;
             when others =>

@@ -15,5 +15,14 @@ package Advent.Day_12 is
       Plants'First (2) = Visited'First (2) and
       Plants'Last (2) = Visited'Last (2) and not Visited (Row, Col);
 
+   function Flood_Fill
+     (Plants : Garden; Row, Col : Positive) return Visited_Map;
+   function Flood_Fill
+     (Plants : Garden; Row, Col : Positive; Area : out Natural)
+      return Visited_Map;
+   function Flood_Fill
+     (Plants : Garden; Row, Col : Positive; Area, Perimeter : out Natural)
+      return Visited_Map;
+
    function Input (File : File_Type) return Garden;
 end Advent.Day_12;

@@ -48,6 +48,75 @@ package body Advent.Day_12 is
       Flood_Fill (Row, Col);
    end Analyze;
 
+   function Flood_Fill
+     (Plants : Garden; Row, Col : Positive) return Visited_Map
+   is
+      Unused_Area : Positive;
+   begin
+      return Flood_Fill (Plants, Row, Col, Unused_Area);
+   end Flood_Fill;
+
+   function Flood_Fill
+     (Plants : Garden; Row, Col : Positive; Area : out Natural)
+      return Visited_Map
+   is
+      Unused_Perimeter : Positive;
+   begin
+      return Flood_Fill (Plants, Row, Col, Area, Unused_Perimeter);
+   end Flood_Fill;
+
+   function Flood_Fill
+     (Plants : Garden; Row, Col : Positive; Area, Perimeter : out Natural)
+      return Visited_Map
+   is
+      Plant   : Plant_Type renames Plants (Row, Col);
+      Visited : Visited_Map (Plants'Range (1), Plants'Range (2)) :=
+        [others => [others => False]];
+
+      procedure Iterate (Row, Col : Positive) is
+      begin
+         if Visited (Row, Col) then
+            return;
+         end if;
+
+         Area               := Area + 1;
+         Visited (Row, Col) := True;
+
+         if Row + 1 in Plants'Range (1) and then Plants (Row + 1, Col) = Plant
+         then
+            Iterate (Row + 1, Col);
+         else
+            Perimeter := Perimeter + 1;
+         end if;
+
+         if Col - 1 in Plants'Range (2) and then Plants (Row, Col - 1) = Plant
+         then
+            Iterate (Row, Col - 1);
+         else
+            Perimeter := Perimeter + 1;
+         end if;
+
+         if Col + 1 in Plants'Range (2) and then Plants (Row, Col + 1) = Plant
+         then
+            Iterate (Row, Col + 1);
+         else
+            Perimeter := Perimeter + 1;
+         end if;
+
+         if Row - 1 in Plants'Range (1) and then Plants (Row - 1, Col) = Plant
+         then
+            Iterate (Row - 1, Col);
+         else
+            Perimeter := Perimeter + 1;
+         end if;
+      end Iterate;
+   begin
+      Area      := 0;
+      Perimeter := 0;
+      Iterate (Row, Col);
+      return Visited;
+   end Flood_Fill;
+
    function Input (File : File_Type) return Garden is
       Line   : constant String := Get_Line (File);
       Plants : Garden (Line'Range, Line'Range);

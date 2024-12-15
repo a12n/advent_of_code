@@ -12,19 +12,25 @@ package body Advent.Day_14 is
       function Input_Line (Result : Robot_Array) return Robot_Array is
       begin
          declare
-            Line  : String := Get_Line (File);
-            Start : Positive;
+            Line  : String   := Get_Line (File);
+            Start : Positive := 1;
             Robot : Robot_Type;
          begin
             for I in Line'Range loop
-               if Line (I) not in '0' .. '9' then
-                  Line (I) := ' ';
-               end if;
+               case Line (I) is
+                  when '-' | '0' .. '9' =>
+                     null;
+                  when others =>
+                     Line (I) := ' ';
+               end case;
             end loop;
 
-            --  TODO
+            Get (Line (Start .. Line'Last), Robot.P.X, Start);
+            Get (Line (Start + 1 .. Line'Last), Robot.P.Y, Start);
+            Get (Line (Start + 1 .. Line'Last), Robot.V.X, Start);
+            Get (Line (Start + 1 .. Line'Last), Robot.V.Y, Start);
 
-            return Input_Line (Result);
+            return Input_Line (Result & Robot);
          end;
       exception
          when End_Error =>

@@ -5,16 +5,16 @@ with Advent.Grids;        use Advent.Grids;
 
 procedure Day_15_1 is
    Robot     : Position;
-   Move      : Direction;
    Warehouse : Warehouse_Map := Get_Warehouse (Standard_Input, Robot);
 begin
    Put_Line (Standard_Error, Robot'Image);
    Put_Line (Standard_Error, Warehouse'Image);
 
    loop
+      declare
+         Unused : Boolean;
       begin
-         Move := Get_Move (Standard_Input);
-         Put_Line (Standard_Error, Move'Image);
+         Unused := Move (Warehouse, Robot, Get_Move (Standard_Input));
       exception
          when End_Error =>
             exit;

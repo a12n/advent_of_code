@@ -7,24 +7,21 @@ procedure Day_15_1 is
    Robot_Pos : Position;
    Warehouse : Warehouse_Map := Get_Warehouse (Standard_Input, Robot_Pos);
 begin
-   --  Put_Line (Standard_Error, Robot'Image);
-   --  Put_Line (Standard_Error, Warehouse'Image);
-
-   Put (Standard_Error, ASCII.ESC & "[?25l");
-   Put_Line (Standard_Error, ASCII.ESC & "[;H");
-   Print (Standard_Error, Warehouse);
+   --  Put (Standard_Error, ASCII.ESC & "[?25l");
+   --  Put_Line (Standard_Error, ASCII.ESC & "[;H");
+   --  Print (Standard_Error, Warehouse);
    for I in Positive'Range loop
       begin
          --  delay 0.033;
          Robot_Pos := Move (Warehouse, Robot_Pos, Get_Move (Standard_Input));
-         Put_Line (Standard_Error, ASCII.ESC & "[;H" & I'Image);
-         Print (Standard_Error, Warehouse);
+         --  Put_Line (Standard_Error, ASCII.ESC & "[;H" & I'Image);
+         --  Print (Standard_Error, Warehouse);
       exception
          when End_Error =>
             exit;
       end;
    end loop;
-   Put (Standard_Error, ASCII.ESC & "[?25h");
+   --  Put (Standard_Error, ASCII.ESC & "[?25h");
 
    declare
       Sum : Natural := 0;

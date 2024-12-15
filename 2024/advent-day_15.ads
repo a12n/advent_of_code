@@ -15,5 +15,9 @@ package Advent.Day_15 is
 
    function Move
      (Warehouse : in out Warehouse_Map; Pos : in out Position; Dir : Direction)
-      return Boolean;
+      return Boolean with
+     Pre  =>
+      Pos (1) in Warehouse'Range (1) and Pos (2) in Warehouse'Range (2) and
+      Warehouse (Pos (1), Pos (2)) in Box .. Robot,
+     Post => (if Move'Result then Warehouse (Pos (1), Pos (2)) = Empty);
 end Advent.Day_15;

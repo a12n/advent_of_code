@@ -61,12 +61,29 @@ package body Advent.Day_15 is
      (Warehouse : in out Warehouse_Map; Pos : in out Position; Dir : Direction)
       return Boolean
    is
-      Next : constant Position := Pos + To_Offset (Dir);
+      Next      : Position := Pos + To_Offset (Dir);
+      This_Tile : Tile renames Warehouse (Pos (1), Pos (2));
+      Next_Tile : Tile renames Warehouse (Next (1), Next (2));
    begin
-      if Warehouse (Next (1), Next (2)) = Wall_Tile then
-         return False;
-      end if;
-      --  TODO
-      return False;
+      case Next_Tile is
+         when Box =>
+            if Move (Warehouse, Next, Dir) then
+               Next_Tile := This_Tile;
+               This_Tile := Empty;
+               Pos       := Next;
+               return True;
+            else
+               return False;
+            end if;
+         when Empty =>
+            Next_Tile := This_Tile;
+            This_Tile := Empty;
+            Pos       := Next;
+            return True;
+         when Wall =>
+            return False;
+         when others =>
+            raise Constraint_Error;
+      end case;
    end Move;
 end Advent.Day_15;

@@ -97,16 +97,17 @@ package body Advent.Day_15 is
    begin
       for Row in Warehouse'Range (1) loop
          for Col in Warehouse'Range (2) loop
-            case Warehouse (Row, Col) is
-               when Empty =>
-                  Put (File, " ");
-               when Wall =>
-                  Put (File, "#");
-               when Box =>
-                  Put (File, "O");
-               when Robot =>
-                  Put (File, "@");
-            end case;
+            Put (File, To_Character (Warehouse (Row, Col)));
+         end loop;
+         New_Line (File);
+      end loop;
+   end Print;
+
+   procedure Print (File : File_Type; Warehouse : Wide_Warehouse_Map) is
+   begin
+      for Row in Warehouse'Range (1) loop
+         for Col in Warehouse'Range (2) loop
+            Put (File, To_Character (Warehouse (Row, Col)));
          end loop;
          New_Line (File);
       end loop;

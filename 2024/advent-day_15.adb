@@ -103,20 +103,24 @@ package body Advent.Day_15 is
    end Move;
 
    procedure Print (File : File_Type; Warehouse : Warehouse_Map) is
+      Chars : constant array (Tile) of Character :=
+        [Empty => '.', Wall => '#', Robot => '@', Box => 'O'];
    begin
       for Row in Warehouse'Range (1) loop
          for Col in Warehouse'Range (2) loop
-            Put (File, To_Character (Warehouse (Row, Col)));
+            Put (File, Chars (Warehouse (Row, Col)));
          end loop;
          New_Line (File);
       end loop;
    end Print;
 
    procedure Print (File : File_Type; Warehouse : Wide_Warehouse_Map) is
+      Chars : constant array (Wide_Tile) of Character :=
+        [Empty => '.', Wall => '#', Robot => '@', Box => '[', Box_Side => ']'];
    begin
       for Row in Warehouse'Range (1) loop
          for Col in Warehouse'Range (2) loop
-            Put (File, To_Character (Warehouse (Row, Col)));
+            Put (File, Chars (Warehouse (Row, Col)));
          end loop;
          New_Line (File);
       end loop;
@@ -143,8 +147,8 @@ package body Advent.Day_15 is
                      Wide_Tile_1 := This_Tile;
                      Wide_Tile_2 := This_Tile;
                   when Box =>
-                     Wide_Tile_1 := Box_Left;
-                     Wide_Tile_2 := Box_Right;
+                     Wide_Tile_1 := Box;
+                     Wide_Tile_2 := Box_Side;
                   when Robot =>
                      Robot_Pos   := [Row, 2 * Col - 1];
                      Wide_Tile_1 := Robot;

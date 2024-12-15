@@ -11,7 +11,7 @@ package body Advent.Day_06 is
       procedure Process (Pos : Position; Char : Character) is
       begin
          case Char is
-            when '.' =>
+            when '.' | 'o' =>
                null;
             when '#' =>
                Blocked (Pos (1), Pos (2)) := True;

@@ -16,12 +16,12 @@ procedure Day_15_2 is
 begin
    --  Put_Line (Standard_Error, "Robot_Pos" & Robot_Pos'Image);
 
-   Put (Standard_Error, ANSI.Cursor.Hide);
-   Put_Line (Standard_Error, ANSI.Cursor.Position (1, 1));
+   --  Put (Standard_Error, ANSI.Cursor.Hide);
+   --  Put_Line (Standard_Error, ANSI.Cursor.Position (1, 1));
    Print (Standard_Error, Warehouse);   --  50x100
    begin
       for I in Positive'Range loop
-         delay 0.0125;
+         --  delay 0.0125;
 
          Next_Warehouse := Warehouse;
          Next_Robot_Pos :=
@@ -31,14 +31,14 @@ begin
             Warehouse := Next_Warehouse;
          end if;
 
-         Put_Line (Standard_Error, ANSI.Cursor.Position (1, 1) & I'Image);
-         Print (Standard_Error, Warehouse);
+         --  Put_Line (Standard_Error, ANSI.Cursor.Position (1, 1) & I'Image);
+         --  Print (Standard_Error, Warehouse);
       end loop;
    exception
       when End_Error =>
          null;
    end;
-   Put (Standard_Error, ANSI.Cursor.Show);
+   --  Put (Standard_Error, ANSI.Cursor.Show);
 
    declare
       Sum : Natural := 0;

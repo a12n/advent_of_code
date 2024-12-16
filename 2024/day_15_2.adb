@@ -1,7 +1,8 @@
 with Ada.Text_IO;   use Ada.Text_IO;
-with Advent.ANSI;   use Advent.ANSI;
+with Advent.ANSI;
 with Advent.Day_15; use Advent.Day_15;
 with Advent.Grids;  use Advent.Grids;
+with Advent; use Advent;
 
 procedure Day_15_2 is
    Robot_Pos : Position;
@@ -14,8 +15,8 @@ procedure Day_15_2 is
 begin
    --  Put_Line (Standard_Error, "Robot_Pos" & Robot_Pos'Image);
 
-   Put (Standard_Error, Hide_Cursor);
-   Put_Line (Standard_Error, Cursor_Top_Left);
+   Put (Standard_Error, ANSI.Cursor.Hide);
+   Put_Line (Standard_Error, ANSI.Cursor.Position (1, 1));
    Print (Standard_Error, Warehouse);   --  50x100
    begin
       for I in Positive'Range loop
@@ -29,14 +30,14 @@ begin
             Warehouse := Next_Warehouse;
          end if;
 
-         Put_Line (Standard_Error, Cursor_Top_Left & I'Image);
+         Put_Line (Standard_Error, ANSI.Cursor.Position (1, 1) & I'Image);
          Print (Standard_Error, Warehouse);
       end loop;
    exception
       when End_Error =>
          null;
    end;
-   Put (Standard_Error, Show_Cursor);
+   Put (Standard_Error, ANSI.Cursor.Show);
 
    --  TODO
 end Day_15_2;

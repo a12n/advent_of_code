@@ -1,6 +1,7 @@
-with Ada.Containers.Unbounded_Priority_Queues;
+with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
 with Ada.Containers.Synchronized_Queue_Interfaces;
-with Ada.Containers; use Ada.Containers;
+with Ada.Containers.Unbounded_Priority_Queues;
+with Ada.Containers;         use Ada.Containers;
 
 package body Advent.Day_16 is
    function Best_Path
@@ -33,8 +34,8 @@ package body Advent.Day_16 is
       Q.Enqueue ((Start_Pos, Start_Dir, 0));
       Visited (Start_Pos (1), Start_Pos (2), Start_Dir) := True;
       while Q.Current_Use > 0 loop
+         Print (Standard_Error, Maze, Visited);
          Q.Dequeue (S);
-         Put_Line (Standard_Error, Q.Current_Use'Image & S'Image);
 
          if S.Pos = Finish_Pos then
             return S.Cost;

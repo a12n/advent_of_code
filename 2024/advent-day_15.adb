@@ -116,7 +116,7 @@ package body Advent.Day_15 is
          when Robot =>
             null;
          when Box =>
-            if Is_Vertical (Dir) and Warehouse (Row, Col + 1) /= Empty then
+            if Is_Vertical (Dir) and Warehouse (Row, Col + 1) = Box_Side then
                This_Tile := Empty;      --  XXX
                if Move (Warehouse, [Row, Col + 1], Dir) = [Row, Col + 1] then
                   This_Tile := Box;     --  XXX
@@ -126,7 +126,7 @@ package body Advent.Day_15 is
                end if;
             end if;
          when Box_Side =>
-            if Is_Vertical (Dir) and Warehouse (Row, Col - 1) /= Empty then
+            if Is_Vertical (Dir) and Warehouse (Row, Col - 1) = Box then
                This_Tile := Empty;      --  XXX
                if Move (Warehouse, [Row, Col - 1], Dir) = [Row, Col - 1] then
                   This_Tile := Box_Side; --  XXX

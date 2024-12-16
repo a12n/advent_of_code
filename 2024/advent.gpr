@@ -17,6 +17,7 @@ project Advent is
          "-gnatwd",
          -- Style checks
          "-gnaty",
+         "-gnaty-s",
          "-gnatyA",
          "-gnatyC",
          "-gnatyM99",

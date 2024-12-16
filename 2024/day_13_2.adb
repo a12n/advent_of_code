@@ -13,8 +13,13 @@ begin
       begin
          Machine.Prize.X := @ + 10_000_000_000_000;
          Machine.Prize.Y := @ + 10_000_000_000_000;
-         Put_Line (Standard_Error, Machine'Image);
-         if Solution2 (Machine, Pushes) then
+         if Debug then
+            Put_Line (Standard_Error, Machine'Image);
+         end if;
+         if Solution (Machine, Pushes) then
+            if Debug then
+               Put_Line (Standard_Error, Pushes'Image);
+            end if;
             Total_Cost := Total_Cost + Cost (Pushes);
          end if;
       end;

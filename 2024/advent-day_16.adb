@@ -31,6 +31,7 @@ package body Advent.Day_16 is
         [others => [others => [others => False]]];
    begin
       Q.Enqueue ((Start_Pos, Start_Dir, 0));
+      Visited (Start_Pos (1), Start_Pos (2), Start_Dir) := True;
       while Q.Current_Use > 0 loop
          Q.Dequeue (S);
          Put_Line (Standard_Error, Q.Current_Use'Image & S'Image);
@@ -52,10 +53,12 @@ package body Advent.Day_16 is
 
          if not Visited (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) then
             Q.Enqueue ((S.Pos, Rotate (CW, S.Dir), S.Cost + 1_000));
+            Visited (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) := True;
          end if;
 
          if not Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) then
             Q.Enqueue ((S.Pos, Rotate (CCW, S.Dir), S.Cost + 1_000));
+            Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) := True;
          end if;
       end loop;
       raise Constraint_Error;

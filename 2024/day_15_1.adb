@@ -9,7 +9,7 @@ procedure Day_15_1 is
 begin
    --  Put (Standard_Error, ASCII.ESC & "[?25l");
    --  Put_Line (Standard_Error, ASCII.ESC & "[;H");
-   --  Print (Standard_Error, Warehouse);
+   Print (Standard_Error, Warehouse);
    for I in Positive'Range loop
       begin
          --  delay 0.033;

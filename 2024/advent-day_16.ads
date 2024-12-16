@@ -16,4 +16,6 @@ package Advent.Day_16 is
 
    function Get_Maze
      (File : File_Type; Start_Pos, Finish_Pos : out Position) return Maze_Type;
+
+   procedure Print (File : File_Type; Maze : Maze_Type; Visited : Visited_Map);
 end Advent.Day_16;

@@ -99,29 +99,50 @@ package body Advent.Day_15 is
       This_Tile : Tile renames Warehouse (Row, Col);
       Next_Tile : Tile renames Warehouse (Next_Row, Next_Col);
    begin
-      if Dir = Left or Dir = Right then
-         case Next_Tile is
-            when Box | Box_Side =>
-               if Move (Warehouse, Next_Pos, Dir) /= Next_Pos then
-                  Next_Tile := This_Tile;
-                  This_Tile := Empty;
-                  return Next_Pos;
-               else
-                  return Pos;
-               end if;
-            when Empty =>
-               Next_Tile := This_Tile;
-               This_Tile := Empty;
-               return Next_Pos;
-            when Wall =>
-               return Pos;
-            when others =>
-               raise Constraint_Error;
-         end case;
-      elsif Dir = Down or Dir = Up then
-         --  TODO
-         null;
+      --  Put_Line
+      --    (Standard_Error,
+      --     "Pos" & Pos'Image & ", Dir " & Dir'Image & ", Next_Pos" &
+      --     Next_Pos'Image & ", This_Tile " & This_Tile'Image & ", Next_Tile " &
+      --     Next_Tile'Image);
+
+      if Next_Tile = Wall then
+         return Pos;
       end if;
+
+      --  Prepare this tile for move.
+      case This_Tile is
+         when Empty | Wall =>
+            raise Constraint_Error;
+         when Robot =>
+            null;
+         when Box =>
+            if Is_Vertical (Dir)
+              and then Move (Warehouse, [Row, Col + 1], Dir) = [Row, Col + 1]
+            then
+               return Pos;
+            end if;
+         when Box_Side =>
+            if Is_Vertical (Dir)
+              and then Move (Warehouse, [Row, Col - 1], Dir) = [Row, Col - 1]
+            then
+               return Pos;
+            end if;
+      end case;
+
+      if Next_Tile = Empty then
+         Next_Tile := This_Tile;
+         This_Tile := Empty;
+         return Next_Pos;
+      elsif Next_Tile = Box or Next_Tile = Box_Side then
+         if Move (Warehouse, Next_Pos, Dir) = Next_Pos then
+            return Pos;
+         end if;
+         Next_Tile := This_Tile;
+         This_Tile := Empty;
+         return Next_Pos;
+      end if;
+
+      return Pos;
    end Move;
 
    procedure Print (File : File_Type; Warehouse : Warehouse_Map) is

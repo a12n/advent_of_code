@@ -1,5 +1,3 @@
-with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-
 package body Advent.Day_13 is
    function Input_Entry (File : File_Type) return Claw_Machine is
       package Offset_Text_IO is new Ada.Text_IO.Integer_IO (Offset);

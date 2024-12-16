@@ -12,6 +12,12 @@ package Advent.Grids is
    To_Offset : constant array (Direction) of Offset :=
      [Down => [1, 0], Left => [0, -1], Right => [0, 1], Up => [-1, 0]];
 
+   Is_Horizontal : constant array (Direction) of Boolean :=
+     [Down => False, Left => True, Right => True, Up => False];
+
+   Is_Vertical : constant array (Direction) of Boolean :=
+     [Down => True, Left => False, Right => False, Up => True];
+
    function Is_Horizontal_Line (P, Q : Position) return Boolean is
      (P (1) = Q (1) and P (2) /= Q (2));
 

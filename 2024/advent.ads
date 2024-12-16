@@ -1,3 +1,5 @@
+with Ada.Environment_Variables;
+
 package Advent is
-   type Ternary is (Unknown, False, True);
+   Debug : constant Boolean := Ada.Environment_Variables.Exists ("DEBUG");
 end Advent;

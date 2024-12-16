@@ -1,6 +1,6 @@
 package body Advent.Day_16 is
    function Get_Maze
-     (File : File_Type; Start, Finish : out Position) return Maze_Type
+     (File : File_Type; Start_Pos, Finish_Pos : out Position) return Maze_Type
    is
       Line : constant String                    := Get_Line (File);
       Maze : Maze_Type (Line'Range, Line'Range) :=
@@ -14,10 +14,10 @@ package body Advent.Day_16 is
             when '.' =>
                Maze (Pos (1), Pos (2)) := Empty;
             when 'S' =>
-               Start                   := Pos;
+               Start_Pos               := Pos;
                Maze (Pos (1), Pos (2)) := Empty;
             when 'E' =>
-               Finish                  := Pos;
+               Finish_Pos              := Pos;
                Maze (Pos (1), Pos (2)) := Empty;
             when others =>
                raise Constraint_Error;
@@ -41,8 +41,9 @@ package body Advent.Day_16 is
    end Get_Maze;
 
    function Best_Path
-     (Maze : Maze_Type; Start, Finish : Position; Dir : Direction)
-      return Natural is
+     (Maze      : Maze_Type; Start_Pos, Finish_Pos : Position;
+      Start_Dir : Direction) return Natural
+   is
    begin
       --  TODO
       return 0;

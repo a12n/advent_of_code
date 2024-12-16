@@ -7,9 +7,9 @@ package Advent.Day_16 is
    pragma Pack (Maze_Type);
 
    function Get_Maze
-     (File : File_Type; Start, Finish : out Position) return Maze_Type;
+     (File : File_Type; Start_Pos, Finish_Pos : out Position) return Maze_Type;
 
    function Best_Path
-     (Maze : Maze_Type; Start, Finish : Position; Dir : Direction)
-      return Natural;
+     (Maze      : Maze_Type; Start_Pos, Finish_Pos : Position;
+      Start_Dir : Direction) return Natural;
 end Advent.Day_16;

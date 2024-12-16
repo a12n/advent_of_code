@@ -39,4 +39,12 @@ package body Advent.Day_16 is
       end loop;
       return Maze;
    end Get_Maze;
+
+   function Best_Path
+     (Maze : Maze_Type; Start, Finish : Position; Dir : Direction)
+      return Natural is
+   begin
+      --  TODO
+      return 0;
+   end Best_Path;
 end Advent.Day_16;

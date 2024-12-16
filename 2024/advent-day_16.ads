@@ -8,4 +8,8 @@ package Advent.Day_16 is
 
    function Get_Maze
      (File : File_Type; Start, Finish : out Position) return Maze_Type;
+
+   function Best_Path
+     (Maze : Maze_Type; Start, Finish : Position; Dir : Direction)
+      return Natural;
 end Advent.Day_16;

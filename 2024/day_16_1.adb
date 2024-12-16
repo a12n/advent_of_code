@@ -10,4 +10,6 @@ begin
    Put_Line (Standard_Error, Maze'Image);
    Put_Line (Standard_Error, Start'Image);
    Put_Line (Standard_Error, Finish'Image);
+   Put (Best_Path (Maze, Start, Finish, Right), 0);
+   New_Line;
 end Day_16_1;

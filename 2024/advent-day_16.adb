@@ -2,6 +2,7 @@ with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
 with Ada.Containers.Synchronized_Queue_Interfaces;
 with Ada.Containers.Unbounded_Priority_Queues;
 with Ada.Containers;         use Ada.Containers;
+with Advent.ANSI;
 
 package body Advent.Day_16 is
    function Best_Path
@@ -33,11 +34,18 @@ package body Advent.Day_16 is
    begin
       Q.Enqueue ((Start_Pos, Start_Dir, 0));
       Visited (Start_Pos (1), Start_Pos (2), Start_Dir) := True;
+      Put (Standard_Error, ANSI.Cursor.Hide & ANSI.Cursor.Position (1, 1));
+      Print (Standard_Error, Maze);
+      Put
+        (Standard_Error,
+         ANSI.Cursor.Position (Start_Pos (1), Start_Pos (2)) & 'S');
+
       while Q.Current_Use > 0 loop
-         Print (Standard_Error, Maze);
+         delay 0.001;
          Q.Dequeue (S);
 
          if S.Pos = Finish_Pos then
+            Put (Standard_Error, ANSI.Cursor.Show);
             return S.Cost;
          end if;
 
@@ -49,17 +57,29 @@ package body Advent.Day_16 is
             then
                Q.Enqueue ((Next_Pos, S.Dir, S.Cost + 1));
                Visited (Next_Pos (1), Next_Pos (2), S.Dir) := True;
+               Put
+                 (Standard_Error,
+                  ANSI.Cursor.Position (Next_Pos (1), Next_Pos (2)) & ESC &
+                  "[48;5;46m" & 'F');
             end if;
          end;
 
          if not Visited (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) then
             Q.Enqueue ((S.Pos, Rotate (CW, S.Dir), S.Cost + 1_000));
             Visited (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) := True;
+            Put
+              (Standard_Error,
+               ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) & ESC &
+               "[48;5;40m" & 'c');
          end if;
 
          if not Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) then
             Q.Enqueue ((S.Pos, Rotate (CCW, S.Dir), S.Cost + 1_000));
             Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) := True;
+            Put
+              (Standard_Error,
+               ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) & ESC &
+               "[48;5;34m" & 'c');
          end if;
       end loop;
       raise Constraint_Error;

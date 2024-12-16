@@ -59,6 +59,4 @@ package Advent.Day_13 is
    function Input_Entry (File : File_Type) return Claw_Machine;
    function Solution
      (Machine : in Claw_Machine; Pushes : out Push_Count) return Boolean;
-   function Solution2
-     (Machine : in Claw_Machine; Pushes : out Push_Count) return Boolean;
 end Advent.Day_13;

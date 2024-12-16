@@ -61,17 +61,12 @@ package body Advent.Day_15 is
      (Warehouse : in out Warehouse_Map; Pos : Position; Dir : Direction)
       return Position
    is
-      Next      : Position := Pos + To_Offset (Dir);
+      Next      : constant Position := Pos + To_Offset (Dir);
       This_Tile : Tile renames Warehouse (Pos (1), Pos (2));
       Next_Tile : Tile renames Warehouse (Next (1), Next (2));
    begin
-      --  Put_Line
-      --    (Standard_Error,
-      --     "Pos " & Pos'Image & ", Dir " & Dir'Image & ", Next " & Next'Image);
-      --  Put_Line (Standard_Error, "This " & This_Tile'Image);
       case Next_Tile is
          when Box =>
-            --  Put_Line (Standard_Error, "Next " & Next_Tile'Image);
             if Move (Warehouse, Next, Dir) /= Next then
                Next_Tile := This_Tile;
                This_Tile := Empty;
@@ -80,15 +75,12 @@ package body Advent.Day_15 is
                return Pos;
             end if;
          when Empty =>
-            --  Put_Line (Standard_Error, "Next " & Next_Tile'Image);
             Next_Tile := This_Tile;
             This_Tile := Empty;
             return Next;
          when Wall =>
-            --  Put_Line (Standard_Error, "Next " & Next_Tile'Image);
             return Pos;
          when others =>
-            --  Put_Line (Standard_Error, "Next " & Next_Tile'Image);
             raise Constraint_Error;
       end case;
    end Move;

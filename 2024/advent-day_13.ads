@@ -37,6 +37,8 @@ package Advent.Day_13 is
    type Position is range -2**63 .. 2**63;
    type Counter is range 0 .. 2**64;
 
+   package Counter_Text_IO is new Ada.Text_IO.Integer_IO (Counter);
+
    type Button_Behavior is record
       X, Y : Offset;
    end record;

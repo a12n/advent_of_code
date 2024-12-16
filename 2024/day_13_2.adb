@@ -1,9 +1,10 @@
-with Ada.Text_IO;         use Ada.Text_IO;
-with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Advent.Day_13;       use Advent.Day_13;
+with Ada.Text_IO;   use Ada.Text_IO;
+with Advent.Day_13; use Advent.Day_13;
+with Advent;        use Advent;
 
 procedure Day_13_2 is
-   Total_Cost : Natural := 0;
+   use Counter_Text_IO;
+   Total_Cost : Counter := 0;
 begin
    loop
       declare

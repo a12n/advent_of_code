@@ -6,10 +6,6 @@ package Advent.Day_16 is
    type Maze_Type is array (Positive range <>, Positive range <>) of Tile_Type;
    pragma Pack (Maze_Type);
 
-   type Visited_Map is
-     array
-       (Positive range <>, Positive range <>, Direction range <>) of Boolean;
-
    function Best_Path
      (Maze      : Maze_Type; Start_Pos, Finish_Pos : Position;
       Start_Dir : Direction) return Natural;

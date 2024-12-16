@@ -89,9 +89,39 @@ package body Advent.Day_15 is
      (Warehouse : in out Wide_Warehouse_Map; Pos : Position; Dir : Direction)
       return Position
    is
+      Next_Pos : constant Position := Pos + To_Offset (Dir);
+
+      Row      : Integer renames Pos (1);
+      Col      : Integer renames Pos (2);
+      Next_Row : Integer renames Next_Pos (1);
+      Next_Col : Integer renames Next_Pos (2);
+
+      This_Tile : Tile renames Warehouse (Row, Col);
+      Next_Tile : Tile renames Warehouse (Next_Row, Next_Col);
    begin
-      --  TODO
-      return Pos;
+      if Dir = Left or Dir = Right then
+         case Next_Tile is
+            when Box | Box_Side =>
+               if Move (Warehouse, Next_Pos, Dir) /= Next_Pos then
+                  Next_Tile := This_Tile;
+                  This_Tile := Empty;
+                  return Next_Pos;
+               else
+                  return Pos;
+               end if;
+            when Empty =>
+               Next_Tile := This_Tile;
+               This_Tile := Empty;
+               return Next_Pos;
+            when Wall =>
+               return Pos;
+            when others =>
+               raise Constraint_Error;
+         end case;
+      elsif Dir = Down or Dir = Up then
+         --  TODO
+         null;
+      end if;
    end Move;
 
    procedure Print (File : File_Type; Warehouse : Warehouse_Map) is

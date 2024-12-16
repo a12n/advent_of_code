@@ -13,14 +13,14 @@ package body Advent.Day_13 is
       Start   : Positive := 1;
       Machine : Claw_Machine;
 
-      procedure Replace_Non_Digits (Line : in out String) is
+      procedure Filter_Digits (Line : in out String) is
       begin
          for I in Line'Range loop
             if Line (I) not in '0' .. '9' then
                Line (I) := ' ';
             end if;
          end loop;
-      end Replace_Non_Digits;
+      end Filter_Digits;
    begin
       if A_Line (1 .. 12) /= "Button A: X+" or
         B_Line (1 .. 12) /= "Button B: X+" or
@@ -37,9 +37,9 @@ package body Advent.Day_13 is
             null;
       end;
 
-      Replace_Non_Digits (A_Line);
-      Replace_Non_Digits (B_Line);
-      Replace_Non_Digits (Prize_Line);
+      Filter_Digits (A_Line);
+      Filter_Digits (B_Line);
+      Filter_Digits (Prize_Line);
 
       Get (A_Line, Machine.A.X, Start);
       Get (A_Line (Start + 1 .. A_Line'Last), Machine.A.Y, Start);

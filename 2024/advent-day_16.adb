@@ -1,3 +1,7 @@
+with Ada.Containers.Bounded_Priority_Queues;
+with Ada.Containers.Synchronized_Queue_Interfaces;
+with Ada.Containers; use Ada.Containers;
+
 package body Advent.Day_16 is
    function Get_Maze
      (File : File_Type; Start_Pos, Finish_Pos : out Position) return Maze_Type
@@ -44,8 +48,34 @@ package body Advent.Day_16 is
      (Maze      : Maze_Type; Start_Pos, Finish_Pos : Position;
       Start_Dir : Direction) return Natural
    is
+      type State is record
+         Pos  : Position;
+         Dir  : Direction;
+         Cost : Natural;
+      end record;
+
+      function Get_Priority (S : State) return Natural is (S.Cost);
+      function Before (N, M : Natural) return Boolean renames "<";
+
+      package State_Interface is new Ada.Containers
+        .Synchronized_Queue_Interfaces
+        (State);
+      package Priority_Queues is new Ada.Containers.Bounded_Priority_Queues
+        (Queue_Interfaces => State_Interface, Queue_Priority => Natural,
+         Default_Capacity => 16_384);
+
+      use Priority_Queues;
+
+      Q : Queue;
+      S : State;
    begin
-      --  TODO
-      return 0;
+      Q.Enqueue ((Start_Pos, Start_Dir, 0));
+      while Q.Current_Use > 0 loop
+         Q.Dequeue (S);
+         if S.Pos = Finish_Pos then
+            return S.Cost;
+         end if;
+      end loop;
+      raise Constraint_Error;
    end Best_Path;
 end Advent.Day_16;

@@ -34,7 +34,7 @@ package body Advent.Day_16 is
       Q.Enqueue ((Start_Pos, Start_Dir, 0));
       Visited (Start_Pos (1), Start_Pos (2), Start_Dir) := True;
       while Q.Current_Use > 0 loop
-         Print (Standard_Error, Maze, Visited);
+         Print (Standard_Error, Maze);
          Q.Dequeue (S);
 
          if S.Pos = Finish_Pos then
@@ -106,52 +106,18 @@ package body Advent.Day_16 is
       return Maze;
    end Get_Maze;
 
-   procedure Print (File : File_Type; Maze : Maze_Type; Visited : Visited_Map)
-   is
+   procedure Print (File : File_Type; Maze : Maze_Type) is
    begin
-      Put (File, ESC & "[;H");
-      Put (File, ESC & "[?25l");
       for Row in Maze'Range (1) loop
          for Col in Maze'Range (2) loop
             case Maze (Row, Col) is
                when Empty =>
-                  declare
-                     N : Natural := 0;
-                  begin
-                     if Visited (Row, Col, Down) then
-                        N := N + 1;
-                     end if;
-                     if Visited (Row, Col, Left) then
-                        N := N + 1;
-                     end if;
-                     if Visited (Row, Col, Right) then
-                        N := N + 1;
-                     end if;
-                     if Visited (Row, Col, Up) then
-                        N := N + 1;
-                     end if;
-                     case N is
-                        when 0 =>
-                           Put (File, '.');
-                        when 1 =>
-                           Put (File, ESC & "[48;5;240m" & 'o');
-                        when 2 =>
-                           Put (File, ESC & "[48;5;245m" & 'o');
-                        when 3 =>
-                           Put (File, ESC & "[48;5;250m" & 'o');
-                        when 4 =>
-                           Put (File, ESC & "[48;5;255m" & 'o');
-                        when others =>
-                           raise Constraint_Error;
-                     end case;
-                     Put (File, ESC & "[0m");
-                  end;
+                  Put (File, '.');
                when Wall =>
                   Put (File, '#');
             end case;
          end loop;
          New_Line (File);
       end loop;
-      Put (File, ESC & "[?25h");
    end Print;
 end Advent.Day_16;

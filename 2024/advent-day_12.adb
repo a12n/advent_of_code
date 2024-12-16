@@ -149,6 +149,21 @@ package body Advent.Day_12 is
       return Visited;
    end Flood_Fill;
 
+   function Input (File : File_Type) return Garden is
+      Line   : constant String := Get_Line (File);
+      Plants : Garden (Line'Range, Line'Range);
+   begin
+      for Col in Line'Range loop
+         Plants (1, Col) := Line (Col);
+      end loop;
+      for Row in Plants'First (1) + 1 .. Plants'Last (1) loop
+         for Col in Plants'Range (2) loop
+            Get (File, Plants (Row, Col));
+         end loop;
+      end loop;
+      return Plants;
+   end Input;
+
    function Number_Sides (Polygon : Visited_Map) return Positive is
       N     : Natural := 0;
       Sides :
@@ -223,19 +238,4 @@ package body Advent.Day_12 is
 
       return N;
    end Number_Sides;
-
-   function Input (File : File_Type) return Garden is
-      Line   : constant String := Get_Line (File);
-      Plants : Garden (Line'Range, Line'Range);
-   begin
-      for Col in Line'Range loop
-         Plants (1, Col) := Line (Col);
-      end loop;
-      for Row in Plants'First (1) + 1 .. Plants'Last (1) loop
-         for Col in Plants'Range (2) loop
-            Get (File, Plants (Row, Col));
-         end loop;
-      end loop;
-      return Plants;
-   end Input;
 end Advent.Day_12;

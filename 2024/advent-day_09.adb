@@ -33,6 +33,11 @@ package body Advent.Day_09 is
       return Sum;
    end Checksum;
 
+   function File_Index (I : Positive) return Boolean is
+   begin
+      return I mod 2 /= 0;
+   end File_Index;
+
    function Input (File : File_Type) return Size_Array is
       function Parse (Char : Character) return Natural is
       begin
@@ -102,11 +107,6 @@ package body Advent.Day_09 is
          Blocks (J) := -1;
       end loop;
    end Rearrange;
-
-   function File_Index (I : Positive) return Boolean is
-   begin
-      return I mod 2 /= 0;
-   end File_Index;
 
    function To_Blocks (Sizes : Size_Array) return Block_Array is
       function Number_Blocks (Sizes : Size_Array) return Natural is

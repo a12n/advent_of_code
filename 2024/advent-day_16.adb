@@ -27,7 +27,7 @@ package body Advent.Day_16 is
       Q : Queue;
       S : State;
 
-      Visited : array (Maze'Range (1), Maze'Range (2), Direction) of Boolean :=
+      Visited : Visited_Map (Maze'Range (1), Maze'Range (2), Direction) :=
         [others => [others => [others => False]]];
    begin
       Q.Enqueue ((Start_Pos, Start_Dir, 0));

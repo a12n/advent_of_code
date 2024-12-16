@@ -2,12 +2,12 @@ with Ada.Text_IO;   use Ada.Text_IO;
 with Advent.ANSI;
 with Advent.Day_15; use Advent.Day_15;
 with Advent.Grids;  use Advent.Grids;
-with Advent; use Advent;
+with Advent;        use Advent;
 
 procedure Day_15_2 is
-   Robot_Pos : Position;
-   Warehouse : Wide_Warehouse_Map :=
-     Widen (Get_Warehouse (Standard_Input, Robot_Pos), Robot_Pos);
+   Robot_Pos, Unused : Position;
+   Warehouse         : Wide_Warehouse_Map :=
+     Widen (Get_Warehouse (Standard_Input, Unused), Robot_Pos);
 
    Next_Robot_Pos : Position;
    Next_Warehouse :

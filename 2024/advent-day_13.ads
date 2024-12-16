@@ -35,6 +35,7 @@ package Advent.Day_13 is
 
    type Offset is range 0 .. 100;
    type Position is range -2**63 .. 2**63;
+   type Counter is range 0 .. 2**64;
 
    type Button_Behavior is record
       X, Y : Offset;
@@ -50,10 +51,10 @@ package Advent.Day_13 is
    end record;
 
    type Push_Count is record
-      A, B : Natural;
+      A, B : Counter;
    end record;
 
-   function Cost (Pushes : Push_Count) return Natural is
+   function Cost (Pushes : Push_Count) return Counter is
      (3 * Pushes.A + Pushes.B);
    function Input_Entry (File : File_Type) return Claw_Machine;
    function Solution

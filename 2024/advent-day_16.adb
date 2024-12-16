@@ -1,7 +1,6 @@
-with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
 with Ada.Containers.Synchronized_Queue_Interfaces;
 with Ada.Containers.Unbounded_Priority_Queues;
-with Ada.Containers;         use Ada.Containers;
+with Ada.Containers; use Ada.Containers;
 with Advent.ANSI;
 
 package body Advent.Day_16 is
@@ -59,8 +58,8 @@ package body Advent.Day_16 is
                Visited (Next_Pos (1), Next_Pos (2), S.Dir) := True;
                Put
                  (Standard_Error,
-                  ANSI.Cursor.Position (Next_Pos (1), Next_Pos (2)) & ESC &
-                  "[48;5;46m" & 'F');
+                  ANSI.Cursor.Position (Next_Pos (1), Next_Pos (2)) &
+                  ANSI.SGR.Background (0, 5, 0) & 'F');
             end if;
          end;
 
@@ -69,8 +68,8 @@ package body Advent.Day_16 is
             Visited (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) := True;
             Put
               (Standard_Error,
-               ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) & ESC &
-               "[48;5;40m" & 'c');
+               ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
+               ANSI.SGR.Background (0, 1, 0) & 'c');
          end if;
 
          if not Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) then
@@ -78,8 +77,8 @@ package body Advent.Day_16 is
             Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) := True;
             Put
               (Standard_Error,
-               ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) & ESC &
-               "[48;5;34m" & 'c');
+               ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
+               ANSI.SGR.Background (0, 2, 0) & 'C');
          end if;
       end loop;
       raise Constraint_Error;

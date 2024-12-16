@@ -34,7 +34,7 @@ package Advent.Day_13 is
    --  Maybe infeasible.
 
    type Offset is range 0 .. 100;
-   type Position is range 0 .. 2**64;
+   type Position is range -2**63 .. 2**63;
 
    type Button_Behavior is record
       X, Y : Offset;

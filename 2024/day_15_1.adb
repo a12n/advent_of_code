@@ -1,27 +1,38 @@
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Ada.Text_IO;         use Ada.Text_IO;
+with Advent.ANSI;
 with Advent.Day_15;       use Advent.Day_15;
 with Advent.Grids;        use Advent.Grids;
+with Advent;              use Advent;
 
 procedure Day_15_1 is
    Robot_Pos : Position;
    Warehouse : Warehouse_Map := Get_Warehouse (Standard_Input, Robot_Pos);
 begin
-   --  Put (Standard_Error, ASCII.ESC & "[?25l");
-   --  Put_Line (Standard_Error, ASCII.ESC & "[;H");
-   Print (Standard_Error, Warehouse);
+   if Debug then
+      Put (Standard_Error, ANSI.Cursor.Hide);
+   end if;
+
    for I in Positive'Range loop
       begin
-         --  delay 0.033;
+         if Debug then
+            delay 0.033;
+            Put (Standard_Error, ANSI.Cursor.Position (1, 1));
+            Print (Standard_Error, Warehouse);
+            Put_Line (Standard_Error, I'Image);
+         end if;
          Robot_Pos := Move (Warehouse, Robot_Pos, Get_Move (Standard_Input));
-         --  Put_Line (Standard_Error, ASCII.ESC & "[;H" & I'Image);
-         --  Print (Standard_Error, Warehouse);
       exception
          when End_Error =>
             exit;
       end;
    end loop;
-   --  Put (Standard_Error, ASCII.ESC & "[?25h");
+
+   if Debug then
+      Put (Standard_Error, ANSI.Cursor.Position (1, 1));
+      Print (Standard_Error, Warehouse);
+      Put (Standard_Error, ANSI.Cursor.Show);
+   end if;
 
    declare
       Sum : Natural := 0;

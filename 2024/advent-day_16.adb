@@ -33,21 +33,29 @@ package body Advent.Day_16 is
    begin
       Q.Enqueue ((Start_Pos, Start_Dir, 0));
       Visited (Start_Pos (1), Start_Pos (2), Start_Dir) := True;
-      Put (Standard_Error, ANSI.Cursor.Hide & ANSI.Cursor.Position (1, 1));
-      Print (Standard_Error, Maze);
-      Put
-        (Standard_Error,
-         ANSI.Cursor.Position (Start_Pos (1), Start_Pos (2)) & 'S');
+
+      if Debug then
+         Put (Standard_Error, ANSI.Cursor.Hide & ANSI.Cursor.Position (1, 1));
+         Print (Standard_Error, Maze);
+         Put
+           (Standard_Error,
+            ANSI.Cursor.Position (Start_Pos (1), Start_Pos (2)) & 'S');
+      end if;
 
       while Q.Current_Use > 0 loop
-         delay 0.000_5;
+         if Debug then
+            delay 0.001;
+         end if;
+
          Q.Dequeue (S);
 
          if S.Pos = Finish_Pos then
-            Put
-              (Standard_Error,
-               ANSI.Cursor.Position (Maze'Last (1) + 1, 1) & ANSI.SGR.Reset &
-               ANSI.Cursor.Show);
+            if Debug then
+               Put
+                 (Standard_Error,
+                  ANSI.Cursor.Position (Maze'Last (1) + 1, 1) &
+                  ANSI.SGR.Reset & ANSI.Cursor.Show);
+            end if;
             return S.Cost;
          end if;
 
@@ -59,29 +67,35 @@ package body Advent.Day_16 is
             then
                Q.Enqueue ((Next_Pos, S.Dir, S.Cost + 1));
                Visited (Next_Pos (1), Next_Pos (2), S.Dir) := True;
-               Put
-                 (Standard_Error,
-                  ANSI.Cursor.Position (Next_Pos (1), Next_Pos (2)) &
-                  ANSI.SGR.Background (0, 5, 0) & 'F');
+               if Debug then
+                  Put
+                    (Standard_Error,
+                     ANSI.Cursor.Position (Next_Pos (1), Next_Pos (2)) &
+                     ANSI.SGR.Background (0, 5, 0) & 'F');
+               end if;
             end if;
          end;
 
          if not Visited (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) then
             Q.Enqueue ((S.Pos, Rotate (CW, S.Dir), S.Cost + 1_000));
             Visited (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) := True;
-            Put
-              (Standard_Error,
-               ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
-               ANSI.SGR.Background (3, 0, 1) & 'c');
+            if Debug then
+               Put
+                 (Standard_Error,
+                  ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
+                  ANSI.SGR.Background (3, 0, 1) & 'c');
+            end if;
          end if;
 
          if not Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) then
             Q.Enqueue ((S.Pos, Rotate (CCW, S.Dir), S.Cost + 1_000));
             Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) := True;
-            Put
-              (Standard_Error,
-               ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
-               ANSI.SGR.Background (1, 0, 3) & 'C');
+            if Debug then
+               Put
+                 (Standard_Error,
+                  ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
+                  ANSI.SGR.Background (1, 0, 3) & 'C');
+            end if;
          end if;
       end loop;
       raise Constraint_Error;

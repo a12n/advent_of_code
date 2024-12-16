@@ -1,6 +1,7 @@
-with Ada.Text_IO;         use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
+with Ada.Text_IO;         use Ada.Text_IO;
 with Advent.Day_14;       use Advent.Day_14;
+with Advent;              use Advent;
 
 procedure Day_14_2 is
    Robots   : Robot_Array := Input (Standard_Input);
@@ -14,11 +15,13 @@ begin
          if Dist < Min_Dist then
             Min_Dist := Dist;
             Min_Time := Time;
-            Put_Line
-              (Standard_Error,
-               ASCII.ESC & "[2JAfter " & Time'Image & ", Distance " &
-               Dist'Image);
-            Print (Standard_Error, Robots);
+            if Debug then
+               Put_Line
+                 (Standard_Error,
+                  ASCII.ESC & "[2JAfter " & Time'Image & ", Distance " &
+                  Dist'Image);
+               Print (Standard_Error, Robots);
+            end if;
          end if;
       end;
       Simulate (Robots, 1);

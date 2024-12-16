@@ -14,14 +14,18 @@ procedure Day_15_2 is
    Next_Warehouse :
      Wide_Warehouse_Map (Warehouse'Range (1), Warehouse'Range (2));
 begin
-   --  Put_Line (Standard_Error, "Robot_Pos" & Robot_Pos'Image);
+   if Debug then
+      Put (Standard_Error, ANSI.Cursor.Hide);
+   end if;
 
-   --  Put (Standard_Error, ANSI.Cursor.Hide);
-   --  Put_Line (Standard_Error, ANSI.Cursor.Position (1, 1));
-   Print (Standard_Error, Warehouse);   --  50x100
    begin
       for I in Positive'Range loop
-         --  delay 0.0125;
+         if Debug then
+            delay 0.012_5;
+            Put (Standard_Error, ANSI.Cursor.Position (1, 1));
+            Print (Standard_Error, Warehouse);
+            Put_Line (Standard_Error, I'Image);
+         end if;
 
          Next_Warehouse := Warehouse;
          Next_Robot_Pos :=
@@ -30,15 +34,17 @@ begin
             Robot_Pos := Next_Robot_Pos;
             Warehouse := Next_Warehouse;
          end if;
-
-         --  Put_Line (Standard_Error, ANSI.Cursor.Position (1, 1) & I'Image);
-         --  Print (Standard_Error, Warehouse);
       end loop;
    exception
       when End_Error =>
          null;
    end;
-   --  Put (Standard_Error, ANSI.Cursor.Show);
+
+   if Debug then
+      Put (Standard_Error, ANSI.Cursor.Position (1, 1));
+      Print (Standard_Error, Warehouse);
+      Put (Standard_Error, ANSI.Cursor.Show);
+   end if;
 
    declare
       Sum : Natural := 0;

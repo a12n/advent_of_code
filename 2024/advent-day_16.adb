@@ -1,4 +1,4 @@
-with Ada.Containers.Bounded_Priority_Queues;
+with Ada.Containers.Unbounded_Priority_Queues;
 with Ada.Containers.Synchronized_Queue_Interfaces;
 with Ada.Containers; use Ada.Containers;
 
@@ -60,9 +60,8 @@ package body Advent.Day_16 is
       package State_Queue_Interface is new Ada.Containers
         .Synchronized_Queue_Interfaces
         (State);
-      package State_Queues is new Ada.Containers.Bounded_Priority_Queues
-        (Queue_Interfaces => State_Queue_Interface, Queue_Priority => Natural,
-         Default_Capacity => 16_384);
+      package State_Queues is new Ada.Containers.Unbounded_Priority_Queues
+        (Queue_Interfaces => State_Queue_Interface, Queue_Priority => Natural);
 
       use State_Queues;
 

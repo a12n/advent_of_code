@@ -12,12 +12,15 @@ package Advent.ANSI is
    end Cursor;
 
    package SGR is
-      subtype Intensity is Natural range 0 .. 5;
-      function Foreground (R, G, B : Intensity) return String;
-      function Background (R, G, B : Intensity) return String;
+      subtype Gray_Level is Natural range 0 .. 23;
+      subtype Color_Level is Gray_Level range 0 .. 5;
+      function Background (N : Gray_Level) return String;
+      function Background (R, G, B : Color_Level) return String;
+      function Foreground (N : Gray_Level) return String;
+      function Foreground (R, G, B : Color_Level) return String;
       Reset : constant String := ESC & "[0m";
    private
-      function Color (R, G, B : Intensity) return String is
+      function Color (R, G, B : Color_Level) return String is
         (Trim (Natural'(16 + 36 * R + 6 * G + B)'Image, Left));
    end SGR;
 end Advent.ANSI;

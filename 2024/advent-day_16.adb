@@ -40,11 +40,14 @@ package body Advent.Day_16 is
          ANSI.Cursor.Position (Start_Pos (1), Start_Pos (2)) & 'S');
 
       while Q.Current_Use > 0 loop
-         delay 0.001;
+         delay 0.000_5;
          Q.Dequeue (S);
 
          if S.Pos = Finish_Pos then
-            Put (Standard_Error, ANSI.Cursor.Show);
+            Put
+              (Standard_Error,
+               ANSI.Cursor.Position (Maze'Last (1) + 1, 1) & ANSI.SGR.Reset &
+               ANSI.Cursor.Show);
             return S.Cost;
          end if;
 
@@ -69,7 +72,7 @@ package body Advent.Day_16 is
             Put
               (Standard_Error,
                ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
-               ANSI.SGR.Background (0, 1, 0) & 'c');
+               ANSI.SGR.Background (3, 0, 1) & 'c');
          end if;
 
          if not Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) then
@@ -78,7 +81,7 @@ package body Advent.Day_16 is
             Put
               (Standard_Error,
                ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
-               ANSI.SGR.Background (0, 2, 0) & 'C');
+               ANSI.SGR.Background (1, 0, 3) & 'C');
          end if;
       end loop;
       raise Constraint_Error;

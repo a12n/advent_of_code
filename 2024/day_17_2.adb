@@ -1,9 +1,10 @@
-with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Ada.Text_IO;         use Ada.Text_IO;
-with Advent.Day_17;       use Advent.Day_17;
-with Advent;              use Advent;
+with Ada.Text_IO;   use Ada.Text_IO;
+with Advent.Day_17; use Advent.Day_17;
+with Advent;        use Advent;
 
 procedure Day_17_2 is
+   use Register_Text_IO;
+
    CPU     : constant CPU_Type     := Get_CPU (Standard_Input);
    Program : constant Number_Array := Get_Program (Standard_Input);
 
@@ -26,11 +27,11 @@ procedure Day_17_2 is
       return not Temp_CPU.Run (Program, Output);
    end Quine;
 begin
-   for Initial in Natural'Range loop
+   for Initial in Register'Range loop
       if Debug then
          Put_Line (Standard_Error, Initial'Image);
       end if;
-      if Quine (Register (Initial)) then
+      if Quine (Initial) then
          Put (Initial, 0);
          New_Line;
          exit;

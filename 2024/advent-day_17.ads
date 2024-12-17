@@ -7,6 +7,8 @@ package Advent.Day_17 is
    type Register_Name is (A, B, C);
    type Register_Set is array (Register_Name) of Register;
 
+   package Register_Text_IO is new Ada.Text_IO.Modular_IO (Register);
+
    type CPU_Type is record
       R : Register_Set := [others => 0];
       I : Natural      := 0;

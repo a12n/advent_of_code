@@ -1,8 +1,6 @@
 with Interfaces; use Interfaces;
 
 package body Advent.Day_17 is
-   package Register_Text_IO is new Ada.Text_IO.Modular_IO (Register);
-
    function From_String (Chars : String) return Number_Array is
       Numbers : Number_Array (1 .. (Chars'Length + 1) / 2) := [others => 0];
    begin

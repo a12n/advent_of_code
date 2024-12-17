@@ -1,42 +1,54 @@
 package body Advent.Day_17 is
-   function Get_CPU (File : File_Type) return CPU_Type is
-      package Register_Text_IO is new Ada.Text_IO.Integer_IO (Register);
-      use Register_Text_IO;
+   package Register_Text_IO is new Ada.Text_IO.Modular_IO (Register);
 
-      A_Line : String := Get_Line (File);
-      B_Line : String := Get_Line (File);
-      C_Line : String := Get_Line (File);
-      Unused : Positive;
-      CPU    : CPU_Type;
-
-      procedure Filter (Chars : in out String) is
-      begin
-         for I in Chars'Range loop
-            if Chars (I) not in '0' .. '9' then
-               Chars (I) := ' ';
-            end if;
-         end loop;
-      end Filter;
+   function From_String (Chars : String) return Number_Array is
+      Numbers : Number_Array (1 .. (Chars'Length + 1) / 2) := [others => 0];
    begin
-      if A_Line (1 .. 12) /= "Register A: " or
-        B_Line (1 .. 12) /= "Register B: " or
-        C_Line (1 .. 12) /= "Register C: "
-      then
-         raise Constraint_Error;
-      end if;
-      Filter (A_Line);
-      Filter (B_Line);
-      Filter (C_Line);
-      Get (A_Line, CPU.A, Unused);
-      Get (B_Line, CPU.B, Unused);
-      Get (C_Line, CPU.C, Unused);
+      for I in Numbers'Range loop
+         --  TODO: Check ','
+         Numbers (I) :=
+           Character'Pos (Chars (Chars'First + 2 * I - 2)) -
+           Character'Pos ('0');
+      end loop;
+      return Numbers;
+   end From_String;
+
+   function Get_CPU (File : File_Type) return CPU_Type is
+      function Get_Register
+        (File : File_Type; Name : Register_Name) return Register
+      is
+         use Register_Text_IO;
+         Line   : constant String := Get_Line (File);
+         R      : Register;
+         Unused : Positive;
+      begin
+         if Line (1 .. 9) /= "Register " or Line (10 .. 10) /= Name'Image or
+           Line (11 .. 12) /= ": "
+         then
+            raise Constraint_Error;
+         end if;
+         Get (Line (13 .. Line'Last), R, Unused);
+         return R;
+      end Get_Register;
+
+      CPU : CPU_Type;
+   begin
+      CPU.R (A) := Get_Register (File, A);
+      CPU.R (B) := Get_Register (File, B);
+      CPU.R (C) := Get_Register (File, C);
+
+      Skip_Line (File);
+
       return CPU;
    end Get_CPU;
 
    function Get_Program (File : File_Type) return Number_Array is
+      Line : constant String := Get_Line (File);
    begin
-      --  TODO
-      return Number_Array'[];
+      if Line (1 .. 9) /= "Program: " then
+         raise Constraint_Error;
+      end if;
+      return From_String (Line (10 .. Line'Last));
    end Get_Program;
 
    function Run

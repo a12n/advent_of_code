@@ -3,40 +3,23 @@ with Advent.Day_17; use Advent.Day_17;
 with Advent;        use Advent;
 
 procedure Day_17_2 is
-   use Register_Text_IO;
-
    CPU     : constant CPU_Type     := Get_CPU (Standard_Input);
    Program : constant Number_Array := Get_Program (Standard_Input);
-
-   function Quine (Initial : Register) return Boolean is
-      Temp_CPU : CPU_Type := CPU;
-      Output   : Number;
-   begin
-      Temp_CPU.R (A) := Initial;
-      --  If program outputs itself instructions…
-      for I in Program'Range loop
-         if Temp_CPU.Run (Program, Output) then
-            if Output /= Program (I) then
-               return False;
-            end if;
-         else
-            return False;
-         end if;
-      end loop;
-      --  …and then halts.
-      return not Temp_CPU.Run (Program, Output);
-   end Quine;
 begin
+   Put_Line (Standard_Error, Program'Image & Natural'Image (Program'Length));
    Print (Standard_Error, Program);
-   return;
-   for Initial in Register'Range loop
-      if Debug then
-         Put_Line (Standard_Error, Initial'Image);
-      end if;
-      if Quine (Initial) then
-         Put (Initial, 0);
-         New_Line;
-         exit;
-      end if;
-   end loop;
+   --  0: b = a & 0b111
+   --  2: b = b ^ 4
+   --  4: c = a >> b
+   --  6: b = b ^ c
+   --  8: b = b ^ 4
+   --  10: output = b & 0b111
+   --  12: a = a >> 3
+   --  14: if a != 0 { goto 0 }
+
+   --  2: b = (a & 0b111) ^ 0b100
+   --  8: b = (b ^ (a >> b)) ^ 0b100
+   --  10: output = b & 0b111
+   --  12: a = a >> 3
+   --  14: if a != 0 { goto 0 }
 end Day_17_2;

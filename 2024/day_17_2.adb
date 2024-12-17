@@ -27,10 +27,10 @@ procedure Day_17_2 is
    end Quine;
 begin
    for Initial in Natural'Range loop
+      if Debug then
+         Put_Line (Standard_Error, Initial'Image);
+      end if;
       if Quine (Register (Initial)) then
-         if Debug then
-            Put_Line (Standard_Error, Initial'Image);
-         end if;
          Put (Initial, 0);
          New_Line;
          exit;

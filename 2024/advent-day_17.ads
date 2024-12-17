@@ -15,6 +15,7 @@ package Advent.Day_17 is
    function Get_CPU (File : File_Type) return CPU_Type;
    function Get_Program (File : File_Type) return Number_Array;
    function Run
-     (CPU : in out CPU_Type; Program : Number_Array) return Number_Array;
+     (CPU : in out CPU_Type; Program : Number_Array; Output : out Number)
+      return Boolean;
    function To_String (Numbers : Number_Array) return String;
 end Advent.Day_17;

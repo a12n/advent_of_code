@@ -1,3 +1,5 @@
+with Interfaces; use Interfaces;
+
 package body Advent.Day_17 is
    package Register_Text_IO is new Ada.Text_IO.Modular_IO (Register);
 
@@ -52,11 +54,73 @@ package body Advent.Day_17 is
    end Get_Program;
 
    function Run
-     (CPU : in out CPU_Type; Program : Number_Array) return Number_Array
+     (CPU : in out CPU_Type; Program : Number_Array; Output : out Number)
+      return Boolean
    is
+      function Combo (N : Number) return Register is
+      begin
+         case N is
+            when 0 .. 3 =>
+               return Register (N);
+            when 4 =>
+               return CPU.R (A);
+            when 5 =>
+               return CPU.R (B);
+            when 6 =>
+               return CPU.R (C);
+            when 7 =>
+               raise Program_Error;
+         end case;
+      end Combo;
    begin
-      --  TODO
-      return Number_Array'[4, 6, 3, 5, 6, 3, 5, 2, 1, 0];
+      while (Program'First + CPU.I) <= Program'Last loop
+         case Program (Program'First + CPU.I) is
+            when 0 =>
+               CPU.R (A) :=
+                 Register
+                   (Shift_Right
+                      (Unsigned_64 (CPU.R (A)),
+                       Natural (Combo (Program (Program'First + CPU.I + 1)))));
+               CPU.I     := @ + 2;
+            when 1 =>
+               CPU.R (B) :=
+                 CPU.R (B) xor Register (Program (Program'First + CPU.I + 1));
+               CPU.I     := @ + 2;
+            when 2 =>
+               CPU.R (B) := Combo (Program (Program'First + CPU.I + 1)) mod 8;
+               CPU.I     := @ + 2;
+            when 3 =>
+               if CPU.R (A) /= 0 then
+                  CPU.I := Natural (Program (Program'First + CPU.I + 1));
+               else
+                  CPU.I := @ + 2;
+               end if;
+            when 4 =>
+               CPU.R (B) := CPU.R (B) xor CPU.R (C);
+               CPU.I     := @ + 2;
+            when 5 =>
+               Output :=
+                 Number (Combo (Program (Program'First + CPU.I + 1)) mod 8);
+               CPU.I  := @ + 2;
+               return True;
+            when 6 =>
+               CPU.R (B) :=
+                 Register
+                   (Shift_Right
+                      (Unsigned_64 (CPU.R (A)),
+                       Natural (Combo (Program (Program'First + CPU.I + 1)))));
+               CPU.I     := @ + 2;
+            when 7 =>
+               CPU.R (C) :=
+                 Register
+                   (Shift_Right
+                      (Unsigned_64 (CPU.R (A)),
+                       Natural (Combo (Program (Program'First + CPU.I + 1)))));
+               CPU.I     := @ + 2;
+         end case;
+      end loop;
+
+      return False;
    end Run;
 
    function To_String (Numbers : Number_Array) return String is

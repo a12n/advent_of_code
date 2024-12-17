@@ -51,6 +51,50 @@ package body Advent.Day_17 is
       return From_String (Line (10 .. Line'Last));
    end Get_Program;
 
+   procedure Print (File : File_Type; Program : Number_Array) is
+      function Combo (N : Number) return String is
+      begin
+         case N is
+            when 0 .. 3 =>
+               return N'Image;
+            when 4 =>
+               return " a";
+            when 5 =>
+               return " b";
+            when 6 =>
+               return " c";
+            when 7 =>
+               raise Constraint_Error;
+         end case;
+      end Combo;
+      I : Positive := Program'First;
+   begin
+      while I <= Program'Last loop
+         Put (File, Natural'Image (I - 1) & ": ");
+         case Program (I) is
+            when 0 =>
+               Put_Line (File, "a = a >>" & Combo (Program (I + 1)));
+            when 1 =>
+               Put_Line (File, "b = b ^" & Program (I + 1)'Image);
+            when 2 =>
+               Put_Line (File, "b =" & Combo (Program (I + 1)) & " & 0b111");
+            when 3 =>
+               Put_Line
+                 (File, "if a != 0 { goto" & Program (I + 1)'Image & " }");
+            when 4 =>
+               Put_Line (File, "b = b ^ c");
+            when 5 =>
+               Put_Line
+                 (File, "output =" & Combo (Program (I + 1)) & " & 0b111");
+            when 6 =>
+               Put_Line (File, "b = a >>" & Combo (Program (I + 1)));
+            when 7 =>
+               Put_Line (File, "c = a >>" & Combo (Program (I + 1)));
+         end case;
+         I := I + 2;
+      end loop;
+   end Print;
+
    function Run
      (CPU : in out CPU_Type; Program : Number_Array; Output : out Number)
       return Boolean

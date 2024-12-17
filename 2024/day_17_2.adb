@@ -27,6 +27,8 @@ procedure Day_17_2 is
       return not Temp_CPU.Run (Program, Output);
    end Quine;
 begin
+   Print (Standard_Error, Program);
+   return;
    for Initial in Register'Range loop
       if Debug then
          Put_Line (Standard_Error, Initial'Image);

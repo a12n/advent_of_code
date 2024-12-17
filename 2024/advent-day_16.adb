@@ -161,6 +161,12 @@ package body Advent.Day_16 is
             return False;
          end if;
 
+         --  XXX
+         if (Finish_Cost - Cost) < Taxicab_Distance (Pos, Finish_Pos) + 1_000
+         then
+            return False;
+         end if;
+
          if Cost = Finish_Cost and Pos = Finish_Pos then
             Put_Line (Standard_Error, "Found");
             Best_Spots (Pos (1), Pos (2)) := True;

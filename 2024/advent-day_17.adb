@@ -70,7 +70,9 @@ package body Advent.Day_17 is
       I : Positive := Program'First;
    begin
       while I <= Program'Last loop
-         Put (File, Natural'Image (I - 1) & ": ");
+         Put
+           (File,
+            Natural'Image (I - 1) & ": [" & Program (I)'Image & Program (I + 1)'Image & " ] ");
          case Program (I) is
             when 0 =>
                Put_Line (File, "a = a >>" & Combo (Program (I + 1)));

@@ -6,7 +6,6 @@ procedure Day_17_2 is
    CPU     : constant CPU_Type     := Get_CPU (Standard_Input);
    Program : constant Number_Array := Get_Program (Standard_Input);
 begin
-   Put_Line (Standard_Error, Program'Image & Natural'Image (Program'Length));
    Print (Standard_Error, Program);
    --  0: b = a & 0b111
    --  2: b = b ^ 4

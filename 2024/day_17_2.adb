@@ -1,24 +1,32 @@
 with Ada.Text_IO;   use Ada.Text_IO;
 with Advent.Day_17; use Advent.Day_17;
 with Advent;        use Advent;
+with Interfaces;    use Interfaces;
 
 procedure Day_17_2 is
-   CPU     : constant CPU_Type     := Get_CPU (Standard_Input);
+   Initial : constant CPU_Type     := Get_CPU (Standard_Input);
    Program : constant Number_Array := Get_Program (Standard_Input);
+   Answer  : Unsigned_64           := 0;
 begin
    Print (Standard_Error, Program);
-   --  0: b = a & 0b111
-   --  2: b = b ^ 4
-   --  4: c = a >> b
-   --  6: b = b ^ c
-   --  8: b = b ^ 4
-   --  10: output = b & 0b111
-   --  12: a = a >> 3
-   --  14: if a != 0 { goto 0 }
-
-   --  2: b = (a & 0b111) ^ 0b100
-   --  8: b = (b ^ (a >> b)) ^ 0b100
-   --  10: output = b & 0b111
-   --  12: a = a >> 3
-   --  14: if a != 0 { goto 0 }
+   for I in Program'Range loop
+      for V in 0 .. 2**7 loop
+         declare
+            CPU    : CPU_Type := Initial;
+            Output : Number;
+         begin
+            CPU.R (A) := Register (V);
+            if CPU.Run (Program, Output) and then Output = Program (I) then
+               Put_Line
+                 (Standard_Error,
+                  "I " & I'Image & ", Program(I) " & Program (I)'Image &
+                  ", V " & Unsigned_64'Image (Unsigned_64 (V) and 2#111#));
+               Answer :=
+                 Shift_Left (Answer, 3) or (Unsigned_64 (V) and 2#111#);
+               exit;
+            end if;
+         end;
+      end loop;
+   end loop;
+   Put_Line (Standard_Error, Answer'Image);
 end Day_17_2;

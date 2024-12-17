@@ -26,6 +26,9 @@ package Advent.Grids is
 
    function Line_Direction (P, Q : Position) return Direction;
 
+   function Taxicab_Distance (P, Q : Position) return Natural is
+     (abs (P (1) - Q (1)) + abs (P (2) - Q (2)));
+
    function "*" (V : Offset; N : Integer) return Offset is
      [V (1) * N, V (2) * N];
    function "+" (U, V : Offset) return Offset is

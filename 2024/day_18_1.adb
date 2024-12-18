@@ -5,11 +5,10 @@ with Advent.Grids;        use Advent.Grids;
 with Advent;              use Advent;
 
 procedure Day_18_1 is
-   Size    : constant Natural  := 6;
-   N_Bytes : constant Positive := 12;
-   --  Size : constant Natural := 70;
-   --  N_Bytes : constant Positive := 1_000;
-   --  N_Bytes : constant Positive := 1_024;
+   --  Size    : constant Natural  := 6;
+   --  N_Bytes : constant Positive := 12;
+   Size : constant Natural := 70;
+   N_Bytes : constant Positive := 1_024;
 
    Corrupted : Corrupted_Map (0 .. Size, 0 .. Size) :=
      [others => [others => False]];

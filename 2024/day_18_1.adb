@@ -20,14 +20,14 @@ begin
       declare
          Pos : constant Position := Get_Byte_Position (Standard_Input);
       begin
-         if Debug_Level < 2 then
+         if Debug then
             Put_Line (Standard_Error, I'Image & ":" & Pos'Image);
          end if;
          Corrupted (Pos (1), Pos (2)) := True;
       end;
    end loop;
 
-   if Debug_Level < 2 then
+   if Debug then
       Print (Standard_Error, Corrupted);
    end if;
 

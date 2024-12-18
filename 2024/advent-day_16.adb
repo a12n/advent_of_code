@@ -8,6 +8,17 @@ package body Advent.Day_16 is
      (Maze      : Maze_Type; Start_Pos, Finish_Pos : Position;
       Start_Dir : Direction) return Natural
    is
+      Cost         : Natural;
+      Unused_Paths : constant Tile_Map :=
+        Best_Paths (Maze, Start_Pos, Finish_Pos, Start_Dir, Cost);
+   begin
+      return Cost;
+   end Best_Path;
+
+   function Best_Paths
+     (Maze      : Maze_Type; Start_Pos, Finish_Pos : Position;
+      Start_Dir : Direction; Cost : out Natural) return Tile_Map
+   is
       type State is record
          Pos  : Position;
          Dir  : Direction;
@@ -28,13 +39,31 @@ package body Advent.Day_16 is
       Q : Queue;
       S : State;
 
+      Parent  : array (Maze'Range (1), Maze'Range (2), Direction) of Boolean :=
+        [others => [others => [others => False]]];
       Visited : array (Maze'Range (1), Maze'Range (2), Direction) of Boolean :=
         [others => [others => [others => False]]];
+      Paths   : Tile_Map (Maze'Range (1), Maze'Range (2))                    :=
+        [others => [others => False]];
+
+      procedure Backtrack (Pos : Position) is
+      begin
+         Paths (Pos (1), Pos (2)) := True;
+         if Pos /= Start_Pos then
+            for Dir in Direction'Range loop
+               if Parent (Pos (1), Pos (2), Dir) then
+                  Backtrack (Pos + To_Offset (Dir));
+               end if;
+            end loop;
+         end if;
+      end Backtrack;
    begin
+      Cost := Natural'Last;
+
       Q.Enqueue ((Start_Pos, Start_Dir, 0));
       Visited (Start_Pos (1), Start_Pos (2), Start_Dir) := True;
 
-      if Debug then
+      if Debug_Level > 1 then
          Put (Standard_Error, ANSI.Cursor.Hide & ANSI.Cursor.Position (1, 1));
          Print (Standard_Error, Maze);
          Put
@@ -43,63 +72,68 @@ package body Advent.Day_16 is
       end if;
 
       while Q.Current_Use > 0 loop
-         if Debug then
+         if Debug_Level > 1 then
             delay 0.001;
          end if;
 
          Q.Dequeue (S);
 
          if S.Pos = Finish_Pos then
-            if Debug then
-               Put
-                 (Standard_Error,
-                  ANSI.Cursor.Position (Maze'Last (1) + 1, 1) &
-                  ANSI.SGR.Reset & ANSI.Cursor.Show);
-            end if;
-            return S.Cost;
-         end if;
+            Cost := Natural'Min (Cost, S.Cost);
+         else
+            declare
+               Next_Pos : constant Position := S.Pos + To_Offset (S.Dir);
+            begin
+               if not Visited (Next_Pos (1), Next_Pos (2), S.Dir) and
+                 Maze (Next_Pos (1), Next_Pos (2)) = Empty
+               then
+                  Q.Enqueue ((Next_Pos, S.Dir, S.Cost + 1));
+                  Parent (Next_Pos (1), Next_Pos (2), Opposite (S.Dir)) :=
+                    True;
+                  Visited (Next_Pos (1), Next_Pos (2), S.Dir) := True;
+                  if Debug_Level > 1 then
+                     Put
+                       (Standard_Error,
+                        ANSI.Cursor.Position (Next_Pos (1), Next_Pos (2)) &
+                        ANSI.SGR.Background (0, 5, 0) & 'F');
+                  end if;
+               end if;
+            end;
 
-         declare
-            Next_Pos : constant Position := S.Pos + To_Offset (S.Dir);
-         begin
-            if not Visited (Next_Pos (1), Next_Pos (2), S.Dir) and
-              Maze (Next_Pos (1), Next_Pos (2)) = Empty
-            then
-               Q.Enqueue ((Next_Pos, S.Dir, S.Cost + 1));
-               Visited (Next_Pos (1), Next_Pos (2), S.Dir) := True;
-               if Debug then
+            if not Visited (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) then
+               Q.Enqueue ((S.Pos, Rotate (CW, S.Dir), S.Cost + 1_000));
+               Visited (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) := True;
+               if Debug_Level > 1 then
                   Put
                     (Standard_Error,
-                     ANSI.Cursor.Position (Next_Pos (1), Next_Pos (2)) &
-                     ANSI.SGR.Background (0, 5, 0) & 'F');
+                     ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
+                     ANSI.SGR.Background (3, 0, 1) & 'c');
                end if;
             end if;
-         end;
 
-         if not Visited (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) then
-            Q.Enqueue ((S.Pos, Rotate (CW, S.Dir), S.Cost + 1_000));
-            Visited (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) := True;
-            if Debug then
-               Put
-                 (Standard_Error,
-                  ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
-                  ANSI.SGR.Background (3, 0, 1) & 'c');
-            end if;
-         end if;
-
-         if not Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) then
-            Q.Enqueue ((S.Pos, Rotate (CCW, S.Dir), S.Cost + 1_000));
-            Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) := True;
-            if Debug then
-               Put
-                 (Standard_Error,
-                  ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
-                  ANSI.SGR.Background (1, 0, 3) & 'C');
+            if not Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) then
+               Q.Enqueue ((S.Pos, Rotate (CCW, S.Dir), S.Cost + 1_000));
+               Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) := True;
+               if Debug_Level > 1 then
+                  Put
+                    (Standard_Error,
+                     ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
+                     ANSI.SGR.Background (1, 0, 3) & 'C');
+               end if;
             end if;
          end if;
       end loop;
-      raise Constraint_Error;
-   end Best_Path;
+
+      if Debug_Level > 1 then
+         Put
+           (Standard_Error,
+            ANSI.Cursor.Position (Maze'Last (1) + 1, 1) & ANSI.SGR.Reset &
+            ANSI.Cursor.Show);
+      end if;
+
+      Backtrack (Finish_Pos);
+      return Paths;
+   end Best_Paths;
 
    function Get_Maze
      (File : File_Type; Start_Pos, Finish_Pos : out Position) return Maze_Type

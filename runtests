@@ -29,13 +29,19 @@ esac
 
 for IN_FILE in $PROG_ID/*.in; do
     TEST_ID=${IN_FILE%.*}
+    ENV_FILE=$TEST_ID.env
     OUT_FILE=$TEST_ID.out
     if [ ! -f $OUT_FILE ]; then
         continue
     fi
-    PROG_OUT=$($PROG < $IN_FILE | $OUT_CMD)
+    if [ -r $ENV_FILE ]; then
+        echo "==== $TEST_ID < $ENV_FILE ===="
+        PROG_OUT=$(export $(xargs < $ENV_FILE) && $PROG < $IN_FILE | $OUT_CMD)
+    else
+        echo "==== $TEST_ID ===="
+        PROG_OUT=$($PROG < $IN_FILE | $OUT_CMD)
+    fi
     EXPECT_OUT=$($OUT_CMD $OUT_FILE)
-    echo ==== $TEST_ID ====
     if [ "$PROG_OUT" != "$EXPECT_OUT" ]; then
         echo ---- Program Output ----
         echo $PROG_OUT

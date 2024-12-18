@@ -8,9 +8,9 @@ procedure Day_16_2 is
    Maze : constant Maze_Type := Get_Maze (Standard_Input, Start, Finish);
 
    Unused_Cost : Natural;
-   Paths       : constant Tile_Map :=
+   Paths       : constant Paths_Map :=
      Best_Paths (Maze, Start, Finish, Right, Unused_Cost);
-   N           : Natural           := 0;
+   N           : Natural            := 0;
 begin
    Print (Standard_Error, Maze, Paths);
    for Row in Paths'Range (1) loop

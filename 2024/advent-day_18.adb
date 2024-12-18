@@ -25,14 +25,17 @@ package body Advent.Day_18 is
       return Pos;
    end Get_Byte_Position;
 
-   procedure Print (File : File_Type; Corrupted : Position_Map) is
+   procedure Print
+     (File : File_Type; Positions : Position_Map; No : Character := '.';
+      Yes  : Character := '#')
+   is
    begin
-      for Row in Corrupted'Range (1) loop
-         for Col in Corrupted'Range (2) loop
-            if Corrupted (Row, Col) then
-               Put (File, '#');
+      for Row in Positions'Range (1) loop
+         for Col in Positions'Range (2) loop
+            if Positions (Row, Col) then
+               Put (File, Yes);
             else
-               Put (File, '.');
+               Put (File, No);
             end if;
          end loop;
          New_Line (File);

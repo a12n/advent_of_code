@@ -1,8 +1,25 @@
+with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
+
 package body Advent.Day_18 is
    function Get_Byte_Position (File : File_Type) return Position is
+      Line  : String := Get_Line (File);
+      Pos   : Position;
+      Start : Positive;
    begin
-      --  TODO
-      return [0, 0];
+      if Line'Length = 3 and Line (2) = ',' then
+         Line (2) := ' ';
+      elsif Line'Length = 4 and Line (2) = ',' then
+         Line (2) := ' ';
+      elsif Line'Length = 4 and Line (3) = ',' then
+         Line (3) := ' ';
+      elsif Line'Length = 5 and Line (3) = ',' then
+         Line (3) := ' ';
+      else
+         raise Constraint_Error;
+      end if;
+      Get (Line, Pos (1), Start);
+      Get (Line (Start + 1 .. Line'Last), Pos (2), Start);
+      return Pos;
    end Get_Byte_Position;
 
    function Shortest_Path

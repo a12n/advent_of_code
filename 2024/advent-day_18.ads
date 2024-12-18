@@ -9,8 +9,8 @@ package Advent.Day_18 is
    procedure Print (File : File_Type; Corrupted : Corrupted_Map);
 
    function Shortest_Path
-     (Corrupted : Corrupted_Map; Start_Pos, Finish_Pos : Position)
-      return Natural with
+     (Corrupted :     Corrupted_Map; Start_Pos, Finish_Pos : Position;
+      Distance  : out Natural) return Boolean with
      Pre =>
       Start_Pos (1) in Corrupted'Range (1) and
       Start_Pos (2) in Corrupted'Range (2) and

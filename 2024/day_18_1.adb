@@ -15,22 +15,30 @@ procedure Day_18_1 is
 
    Start_Pos  : constant Position := [0, 0];
    Finish_Pos : constant Position := [Size, Size];
+
+   Byte_Pos : Position;
+   Distance : Natural;
 begin
+   if Debug then
+      Print (Standard_Error, Corrupted);
+   end if;
+
    for I in 1 .. N_Bytes loop
-      declare
-         Pos : constant Position := Get_Byte_Position (Standard_Input);
-      begin
-         if Debug then
-            Put_Line (Standard_Error, I'Image & ":" & Pos'Image);
-         end if;
-         Corrupted (Pos (1), Pos (2)) := True;
-      end;
+      Byte_Pos := Get_Byte_Position (Standard_Input);
+      if Debug then
+         Put_Line (Standard_Error, I'Image & ":" & Byte_Pos'Image);
+      end if;
+      Corrupted (Byte_Pos (1), Byte_Pos (2)) := True;
    end loop;
 
    if Debug then
       Print (Standard_Error, Corrupted);
    end if;
 
-   Put (Shortest_Path (Corrupted, Start_Pos, Finish_Pos), 0);
-   New_Line;
+   if Shortest_Path (Corrupted, Start_Pos, Finish_Pos, Distance) then
+      Put (Distance, 0);
+      New_Line;
+   else
+      raise Constraint_Error;
+   end if;
 end Day_18_1;

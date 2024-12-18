@@ -40,8 +40,8 @@ package body Advent.Day_18 is
    end Print;
 
    function Shortest_Path
-     (Corrupted : Corrupted_Map; Start_Pos, Finish_Pos : Position)
-      return Natural
+     (Corrupted :     Corrupted_Map; Start_Pos, Finish_Pos : Position;
+      Distance  : out Natural) return Boolean
    is
       type State is record
          Pos  : Position;
@@ -88,11 +88,12 @@ package body Advent.Day_18 is
          end loop;
       end loop;
 
-      if S.Pos /= Finish_Pos then
-         --  No path.
-         raise Constraint_Error;
+      if S.Pos = Finish_Pos then
+         Distance := S.Dist;
+         return True;
       end if;
 
-      return S.Dist;
+      --  No path.
+      return False;
    end Shortest_Path;
 end Advent.Day_18;

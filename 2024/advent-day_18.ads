@@ -12,7 +12,11 @@ package Advent.Day_18 is
 
    function Shortest_Path
      (Corrupted :     Position_Map; Start_Pos, Finish_Pos : Position;
-      Distance  : out Natural) return Boolean with
+      Distance  : out Natural) return Boolean;
+
+   function Shortest_Path
+     (Corrupted :     Position_Map; Start_Pos, Finish_Pos : Position;
+      Path      : out Position_Map; Distance : out Natural) return Boolean with
      Pre =>
       Start_Pos (1) in Corrupted'Range (1) and
       Start_Pos (2) in Corrupted'Range (2) and

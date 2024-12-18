@@ -46,6 +46,17 @@ package body Advent.Day_18 is
      (Corrupted :     Position_Map; Start_Pos, Finish_Pos : Position;
       Distance  : out Natural) return Boolean
    is
+      Unused_Path : Position_Map (Corrupted'Range (1), Corrupted'Range (2));
+   begin
+      return
+        Shortest_Path
+          (Corrupted, Start_Pos, Finish_Pos, Unused_Path, Distance);
+   end Shortest_Path;
+
+   function Shortest_Path
+     (Corrupted :     Position_Map; Start_Pos, Finish_Pos : Position;
+      Path      : out Position_Map; Distance : out Natural) return Boolean
+   is
       type State is record
          Pos  : Position;
          Dist : Natural;
@@ -64,11 +75,18 @@ package body Advent.Day_18 is
       Q : Queue;
       S : State;
 
-      Visited : array (Corrupted'Range (1), Corrupted'Range (2)) of Boolean :=
-        [others => [others => False]];
+      type Parent_Link is record
+         Valid : Boolean;
+         Dir   : Direction;
+      end record;
+
+      Parent :
+        array (Corrupted'Range (1), Corrupted'Range (2)) of Parent_Link :=
+        [others => [others => (Valid => False, Dir => Down)]];
    begin
       Q.Enqueue ((Start_Pos, 0));
-      Visited (Start_Pos (1), Start_Pos (2)) := True;
+      Parent (Start_Pos (1), Start_Pos (2)).Valid :=
+        True; --  Arbitrary direction.
 
       while Q.Current_Use > 0 loop
          Q.Dequeue (S);
@@ -82,21 +100,28 @@ package body Advent.Day_18 is
                if Next (1) in Corrupted'Range (1)
                  and then Next (2) in Corrupted'Range (2)
                  and then not Corrupted (Next (1), Next (2))
-                 and then not Visited (Next (1), Next (2))
+                 and then not Parent (Next (1), Next (2)).Valid
                then
                   Q.Enqueue ((Next, S.Dist + 1));
-                  Visited (Next (1), Next (2)) := True;
+                  Parent (Next (1), Next (2)) :=
+                    (Valid => True, Dir => Opposite (Dir));
                end if;
             end;
          end loop;
       end loop;
 
-      if S.Pos = Finish_Pos then
-         Distance := S.Dist;
-         return True;
+      if S.Pos /= Finish_Pos then
+         return False;
       end if;
 
-      --  No path.
-      return False;
+      Distance := S.Dist;
+      while S.Pos /= Start_Pos loop
+         Path (S.Pos (1), S.Pos (2)) := True;
+         pragma Assert (Parent (S.Pos (1), S.Pos (2)).Valid);
+         S.Pos := S.Pos + To_Offset (Parent (S.Pos (1), S.Pos (2)).Dir);
+      end loop;
+      Path (Start_Pos (1), Start_Pos (2)) := True;
+
+      return True;
    end Shortest_Path;
 end Advent.Day_18;

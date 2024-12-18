@@ -18,6 +18,9 @@ package Advent.Grids is
    Is_Vertical : constant array (Direction) of Boolean :=
      [Down => True, Left => False, Right => False, Up => True];
 
+   Opposite : constant array (Direction) of Direction :=
+     [Down => Up, Left => Right, Right => Left, Up => Down];
+
    function Is_Horizontal_Line (P, Q : Position) return Boolean is
      (P (1) = Q (1) and P (2) /= Q (2));
 

@@ -6,6 +6,8 @@ package Advent.Day_18 is
 
    function Get_Byte_Position (File : File_Type) return Position;
 
+   procedure Print (File : File_Type; Corrupted : Corrupted_Map);
+
    function Shortest_Path
      (Corrupted : Corrupted_Map; Start_Pos, Finish_Pos : Position)
       return Natural with

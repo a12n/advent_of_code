@@ -22,6 +22,20 @@ package body Advent.Day_18 is
       return Pos;
    end Get_Byte_Position;
 
+   procedure Print (File : File_Type; Corrupted : Corrupted_Map) is
+   begin
+      for Row in Corrupted'Range (1) loop
+         for Col in Corrupted'Range (2) loop
+            if Corrupted (Row, Col) then
+               Put (File, '#');
+            else
+               Put (File, '.');
+            end if;
+         end loop;
+         New_Line (File);
+      end loop;
+   end Print;
+
    function Shortest_Path
      (Corrupted : Corrupted_Map; Start_Pos, Finish_Pos : Position)
       return Natural

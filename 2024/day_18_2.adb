@@ -8,7 +8,7 @@ with Advent;                    use Advent;
 procedure Day_18_2 is
    Size : constant Natural := Natural'Value (Value ("SIZE", "70"));
 
-   Corrupted : Corrupted_Map (0 .. Size, 0 .. Size) :=
+   Corrupted : Position_Map (0 .. Size, 0 .. Size) :=
      [others => [others => False]];
 
    Start_Pos  : constant Position := [0, 0];

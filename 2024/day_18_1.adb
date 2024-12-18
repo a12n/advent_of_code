@@ -9,7 +9,7 @@ procedure Day_18_1 is
    Size    : constant Natural  := Natural'Value (Value ("SIZE", "70"));
    N_Bytes : constant Positive := Positive'Value (Value ("N_BYTES", "1024"));
 
-   Corrupted : Corrupted_Map (0 .. Size, 0 .. Size) :=
+   Corrupted : Position_Map (0 .. Size, 0 .. Size) :=
      [others => [others => False]];
 
    Start_Pos  : constant Position := [0, 0];

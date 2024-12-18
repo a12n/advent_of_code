@@ -25,7 +25,7 @@ package body Advent.Day_18 is
       return Pos;
    end Get_Byte_Position;
 
-   procedure Print (File : File_Type; Corrupted : Corrupted_Map) is
+   procedure Print (File : File_Type; Corrupted : Position_Map) is
    begin
       for Row in Corrupted'Range (1) loop
          for Col in Corrupted'Range (2) loop
@@ -40,7 +40,7 @@ package body Advent.Day_18 is
    end Print;
 
    function Shortest_Path
-     (Corrupted :     Corrupted_Map; Start_Pos, Finish_Pos : Position;
+     (Corrupted :     Position_Map; Start_Pos, Finish_Pos : Position;
       Distance  : out Natural) return Boolean
    is
       type State is record

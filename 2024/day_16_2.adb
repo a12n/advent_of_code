@@ -12,6 +12,7 @@ procedure Day_16_2 is
      Best_Paths (Maze, Start, Finish, Right, Unused_Cost);
    N           : Natural           := 0;
 begin
+   Print (Standard_Error, Maze, Paths);
    for Row in Paths'Range (1) loop
       for Col in Paths'Range (2) loop
          if Paths (Row, Col) then

@@ -9,7 +9,7 @@ package body Advent.Day_16 is
       Start_Dir : Direction) return Natural
    is
       Cost         : Natural;
-      Unused_Paths : constant Tile_Map :=
+      Unused_Paths : constant Paths_Map :=
         Best_Paths (Maze, Start_Pos, Finish_Pos, Start_Dir, Cost);
    begin
       return Cost;
@@ -17,7 +17,7 @@ package body Advent.Day_16 is
 
    function Best_Paths
      (Maze      : Maze_Type; Start_Pos, Finish_Pos : Position;
-      Start_Dir : Direction; Cost : out Natural) return Tile_Map
+      Start_Dir : Direction; Cost : out Natural) return Paths_Map
    is
       type State is record
          Pos  : Position;
@@ -43,7 +43,7 @@ package body Advent.Day_16 is
         [others => [others => [others => False]]];
       Visited : array (Maze'Range (1), Maze'Range (2), Direction) of Boolean :=
         [others => [others => [others => False]]];
-      Paths   : Tile_Map (Maze'Range (1), Maze'Range (2))                    :=
+      Paths   : Paths_Map (Maze'Range (1), Maze'Range (2))                   :=
         [others => [others => False]];
 
       procedure Backtrack (Pos : Position) is
@@ -266,7 +266,7 @@ package body Advent.Day_16 is
       end loop;
    end Print;
 
-   procedure Print (File : File_Type; Maze : Maze_Type; Paths : Tile_Map) is
+   procedure Print (File : File_Type; Maze : Maze_Type; Paths : Paths_Map) is
    begin
       for Row in Maze'Range (1) loop
          for Col in Maze'Range (2) loop

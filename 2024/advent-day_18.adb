@@ -2,7 +2,6 @@ with Ada.Containers.Synchronized_Queue_Interfaces;
 with Ada.Containers.Unbounded_Priority_Queues;
 with Ada.Containers;      use Ada.Containers;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Advent.ANSI;
 
 package body Advent.Day_18 is
    function Get_Byte_Position (File : File_Type) return Position is
@@ -68,23 +67,7 @@ package body Advent.Day_18 is
       Q.Enqueue ((Start_Pos, 0));
       Visited (Start_Pos (1), Start_Pos (2)) := True;
 
-      if Debug_Level > 1 then
-         Put (Standard_Error, ANSI.Cursor.Hide & ANSI.Cursor.Position (1, 1));
-         Print (Standard_Error, Corrupted);
-         Put
-           (Standard_Error,
-            ANSI.Cursor.Position (Start_Pos (1) + 1, Start_Pos (2) + 1) & 'S');
-      end if;
-
       while Q.Current_Use > 0 loop
-         if Debug_Level > 1 then
-            delay 0.001;
-            Put
-              (Standard_Error,
-               ANSI.Cursor.Position (S.Pos (1) + 1, S.Pos (2) + 1) &
-               ANSI.SGR.Background (0, 4, 0) & '@');
-         end if;
-
          Q.Dequeue (S);
 
          exit when S.Pos = Finish_Pos;
@@ -100,23 +83,10 @@ package body Advent.Day_18 is
                then
                   Q.Enqueue ((Next, S.Dist + 1));
                   Visited (Next (1), Next (2)) := True;
-                  if Debug_Level > 1 then
-                     Put
-                       (Standard_Error,
-                        ANSI.Cursor.Position (Next (1) + 1, Next (2) + 1) &
-                        ANSI.SGR.Background (3, 3, 0) & 'o');
-                  end if;
                end if;
             end;
          end loop;
       end loop;
-
-      if Debug_Level > 1 then
-         Put
-           (Standard_Error,
-            ANSI.Cursor.Position (Corrupted'Last (1) + 2, 1) & ANSI.SGR.Reset &
-            ANSI.Cursor.Show);
-      end if;
 
       if S.Pos /= Finish_Pos then
          --  No path.

@@ -1,14 +1,13 @@
-with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Ada.Text_IO;         use Ada.Text_IO;
-with Advent.Day_18;       use Advent.Day_18;
-with Advent.Grids;        use Advent.Grids;
-with Advent;              use Advent;
+with Ada.Environment_Variables; use Ada.Environment_Variables;
+with Ada.Integer_Text_IO;       use Ada.Integer_Text_IO;
+with Ada.Text_IO;               use Ada.Text_IO;
+with Advent.Day_18;             use Advent.Day_18;
+with Advent.Grids;              use Advent.Grids;
+with Advent;                    use Advent;
 
 procedure Day_18_1 is
-   --  Size    : constant Natural  := 6;
-   --  N_Bytes : constant Positive := 12;
-   Size : constant Natural := 70;
-   N_Bytes : constant Positive := 1_024;
+   Size    : constant Natural  := Natural'Value (Value ("SIZE", "70"));
+   N_Bytes : constant Positive := Positive'Value (Value ("N_BYTES", "1024"));
 
    Corrupted : Corrupted_Map (0 .. Size, 0 .. Size) :=
      [others => [others => False]];

@@ -265,4 +265,23 @@ package body Advent.Day_16 is
          New_Line (File);
       end loop;
    end Print;
+
+   procedure Print (File : File_Type; Maze : Maze_Type; Paths : Tile_Map) is
+   begin
+      for Row in Maze'Range (1) loop
+         for Col in Maze'Range (2) loop
+            if Paths (Row, Col) then
+               Put (File, 'O');
+            else
+               case Maze (Row, Col) is
+                  when Empty =>
+                     Put (File, '.');
+                  when Wall =>
+                     Put (File, '#');
+               end case;
+            end if;
+         end loop;
+         New_Line (File);
+      end loop;
+   end Print;
 end Advent.Day_16;

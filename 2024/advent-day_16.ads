@@ -23,4 +23,5 @@ package Advent.Day_16 is
       Start_Dir : Direction; Finish_Cost : Natural) return Natural;
 
    procedure Print (File : File_Type; Maze : Maze_Type);
+   procedure Print (File : File_Type; Maze : Maze_Type; Paths : Tile_Map);
 end Advent.Day_16;

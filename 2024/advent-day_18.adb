@@ -17,8 +17,8 @@ package body Advent.Day_18 is
       else
          raise Constraint_Error;
       end if;
-      Get (Line, Pos (1), Start);
-      Get (Line (Start + 1 .. Line'Last), Pos (2), Start);
+      Get (Line, Pos (2), Start);
+      Get (Line (Start + 1 .. Line'Last), Pos (1), Start);
       return Pos;
    end Get_Byte_Position;
 

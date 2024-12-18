@@ -10,6 +10,7 @@ procedure Day_18_2 is
 
    Corrupted : Position_Map (0 .. Size, 0 .. Size) :=
      [others => [others => False]];
+   Path : Position_Map (0 .. Size, 0 .. Size) := [others => [others => False]];
 
    Start_Pos  : constant Position := [0, 0];
    Finish_Pos : constant Position := [Size, Size];
@@ -17,10 +18,24 @@ procedure Day_18_2 is
    Byte_Pos : Position;
    Distance : Natural;
 begin
+   if not Shortest_Path (Corrupted, Start_Pos, Finish_Pos, Path, Distance) then
+      --  Must not happen.
+      raise Constraint_Error;
+   end if;
+
+   if Debug then
+      Put_Line (Standard_Error, "Initial path:");
+      Print (Standard_Error, Path);
+   end if;
+
    loop
       Byte_Pos := Get_Byte_Position (Standard_Input);
       Corrupted (Byte_Pos (1), Byte_Pos (2)) := True;
-      exit when not Shortest_Path (Corrupted, Start_Pos, Finish_Pos, Distance);
+      if Path (Byte_Pos (1), Byte_Pos (2)) then
+         Path := [others => [others => False]];
+         exit when not Shortest_Path
+             (Corrupted, Start_Pos, Finish_Pos, Path, Distance);
+      end if;
    end loop;
 
    Put (Byte_Pos (2), 0);

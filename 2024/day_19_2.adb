@@ -4,6 +4,7 @@ with Advent.Day_19;       use Advent.Day_19;
 with Advent;              use Advent;
 
 procedure Day_19_2 is
+   Cache  : Towel_Cache;
    Towels : constant Towel_Array := Get_Towels (Standard_Input);
    Total  : Natural              := 0;
 begin
@@ -14,7 +15,7 @@ begin
          if Debug then
             Put_Line (Standard_Error, Design'Image);
          end if;
-         Total := Total + Number_Arrangements (Towels, Design);
+         Total := Total + Number_Arrangements (Cache, Towels, Design);
       end;
    end loop;
 exception

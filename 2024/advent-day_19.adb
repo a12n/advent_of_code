@@ -58,14 +58,22 @@ package body Advent.Day_19 is
    end Get_Towels;
 
    function Number_Arrangements
-     (Towels : Towel_Array; Design : Design_Type) return Natural
+     (Cache : in out Towel_Cache; Towels : Towel_Array; Design : Design_Type)
+      return Natural
    is
-      --  TODO: Memoization.
-      N : Natural := 0;
+      use Bounded_Strings_Maps;
+      N   : Natural := 0;
+      Pos : Cursor;
    begin
       if Design.Length = 0 then
          return 1;
       end if;
+
+      Pos := Cache.Find (Bounded_String (Design));
+      if Pos /= No_Element then
+         return Pos.Element;
+      end if;
+
       for I in Towels'Range loop
          if Design.Length >= Towels (I).Length
            and then Design.Slice (1, Towels (I).Length) = Towels (I)
@@ -73,10 +81,13 @@ package body Advent.Day_19 is
             N :=
               N +
               Number_Arrangements
-                (Towels,
+                (Cache, Towels,
                  Design.Bounded_Slice (Towels (I).Length + 1, Design.Length));
          end if;
       end loop;
+
+      Cache.Include (Bounded_String (Design), N);
+
       return N;
    end Number_Arrangements;
 end Advent.Day_19;

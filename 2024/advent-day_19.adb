@@ -59,8 +59,27 @@ package body Advent.Day_19 is
      (Towels : Towel_Set; Design : Design_Type) return Boolean
    is
    begin
-      Put_Line (Standard_Error, Towels.Towels'Image);
-      Put_Line (Standard_Error, Design'Image);
+      if Design'Length = 0 then
+         return True;
+      end if;
+      --  Put_Line (Standard_Error, "Towels" & Towels.Towels'Image);
+      Put_Line (Standard_Error, "Design" & Design'Image);
+      for I in Towels.Towels.First_Index .. Towels.Towels.Last_Index loop
+         declare
+            Towel : constant Stripe_Array := Towels.Towels.Element (I);
+         begin
+            --  Put_Line (Standard_Error, "Towel" & Towel'Image);
+            if Design'Length >= Towel'Length
+              and then
+                Design (Design'First .. Design'First + Towel'Length - 1) =
+                Towel
+              and then Design_Possible
+                (Towels, Design (Design'First + Towel'Length .. Design'Last))
+            then
+               return True;
+            end if;
+         end;
+      end loop;
       return False;
    end Design_Possible;
 

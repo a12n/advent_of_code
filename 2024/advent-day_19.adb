@@ -5,17 +5,10 @@ package body Advent.Day_19 is
      (Towels : Towel_Array; Design : Design_Type) return Boolean
    is
    begin
-      --  Put_Line (Standard_Error, "Design " & Design.To_String'Image);
       if Design.Length = 0 then
          return True;
       end if;
       for I in Towels'Range loop
-         --  Put_Line
-         --    (Standard_Error,
-         --     "Towels(" & I'Image & ") " & Towels (I).To_String'Image);
-         --  Put_Line
-         --    (Standard_Error,
-         --     "Slice " & Design.Slice (1, Towels (I).Length)'Image);
          if Design.Length >= Towels (I).Length
            and then Design.Slice (1, Towels (I).Length) = Towels (I)
            and then Design_Possible

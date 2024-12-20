@@ -109,12 +109,32 @@ package body Advent.Day_19 is
    function Number_Arrangements
      (Towels : Towel_Set; Design : Design_Type) return Natural
    is
+      --  TODO: Memoization.
       N : Natural := 0;
    begin
       if Design'Length = 0 then
          return 1;
       end if;
-      --  TODO
+      --  Put_Line (Standard_Error, "Towels" & Towels.Towels'Image);
+      Put_Line (Standard_Error, "Design" & Design'Image);
+      for I in Towels.Towels.First_Index .. Towels.Towels.Last_Index loop
+         declare
+            Towel : constant Stripe_Array := Towels.Towels.Element (I);
+         begin
+            --  Put_Line (Standard_Error, "Towel" & Towel'Image);
+            if Design'Length >= Towel'Length
+              and then
+                Design (Design'First .. Design'First + Towel'Length - 1) =
+                Towel
+            then
+               N :=
+                 N +
+                 Number_Arrangements
+                   (Towels,
+                    Design (Design'First + Towel'Length .. Design'Last));
+            end if;
+         end;
+      end loop;
       return N;
    end Number_Arrangements;
 end Advent.Day_19;

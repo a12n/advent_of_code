@@ -15,6 +15,8 @@ package Advent.Day_19 is
      (Towels : Towel_Set; Design : Design_Type) return Boolean;
    function Get_Design (File : File_Type) return Design_Type;
    function Get_Towels (File : File_Type) return Towel_Set;
+   function Number_Arrangements
+     (Towels : Towel_Set; Design : Design_Type) return Natural;
 
 private
    package Towel_Vectors is new Ada.Containers.Indefinite_Vectors

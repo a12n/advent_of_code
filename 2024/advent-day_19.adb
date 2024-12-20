@@ -105,4 +105,16 @@ package body Advent.Day_19 is
       end loop;
       return Result;
    end Get_Towels;
+
+   function Number_Arrangements
+     (Towels : Towel_Set; Design : Design_Type) return Natural
+   is
+      N : Natural := 0;
+   begin
+      if Design'Length = 0 then
+         return 1;
+      end if;
+      --  TODO
+      return N;
+   end Number_Arrangements;
 end Advent.Day_19;

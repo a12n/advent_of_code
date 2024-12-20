@@ -8,10 +8,14 @@ package Advent.Day_19 is
      (60);
    use Bounded_Strings;
 
+   type Count_Type is range 0 .. 2**64;
+
+   package Count_Text_IO is new Ada.Text_IO.Integer_IO (Count_Type);
+
    function Bounded_Strings_Hash is new Ada.Strings.Bounded.Hash
      (Bounded_Strings);
    package Bounded_Strings_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type => Bounded_String, Element_Type => Natural,
+     (Key_Type => Bounded_String, Element_Type => Count_Type,
       Hash     => Bounded_Strings_Hash, Equivalent_Keys => "=");
 
    type Design_Type is new Bounded_String;
@@ -25,5 +29,5 @@ package Advent.Day_19 is
    function Get_Towels (File : File_Type) return Towel_Array;
    function Number_Arrangements
      (Cache : in out Towel_Cache; Towels : Towel_Array; Design : Design_Type)
-      return Natural;
+      return Count_Type;
 end Advent.Day_19;

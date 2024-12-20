@@ -1,12 +1,12 @@
-with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Ada.Text_IO;         use Ada.Text_IO;
-with Advent.Day_19;       use Advent.Day_19;
-with Advent;              use Advent;
+with Ada.Text_IO;   use Ada.Text_IO;
+with Advent.Day_19; use Advent.Day_19;
+with Advent;        use Advent;
 
 procedure Day_19_2 is
+   use Count_Text_IO;
    Cache  : Towel_Cache;
    Towels : constant Towel_Array := Get_Towels (Standard_Input);
-   Total  : Natural              := 0;
+   Total  : Count_Type           := 0;
 begin
    loop
       declare

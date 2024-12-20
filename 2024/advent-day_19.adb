@@ -59,10 +59,10 @@ package body Advent.Day_19 is
 
    function Number_Arrangements
      (Cache : in out Towel_Cache; Towels : Towel_Array; Design : Design_Type)
-      return Natural
+      return Count_Type
    is
       use Bounded_Strings_Maps;
-      N   : Natural := 0;
+      N   : Count_Type := 0;
       Pos : Cursor;
    begin
       if Design.Length = 0 then

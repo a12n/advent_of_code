@@ -8,14 +8,14 @@ procedure Day_16_2 is
    Maze : constant Maze_Type := Get_Maze (Standard_Input, Start, Finish);
 
    Unused_Cost : Natural;
-   Paths       : constant Paths_Map :=
+   Paths       : constant Maze_Type :=
      Best_Paths (Maze, Start, Finish, Right, Unused_Cost);
    N           : Natural            := 0;
 begin
    Print (Standard_Error, Maze, Paths);
    for Row in Paths'Range (1) loop
       for Col in Paths'Range (2) loop
-         if Paths (Row, Col) then
+         if Paths (Row, Col) = Empty then
             N := N + 1;
          end if;
       end loop;

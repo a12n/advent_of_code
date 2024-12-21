@@ -268,31 +268,24 @@ package body Advent.Day_16 is
 
    procedure Print (File : File_Type; Maze : Maze_Type) is
    begin
-      for Row in Maze'Range (1) loop
-         for Col in Maze'Range (2) loop
-            case Maze (Row, Col) is
-               when Empty =>
-                  Put (File, '.');
-               when Wall =>
-                  Put (File, '#');
-            end case;
-         end loop;
-         New_Line (File);
-      end loop;
+      Print (File, Maze, Maze, Path_Char => '.');
    end Print;
 
-   procedure Print (File : File_Type; Maze, Paths : Maze_Type) is
+   procedure Print
+     (File : File_Type; Maze, Paths : Maze_Type; Empty_Char : Character := '.';
+      Wall_Char : Character := '#'; Path_Char : Character := 'O')
+   is
    begin
       for Row in Maze'Range (1) loop
          for Col in Maze'Range (2) loop
             if Paths (Row, Col) = Empty then
-               Put (File, 'O');
+               Put (File, Path_Char);
             else
                case Maze (Row, Col) is
                   when Empty =>
-                     Put (File, '.');
+                     Put (File, Empty_Char);
                   when Wall =>
-                     Put (File, '#');
+                     Put (File, Wall_Char);
                end case;
             end if;
          end loop;

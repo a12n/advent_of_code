@@ -22,5 +22,7 @@ package Advent.Day_16 is
       Start_Dir : Direction; Finish_Cost : Natural) return Natural;
 
    procedure Print (File : File_Type; Maze : Maze_Type);
-   procedure Print (File : File_Type; Maze, Paths : Maze_Type);
+   procedure Print
+     (File : File_Type; Maze, Paths : Maze_Type; Empty_Char : Character := '.';
+      Wall_Char : Character := '#'; Path_Char : Character := 'O');
 end Advent.Day_16;

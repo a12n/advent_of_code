@@ -20,48 +20,58 @@ package body Advent.Day_16 is
       Start_Dir : Direction; Cost : out Natural) return Paths_Map
    is
       type State is record
-         Pos  : Position;
-         Dir  : Direction;
-         Cost : Natural;
+         Pos : Position;
+         Dir : Direction;
       end record;
 
-      function Get_Priority (S : State) return Natural is (S.Cost);
-      function Before (N, M : Natural) return Boolean renames "<";
+      Parent : array (Maze'Range (1), Maze'Range (2), Direction) of Boolean :=
+        [others => [others => [others => False]]];
+      Paths  : Paths_Map (Maze'Range (1), Maze'Range (2))                   :=
+        [others => [others => False]];
+      Costs  : array (Maze'Range (1), Maze'Range (2), Direction) of Natural :=
+        [others => [others => [others => Natural'Last]]];
+
+      function Get_Priority (S : State) return Natural is
+        (Costs (S.Pos (1), S.Pos (2), S.Dir));
 
       package State_Queue_Interface is new Ada.Containers
         .Synchronized_Queue_Interfaces
         (State);
       package State_Queues is new Ada.Containers.Unbounded_Priority_Queues
-        (Queue_Interfaces => State_Queue_Interface, Queue_Priority => Natural);
+        (Queue_Interfaces => State_Queue_Interface, Queue_Priority => Natural,
+         Before           => "<");
 
       use State_Queues;
 
       Q : Queue;
       S : State;
 
-      Parent  : array (Maze'Range (1), Maze'Range (2), Direction) of Boolean :=
-        [others => [others => [others => False]]];
-      Visited : array (Maze'Range (1), Maze'Range (2), Direction) of Boolean :=
-        [others => [others => [others => False]]];
-      Paths   : Paths_Map (Maze'Range (1), Maze'Range (2))                   :=
-        [others => [others => False]];
-
       procedure Backtrack (Pos : Position) is
       begin
+         Put_Line (Standard_Error, Pos'Image);
+         for Dir in Direction'Range loop
+            if Parent (Pos (1), Pos (2), Dir) then
+               Put (Standard_Error, Dir'Image & ' ');
+            end if;
+         end loop;
+         New_Line (Standard_Error);
+
          Paths (Pos (1), Pos (2)) := True;
          if Pos /= Start_Pos then
             for Dir in Direction'Range loop
                if Parent (Pos (1), Pos (2), Dir) then
+                  --  Parent (Pos (1), Pos (2), Dir) := False;
                   Backtrack (Pos + To_Offset (Dir));
                end if;
             end loop;
          end if;
       end Backtrack;
-   begin
-      Cost := Natural'Last;
 
-      Q.Enqueue ((Start_Pos, Start_Dir, 0));
-      Visited (Start_Pos (1), Start_Pos (2), Start_Dir) := True;
+      New_Cost : Natural;
+      Next_Pos : Position;
+   begin
+      Costs (Start_Pos (1), Start_Pos (2), Start_Dir) := 0;
+      Q.Enqueue ((Start_Pos, Start_Dir));
 
       if Debug_Level > 1 then
          Put (Standard_Error, ANSI.Cursor.Hide & ANSI.Cursor.Position (1, 1));
@@ -73,53 +83,51 @@ package body Advent.Day_16 is
 
       while Q.Current_Use > 0 loop
          if Debug_Level > 1 then
-            delay 0.001;
+            delay 0.000_010;
          end if;
 
          Q.Dequeue (S);
 
-         if S.Pos = Finish_Pos then
-            Cost := Natural'Min (Cost, S.Cost);
-         else
-            declare
-               Next_Pos : constant Position := S.Pos + To_Offset (S.Dir);
-            begin
-               if not Visited (Next_Pos (1), Next_Pos (2), S.Dir) and
-                 Maze (Next_Pos (1), Next_Pos (2)) = Empty
-               then
-                  Q.Enqueue ((Next_Pos, S.Dir, S.Cost + 1));
-                  Parent (Next_Pos (1), Next_Pos (2), Opposite (S.Dir)) :=
-                    True;
-                  Visited (Next_Pos (1), Next_Pos (2), S.Dir) := True;
-                  if Debug_Level > 1 then
-                     Put
-                       (Standard_Error,
-                        ANSI.Cursor.Position (Next_Pos (1), Next_Pos (2)) &
-                        ANSI.SGR.Background (0, 5, 0) & 'F');
-                  end if;
-               end if;
-            end;
+         --  Move forward.
+         New_Cost := Costs (S.Pos (1), S.Pos (2), S.Dir) + 1;
+         Next_Pos := S.Pos + To_Offset (S.Dir);
 
-            if not Visited (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) then
-               Q.Enqueue ((S.Pos, Rotate (CW, S.Dir), S.Cost + 1_000));
-               Visited (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) := True;
-               if Debug_Level > 1 then
-                  Put
-                    (Standard_Error,
-                     ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
-                     ANSI.SGR.Background (3, 0, 1) & 'c');
-               end if;
+         if Maze (Next_Pos (1), Next_Pos (2)) = Empty
+           and then New_Cost <= Costs (Next_Pos (1), Next_Pos (2), S.Dir)
+         then
+            Costs (Next_Pos (1), Next_Pos (2), S.Dir)             := New_Cost;
+            Parent (Next_Pos (1), Next_Pos (2), Opposite (S.Dir)) := True;
+            Q.Enqueue ((Next_Pos, S.Dir));
+            if Debug_Level > 1 then
+               Put
+                 (Standard_Error,
+                  ANSI.Cursor.Position (Next_Pos (1), Next_Pos (2)) &
+                  ANSI.SGR.Background (0, 5, 0) & 'F');
             end if;
+         end if;
 
-            if not Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) then
-               Q.Enqueue ((S.Pos, Rotate (CCW, S.Dir), S.Cost + 1_000));
-               Visited (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) := True;
-               if Debug_Level > 1 then
-                  Put
-                    (Standard_Error,
-                     ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
-                     ANSI.SGR.Background (1, 0, 3) & 'C');
-               end if;
+         --  Rotate CW or CCW.
+         New_Cost := Costs (S.Pos (1), S.Pos (2), S.Dir) + 1_000;
+
+         if New_Cost < Costs (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) then
+            Costs (S.Pos (1), S.Pos (2), Rotate (CW, S.Dir)) := New_Cost;
+            Q.Enqueue ((S.Pos, Rotate (CW, S.Dir)));
+            if Debug_Level > 1 then
+               Put
+                 (Standard_Error,
+                  ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
+                  ANSI.SGR.Background (3, 0, 1) & 'c');
+            end if;
+         end if;
+
+         if New_Cost < Costs (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) then
+            Costs (S.Pos (1), S.Pos (2), Rotate (CCW, S.Dir)) := New_Cost;
+            Q.Enqueue ((S.Pos, Rotate (CCW, S.Dir)));
+            if Debug_Level > 1 then
+               Put
+                 (Standard_Error,
+                  ANSI.Cursor.Position (S.Pos (1), S.Pos (2)) &
+                  ANSI.SGR.Background (1, 0, 3) & 'C');
             end if;
          end if;
       end loop;
@@ -131,7 +139,14 @@ package body Advent.Day_16 is
             ANSI.Cursor.Show);
       end if;
 
-      Backtrack (Finish_Pos);
+      Cost := Natural'Last;
+      for Dir in Direction'Range loop
+         Cost :=
+           Natural'Min (Cost, Costs (Finish_Pos (1), Finish_Pos (2), Dir));
+      end loop;
+
+      --  XXX
+      --  Backtrack (Finish_Pos);
       return Paths;
    end Best_Paths;
 

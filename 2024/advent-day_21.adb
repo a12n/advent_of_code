@@ -34,7 +34,7 @@ package body Advent.Day_21 is
          Result     : Directional_Presses (Presses'Range);
       begin
          for I in Presses'Range loop
-            Result (Result'Last - I - 1) := Revert_Key (Presses (I));
+            Result (Result'Last - (I - 1)) := Revert_Key (Presses (I));
          end loop;
          return Result;
       end Revert;

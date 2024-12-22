@@ -28,4 +28,7 @@ package Advent.Day_21 is
 
    function Get_Code (File : File_Type) return Numeric_Presses with
      Post => Valid_Code (Get_Code'Result);
+
+   function To_Number (Code : Numeric_Presses) return Natural with
+     Pre => Valid_Code (Code), Post => To_Number'Result in 0 .. 999;
 end Advent.Day_21;

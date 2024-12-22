@@ -25,7 +25,37 @@ procedure Day_20_1 is
    Path     : constant Position_Array :=
      Shortest_Path_Positions (Previous, Start, Finish);
 
-   N_Cheats : Natural := 0;
+   function Cheat
+     (P, Q : Position; Old_Dist, New_Dist : Natural) return Boolean
+   is
+   begin
+      --  Taxicab distance between path positions must be 2.
+      if New_Dist /= 2 then
+         return False;
+      end if;
+
+      --  Positions must be in a horizontal/vertical line with a wall
+      --  between them.
+      if not
+        ((P (1) = Q (1) and Track (P (1), (P (2) + Q (2)) / 2) = Wall) or
+         (P (2) = Q (2) and Track ((P (1) + Q (1)) / 2, P (2)) = Wall))
+      then
+         return False;
+      end if;
+
+      --  Cheat saved some time…
+      if Debug then
+         Put_Line
+           (Standard_Error,
+            "Cheat between path positions [" & P (1)'Image & "," &
+            P (2)'Image & "] and [" & Q (1)'Image & "," & Q (2)'Image &
+            "], old" & Old_Dist'Image & " - new" & New_Dist'Image & " =" &
+            Natural'(Old_Dist - New_Dist)'Image);
+      end if;
+
+      --  …but count only savings not less than the threshold.
+      return (Old_Dist - New_Dist) >= Threshold;
+   end Cheat;
 begin
    if Debug then
       Print (Standard_Error, Track, Track, Path_Char => ' ');
@@ -33,43 +63,6 @@ begin
       Put_Line (Standard_Error, Finish'Image);
    end if;
 
-   --  Try to cheat between all possible pairs of positions on the
-   --  shortest path.
-   for I in Path'First .. Path'Last - 1 loop
-      for J in I + 1 .. Path'Last loop
-         declare
-            P : Position renames Path (I);
-            Q : Position renames Path (J);
-
-            Old_Dist : constant Natural :=
-              Distance (Q (1), Q (2)) - Distance (P (1), P (2));
-            New_Dist : constant Natural := Taxicab_Distance (P, Q);
-         begin
-            --  Taxicab distance between positions is 2, and…
-            --  …a wall between positions in horizontal line,
-            --  …or a wall between positions in vertical line.
-            if New_Dist = 2 and
-              ((P (1) = Q (1) and Track (P (1), (P (2) + Q (2)) / 2) = Wall) or
-               (P (2) = Q (2) and Track ((P (1) + Q (1)) / 2, P (2)) = Wall))
-            then
-               if Debug then
-                  Put_Line
-                    (Standard_Error,
-                     "Cheat between path positions [" & P (1)'Image & "," &
-                     P (2)'Image & "] and [" & Q (1)'Image & "," &
-                     Q (2)'Image & "], old" & Old_Dist'Image & " - new" &
-                     New_Dist'Image & " =" &
-                     Natural'(Old_Dist - New_Dist)'Image);
-               end if;
-
-               if (Old_Dist - New_Dist) >= Threshold then
-                  N_Cheats := @ + 1;
-               end if;
-            end if;
-         end;
-      end loop;
-   end loop;
-
-   Put (N_Cheats, 0);
+   Put (Number_Cheats (Track, Distance, Path, Cheat'Access), 0);
    New_Line;
 end Day_20_1;

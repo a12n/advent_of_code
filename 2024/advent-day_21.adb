@@ -201,8 +201,41 @@ package body Advent.Day_21 is
    function Translate (From, To : Directional_Key) return Directional_Presses
    is
    begin
+      if From = To then
+         return "";
+      elsif From > To then
+         return Revert (Translate (From => To, To => From));
+      end if;
+
       --  TODO
-      return "";
+      case Directional_Presses'[From, To] is
+         when "v<" =>
+            return "";
+         when "v>" =>
+            return "";
+         when "v^" =>
+            return "";
+         when "vA" =>
+            return "";
+
+         when "<>" =>
+            return "";
+         when "<^" =>
+            return "";
+         when "<A" =>
+            return "";
+
+         when ">^" =>
+            return "";
+         when ">A" =>
+            return "";
+
+         when "^A" =>
+            return "";
+
+         when others =>
+            raise Program_Error;
+      end case;
    end Translate;
 
    function Translate (Keys : Directional_Presses) return Directional_Presses

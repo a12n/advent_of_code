@@ -36,10 +36,16 @@ package Advent.Day_21 is
    --  to move from one button to another on the numeric keypad.
    function Translate (From, To : Numeric_Key) return Directional_Presses;
    function Translate (Presses : Numeric_Presses) return Directional_Presses;
+   function Translate
+     (Presses : Numeric_Presses; Current : in out Numeric_Key)
+      return Directional_Presses;
 
    --  Button presses needed on the corresponding directional keypad
    --  to move on the second order directional keypad.
    function Translate (From, To : Directional_Key) return Directional_Presses;
    function Translate
      (Presses : Directional_Presses) return Directional_Presses;
+   function Translate
+     (Presses : Directional_Presses; Current : in out Directional_Key)
+      return Directional_Presses;
 end Advent.Day_21;

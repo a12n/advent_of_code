@@ -28,14 +28,16 @@ package Advent.Day_21 is
    function Get_Code (File : File_Type) return Numeric_Presses with
      Post => Valid_Code (Get_Code'Result);
 
-   function Revert (Keys : Directional_Presses) return Directional_Presses;
+   function Revert (Keys : Directional_Presses) return Directional_Presses with
+     Post => Revert'Result'Length = Keys'Length;
 
    function To_Number (Code : Numeric_Presses) return Natural with
      Pre => Valid_Code (Code), Post => To_Number'Result < 1_000;
 
    --  Button presses needed on the corresponding directional keypad
    --  to move from one button to another on the numeric keypad.
-   function Translate (From, To : Numeric_Key) return Directional_Presses;
+   function Translate (From, To : Numeric_Key) return Directional_Presses with
+     Post => Translate'Result'Length in 0 .. 5;
    function Translate (Keys : Numeric_Presses) return Directional_Presses;
    function Translate
      (Keys : Numeric_Presses; Current : in out Numeric_Key)
@@ -43,7 +45,9 @@ package Advent.Day_21 is
 
    --  Button presses needed on the corresponding directional keypad
    --  to move on the second order directional keypad.
-   function Translate (From, To : Directional_Key) return Directional_Presses;
+   function Translate
+     (From, To : Directional_Key) return Directional_Presses with
+     Post => Translate'Result'Length in 0 .. 3;
    function Translate (Keys : Directional_Presses) return Directional_Presses;
    function Translate
      (Keys : Directional_Presses; Current : in out Directional_Key)

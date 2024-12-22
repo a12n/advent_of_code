@@ -14,9 +14,16 @@ package Advent.Day_20 is
    type Previous_Map is
      array (Positive range <>, Positive range <>) of Maybe_Direction;
 
-   procedure Find_Shortest_Path
+   function Get_Racetrack
+     (File : File_Type; Start_Pos, Finish_Pos : out Position)
+      return Racetrack_Type renames
+     Day_16.Get_Maze;
+
+   --  Find shortest path and fill distance and previous position
+   --  maps. Returns False if there's no path.
+   function Shortest_Path
      (Track    :     Racetrack_Type; Start_Pos, Finish_Pos : Position;
-      Previous : out Previous_Map; Distance : out Distance_Map) with
+      Previous : out Previous_Map; Distance : out Distance_Map) return Boolean with
      Pre =>
       Start_Pos (1) in Track'Range (1) and Start_Pos (2) in Track'Range (2) and
       Finish_Pos (1) in Track'Range (1) and
@@ -26,14 +33,13 @@ package Advent.Day_20 is
       Distance'Length (1) = Track'Length (1) and
       Distance'Length (2) = Track'Length (2);
 
-   function Get_Racetrack
-     (File : File_Type; Start_Pos, Finish_Pos : out Position)
-      return Racetrack_Type renames
-     Day_16.Get_Maze;
+   --  Find shortest path and get distance from start to finish.
+   function Shortest_Path_Length
+     (Track : Racetrack_Type; Start_Pos, Finish_Pos : Position) return Natural;
 
    --  Backtrack shortest path positions from the previous map of a
    --  found shortest path.
-   function Shortest_Path
+   function Shortest_Path_Positions
      (Previous : Previous_Map; Start_Pos, Finish_Pos : Position)
       return Position_Array with
      Pre =>
@@ -45,13 +51,9 @@ package Advent.Day_20 is
       Previous (Finish_Pos (1), Finish_Pos (2)) /= None;
 
    --  Find shortest path and then backtrack path positions.
-   function Shortest_Path
+   function Shortest_Path_Positions
      (Track : Racetrack_Type; Start_Pos, Finish_Pos : Position)
       return Position_Array;
-
-   --  Find shortest path and get distance from start to finish.
-   function Shortest_Path_Length
-     (Track : Racetrack_Type; Start_Pos, Finish_Pos : Position) return Natural;
 
    procedure Print
      (File       : File_Type; Track, Paths : Racetrack_Type;

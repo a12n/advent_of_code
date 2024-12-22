@@ -3,9 +3,9 @@ with Ada.Containers.Unbounded_Priority_Queues;
 with Ada.Containers; use Ada.Containers;
 
 package body Advent.Day_20 is
-   procedure Find_Shortest_Path
+   function Shortest_Path
      (Track    :     Racetrack_Type; Start_Pos, Finish_Pos : Position;
-      Previous : out Previous_Map; Distance : out Distance_Map)
+      Previous : out Previous_Map; Distance : out Distance_Map) return Boolean
    is
       function Get_Priority (Pos : Position) return Natural is
         (Distance (Pos (1), Pos (2)));
@@ -49,13 +49,24 @@ package body Advent.Day_20 is
          end loop;
       end loop;
 
-      if Distance (Finish_Pos (1), Finish_Pos (2)) = Natural'Last then
+      return Distance (Finish_Pos (1), Finish_Pos (2)) < Natural'Last;
+   end Shortest_Path;
+
+   function Shortest_Path_Length
+     (Track : Racetrack_Type; Start_Pos, Finish_Pos : Position) return Natural
+   is
+      Distance : Distance_Map (Track'Range (1), Track'Range (2));
+      Previous : Previous_Map (Track'Range (1), Track'Range (2));
+   begin
+      if Shortest_Path (Track, Start_Pos, Finish_Pos, Previous, Distance) then
+         return Distance (Finish_Pos (1), Finish_Pos (2));
+      else
          --  No path.
          raise Constraint_Error;
       end if;
-   end Find_Shortest_Path;
+   end Shortest_Path_Length;
 
-   function Shortest_Path
+   function Shortest_Path_Positions
      (Previous : Previous_Map; Start_Pos, Finish_Pos : Position)
       return Position_Array
    is
@@ -84,26 +95,20 @@ package body Advent.Day_20 is
       end Backtrack;
    begin
       return Path (Backtrack (Finish_Pos, Path'Last) .. Path'Last);
-   end Shortest_Path;
+   end Shortest_Path_Positions;
 
-   function Shortest_Path
+   function Shortest_Path_Positions
      (Track : Racetrack_Type; Start_Pos, Finish_Pos : Position)
       return Position_Array
    is
       Distance : Distance_Map (Track'Range (1), Track'Range (2));
       Previous : Previous_Map (Track'Range (1), Track'Range (2));
    begin
-      Find_Shortest_Path (Track, Start_Pos, Finish_Pos, Previous, Distance);
-      return Shortest_Path (Previous, Start_Pos, Finish_Pos);
-   end Shortest_Path;
-
-   function Shortest_Path_Length
-     (Track : Racetrack_Type; Start_Pos, Finish_Pos : Position) return Natural
-   is
-      Distance : Distance_Map (Track'Range (1), Track'Range (2));
-      Previous : Previous_Map (Track'Range (1), Track'Range (2));
-   begin
-      Find_Shortest_Path (Track, Start_Pos, Finish_Pos, Previous, Distance);
-      return Distance (Finish_Pos (1), Finish_Pos (2));
-   end Shortest_Path_Length;
+      if Shortest_Path (Track, Start_Pos, Finish_Pos, Previous, Distance) then
+         return Shortest_Path_Positions (Previous, Start_Pos, Finish_Pos);
+      else
+         --  No path.
+         raise Constraint_Error;
+      end if;
+   end Shortest_Path_Positions;
 end Advent.Day_20;

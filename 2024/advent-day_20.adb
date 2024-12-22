@@ -46,6 +46,11 @@ package body Advent.Day_20 is
          end loop;
       end loop;
 
+      if Distances (Finish_Pos (1), Finish_Pos (2)) = Natural'Last then
+         --  No path.
+         raise Constraint_Error;
+      end if;
+
       return Distances (Finish_Pos (1), Finish_Pos (2));
    end Shortest_Path_Length;
 end Advent.Day_20;

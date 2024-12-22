@@ -15,9 +15,9 @@ package body Advent.Day_13 is
 
       procedure Filter_Digits (Line : in out String) is
       begin
-         for I in Line'Range loop
-            if Line (I) not in '0' .. '9' then
-               Line (I) := ' ';
+         for Char of Line loop
+            if Char not in '0' .. '9' then
+               Char := ' ';
             end if;
          end loop;
       end Filter_Digits;

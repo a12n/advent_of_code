@@ -12,17 +12,17 @@ begin
    end if;
    Simulate (Robots, 100);
 
-   for I in Robots'Range loop
-      if Robots (I).P.X < X_Position'Last / 2 then
-         if Robots (I).P.Y < Y_Position'Last / 2 then
+   for Robot of Robots loop
+      if Robot.P.X < X_Position'Last / 2 then
+         if Robot.P.Y < Y_Position'Last / 2 then
             Quadrants (1) := @ + 1;
-         elsif Robots (I).P.Y > Y_Position'Last / 2 then
+         elsif Robot.P.Y > Y_Position'Last / 2 then
             Quadrants (3) := @ + 1;
          end if;
-      elsif Robots (I).P.X > X_Position'Last / 2 then
-         if Robots (I).P.Y < Y_Position'Last / 2 then
+      elsif Robot.P.X > X_Position'Last / 2 then
+         if Robot.P.Y < Y_Position'Last / 2 then
             Quadrants (2) := @ + 1;
-         elsif Robots (I).P.Y > Y_Position'Last / 2 then
+         elsif Robot.P.Y > Y_Position'Last / 2 then
             Quadrants (4) := @ + 1;
          end if;
       end if;

@@ -17,8 +17,8 @@ package body Advent.Day_02 is
 
       Levels : Level_Array (1 .. N);
    begin
-      for I in Levels'Range loop
-         Level_Text_IO.Get (Line (Start .. Line'Last), Levels (I), Start);
+      for Level of Levels loop
+         Level_Text_IO.Get (Line (Start .. Line'Last), Level, Start);
          Start := Start + 1;
       end loop;
       return Levels;

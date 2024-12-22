@@ -23,8 +23,8 @@ package body Advent.Day_05 is
       Pages : Page_Array (1 .. N);
       Start : Positive          := Line'First;
    begin
-      for I in Pages'Range loop
-         Get (Line (Start .. Line'Last), Pages (I), Start);
+      for Page of Pages loop
+         Get (Line (Start .. Line'Last), Page, Start);
          Start := Start + 2;    --  Skip past ',' where the next number starts.
       end loop;
       return Pages;

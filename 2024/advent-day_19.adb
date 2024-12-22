@@ -8,12 +8,11 @@ package body Advent.Day_19 is
       if Design.Length = 0 then
          return True;
       end if;
-      for I in Towels'Range loop
-         if Design.Length >= Towels (I).Length
-           and then Design.Slice (1, Towels (I).Length) = Towels (I)
+      for Towel of Towels loop
+         if Design.Length >= Towel.Length
+           and then Design.Slice (1, Towel.Length) = Towel
            and then Design_Possible
-             (Towels,
-              Design.Bounded_Slice (Towels (I).Length + 1, Design.Length))
+             (Towels, Design.Bounded_Slice (Towel.Length + 1, Design.Length))
          then
             return True;
          end if;
@@ -67,15 +66,15 @@ package body Advent.Day_19 is
          return Pos.Element;
       end if;
 
-      for I in Towels'Range loop
-         if Design.Length >= Towels (I).Length
-           and then Design.Slice (1, Towels (I).Length) = Towels (I)
+      for Towel of Towels loop
+         if Design.Length >= Towel.Length
+           and then Design.Slice (1, Towel.Length) = Towel
          then
             N :=
               N +
               Number_Arrangements
                 (Cache, Towels,
-                 Design.Bounded_Slice (Towels (I).Length + 1, Design.Length));
+                 Design.Bounded_Slice (Towel.Length + 1, Design.Length));
          end if;
       end loop;
 

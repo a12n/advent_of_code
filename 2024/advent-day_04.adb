@@ -17,8 +17,8 @@ package body Advent.Day_04 is
          return False;
       end if;
 
-      for I in Word'Range loop
-         if Word (I) /= Letters (Pos (1), Pos (2)) then
+      for Letter of Word loop
+         if Letter /= Letters (Pos (1), Pos (2)) then
             return False;
          end if;
          Pos := Pos + Dir;

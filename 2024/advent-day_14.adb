@@ -34,12 +34,12 @@ package body Advent.Day_14 is
             Start : Positive := 1;
             Robot : Robot_Type;
          begin
-            for I in Line'Range loop
-               case Line (I) is
+            for Char of Line loop
+               case Char is
                   when '-' | '0' .. '9' =>
                      null;
                   when others =>
-                     Line (I) := ' ';
+                     Char := ' ';
                end case;
             end loop;
 
@@ -73,11 +73,9 @@ package body Advent.Day_14 is
 
    procedure Simulate (Robots : in out Robot_Array; Time : Positive) is
    begin
-      for I in Robots'Range loop
-         Robots (I).P.X :=
-           X_Position'Mod (Integer (@) + Robots (I).V.X * Time);
-         Robots (I).P.Y :=
-           Y_Position'Mod (Integer (@) + Robots (I).V.Y * Time);
+      for Robot of Robots loop
+         Robot.P.X := X_Position'Mod (Integer (@) + Robot.V.X * Time);
+         Robot.P.Y := Y_Position'Mod (Integer (@) + Robot.V.Y * Time);
       end loop;
    end Simulate;
 end Advent.Day_14;

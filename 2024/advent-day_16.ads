@@ -15,7 +15,13 @@ package Advent.Day_16 is
       Start_Dir : Direction; Finish_Cost : out Natural) return Maze_Type;
 
    function Get_Maze
-     (File : File_Type; Start_Pos, Finish_Pos : out Position) return Maze_Type;
+     (File : File_Type; Start_Pos, Finish_Pos : out Position)
+      return Maze_Type with
+     Post =>
+      Start_Pos (1) in Get_Maze'Result'Range (1) and
+      Start_Pos (2) in Get_Maze'Result'Range (2) and
+      Finish_Pos (1) in Get_Maze'Result'Range (1) and
+      Finish_Pos (2) in Get_Maze'Result'Range (2);
 
    procedure Print (File : File_Type; Maze : Maze_Type);
    procedure Print

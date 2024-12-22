@@ -19,6 +19,19 @@ package Advent.Day_20 is
       return Racetrack_Type renames
      Day_16.Get_Maze;
 
+   function Number_Cheats
+     (Track : Racetrack_Type; Distance : Distance_Map; Path : Position_Array;
+      Cheat : not null access function
+        (P, Q : Position; Old_Dist, New_Dist : Natural) return Boolean)
+      return Natural with
+     Pre =>
+      Distance'Length (1) = Track'Length (1) and
+      Distance'Length (2) = Track'Length (2) and Path'Length > 0 and
+      (for all Pos of Path => Track (Pos (1), Pos (2)) = Empty) and
+      (for all I in Path'First + 1 .. Path'Last =>
+         Distance (Path (I) (1), Path (I) (2)) =
+         Distance (Path (I - 1) (1), Path (I - 1) (2)) + 1);
+
    --  Find shortest path and fill distance and previous position
    --  maps. Returns False if there's no path.
    function Shortest_Path

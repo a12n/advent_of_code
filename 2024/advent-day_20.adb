@@ -111,4 +111,33 @@ package body Advent.Day_20 is
          raise Constraint_Error;
       end if;
    end Shortest_Path_Positions;
+
+   function Number_Cheats
+     (Track : Racetrack_Type; Distance : Distance_Map; Path : Position_Array;
+      Cheat : not null access function
+        (P, Q : Position; Old_Dist, New_Dist : Natural) return Boolean)
+      return Natural
+   is
+      N : Natural := 0;
+   begin
+      --  Try to cheat between all possible pairs of positions on the
+      --  shortest path.
+      for I in Path'First .. Path'Last - 1 loop
+         for J in I + 1 .. Path'Last loop
+            declare
+               P : Position renames Path (I);
+               Q : Position renames Path (J);
+
+               Old_Dist : constant Natural :=
+                 Distance (Q (1), Q (2)) - Distance (P (1), P (2));
+               New_Dist : constant Natural := Taxicab_Distance (P, Q);
+            begin
+               if Cheat (P, Q, Old_Dist, New_Dist) then
+                  N := N + 1;
+               end if;
+            end;
+         end loop;
+      end loop;
+      return N;
+   end Number_Cheats;
 end Advent.Day_20;

@@ -195,69 +195,60 @@ package body Advent.Day_16 is
      (Maze      : Maze_Type; Start_Pos, Finish_Pos : Position;
       Start_Dir : Direction; Finish_Cost : Natural) return Natural
    is
-      Best_Spots : array (Maze'Range (1), Maze'Range (2)) of Boolean :=
+      Best    : array (Maze'Range (1), Maze'Range (2)) of Boolean :=
+        [others => [others => False]];
+      Visited : array (Maze'Range (1), Maze'Range (2)) of Boolean :=
         [others => [others => False]];
 
       function Iterate
         (Pos : Position; Dir : Direction; Cost : Natural) return Boolean
       is
+         Found    : Boolean := False;
+         Next_Pos : Position;
       begin
-         --  Put_Line
-         --    (Standard_Error,
-         --     "Pos" & Pos'Image & ", Dir " & Dir'Image & ", Cost " & Cost'Image);
-
          if Cost > Finish_Cost then
             return False;
          end if;
 
-         --  XXX
-         if (Finish_Cost - Cost) < Taxicab_Distance (Pos, Finish_Pos) + 1_000
-         then
-            return False;
-         end if;
-
          if Cost = Finish_Cost and Pos = Finish_Pos then
-            Put_Line (Standard_Error, "Found");
-            Best_Spots (Pos (1), Pos (2)) := True;
+            Best (Pos (1), Pos (2)) := True;
             return True;
          end if;
 
-         declare
-            Next_Pos : constant Position := Pos + To_Offset (Dir);
-            Found    : Boolean           := False;
-         begin
-            --  Forward
-            if Maze (Next_Pos (1), Next_Pos (2)) = Empty
-              and then Iterate (Next_Pos, Dir, Cost + 1)
+         for Next_Dir in Direction'Range loop
+            Next_Pos := Pos + To_Offset (Next_Dir);
+            if Maze (Next_Pos (1), Next_Pos (2)) = Empty and
+              not Visited (Next_Pos (1), Next_Pos (2))
             then
-               Found := True;
-            end if;
-            --  CW
-            if Iterate (Pos, Rotate (CW, Dir), Cost + 1_000) then
-               Found := True;
-            end if;
-            --  CCW
-            if Iterate (Pos, Rotate (CCW, Dir), Cost + 1_000) then
-               Found := True;
-            end if;
+               Visited (Next_Pos (1), Next_Pos (2)) := True;
 
-            if Found then
-               Best_Spots (Pos (1), Pos (2)) := True;
+               Found :=
+                 Found or
+                 Iterate
+                   (Next_Pos, Next_Dir,
+                    Cost +
+                    (if Next_Dir = Dir then 1
+                     elsif Next_Dir = Opposite (Dir) then 2_000 + 1
+                     else 1_000 + 1));
+
+               Visited (Next_Pos (1), Next_Pos (2)) := False;
             end if;
+         end loop;
 
-            return Found;
-         end;
+         if Found then
+            Best (Pos (1), Pos (2)) := True;
+         end if;
 
-         return False;
+         return Found;
       end Iterate;
 
       N : Natural := 0;
    begin
       if Iterate (Start_Pos, Start_Dir, 0) then
-         Best_Spots (Start_Pos (1), Start_Pos (2)) := True;
-         for Row in Best_Spots'Range (1) loop
-            for Col in Best_Spots'Range (2) loop
-               if Best_Spots (Row, Col) then
+         Best (Start_Pos (1), Start_Pos (2)) := True;
+         for Row in Best'Range (1) loop
+            for Col in Best'Range (2) loop
+               if Best (Row, Col) then
                   N := N + 1;
                end if;
             end loop;

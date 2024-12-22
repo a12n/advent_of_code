@@ -50,21 +50,24 @@ package body Advent.Day_16 is
          Prev_Pos : Position;
       begin
          Paths (Pos (1), Pos (2)) := Empty;
-         if Pos /= Start_Pos then
-            for Prev_Dir in Direction'Range loop
-               if Parent (Pos (1), Pos (2), Prev_Dir) and
-                 Costs (Pos (1), Pos (2), Opposite (Prev_Dir)) = Cost
-               then
-                  Prev_Pos := Pos + To_Offset (Prev_Dir);
-                  Parent (Pos (1), Pos (2), Prev_Dir) := False;
-                  Backtrack (Prev_Pos, Cost - 1);
-                  if Cost > 1_000 then
-                     Backtrack (Prev_Pos, Cost - 1_001);
-                  end if;
-                  Parent (Pos (1), Pos (2), Prev_Dir) := True;
-               end if;
-            end loop;
+
+         if Pos = Start_Pos then
+            return;
          end if;
+
+         for Prev_Dir in Direction'Range loop
+            if Parent (Pos (1), Pos (2), Prev_Dir) and
+              Costs (Pos (1), Pos (2), Opposite (Prev_Dir)) = Cost
+            then
+               Prev_Pos := Pos + To_Offset (Prev_Dir);
+               Parent (Pos (1), Pos (2), Prev_Dir) := False;
+               Backtrack (Prev_Pos, Cost - 1);
+               if Cost > 1_000 then
+                  Backtrack (Prev_Pos, Cost - 1_001);
+               end if;
+               Parent (Pos (1), Pos (2), Prev_Dir) := True;
+            end if;
+         end loop;
       end Backtrack;
 
       New_Cost : Natural;
@@ -146,7 +149,6 @@ package body Advent.Day_16 is
              (Finish_Cost, Costs (Finish_Pos (1), Finish_Pos (2), Dir));
       end loop;
 
-      --  XXX
       Backtrack (Finish_Pos, Finish_Cost);
       return Paths;
    end Best_Paths;

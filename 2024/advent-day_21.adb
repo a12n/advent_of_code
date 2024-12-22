@@ -24,4 +24,31 @@ package body Advent.Day_21 is
         (Numeric_Key'Pos (Code (1)) * 100 + Numeric_Key'Pos (Code (2)) * 10 +
          Numeric_Key'Pos (Code (3)));
    end To_Number;
+
+   function Translate (From, To : Numeric_Key) return Directional_Presses is
+   begin
+      --  TODO
+      return Directional_Presses'[];
+   end Translate;
+
+   function Translate (Presses : Numeric_Presses) return Directional_Presses is
+   begin
+      --  TODO
+      return Directional_Presses'[];
+   end Translate;
+
+   function Translate (From, To : Directional_Key) return Directional_Presses
+   is
+   begin
+      --  TODO
+      return Directional_Presses'[];
+   end Translate;
+
+   function Translate
+     (Presses : Directional_Presses) return Directional_Presses
+   is
+   begin
+      --  TODO
+      return Directional_Presses'[];
+   end Translate;
 end Advent.Day_21;

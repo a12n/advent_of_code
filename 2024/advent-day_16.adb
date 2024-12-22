@@ -205,7 +205,9 @@ package body Advent.Day_16 is
       for Row in Maze'Range (1) loop
          for Col in Maze'Range (2) loop
             if Paths (Row, Col) = Empty then
-               Put (File, Path_Char);
+               Put
+                 (File,
+                  ANSI.SGR.Foreground (0, 5, 0) & Path_Char & ANSI.SGR.Reset);
             else
                case Maze (Row, Col) is
                   when Empty =>

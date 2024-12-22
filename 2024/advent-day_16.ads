@@ -17,10 +17,6 @@ package Advent.Day_16 is
    function Get_Maze
      (File : File_Type; Start_Pos, Finish_Pos : out Position) return Maze_Type;
 
-   function Number_Best_Tiles
-     (Maze      : Maze_Type; Start_Pos, Finish_Pos : Position;
-      Start_Dir : Direction; Finish_Cost : Natural) return Natural;
-
    procedure Print (File : File_Type; Maze : Maze_Type);
    procedure Print
      (File : File_Type; Maze, Paths : Maze_Type; Empty_Char : Character := '.';

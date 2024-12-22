@@ -52,11 +52,6 @@ package body Advent.Day_16 is
          Paths (Pos (1), Pos (2)) := Empty;
          if Pos /= Start_Pos then
             for Prev_Dir in Direction'Range loop
-               --  Put_Line
-               --    (Standard_Error,
-               --     "[" & Pos (1)'Image & "," & Pos (2)'Image & "], " &
-               --     Prev_Dir'Image & ", " &
-               --     Costs (Pos (1), Pos (2), Prev_Dir)'Image);
                if Parent (Pos (1), Pos (2), Prev_Dir) and
                  Costs (Pos (1), Pos (2), Opposite (Prev_Dir)) = Cost
                then
@@ -196,72 +191,6 @@ package body Advent.Day_16 is
       end loop;
       return Maze;
    end Get_Maze;
-
-   function Number_Best_Tiles
-     (Maze      : Maze_Type; Start_Pos, Finish_Pos : Position;
-      Start_Dir : Direction; Finish_Cost : Natural) return Natural
-   is
-      Best    : array (Maze'Range (1), Maze'Range (2)) of Boolean :=
-        [others => [others => False]];
-      Visited : array (Maze'Range (1), Maze'Range (2)) of Boolean :=
-        [others => [others => False]];
-
-      function Iterate
-        (Pos : Position; Dir : Direction; Cost : Natural) return Boolean
-      is
-         Found    : Boolean := False;
-         Next_Pos : Position;
-      begin
-         if Cost > Finish_Cost then
-            return False;
-         end if;
-
-         if Cost = Finish_Cost and Pos = Finish_Pos then
-            Best (Pos (1), Pos (2)) := True;
-            return True;
-         end if;
-
-         for Next_Dir in Direction'Range loop
-            Next_Pos := Pos + To_Offset (Next_Dir);
-            if Maze (Next_Pos (1), Next_Pos (2)) = Empty and
-              not Visited (Next_Pos (1), Next_Pos (2))
-            then
-               Visited (Next_Pos (1), Next_Pos (2)) := True;
-
-               Found :=
-                 Found or
-                 Iterate
-                   (Next_Pos, Next_Dir,
-                    Cost +
-                    (if Next_Dir = Dir then 1
-                     elsif Next_Dir = Opposite (Dir) then 2_000 + 1
-                     else 1_000 + 1));
-
-               Visited (Next_Pos (1), Next_Pos (2)) := False;
-            end if;
-         end loop;
-
-         if Found then
-            Best (Pos (1), Pos (2)) := True;
-         end if;
-
-         return Found;
-      end Iterate;
-
-      N : Natural := 0;
-   begin
-      if Iterate (Start_Pos, Start_Dir, 0) then
-         Best (Start_Pos (1), Start_Pos (2)) := True;
-         for Row in Best'Range (1) loop
-            for Col in Best'Range (2) loop
-               if Best (Row, Col) then
-                  N := N + 1;
-               end if;
-            end loop;
-         end loop;
-      end if;
-      return N;
-   end Number_Best_Tiles;
 
    procedure Print (File : File_Type; Maze : Maze_Type) is
    begin

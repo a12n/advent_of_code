@@ -23,7 +23,8 @@ package Advent.Day_20 is
    --  maps. Returns False if there's no path.
    function Shortest_Path
      (Track    :     Racetrack_Type; Start_Pos, Finish_Pos : Position;
-      Previous : out Previous_Map; Distance : out Distance_Map) return Boolean with
+      Previous : out Previous_Map; Distance : out Distance_Map)
+      return Boolean with
      Pre =>
       Start_Pos (1) in Track'Range (1) and Start_Pos (2) in Track'Range (2) and
       Finish_Pos (1) in Track'Range (1) and

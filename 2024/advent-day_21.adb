@@ -41,7 +41,7 @@ package body Advent.Day_21 is
       if From = To then
          return "";
       elsif From > To then
-         return Revert (Translate (To, From));
+         return Revert (Translate (From => To, To => From));
       end if;
 
       case Numeric_Presses'[From, To] is

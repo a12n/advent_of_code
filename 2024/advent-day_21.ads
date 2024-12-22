@@ -28,6 +28,8 @@ package Advent.Day_21 is
    function Get_Code (File : File_Type) return Numeric_Presses with
      Post => Valid_Code (Get_Code'Result);
 
+   function Revert (Keys : Directional_Presses) return Directional_Presses;
+
    function To_Number (Code : Numeric_Presses) return Natural with
      Pre => Valid_Code (Code), Post => To_Number'Result < 1_000;
 

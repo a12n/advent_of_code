@@ -18,6 +18,17 @@ package body Advent.Day_21 is
       return Keys;
    end Get_Code;
 
+   function Revert (Keys : Directional_Presses) return Directional_Presses is
+      Revert_Key : constant array (Directional_Key) of Directional_Key :=
+        ['v' => '^', '<' => '>', '>' => '<', '^' => 'v', 'A' => 'A'];
+      Reverted   : Directional_Presses (Keys'Range);
+   begin
+      for I in Keys'Range loop
+         Reverted (Reverted'Last - (I - 1)) := Revert_Key (Keys (I));
+      end loop;
+      return Reverted;
+   end Revert;
+
    function To_Number (Code : Numeric_Presses) return Natural is
    begin
       return
@@ -26,17 +37,6 @@ package body Advent.Day_21 is
    end To_Number;
 
    function Translate (From, To : Numeric_Key) return Directional_Presses is
-      function Revert (Keys : Directional_Presses) return Directional_Presses
-      is
-         Revert_Key : constant array (Directional_Key) of Directional_Key :=
-           ['v' => '^', '<' => '>', '>' => '<', '^' => 'v', 'A' => 'A'];
-         Result     : Directional_Presses (Keys'Range);
-      begin
-         for I in Keys'Range loop
-            Result (Result'Last - (I - 1)) := Revert_Key (Keys (I));
-         end loop;
-         return Result;
-      end Revert;
    begin
       if From = To then
          return "";

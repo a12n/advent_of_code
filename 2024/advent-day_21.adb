@@ -1,21 +1,21 @@
 package body Advent.Day_21 is
    function Get_Code (File : File_Type) return Numeric_Presses is
-      Line    : constant String := Get_Line (File);
-      Presses : Numeric_Presses (Line'Range);
+      Line : constant String := Get_Line (File);
+      Keys : Numeric_Presses (Line'Range);
    begin
       for I in Line'Range loop
          case Line (I) is
             when '0' .. '9' =>
-               Presses (I) :=
+               Keys (I) :=
                  Numeric_Key'Val
                    (Character'Pos (Line (I)) - Character'Pos ('0'));
             when 'A' =>
-               Presses (I) := 'A';
+               Keys (I) := 'A';
             when others =>
                raise Constraint_Error;
          end case;
       end loop;
-      return Presses;
+      return Keys;
    end Get_Code;
 
    function To_Number (Code : Numeric_Presses) return Natural is
@@ -26,15 +26,14 @@ package body Advent.Day_21 is
    end To_Number;
 
    function Translate (From, To : Numeric_Key) return Directional_Presses is
-      function Revert
-        (Presses : Directional_Presses) return Directional_Presses
+      function Revert (Keys : Directional_Presses) return Directional_Presses
       is
          Revert_Key : constant array (Directional_Key) of Directional_Key :=
            ['v' => '^', '<' => '>', '>' => '<', '^' => 'v', 'A' => 'A'];
-         Result     : Directional_Presses (Presses'Range);
+         Result     : Directional_Presses (Keys'Range);
       begin
-         for I in Presses'Range loop
-            Result (Result'Last - (I - 1)) := Revert_Key (Presses (I));
+         for I in Keys'Range loop
+            Result (Result'Last - (I - 1)) := Revert_Key (Keys (I));
          end loop;
          return Result;
       end Revert;
@@ -172,21 +171,20 @@ package body Advent.Day_21 is
       end case;
    end Translate;
 
-   function Translate (Presses : Numeric_Presses) return Directional_Presses is
+   function Translate (Keys : Numeric_Presses) return Directional_Presses is
       Current : Numeric_Key := 'A';
    begin
-      return Translate (Presses, Current);
+      return Translate (Keys, Current);
    end Translate;
 
    function Translate
-     (Presses : Numeric_Presses; Current : in out Numeric_Key)
+     (Keys : Numeric_Presses; Current : in out Numeric_Key)
       return Directional_Presses
    is
-      Result :
-        Directional_Presses (1 .. (Presses'Length * 5 + Presses'Length));
+      Result : Directional_Presses (1 .. (Keys'Length * 5 + Keys'Length));
       Start  : Positive := Result'First;
    begin
-      for Next of Presses loop
+      for Next of Keys loop
          declare
             Directional : constant Directional_Presses :=
               Translate (Current, Next);
@@ -207,16 +205,15 @@ package body Advent.Day_21 is
       return "";
    end Translate;
 
-   function Translate
-     (Presses : Directional_Presses) return Directional_Presses
+   function Translate (Keys : Directional_Presses) return Directional_Presses
    is
       Current : Directional_Key := 'A';
    begin
-      return Translate (Presses, Current);
+      return Translate (Keys, Current);
    end Translate;
 
    function Translate
-     (Presses : Directional_Presses; Current : in out Directional_Key)
+     (Keys : Directional_Presses; Current : in out Directional_Key)
       return Directional_Presses
    is
    begin

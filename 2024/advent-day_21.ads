@@ -21,10 +21,9 @@ package Advent.Day_21 is
    type Directional_Key is ('v', '<', '>', '^', 'A');
    type Directional_Presses is array (Positive range <>) of Directional_Key;
 
-   function Valid_Code (Presses : Numeric_Presses) return Boolean is
-     (Presses'Length = 4
-      and then (for all I in 1 .. 3 => Presses (I) in '0' .. '9')
-      and then Presses (4) = 'A');
+   function Valid_Code (Keys : Numeric_Presses) return Boolean is
+     (Keys'Length = 4 and then (for all I in 1 .. 3 => Keys (I) in '0' .. '9')
+      and then Keys (4) = 'A');
 
    function Get_Code (File : File_Type) return Numeric_Presses with
      Post => Valid_Code (Get_Code'Result);
@@ -35,17 +34,16 @@ package Advent.Day_21 is
    --  Button presses needed on the corresponding directional keypad
    --  to move from one button to another on the numeric keypad.
    function Translate (From, To : Numeric_Key) return Directional_Presses;
-   function Translate (Presses : Numeric_Presses) return Directional_Presses;
+   function Translate (Keys : Numeric_Presses) return Directional_Presses;
    function Translate
-     (Presses : Numeric_Presses; Current : in out Numeric_Key)
+     (Keys : Numeric_Presses; Current : in out Numeric_Key)
       return Directional_Presses;
 
    --  Button presses needed on the corresponding directional keypad
    --  to move on the second order directional keypad.
    function Translate (From, To : Directional_Key) return Directional_Presses;
+   function Translate (Keys : Directional_Presses) return Directional_Presses;
    function Translate
-     (Presses : Directional_Presses) return Directional_Presses;
-   function Translate
-     (Presses : Directional_Presses; Current : in out Directional_Key)
+     (Keys : Directional_Presses; Current : in out Directional_Key)
       return Directional_Presses;
 end Advent.Day_21;

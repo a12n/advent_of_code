@@ -1,5 +1,6 @@
 package Advent.Grids is
-   type Direction is (Down, Left, Right, Up);
+   type Maybe_Direction is (None, Down, Left, Right, Up);
+   subtype Direction is Maybe_Direction range Down .. Up;
    type Rotation is (CW, CCW);
    type Position is array (1 .. 2) of Integer;
    type Position_Array is array (Positive range <>) of Position;

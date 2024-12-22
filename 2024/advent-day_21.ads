@@ -1,9 +1,24 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 package Advent.Day_21 is
+   --  +---+---+---+
+   --  | 7 | 8 | 9 |
+   --  +---+---+---+
+   --  | 4 | 5 | 6 |
+   --  +---+---+---+
+   --  | 1 | 2 | 3 |
+   --  +---+---+---+
+   --      | 0 | A |
+   --      +---+---+
    type Numeric_Key is ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A');
-   type Directional_Key is ('v', '<', '>', '^', 'A');
    type Numeric_Presses is array (Positive range <>) of Numeric_Key;
+
+   --      +---+---+
+   --      | ^ | A |
+   --  +---+---+---+
+   --  | < | v | > |
+   --  +---+---+---+
+   type Directional_Key is ('v', '<', '>', '^', 'A');
    type Directional_Presses is array (Positive range <>) of Directional_Key;
 
   function Get_Code (File : File_Type) return Numeric_Presses with

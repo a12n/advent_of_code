@@ -181,20 +181,22 @@ package body Advent.Day_21 is
       return Directional_Presses
    is
       Result : Directional_Presses (1 .. (Keys'Length * 5 + Keys'Length));
-      Start  : Positive := Result'First;
+      Offset : Positive := Result'First;
    begin
       for Next of Keys loop
          declare
-            Directional : constant Directional_Presses :=
+            Derived : constant Directional_Presses :=
               Translate (Current, Next);
          begin
-            Result (Start .. Start + Directional'Length) := Directional & 'A';
+            Result (Offset .. Offset + Derived'Length - 1) := Derived;
 
-            Start   := Start + Directional'Length + 1;
+            Result (Offset + Derived'Length) := 'A';
+
+            Offset  := Offset + Derived'Length + 1;
             Current := Next;
          end;
       end loop;
-      return Result (1 .. Start - 1);
+      return Result (1 .. Offset - 1);
    end Translate;
 
    function Translate (From, To : Directional_Key) return Directional_Presses

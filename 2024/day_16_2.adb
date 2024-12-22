@@ -2,6 +2,7 @@ with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Ada.Text_IO;         use Ada.Text_IO;
 with Advent.Day_16;       use Advent.Day_16;
 with Advent.Grids;        use Advent.Grids;
+with Advent;              use Advent;
 
 procedure Day_16_2 is
    Start, Finish : Position;
@@ -12,7 +13,10 @@ procedure Day_16_2 is
      Best_Paths (Maze, Start, Finish, Right, Unused_Cost);
    N           : Natural            := 0;
 begin
-   Print (Standard_Error, Maze, Paths);
+   if Debug_Level = 1 then
+      Print (Standard_Error, Maze, Paths);
+   end if;
+
    for Row in Paths'Range (1) loop
       for Col in Paths'Range (2) loop
          if Paths (Row, Col) = Empty then
@@ -20,6 +24,7 @@ begin
          end if;
       end loop;
    end loop;
+
    Put (N, 0);
    New_Line;
 end Day_16_2;

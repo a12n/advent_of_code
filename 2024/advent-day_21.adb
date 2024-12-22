@@ -24,7 +24,7 @@ package body Advent.Day_21 is
       Reverted   : Directional_Presses (Keys'Range);
    begin
       for I in Keys'Range loop
-         Reverted (Reverted'Last - (I - 1)) := Revert_Key (Keys (I));
+         Reverted (Reverted'Last - (I - Keys'First)) := Revert_Key (Keys (I));
       end loop;
       return Reverted;
    end Revert;

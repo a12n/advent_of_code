@@ -1,5 +1,6 @@
-with Ada.Text_IO;  use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 with Advent.Day_16;
+use all type Advent.Day_16.Tile_Type;
 with Advent.Grids; use Advent.Grids;
 
 package Advent.Day_20 is

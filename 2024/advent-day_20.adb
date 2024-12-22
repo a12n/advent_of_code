@@ -1,7 +1,6 @@
 with Ada.Containers.Synchronized_Queue_Interfaces;
 with Ada.Containers.Unbounded_Priority_Queues;
 with Ada.Containers; use Ada.Containers;
-with Advent.Day_16;  use Advent.Day_16;
 
 package body Advent.Day_20 is
    function Shortest_Path_Length

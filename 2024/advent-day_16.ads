@@ -12,7 +12,7 @@ package Advent.Day_16 is
 
    function Best_Paths
      (Maze      : Maze_Type; Start_Pos, Finish_Pos : Position;
-      Start_Dir : Direction; Cost : out Natural) return Maze_Type;
+      Start_Dir : Direction; Finish_Cost : out Natural) return Maze_Type;
 
    function Get_Maze
      (File : File_Type; Start_Pos, Finish_Pos : out Position) return Maze_Type;

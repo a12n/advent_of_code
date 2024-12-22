@@ -17,7 +17,7 @@ package body Advent.Day_16 is
 
    function Best_Paths
      (Maze      : Maze_Type; Start_Pos, Finish_Pos : Position;
-      Start_Dir : Direction; Cost : out Natural) return Maze_Type
+      Start_Dir : Direction; Finish_Cost : out Natural) return Maze_Type
    is
       type State is record
          Pos : Position;
@@ -139,10 +139,11 @@ package body Advent.Day_16 is
             ANSI.Cursor.Show);
       end if;
 
-      Cost := Natural'Last;
+      Finish_Cost := Natural'Last;
       for Dir in Direction'Range loop
-         Cost :=
-           Natural'Min (Cost, Costs (Finish_Pos (1), Finish_Pos (2), Dir));
+         Finish_Cost :=
+           Natural'Min
+             (Finish_Cost, Costs (Finish_Pos (1), Finish_Pos (2), Dir));
       end loop;
 
       --  XXX

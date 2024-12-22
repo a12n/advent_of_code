@@ -208,7 +208,6 @@ package body Advent.Day_21 is
          return Revert (Translate (From => To, To => From));
       end if;
 
-      --  TODO
       case Directional_Presses'[From, To] is
          when "v<" =>
             return "<";
@@ -235,7 +234,7 @@ package body Advent.Day_21 is
             return ">";
 
          when others =>
-            raise Program_Error;
+            raise Constraint_Error with "Invalid directional key translation";
       end case;
    end Translate;
 

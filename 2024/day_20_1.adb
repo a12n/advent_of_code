@@ -1,14 +1,17 @@
-with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Ada.Text_IO;         use Ada.Text_IO;
-with Advent.Day_20;       use Advent.Day_20;
-with Advent.Grids;        use Advent.Grids;
-with Advent;              use Advent;
+with Ada.Environment_Variables; use Ada.Environment_Variables;
+with Ada.Integer_Text_IO;       use Ada.Integer_Text_IO;
+with Ada.Text_IO;               use Ada.Text_IO;
+with Advent.Day_20;             use Advent.Day_20;
+with Advent.Grids;              use Advent.Grids;
+with Advent;                    use Advent;
 
 --  FIXME: Re-export from Day_20?
 with Advent.Day_16;
 use all type Advent.Day_16.Tile_Type;
 
 procedure Day_20_1 is
+   Threshold : constant Natural := Natural'Value (Value ("THRESHOLD", "100"));
+
    Start, Finish : Position;
 
    Track  : Racetrack_Type   := Get_Racetrack (Standard_Input, Start, Finish);
@@ -42,8 +45,8 @@ begin
                   Integer'(Length - Cheat_Length)'Image);
             end if;
 
-            --  Cheat saved at least 100 picoseconds.
-            if (Length - Cheat_Length) >= 100 then
+            --  Cheat saved at least THRESHOLD picoseconds.
+            if (Length - Cheat_Length) >= Threshold then
                N := N + 1;
             end if;
          end if;

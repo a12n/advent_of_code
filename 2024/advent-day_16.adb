@@ -46,22 +46,27 @@ package body Advent.Day_16 is
       Q : Queue;
       S : State;
 
-      procedure Backtrack (Pos : Position) is
+      procedure Backtrack (Pos : Position; Cost : Natural) is
+         Prev_Pos : Position;
       begin
-         Put_Line (Standard_Error, Pos'Image);
-         for Dir in Direction'Range loop
-            if Parent (Pos (1), Pos (2), Dir) then
-               Put (Standard_Error, Dir'Image & ' ');
-            end if;
-         end loop;
-         New_Line (Standard_Error);
-
          Paths (Pos (1), Pos (2)) := Empty;
          if Pos /= Start_Pos then
-            for Dir in Direction'Range loop
-               if Parent (Pos (1), Pos (2), Dir) then
-                  --  Parent (Pos (1), Pos (2), Dir) := False;
-                  Backtrack (Pos + To_Offset (Dir));
+            for Prev_Dir in Direction'Range loop
+               --  Put_Line
+               --    (Standard_Error,
+               --     "[" & Pos (1)'Image & "," & Pos (2)'Image & "], " &
+               --     Prev_Dir'Image & ", " &
+               --     Costs (Pos (1), Pos (2), Prev_Dir)'Image);
+               if Parent (Pos (1), Pos (2), Prev_Dir) and
+                 Costs (Pos (1), Pos (2), Opposite (Prev_Dir)) = Cost
+               then
+                  Prev_Pos := Pos + To_Offset (Prev_Dir);
+                  Parent (Pos (1), Pos (2), Prev_Dir) := False;
+                  Backtrack (Prev_Pos, Cost - 1);
+                  if Cost > 1_000 then
+                     Backtrack (Prev_Pos, Cost - 1_001);
+                  end if;
+                  Parent (Pos (1), Pos (2), Prev_Dir) := True;
                end if;
             end loop;
          end if;
@@ -147,7 +152,7 @@ package body Advent.Day_16 is
       end loop;
 
       --  XXX
-      --  Backtrack (Finish_Pos);
+      Backtrack (Finish_Pos, Finish_Cost);
       return Paths;
    end Best_Paths;
 

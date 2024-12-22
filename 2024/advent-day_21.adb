@@ -210,28 +210,28 @@ package body Advent.Day_21 is
       --  TODO
       case Directional_Presses'[From, To] is
          when "v<" =>
-            return "";
+            return "<";
          when "v>" =>
-            return "";
+            return ">";
          when "v^" =>
-            return "";
+            return "^";
          when "vA" =>
-            return "";
+            return "^>";
 
          when "<>" =>
-            return "";
+            return ">>";
          when "<^" =>
-            return "";
+            return ">^";
          when "<A" =>
-            return "";
+            return ">>^";
 
          when ">^" =>
-            return "";
+            return "^<";
          when ">A" =>
-            return "";
+            return "^";
 
          when "^A" =>
-            return "";
+            return ">";
 
          when others =>
             raise Program_Error;

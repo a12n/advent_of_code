@@ -14,8 +14,7 @@ begin
            Translate (Translate (Translate (Translate (Code))));
       begin
          if Debug then
-            Put_Line (Standard_Error, Code'Image);
-            Put_Line (Standard_Error, Presses'Image);
+            Put_Line (Standard_Error, Code'Image & " =>" & Presses'Image);
          end if;
 
          Total := Total + To_Number (Code) * Presses'Length;

@@ -21,9 +21,11 @@ package Advent.Day_21 is
    type Directional_Key is ('v', '<', '>', '^', 'A');
    type Directional_Presses is array (Positive range <>) of Directional_Key;
 
-  function Get_Code (File : File_Type) return Numeric_Presses with
-     Post =>
-      Get_Code'Result'Length = 4 and
-      (for all I in 1 .. 3 => Get_Code'Result (I) in '0' .. '9') and
-      Get_Code'Result (4) = 'A';
+   function Valid_Code (Presses : Numeric_Presses) return Boolean is
+     (Presses'Length = 4
+      and then (for all I in 1 .. 3 => Presses (I) in '0' .. '9')
+      and then Presses (4) = 'A');
+
+   function Get_Code (File : File_Type) return Numeric_Presses with
+     Post => Valid_Code (Get_Code'Result);
 end Advent.Day_21;

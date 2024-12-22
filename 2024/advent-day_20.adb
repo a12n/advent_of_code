@@ -3,11 +3,41 @@ with Ada.Containers.Unbounded_Priority_Queues;
 with Ada.Containers; use Ada.Containers;
 
 package body Advent.Day_20 is
-   function Shortest_Path_Length
-     (Track : Racetrack_Type; Start_Pos, Finish_Pos : Position) return Natural
+   function Shortest_Path
+     (Track : Racetrack_Type; Start_Pos, Finish_Pos : Position)
+      return Position_Array
    is
       Distances : array (Track'Range (1), Track'Range (2)) of Natural :=
         [others => [others => Natural'Last]];
+
+      Previous : array (Track'Range (1), Track'Range (2)) of Maybe_Direction :=
+        [others => [others => None]];
+
+      --  Buffer to store the shortest path. A slice of this array is
+      --  returned by the function as a result.
+      Path :
+        Position_Array
+          (1 .. ((Track'Length (1) - 2) * (Track'Length (2) - 2)));
+
+      function Backtrack
+        (Pos : Position; Path_Index : Positive) return Positive
+      is
+      begin
+         Path (Path_Index) := Pos;
+         if Pos = Start_Pos then
+            if Debug then
+               Put_Line
+                 (Standard_Error,
+                  "Path" & Path (Path_Index .. Path'Last)'Image);
+            end if;
+            return Path_Index;
+         else
+            return
+              Backtrack
+                (Pos + To_Offset (Previous (Pos (1), Pos (2))),
+                 Path_Index - 1);
+         end if;
+      end Backtrack;
 
       function Get_Priority (Pos : Position) return Natural is
         (Distances (Pos (1), Pos (2)));
@@ -15,6 +45,7 @@ package body Advent.Day_20 is
       package Position_Queue_Interface is new Ada.Containers
         .Synchronized_Queue_Interfaces
         (Position);
+
       package Position_Queues is new Ada.Containers.Unbounded_Priority_Queues
         (Queue_Interfaces => Position_Queue_Interface,
          Queue_Priority   => Natural, Before => "<");
@@ -41,6 +72,7 @@ package body Advent.Day_20 is
               New_Dist < Distances (Next_Pos (1), Next_Pos (2))
             then
                Distances (Next_Pos (1), Next_Pos (2)) := New_Dist;
+               Previous (Next_Pos (1), Next_Pos (2))  := Opposite (Dir);
                Q.Enqueue (Next_Pos);
             end if;
          end loop;
@@ -51,6 +83,6 @@ package body Advent.Day_20 is
          raise Constraint_Error;
       end if;
 
-      return Distances (Finish_Pos (1), Finish_Pos (2));
-   end Shortest_Path_Length;
+      return Path (Backtrack (Finish_Pos, Path'Last) .. Path'Last);
+   end Shortest_Path;
 end Advent.Day_20;

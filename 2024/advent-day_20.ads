@@ -11,8 +11,13 @@ package Advent.Day_20 is
       return Racetrack_Type renames
      Day_16.Get_Maze;
 
+   function Shortest_Path
+     (Track : Racetrack_Type; Start_Pos, Finish_Pos : Position)
+      return Position_Array;
    function Shortest_Path_Length
-     (Track : Racetrack_Type; Start_Pos, Finish_Pos : Position) return Natural;
+     (Track : Racetrack_Type; Start_Pos, Finish_Pos : Position)
+      return Natural is
+     (Shortest_Path (Track, Start_Pos, Finish_Pos)'Length - 1);
 
    procedure Print
      (File       : File_Type; Track, Paths : Racetrack_Type;

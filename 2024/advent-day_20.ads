@@ -14,10 +14,13 @@ package Advent.Day_20 is
    function Shortest_Path
      (Track : Racetrack_Type; Start_Pos, Finish_Pos : Position)
       return Position_Array;
+
    function Shortest_Path_Length
      (Track : Racetrack_Type; Start_Pos, Finish_Pos : Position)
       return Natural is
-     (Shortest_Path (Track, Start_Pos, Finish_Pos)'Length - 1);
+     (Shortest_Path (Track, Start_Pos, Finish_Pos)'Length -
+      1 --  Path from Start_Pos to Start_Pos has length 0
+   );
 
    procedure Print
      (File       : File_Type; Track, Paths : Racetrack_Type;

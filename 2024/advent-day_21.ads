@@ -30,7 +30,7 @@ package Advent.Day_21 is
      Post => Valid_Code (Get_Code'Result);
 
    function To_Number (Code : Numeric_Presses) return Natural with
-     Pre => Valid_Code (Code), Post => To_Number'Result in 0 .. 999;
+     Pre => Valid_Code (Code), Post => To_Number'Result < 1_000;
 
    --  Button presses needed on the corresponding directional keypad
    --  to move from one button to another on the numeric keypad.

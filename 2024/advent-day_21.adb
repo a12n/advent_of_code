@@ -166,8 +166,7 @@ package body Advent.Day_21 is
             return "vvv";
 
          when others =>
-            --  Already covered at the top.
-            raise Program_Error;
+            raise Constraint_Error with "Invalid numeric key translation";
       end case;
    end Translate;
 

@@ -6,6 +6,11 @@ package Advent.Grids is
    type Position_Array is array (Positive range <>) of Position;
    type Offset is array (1 .. 2) of Integer;
 
+   --  TODO
+   --  type Position_Range is array (1 .. 2) of Position with
+   --    Constant_Indexing => Taxicab_Iterate_Element,
+   --    Default_Iterator  => Taxicab_Iterate, Iterator_Element => Position;
+
    Rotate : constant array (Rotation, Direction) of Direction :=
      [CW => [Down => Left, Left => Up, Up => Right, Right => Down],
      CCW => [Down => Right, Left => Down, Up => Left, Right => Up]];

@@ -35,6 +35,11 @@ procedure Day_20_2 is
          return False;
       end if;
 
+      --  Track at P and Q is Empty (since both positions are on the
+      --  shortest path). There are no more than 20 walls on the path
+      --  from P to Q, any of them may be ignored during the
+      --  cheat. So, the cheat is valid.
+
       --  Cheat saved some time…
       if Debug then
          Put_Line

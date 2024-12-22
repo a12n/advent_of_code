@@ -21,7 +21,9 @@ package Advent.Day_16 is
       Start_Pos (1) in Get_Maze'Result'Range (1) and
       Start_Pos (2) in Get_Maze'Result'Range (2) and
       Finish_Pos (1) in Get_Maze'Result'Range (1) and
-      Finish_Pos (2) in Get_Maze'Result'Range (2);
+      Finish_Pos (2) in Get_Maze'Result'Range (2) and
+      Get_Maze'Result (Start_Pos (1), Start_Pos (2)) = Empty and
+      Get_Maze'Result (Finish_Pos (1), Finish_Pos (2)) = Empty;
 
    procedure Print (File : File_Type; Maze : Maze_Type);
    procedure Print

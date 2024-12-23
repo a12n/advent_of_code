@@ -9,6 +9,10 @@ package Advent.Day_23 is
    type Connection_Map is array (Address) of Address_Set;
    pragma Pack (Address_Set);
 
+   function Empty (Set : Address_Set) return Boolean is
+     (for all I in Set'Range => not Set (I));
+   function Length (Set : Address_Set) return Natural;
+
    function To_Address (Addr : String_Address) return Address is
      ((Address_Char'Pos (Addr (1)) - Address_Char'Pos (Address_Char'First)) *
       26 +

@@ -1,4 +1,15 @@
 package body Advent.Day_23 is
+   function Length (Set : Address_Set) return Natural is
+   begin
+      return N : Natural := 0 do
+         for I in Set'Range loop
+            if Set (I) then
+               N := N + 1;
+            end if;
+         end loop;
+      end return;
+   end Length;
+
    function Get_Connections (File : File_Type) return Connection_Map is
       Connections : Connection_Map := [others => [others => False]];
    begin

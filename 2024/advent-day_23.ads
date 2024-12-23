@@ -32,8 +32,9 @@ package Advent.Day_23 is
      (Connections (Addr, Addr));
 
    function To_Address (Addr : String_Address) return Address is
-     ((Address_Char'Pos (Addr (1)) - Address_Char'Pos ('a')) * 26 +
-      Address_Char'Pos (Addr (2)) - Address_Char'Pos ('a'));
+     ((Address_Char'Pos (Addr (1)) - Address_Char'Pos (Address_Char'First)) *
+      26 +
+      Address_Char'Pos (Addr (2)) - Address_Char'Pos (Address_Char'First));
 
    function To_String_Address (Addr : Address) return String_Address is
      ([Address_Char'Val (Addr / 26 + Address_Char'Pos (Address_Char'First)),

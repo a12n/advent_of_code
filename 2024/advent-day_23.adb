@@ -1,4 +1,34 @@
 package body Advent.Day_23 is
+   function Connected_Components
+     (Connections : Connection_Map; Components : out Component_Map)
+      return Component_Size_Array
+   is
+      Sizes : Component_Size_Array (1 .. Positive (Address'Last)) :=
+        [others => 0];
+      N     : Natural                                             := 0;
+
+      procedure Connect (Addr : Address) is
+      begin
+         Components (Addr) := N;
+         for Peer in Address'Range loop
+            if Connections (Addr, Peer) then
+               Connect (Peer);
+            end if;
+         end loop;
+      end Connect;
+   begin
+      Components := [others => Natural'Last];
+
+      for Addr in Address'Range loop
+         if Components (Addr) = Natural'Last then
+            Connect (Addr);
+            N := N + 1;
+         end if;
+      end loop;
+
+      return Sizes (1 .. N);
+   end Connected_Components;
+
    function Get_Connections (File : File_Type) return Connection_Map is
       Connections : Connection_Map;
    begin

@@ -7,6 +7,22 @@ package Advent.Day_23 is
    type Address is range 0 .. (25 * 26 + 25); --  From "aa" to "zz"
    type Connection_Map is array (Address, Address) of Boolean;
 
+   --  Connected components of the network.
+   type Component_Map is array (Address) of Natural;
+   type Component_Size_Array is array (Positive range <>) of Natural;
+
+   --  Analyzes connected components of the network. If
+   --  Components(Addr) is 3, then address belongs to the component
+   --  number 3. The number of nodes in the component 3 is in
+   --  Connected_Components'Result(3).
+   function Connected_Components
+     (Connections : Connection_Map; Components : out Component_Map)
+      return Component_Size_Array with
+     Post =>
+      (for all I in Address'Range =>
+         Components (I) < Connected_Components'Result'Length or
+         Components (I) = Natural'Last);
+
    function Get_Connections (File : File_Type) return Connection_Map;
 
    function To_Address (Addr : String_Address) return Address is

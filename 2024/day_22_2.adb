@@ -1,6 +1,7 @@
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Ada.Text_IO;         use Ada.Text_IO;
 with Advent.Day_22;       use Advent.Day_22;
+with Advent;              use Advent;
 
 procedure Day_22_2 is
    use Number_Text_IO;
@@ -61,8 +62,16 @@ exception
             for B in Change_Type'Range loop
                for C in Change_Type'Range loop
                   for D in Change_Type'Range loop
-                     Max_Bananas :=
-                       Natural'Max (Max_Bananas, Bananas (A, B, C, D));
+                     if Bananas (A, B, C, D) > Max_Bananas then
+                        Max_Bananas := Bananas (A, B, C, D);
+                        if Debug then
+                           Put_Line
+                             (Standard_Error,
+                              "Sequence " & A'Image & ", " & B'Image & ", " &
+                              C'Image & ", " & D'Image & ", bananas " &
+                              Max_Bananas'Image);
+                        end if;
+                     end if;
                   end loop;
                end loop;
             end loop;

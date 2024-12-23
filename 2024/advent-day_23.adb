@@ -30,12 +30,12 @@ package body Advent.Day_23 is
 
             --  A host with no connection to itself isn't in the
             --  network.
-            Connections (I, I) := True;
-            Connections (J, J) := True;
+            Connections (I) (I) := True;
+            Connections (J) (J) := True;
 
             --  Mark peer hosts as connected.
-            Connections (I, J) := True;
-            Connections (J, I) := True;
+            Connections (I) (J) := True;
+            Connections (J) (I) := True;
          end;
       end loop;
    exception

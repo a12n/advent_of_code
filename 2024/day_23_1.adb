@@ -10,9 +10,9 @@ begin
    for A in Address'Range loop
       if Connections.Online (A) then
          for B in A + 1 .. Address'Last loop
-            if Connections (A, B) then
+            if Connections (A) (B) then
                for C in B + 1 .. Address'Last loop
-                  if Connections (B, C) and Connections (C, A) and
+                  if Connections (B) (C) and Connections (C) (A) and
                     (A in Historian_Address'Range or
                      B in Historian_Address'Range or
                      C in Historian_Address'Range)

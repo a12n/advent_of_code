@@ -10,10 +10,12 @@ begin
       declare
          Code : constant Numeric_Presses := Get_Code (Standard_Input);
 
-         --  FIXME: Keep state (arm positions) between codes?
          Presses : constant Directional_Presses :=
            Translate (Translate (Translate (Code)));
 
+         -- FIXME: Multiple translations of "379A", each of these
+         -- translations may have multiple translations, these
+         -- translations may have different lengths.
          Numeric_Code : constant Natural := To_Number (Code);
       begin
          if Debug then

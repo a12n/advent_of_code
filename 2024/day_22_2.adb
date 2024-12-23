@@ -54,14 +54,6 @@ begin
                  Change_Type renames Changes (Change_Index'Mod (I - 2));
                Change_3 :
                  Change_Type renames Changes (Change_Index'Mod (I - 3));
-
-               Seen :
-                 Natural renames
-                 Seen_Sequences (Change_3, Change_2, Change_1, Change);
-
-               Accum :
-                 Natural renames
-                 Bananas (Change_3, Change_2, Change_1, Change);
             begin
                Value := Digit_Type (Current mod 10);
                if Debug then
@@ -84,17 +76,23 @@ begin
                        (Standard_Error,
                         "Changes " & Change_3'Image & ", " & Change_2'Image &
                         ", " & Change_1'Image & ", " & Change'Image &
-                        ", seen " & Seen'Image);
+                        ", seen " &
+                        Seen_Sequences (Change_3, Change_2, Change_1, Change)'
+                          Image);
                   end if;
 
-                  --  XXX: Seen not zero for buyer 1 and unseen sequence -2,1,-1,3.
-                  if Seen = 0 then
-                     Accum := @ + Natural (Value);
-                     Seen  := @ + 1;
+                  if Seen_Sequences (Change_3, Change_2, Change_1, Change) = 0
+                  then
+                     Bananas (Change_3, Change_2, Change_1, Change)        :=
+                       @ + Natural (Value);
+                     Seen_Sequences (Change_3, Change_2, Change_1, Change) :=
+                       @ + 1;
                      if Debug then
                         Put_Line
                           (Standard_Error,
-                           "Bananas + " & Value'Image & " = " & Accum'Image);
+                           "Bananas + " & Value'Image & " = " &
+                           Bananas (Change_3, Change_2, Change_1, Change)'
+                             Image);
                      end if;
                   end if;
                end if;

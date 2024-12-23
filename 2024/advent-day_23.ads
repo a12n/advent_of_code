@@ -34,4 +34,8 @@ package Advent.Day_23 is
    function To_Address (Addr : String_Address) return Address is
      ((Address_Char'Pos (Addr (1)) - Address_Char'Pos ('a')) * 26 +
       Address_Char'Pos (Addr (2)) - Address_Char'Pos ('a'));
+
+   function To_String_Address (Addr : Address) return String_Address is
+     ([Address_Char'Val (Addr / 26 + Address_Char'Pos (Address_Char'First)),
+      Address_Char'Val (Addr mod 26 + Address_Char'Pos (Address_Char'First))]);
 end Advent.Day_23;

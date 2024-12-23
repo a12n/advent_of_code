@@ -52,21 +52,29 @@ begin
                  Bananas (Change_3, Change_2, Change_1, Change);
             begin
                Value := Digit_Type (Current mod 10);
-               New_Line (Standard_Error);
-               Put_Line (Standard_Error, "Value " & Value'Image);
+               if Debug then
+                  New_Line (Standard_Error);
+                  Put_Line
+                    (Standard_Error,
+                     "Value " & Value'Image & " (" & Current'Image & ")");
+               end if;
 
                if I > 0 then
                   Change := Change_Type (Value) - Change_Type (Value_1);
-                  Put_Line (Standard_Error, "Change " & Change'Image);
+                  if Debug then
+                     Put_Line (Standard_Error, "Change " & Change'Image);
+                  end if;
                end if;
 
                if I > Natural (Change_Index'Last) then
                   Accum := @ + Natural (Value);
-                  Put_Line
-                    (Standard_Error,
-                     "Bananas(" & Change_3'Image & ", " & Change_2'Image &
-                     ", " & Change_1'Image & ", " & Change'Image & ") + " &
-                     Value'Image & " = " & Accum'Image);
+                  if Debug then
+                     Put_Line
+                       (Standard_Error,
+                        "Bananas(" & Change_3'Image & ", " & Change_2'Image &
+                        ", " & Change_1'Image & ", " & Change'Image & ") + " &
+                        Value'Image & " = " & Accum'Image);
+                  end if;
                end if;
 
                Current := Evolve (Current);

@@ -45,4 +45,6 @@ package Advent.Day_23 is
 
    function To_String (Addr : String_Address) return String is
      ([Addr (1), Addr (2)]);
+   function To_String (Addr : Address) return String is
+     (To_String (To_String_Address (Addr)));
 end Advent.Day_23;

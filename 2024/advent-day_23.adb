@@ -56,8 +56,8 @@ package body Advent.Day_23 is
             if Debug then
                Put_Line
                  (Standard_Error,
-                  "Line " & Line'Image & ", " & S (1) & S (2) & ' ' & T (1) &
-                  T (2) & ", " & I'Image & ' ' & J'Image);
+                  "Line " & Line'Image & ", " & To_String (S) & ' ' &
+                  To_String (T) & ", " & I'Image & ' ' & J'Image);
                if To_String_Address (I) /= S or To_String_Address (J) /= T then
                   raise Program_Error with "Bug in address conversion";
                end if;

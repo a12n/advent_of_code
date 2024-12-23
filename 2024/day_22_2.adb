@@ -48,6 +48,7 @@ begin
                  Bananas (Change_3, Change_2, Change_1, Change);
             begin
                Value := Digit_Type (Current mod 10);
+               New_Line (Standard_Error);
                Put_Line (Standard_Error, "Value " & Value'Image);
 
                if I > 0 then
@@ -59,7 +60,9 @@ begin
                   Accum := @ + Natural (Value);
                   Put_Line
                     (Standard_Error,
-                     "Bananas + " & Value'Image & " = " & Accum'Image);
+                     "Bananas(" & Change_3'Image & ", " & Change_2'Image &
+                     ", " & Change_1'Image & ", " & Change'Image & ") + " &
+                     Value'Image & " = " & Accum'Image);
                end if;
 
                Current := Evolve (Current);

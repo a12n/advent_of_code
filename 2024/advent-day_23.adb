@@ -52,7 +52,7 @@ package body Advent.Day_23 is
                Put_Line
                  (Standard_Error,
                   "Line " & Line'Image & ", " & S (1) & S (2) & ' ' & T (1) &
-                 T (2) & "," & I'Image & ' ' & J'Image);
+                  T (2) & "," & I'Image & ' ' & J'Image);
             end if;
 
             Connections (I, J) := True;

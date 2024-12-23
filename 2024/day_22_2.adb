@@ -78,15 +78,24 @@ begin
                   end if;
                end if;
 
-               if I > Natural (Change_Index'Last) and Seen = 0 then
-                  Accum := @ + Natural (Value);
-                  Seen  := @ + 1;
+               if I > Natural (Change_Index'Last) then
                   if Debug then
                      Put_Line
                        (Standard_Error,
-                        "Bananas(" & Change_3'Image & ", " & Change_2'Image &
-                        ", " & Change_1'Image & ", " & Change'Image & ") + " &
-                        Value'Image & " = " & Accum'Image);
+                        "Changes " & Change_3'Image & ", " & Change_2'Image &
+                        ", " & Change_1'Image & ", " & Change'Image &
+                        ", seen " & Seen'Image);
+                  end if;
+
+                  --  XXX: Seen not zero for buyer 1 and unseen sequence -2,1,-1,3.
+                  if Seen = 0 then
+                     Accum := @ + Natural (Value);
+                     Seen  := @ + 1;
+                     if Debug then
+                        Put_Line
+                          (Standard_Error,
+                           "Bananas + " & Value'Image & " = " & Accum'Image);
+                     end if;
                   end if;
                end if;
 

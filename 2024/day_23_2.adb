@@ -42,9 +42,6 @@ procedure Day_23_2 is
       end loop;
    end Bron_Kerbosch;
 begin
-   --  TODO: Maximum clique.
-   Put_Line (Standard_Error, "Online" & Online'Image);
-   Put_Line (Standard_Error, "Connected" & Connected'Image);
    declare
       R : Address_Set := [others => False];
       X : Address_Set := [others => False];

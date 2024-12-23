@@ -6,16 +6,17 @@ procedure Day_22_2 is
    use Number_Text_IO;
 
    type Digit_Type is range 0 .. 9;
-   type Digit_Sequence is array (1 .. 4) of Digit_Type;
+   type Digit_Index is mod 2;
+   type Digit_Sequence is array (Digit_Index) of Digit_Type;
 
    type Change_Type is range -9 .. 9;
-   type Change_Sequence is array (1 .. 4) of Change_Type;
+   type Change_Index is mod 4;
+   type Change_Sequence is array (Change_Index) of Change_Type;
 
    type Count_Array is
      array (Change_Type, Change_Type, Change_Type, Change_Type) of Natural;
-   pragma Pack (Count_Array);
 
-   Current, Previous : Number_Type;
+   Current : Number_Type;
 
    --  Number of bananas for each possible sequence of four
    --  consecutive changes.
@@ -25,12 +26,26 @@ begin
    loop
       Get (Standard_Input, Current);
       declare
-         Ones    : Digit_Sequence  := [others => 0];
+         Values  : Digit_Sequence  := [others => 0];
          Changes : Change_Sequence := [others => 0];
       begin
-         for I in 1 .. 2_000 loop
-            --  Shift Ones
-            --  Shift Changes
+         for I in 0 .. 2_000 - 1 loop
+            Values (Digit_Index'Mod (I)) := Digit_Type (Current mod 10);
+
+            if I > 0 then
+               Changes (Change_Index'Mod (I)) :=
+                 Change_Type (Values (Digit_Index'Mod (I))) -
+                 Change_Type (Values (Digit_Index'Mod (I - 1)));
+            end if;
+
+            if I > Natural (Change_Index'Last) then
+               Bananas
+                 (Changes (Change_Index'Mod (I - 3)),
+                  Changes (Change_Index'Mod (I - 2)),
+                  Changes (Change_Index'Mod (I - 1)),
+                  Changes (Change_Index'Mod (I))) :=
+                 @ + 1;
+            end if;
 
             Current := Evolve (Current);
          end loop;

@@ -45,7 +45,7 @@ begin
                   Changes (Change_Index'Mod (I - 2)),
                   Changes (Change_Index'Mod (I - 1)),
                   Changes (Change_Index'Mod (I))) :=
-                 @ + 1;
+                 @ + Natural (Values (Digit_Index'Mod (I)));
             end if;
 
             Current := Evolve (Current);

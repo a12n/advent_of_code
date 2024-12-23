@@ -1,14 +1,36 @@
-with Ada.Text_IO;   use Ada.Text_IO;
-with Advent.Day_23; use Advent.Day_23;
+with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
+with Ada.Text_IO;         use Ada.Text_IO;
+with Advent.Day_23;       use Advent.Day_23;
+with Advent;              use Advent;
 
 procedure Day_23_1 is
    Connections : constant Connection_Map := Get_Connections (Standard_Input);
-   Components      : Component_Map;
-   Component_Sizes : constant Component_Size_Array :=
-     Connected_Components (Connections, Components);
+   N           : Natural                 := 0;
 begin
-   Put_Line (Standard_Error, "Connections" & Connections'Image);
-   Put_Line (Standard_Error, "Components" & Components'Image);
-   Put_Line (Standard_Error, "Component_Sizes" & Component_Sizes'Image);
-   --  TODO
+   for A in Address'Range loop
+      if Connections.Online (A) then
+         for B in A + 1 .. Address'Last loop
+            if Connections (A, B) then
+               for C in B + 1 .. Address'Last loop
+                  if Connections (B, C) and Connections (C, A) and
+                    (A in Historian_Address'Range or
+                     B in Historian_Address'Range or
+                     C in Historian_Address'Range)
+                  then
+                     N := N + 1;
+                     if Debug then
+                        Put_Line
+                          (Standard_Error,
+                           To_String (A) & ',' & To_String (B) & ',' &
+                           To_String (C));
+                     end if;
+                  end if;
+               end loop;
+            end if;
+         end loop;
+      end if;
+   end loop;
+
+   Put (N, 0);
+   New_Line;
 end Day_23_1;

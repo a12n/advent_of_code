@@ -10,6 +10,23 @@ package body Advent.Day_23 is
       end return;
    end Length;
 
+   function To_String (Set : Address_Set) return String is
+      Buffer : String (1 .. (Set'Length * 2 + Set'Length));
+      Offset : Positive := Buffer'First;
+   begin
+      for V in Set'Range loop
+         if Set (V) then
+            if Offset > Buffer'First then
+               Buffer (Offset) := ',';
+               Offset          := Offset + 1;
+            end if;
+            Buffer (Offset .. Offset + 1) := To_String (V);
+            Offset                        := Offset + 2;
+         end if;
+      end loop;
+      return Buffer (1 .. Offset - 1);
+   end To_String;
+
    function Get_Connections
      (File : File_Type; Online : out Address_Set) return Connection_Map
    is

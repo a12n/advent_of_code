@@ -53,11 +53,5 @@ begin
       Bron_Kerbosch (R => R, X => X, P => P);
    end;
 
-   for I in Max_Clique'Range loop
-      if Max_Clique (I) then
-         Put (To_String (I));
-         Put (',');
-      end if;
-   end loop;
-   New_Line;
+   Put_Line (To_String (Max_Clique));
 end Day_23_2;

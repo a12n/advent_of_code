@@ -8,16 +8,22 @@ procedure Day_21_1 is
 begin
    loop
       declare
-         Code    : constant Numeric_Presses     := Get_Code (Standard_Input);
+         Code : constant Numeric_Presses := Get_Code (Standard_Input);
+
          --  FIXME: Keep state (arm positions) between codes?
          Presses : constant Directional_Presses :=
-           Translate (Translate (Translate (Translate (Code))));
+           Translate (Translate (Translate (Code)));
+
+         Numeric_Code : constant Natural := To_Number (Code);
       begin
          if Debug then
-            Put_Line (Standard_Error, Code'Image & " =>" & Presses'Image);
+            Put_Line
+              (Standard_Error,
+               Code'Image & Numeric_Code'Image & " =>" & Presses'Image &
+               Presses'Length'Image);
          end if;
 
-         Total := Total + To_Number (Code) * Presses'Length;
+         Total := Total + Numeric_Code * Presses'Length;
       end;
    end loop;
 exception

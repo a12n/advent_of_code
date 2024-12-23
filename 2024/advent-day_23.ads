@@ -5,7 +5,9 @@ package Advent.Day_23 is
    type String_Address is array (1 .. 2) of Address_Char;
 
    type Address is range 0 .. (25 * 26 + 25); --  From "aa" to "zz"
+   type Address_Set is array (Address) of Boolean;
    type Connection_Map is array (Address, Address) of Boolean;
+   pragma Pack (Address_Set);
 
    function To_Address (Addr : String_Address) return Address is
      ((Address_Char'Pos (Addr (1)) - Address_Char'Pos (Address_Char'First)) *

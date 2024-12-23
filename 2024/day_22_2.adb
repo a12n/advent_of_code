@@ -1,10 +1,14 @@
-with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Ada.Text_IO;         use Ada.Text_IO;
-with Advent.Day_22;       use Advent.Day_22;
-with Advent;              use Advent;
+with Ada.Environment_Variables; use Ada.Environment_Variables;
+with Ada.Integer_Text_IO;       use Ada.Integer_Text_IO;
+with Ada.Text_IO;               use Ada.Text_IO;
+with Advent.Day_22;             use Advent.Day_22;
+with Advent;                    use Advent;
 
 procedure Day_22_2 is
    use Number_Text_IO;
+
+   Max_Numbers : constant Positive :=
+     Positive'Value (Value ("MAX_NUMBERS", "2000"));
 
    type Digit_Type is range 0 .. 9;
    type Digit_Index is mod 2;
@@ -30,7 +34,7 @@ begin
          Values  : Digit_Sequence  := [others => 0];
          Changes : Change_Sequence := [others => 0];
       begin
-         for I in 0 .. 2_000 - 1 loop
+         for I in 0 .. Max_Numbers - 1 loop
             declare
                Value   : Digit_Type renames Values (Digit_Index'Mod (I));
                Value_1 : Digit_Type renames Values (Digit_Index'Mod (I - 1));

@@ -10,44 +10,45 @@ procedure Day_23_2 is
    Max_Clique : Address_Set := [others => False];
    Max_Length : Natural     := 0;
 
-   procedure Bron_Kerbosch (R, P, X : in out Address_Set) is
+   procedure Bron_Kerbosch (Complete, Candidates, Exclude : in out Address_Set)
+   is
    begin
-      if Empty (P) and Empty (X) then
+      if Empty (Candidates) and Empty (Exclude) then
          declare
-            N : constant Natural := Length (R);
+            N : constant Natural := Length (Complete);
          begin
-            --  Put_Line
-            --    (Standard_Error,
-            --     "maximal clique" & R'Image & ", length " & N'Image);
             if N > Max_Length then
-               Max_Clique := R;
+               Max_Clique := Complete;
                Max_Length := N;
             end if;
          end;
       end if;
 
-      for I in P'Range loop
-         if P (I) then
+      for I in Address'Range loop
+         if Candidates (I) then
             declare
-               R2 : Address_Set := R;
-               P2 : Address_Set := P and Connected (I);
-               X2 : Address_Set := X and Connected (I);
+               Next_Complete   : Address_Set := Complete;
+               Next_Candidates : Address_Set := Candidates and Connected (I);
+               Next_Exclude    : Address_Set := Exclude and Connected (I);
             begin
-               R2 (I) := True;
-               Bron_Kerbosch (R => R2, P => P2, X => X2);
-               P (I) := False;
-               X (I) := True;
+               Next_Complete (I) := True;
+               Bron_Kerbosch
+                 (Complete => Next_Complete, Candidates => Next_Candidates,
+                  Exclude  => Next_Exclude);
+               Candidates (I) := False;
+               Exclude (I)    := True;
             end;
          end if;
       end loop;
    end Bron_Kerbosch;
 begin
    declare
-      R : Address_Set := [others => False];
-      X : Address_Set := [others => False];
-      P : Address_Set := Online;
+      Complete   : Address_Set := [others => False];
+      Candidates : Address_Set := Online;
+      Exclude    : Address_Set := [others => False];
    begin
-      Bron_Kerbosch (R => R, X => X, P => P);
+      Bron_Kerbosch
+        (Complete => Complete, Candidates => Candidates, Exclude => Exclude);
    end;
 
    Put_Line (To_String (Max_Clique));

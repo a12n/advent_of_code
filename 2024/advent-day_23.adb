@@ -10,19 +10,24 @@ package body Advent.Day_23 is
       procedure Connect (Addr : Address) is
       begin
          Components (Addr) := N;
+         Sizes (N)         := @ + 1;
          for Peer in Address'Range loop
-            if Connections (Addr, Peer) then
+            if Connections (Addr, Peer) and Components (Peer) /= N then
                Connect (Peer);
             end if;
          end loop;
       end Connect;
    begin
-      Components := [others => Natural'Last];
+      Components := [others => Positive'Last];
 
       for Addr in Address'Range loop
-         if Components (Addr) = Natural'Last then
-            Connect (Addr);
+         --  If address is in the network and not yet assigned to a
+         --  group, DFS from that address to all it's peers, connect
+         --  them into a group.
+         if Connections.Online (Addr) and Components (Addr) = Positive'Last
+         then
             N := N + 1;
+            Connect (Addr);
          end if;
       end loop;
 

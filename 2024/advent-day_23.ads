@@ -8,7 +8,7 @@ package Advent.Day_23 is
    type Connection_Map is array (Address, Address) of Boolean;
 
    --  Connected components of the network.
-   type Component_Map is array (Address) of Natural;
+   type Component_Map is array (Address) of Positive;
    type Component_Size_Array is array (Positive range <>) of Natural;
 
    --  Analyzes connected components of the network. If
@@ -20,8 +20,8 @@ package Advent.Day_23 is
       return Component_Size_Array with
      Post =>
       (for all I in Address'Range =>
-         Components (I) < Connected_Components'Result'Length or
-         Components (I) = Natural'Last);
+         Components (I) <= Connected_Components'Result'Length or
+         Components (I) = Positive'Last);
 
    function Get_Connections (File : File_Type) return Connection_Map;
 

@@ -17,22 +17,6 @@ package Advent.Day_23 is
    subtype Historian_Address is
      Address range To_Address ("ta") .. To_Address ("tz");
 
-   --  Connected components of the network.
-   type Component_Map is array (Address) of Positive;
-   type Component_Size_Array is array (Positive range <>) of Natural;
-
-   --  Analyzes connected components of the network. If
-   --  Components(Addr) is 3, then address belongs to the component
-   --  number 3. The number of nodes in the component 3 is in
-   --  Connected_Components'Result(3).
-   function Connected_Components
-     (Connections : Connection_Map; Components : out Component_Map)
-      return Component_Size_Array with
-     Post =>
-      (for all I in Address'Range =>
-         Components (I) <= Connected_Components'Result'Length or
-         Components (I) = Positive'Last);
-
    function Get_Connections (File : File_Type) return Connection_Map;
 
    --  A host is connected to the network if it has connection to

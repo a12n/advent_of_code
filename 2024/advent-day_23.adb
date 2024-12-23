@@ -1,39 +1,4 @@
 package body Advent.Day_23 is
-   function Connected_Components
-     (Connections : Connection_Map; Components : out Component_Map)
-      return Component_Size_Array
-   is
-      Sizes : Component_Size_Array (1 .. Positive (Address'Last)) :=
-        [others => 0];
-      N     : Natural                                             := 0;
-
-      procedure Connect (Addr : Address) is
-      begin
-         Components (Addr) := N;
-         Sizes (N)         := @ + 1;
-         for Peer in Address'Range loop
-            if Connections (Addr, Peer) and Components (Peer) /= N then
-               Connect (Peer);
-            end if;
-         end loop;
-      end Connect;
-   begin
-      Components := [others => Positive'Last];
-
-      for Addr in Address'Range loop
-         --  If address is in the network and not yet assigned to a
-         --  group, DFS from that address to all it's peers, connect
-         --  them into a group.
-         if Connections.Online (Addr) and Components (Addr) = Positive'Last
-         then
-            N := N + 1;
-            Connect (Addr);
-         end if;
-      end loop;
-
-      return Sizes (1 .. N);
-   end Connected_Components;
-
    function Get_Connections (File : File_Type) return Connection_Map is
       Connections : Connection_Map := [others => [others => False]];
    begin

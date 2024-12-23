@@ -31,24 +31,39 @@ begin
          Changes : Change_Sequence := [others => 0];
       begin
          for I in 0 .. 2_000 - 1 loop
-            Values (Digit_Index'Mod (I)) := Digit_Type (Current mod 10);
+            declare
+               Value   : Digit_Type renames Values (Digit_Index'Mod (I));
+               Value_1 : Digit_Type renames Values (Digit_Index'Mod (I - 1));
 
-            if I > 0 then
-               Changes (Change_Index'Mod (I)) :=
-                 Change_Type (Values (Digit_Index'Mod (I))) -
-                 Change_Type (Values (Digit_Index'Mod (I - 1)));
-            end if;
+               Change   : Change_Type renames Changes (Change_Index'Mod (I));
+               Change_1 :
+                 Change_Type renames Changes (Change_Index'Mod (I - 1));
+               Change_2 :
+                 Change_Type renames Changes (Change_Index'Mod (I - 2));
+               Change_3 :
+                 Change_Type renames Changes (Change_Index'Mod (I - 3));
 
-            if I > Natural (Change_Index'Last) then
-               Bananas
-                 (Changes (Change_Index'Mod (I - 3)),
-                  Changes (Change_Index'Mod (I - 2)),
-                  Changes (Change_Index'Mod (I - 1)),
-                  Changes (Change_Index'Mod (I))) :=
-                 @ + Natural (Values (Digit_Index'Mod (I)));
-            end if;
+               Accum :
+                 Natural renames
+                 Bananas (Change_3, Change_2, Change_1, Change);
+            begin
+               Value := Digit_Type (Current mod 10);
+               Put_Line (Standard_Error, "Value " & Value'Image);
 
-            Current := Evolve (Current);
+               if I > 0 then
+                  Change := Change_Type (Value) - Change_Type (Value_1);
+                  Put_Line (Standard_Error, "Change " & Change'Image);
+               end if;
+
+               if I > Natural (Change_Index'Last) then
+                  Accum := @ + Natural (Value);
+                  Put_Line
+                    (Standard_Error,
+                     "Bananas + " & Value'Image & " = " & Accum'Image);
+               end if;
+
+               Current := Evolve (Current);
+            end;
          end loop;
       end;
    end loop;

@@ -33,7 +33,15 @@ begin
       declare
          Values  : Digit_Sequence  := [others => 0];
          Changes : Change_Sequence := [others => 0];
+
+         --  Whether already sold to this buyer on this sequence.
+         Seen_Sequences : Count_Array :=
+           [others => [others => [others => [others => 0]]]];
       begin
+         if Debug then
+            Put_Line (Standard_Error, "Buyer " & Current'Image);
+         end if;
+
          for I in 0 .. Max_Numbers - 1 loop
             declare
                Value   : Digit_Type renames Values (Digit_Index'Mod (I));
@@ -46,6 +54,10 @@ begin
                  Change_Type renames Changes (Change_Index'Mod (I - 2));
                Change_3 :
                  Change_Type renames Changes (Change_Index'Mod (I - 3));
+
+               Seen :
+                 Natural renames
+                 Seen_Sequences (Change_3, Change_2, Change_1, Change);
 
                Accum :
                  Natural renames
@@ -66,8 +78,9 @@ begin
                   end if;
                end if;
 
-               if I > Natural (Change_Index'Last) then
+               if I > Natural (Change_Index'Last) and Seen = 0 then
                   Accum := @ + Natural (Value);
+                  Seen  := @ + 1;
                   if Debug then
                      Put_Line
                        (Standard_Error,

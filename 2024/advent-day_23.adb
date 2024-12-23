@@ -30,7 +30,7 @@ package body Advent.Day_23 is
    end Connected_Components;
 
    function Get_Connections (File : File_Type) return Connection_Map is
-      Connections : Connection_Map;
+      Connections : Connection_Map := [others => [others => False]];
    begin
       loop
          declare

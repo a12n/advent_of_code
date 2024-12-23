@@ -10,8 +10,7 @@ procedure Day_23_2 is
    Max_Clique : Address_Set := [others => False];
    Max_Length : Natural     := 0;
 
-   procedure Bron_Kerbosch (Complete, Candidates, Exclude : in out Address_Set)
-   is
+   procedure Bron_Kerbosch (Complete, Candidates, Exclude : Address_Set) is
    begin
       if Empty (Candidates) and Empty (Exclude) then
          declare
@@ -24,32 +23,30 @@ procedure Day_23_2 is
          end;
       end if;
 
-      for I in Address'Range loop
-         if Candidates (I) then
-            declare
-               Next_Complete   : Address_Set := Complete;
-               Next_Candidates : Address_Set := Candidates and Connected (I);
-               Next_Exclude    : Address_Set := Exclude and Connected (I);
-            begin
-               Next_Complete (I) := True;
+      declare
+         Current_Complete   : Address_Set := Complete;
+         Current_Candidates : Address_Set := Candidates;
+         Current_Exclude    : Address_Set := Exclude;
+      begin
+         for I in Address'Range loop
+            if Current_Candidates (I) then
+               Current_Complete (I) := True;
+
                Bron_Kerbosch
-                 (Complete => Next_Complete, Candidates => Next_Candidates,
-                  Exclude  => Next_Exclude);
-               Candidates (I) := False;
-               Exclude (I)    := True;
-            end;
-         end if;
-      end loop;
+                 (Complete   => Current_Complete,
+                  Candidates => Current_Candidates and Connected (I),
+                  Exclude    => Current_Exclude and Connected (I));
+
+               Current_Complete (I)   := False;
+               Current_Candidates (I) := False;
+               Current_Exclude (I)    := True;
+            end if;
+         end loop;
+      end;
    end Bron_Kerbosch;
 begin
-   declare
-      Complete   : Address_Set := [others => False];
-      Candidates : Address_Set := Online;
-      Exclude    : Address_Set := [others => False];
-   begin
-      Bron_Kerbosch
-        (Complete => Complete, Candidates => Candidates, Exclude => Exclude);
-   end;
-
+   Bron_Kerbosch
+     (Complete => [others => False], Candidates => Online,
+      Exclude  => [others => False]);
    Put_Line (To_String (Max_Clique));
 end Day_23_2;

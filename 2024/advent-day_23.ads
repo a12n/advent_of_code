@@ -25,6 +25,12 @@ package Advent.Day_23 is
 
    function Get_Connections (File : File_Type) return Connection_Map;
 
+   --  A host is connected to the network if it has connection to
+   --  itself.
+   function Online
+     (Connections : Connection_Map; Addr : Address) return Boolean is
+     (Connections (Addr, Addr));
+
    function To_Address (Addr : String_Address) return Address is
      ((Address_Char'Pos (Addr (1)) - Address_Char'Pos ('a')) * 26 +
       Address_Char'Pos (Addr (2)) - Address_Char'Pos ('a'));

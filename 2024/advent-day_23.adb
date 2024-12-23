@@ -55,6 +55,12 @@ package body Advent.Day_23 is
                   T (2) & "," & I'Image & ' ' & J'Image);
             end if;
 
+            --  A host with no connection to itself isn't in the
+            --  network.
+            Connections (I, I) := True;
+            Connections (J, J) := True;
+
+            --  Mark peer hosts as connected.
             Connections (I, J) := True;
             Connections (J, I) := True;
          end;

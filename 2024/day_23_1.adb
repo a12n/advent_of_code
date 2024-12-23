@@ -4,15 +4,17 @@ with Advent.Day_23;       use Advent.Day_23;
 with Advent;              use Advent;
 
 procedure Day_23_1 is
-   Connections : constant Connection_Map := Get_Connections (Standard_Input);
-   N           : Natural                 := 0;
+   Online    : Address_Set;
+   Connected : constant Connection_Map :=
+     Get_Connections (Standard_Input, Online);
+   N         : Natural                 := 0;
 begin
    for A in Address'Range loop
-      if Connections.Online (A) then
+      if Online (A) then
          for B in A + 1 .. Address'Last loop
-            if Connections (A) (B) then
+            if Connected (A) (B) then
                for C in B + 1 .. Address'Last loop
-                  if Connections (B) (C) and Connections (C) (A) and
+                  if Connected (B) (C) and Connected (C) (A) and
                     (A in Historian_Address'Range or
                      B in Historian_Address'Range or
                      C in Historian_Address'Range)

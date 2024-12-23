@@ -21,13 +21,8 @@ package Advent.Day_23 is
    subtype Historian_Address is
      Address range To_Address ("ta") .. To_Address ("tz");
 
-   function Get_Connections (File : File_Type) return Connection_Map;
-
-   --  A host is connected to the network if it has connection to
-   --  itself.
-   function Online
-     (Connections : Connection_Map; Addr : Address) return Boolean is
-     (Connections (Addr) (Addr));
+   function Get_Connections
+     (File : File_Type; Online : out Address_Set) return Connection_Map;
 
    function To_String_Address (Addr : Address) return String_Address is
      ([Address_Char'Val (Addr / 26 + Address_Char'Pos (Address_Char'First)),

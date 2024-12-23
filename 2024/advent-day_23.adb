@@ -10,9 +10,12 @@ package body Advent.Day_23 is
       end return;
    end Length;
 
-   function Get_Connections (File : File_Type) return Connection_Map is
+   function Get_Connections
+     (File : File_Type; Online : out Address_Set) return Connection_Map
+   is
       Connections : Connection_Map := [others => [others => False]];
    begin
+      Online := [others => False];
       loop
          declare
             Line : constant String := Get_Line (File);
@@ -39,12 +42,9 @@ package body Advent.Day_23 is
                end if;
             end if;
 
-            --  A host with no connection to itself isn't in the
-            --  network.
-            Connections (I) (I) := True;
-            Connections (J) (J) := True;
+            Online (I) := True;
+            Online (J) := True;
 
-            --  Mark peer hosts as connected.
             Connections (I) (J) := True;
             Connections (J) (I) := True;
          end;

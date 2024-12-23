@@ -70,6 +70,8 @@ begin
                   end if;
                end if;
 
+               --  FIXME: Rename Seen_Sequences and Bananas elements here.
+
                if I > Natural (Change_Index'Last) then
                   if Debug then
                      Put_Line

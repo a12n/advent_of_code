@@ -1,4 +1,23 @@
 package body Advent.Day_21 is
+   function To_Bounded (Keys : Numeric_Keys) return Bounded_Numeric_Keys is
+   begin
+      return Result : Bounded_Numeric_Keys do
+         Result.Length                      := Keys'Length;
+         Result.Elements (1 .. Keys'Length) := Keys;
+      end return;
+   end To_Bounded;
+
+   --  TODO: generic unconstrained to bounded function.
+   function To_Bounded
+     (Keys : Directional_Keys) return Bounded_Directional_Keys
+   is
+   begin
+      return Result : Bounded_Directional_Keys do
+         Result.Length                      := Keys'Length;
+         Result.Elements (1 .. Keys'Length) := Keys;
+      end return;
+   end To_Bounded;
+
    function Get_Code (File : File_Type) return Numeric_Keys is
       Line : constant String := Get_Line (File);
       Keys : Numeric_Keys (Line'Range);

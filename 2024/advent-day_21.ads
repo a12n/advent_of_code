@@ -13,6 +13,12 @@ package Advent.Day_21 is
    type Numeric_Key is ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A');
    type Numeric_Keys is array (Positive range <>) of Numeric_Key;
 
+   function To_Character (Key : Numeric_Key) return Character is
+     (case Key is
+        when '0' .. '9' =>
+          Character'Val (Numeric_Key'Pos (Key) + Character'Pos ('0')),
+        when 'A' => 'A');
+
    Numeric_Keys_Capacity : constant := 4;
    type Bounded_Numeric_Keys is record
       Length   : Natural;
@@ -23,6 +29,7 @@ package Advent.Day_21 is
      array (Positive range <>) of Bounded_Numeric_Keys;
 
    function To_Bounded (Keys : Numeric_Keys) return Bounded_Numeric_Keys;
+   function To_String (Keys : Numeric_Keys) return String;
 
    --      +---+---+
    --      | ^ | A |
@@ -31,6 +38,10 @@ package Advent.Day_21 is
    --  +---+---+---+
    type Directional_Key is ('v', '<', '>', '^', 'A');
    type Directional_Keys is array (Positive range <>) of Directional_Key;
+
+   function To_Character (Key : Directional_Key) return Character is
+     (case Key is when 'v' => 'v', when '<' => '<', when '>' => '>',
+        when '^' => '^', when 'A' => 'A');
 
    Directional_Keys_Capacity : constant := 4 * 5 * 3 * 3;
    type Bounded_Directional_Keys is record
@@ -43,6 +54,7 @@ package Advent.Day_21 is
 
    function To_Bounded
      (Keys : Directional_Keys) return Bounded_Directional_Keys;
+   function To_String (Keys : Directional_Keys) return String;
 
    function Valid_Code (Keys : Numeric_Keys) return Boolean is
      (Keys'Length = 4 and then (for all I in 1 .. 3 => Keys (I) in '0' .. '9')

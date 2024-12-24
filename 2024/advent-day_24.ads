@@ -10,7 +10,7 @@ package Advent.Day_24 is
       A, B : Wire_Name := "   ";
    end record;
 
-   type Output_Type is mod 2**45;
+   type Output_Type is mod 2**46;
 
    package Output_Text_IO is new Ada.Text_IO.Modular_IO (Output_Type);
 

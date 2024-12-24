@@ -13,6 +13,8 @@ package Advent.Day_24 is
 
    type Output_Type is mod 2**45;
 
+   package Output_Text_IO is new Ada.Text_IO.Modular_IO (Output_Type);
+
    package Wire_Maps is new Ada.Containers.Ordered_Maps
      (Key_Type => Wire_Name, Element_Type => Wire_Type);
    subtype Wire_Map is Wire_Maps.Map;

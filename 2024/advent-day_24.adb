@@ -84,6 +84,22 @@ package body Advent.Day_24 is
       return Wires;
    end Get_Wires;
 
+   function Output (Wires : Wire_Map) return Output_Type is
+      use Wire_Maps;
+      N : Output_Type := 0;
+      K : Output_Type := 1;                --  2^0
+      I : Cursor      := Wires.Find ("z00");
+   begin
+      while I /= No_Element loop
+         if Signal (Wires, I.Key) then
+            N := N or K;
+         end if;
+         I := I.Next;
+         K := K * 2;
+      end loop;
+      return N;
+   end Output;
+
    function Signal (Wires : Wire_Map; Name : Wire_Name) return Boolean is
       Wire : constant Wire_Type := Wires.Element (Name);
    begin

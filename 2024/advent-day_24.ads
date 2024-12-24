@@ -11,11 +11,15 @@ package Advent.Day_24 is
         Character'Val (0) & Character'Val (0) & Character'Val (0);
    end record;
 
+   type Output_Type is mod 2**45;
+
    package Wire_Maps is new Ada.Containers.Ordered_Maps
      (Key_Type => Wire_Name, Element_Type => Wire_Type);
    subtype Wire_Map is Wire_Maps.Map;
 
    function Get_Wires (File : File_Type) return Wire_Map;
+
+   function Output (Wires : Wire_Map) return Output_Type;
 
    function Signal (Wires : Wire_Map; Name : Wire_Name) return Boolean;
 end Advent.Day_24;

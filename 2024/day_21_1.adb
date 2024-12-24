@@ -15,6 +15,36 @@ begin
          -- FIXME: Multiple translations of "379A", each of these
          -- translations may have multiple translations, these
          -- translations may have different lengths.
+         --
+         -- "379A"
+         -- "^A<<^^A>>AvvvA"
+         -- "<A>A<v<AA>^AA>AvAA^A<vAAA>^A"
+         -- "<A>A<v<AA>^AA>AvAA^A<vAAA^>A"
+         -- "<A>A<v<AA>^AA>AvAA^Av<AAA>^A"
+         -- "<A>A<v<AA>^AA>AvAA^Av<AAA^>A"
+         -- "<A>Av<<AA>^AA>AvAA^A<vAAA>^A"
+         -- "<A>Av<<AA>^AA>AvAA^A<vAAA^>A"
+         -- "<A>Av<<AA>^AA>AvAA^Av<AAA>^A"
+         -- "<A>Av<<AA>^AA>AvAA^Av<AAA^>A"
+         --
+         -- "379A"
+         -- "^A<^<^A>>AvvvA"
+         -- "<A>A<v<A>^Av<A>^A>AvAA^Av<AAA>^A"
+         -- "<A>A<v<A>^Av<A>^A>AvAA^Av<AAA^>A"
+         -- "<A>A<v<A>^Av<A>^A>AvAA^A<vAAA>^A"
+         -- "<A>A<v<A>^Av<A>^A>AvAA^A<vAAA^>A"
+         -- "<A>Av<<A>^Av<A>^A>AvAA^Av<AAA>^A"
+         -- "<A>Av<<A>^Av<A>^A>AvAA^Av<AAA^>A"
+         -- "<A>Av<<A>^Av<A>^A>AvAA^A<vAAA>^A"
+         -- "<A>Av<<A>^Av<A>^A>AvAA^A<vAAA^>A"
+         --
+         -- "379A"
+         -- "^A^<^<A>>AvvvA"
+         -- …
+         --
+         -- "379A"
+         -- "^A^^<<A>>AvvvA"
+         -- …
          Numeric_Code : constant Natural := To_Number (Code);
       begin
          if Debug then

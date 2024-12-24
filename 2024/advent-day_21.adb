@@ -218,18 +218,28 @@ package body Advent.Day_21 is
       Result : Directional_Keys (1 .. (Keys'Length * 5 + Keys'Length));
       Offset : Positive := Result'First;
    begin
-      for Next of Keys loop
+      for Key of Keys loop
          declare
-            Derived : constant Directional_Keys := Translate (Current, Next);
+            Derived : constant Directional_Keys := Translate (Current, Key);
          begin
             Result (Offset .. Offset + Derived'Length - 1) := Derived;
 
             Result (Offset + Derived'Length) := 'A';
 
             Offset  := Offset + Derived'Length + 1;
-            Current := Next;
+            Current := Key;
          end;
       end loop;
+
+      if Debug then
+         Put_Line (Standard_Error, "Translate:");
+         Put_Line (Standard_Error, To_String (Keys)'Image & Keys'Length'Image);
+         Put_Line
+           (Standard_Error,
+            To_String (Result (1 .. Offset - 1))'Image &
+            Result (1 .. Offset - 1)'Length'Image);
+      end if;
+
       return Result (1 .. Offset - 1);
    end Translate;
 
@@ -284,18 +294,28 @@ package body Advent.Day_21 is
       Result : Directional_Keys (1 .. (Keys'Length * 3 + Keys'Length));
       Offset : Positive := Result'First;
    begin
-      for Next of Keys loop
+      for Key of Keys loop
          declare
-            Derived : constant Directional_Keys := Translate (Current, Next);
+            Derived : constant Directional_Keys := Translate (Current, Key);
          begin
             Result (Offset .. Offset + Derived'Length - 1) := Derived;
 
             Result (Offset + Derived'Length) := 'A';
 
-            Current := Next;
+            Current := Key;
             Offset  := Offset + Derived'Length + 1;
          end;
       end loop;
+
+      if Debug then
+         Put_Line (Standard_Error, "Translate:");
+         Put_Line (Standard_Error, To_String (Keys)'Image & Keys'Length'Image);
+         Put_Line
+           (Standard_Error,
+            To_String (Result (1 .. Offset - 1))'Image &
+            Result (1 .. Offset - 1)'Length'Image);
+      end if;
+
       return Result (1 .. Offset - 1);
    end Translate;
 end Advent.Day_21;

@@ -38,14 +38,12 @@ package body Advent.Day_21 is
    end Get_Code;
 
    function Revert (Keys : Directional_Keys) return Directional_Keys is
-      Revert_Key : constant array (Directional_Key) of Directional_Key :=
-        ['v' => '^', '<' => '>', '>' => '<', '^' => 'v', 'A' => 'A'];
-      Reverted   : Directional_Keys (Keys'Range);
    begin
-      for I in Keys'Range loop
-         Reverted (Reverted'Last - (I - Keys'First)) := Revert_Key (Keys (I));
-      end loop;
-      return Reverted;
+      return Result : Directional_Keys (Keys'Range) do
+         for I in Keys'Range loop
+            Result (Result'Last - (I - Keys'First)) := Revert (Keys (I));
+         end loop;
+      end return;
    end Revert;
 
    function To_Number (Code : Numeric_Keys) return Natural is

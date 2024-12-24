@@ -51,6 +51,10 @@ package Advent.Day_21 is
    function Get_Code (File : File_Type) return Numeric_Keys with
      Post => Valid_Code (Get_Code'Result);
 
+   function Revert (Key : Directional_Key) return Directional_Key is
+     (case Key is when 'v' => '^', when '<' => '>', when '>' => '<',
+        when '^' => 'v', when 'A' => 'A');
+
    function Revert (Keys : Directional_Keys) return Directional_Keys with
      Post => Revert'Result'Length = Keys'Length;
 

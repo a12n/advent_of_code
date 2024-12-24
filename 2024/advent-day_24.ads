@@ -7,8 +7,7 @@ package Advent.Day_24 is
    type Gate_Type is ('0', '1', '&', '|', '^');
    type Wire_Type is record
       Gate : Gate_Type;
-      A, B : Wire_Name :=
-        Character'Val (0) & Character'Val (0) & Character'Val (0);
+      A, B : Wire_Name := "   ";
    end record;
 
    type Output_Type is mod 2**45;

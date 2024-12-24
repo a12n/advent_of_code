@@ -94,9 +94,17 @@ package body Advent.Day_24 is
          if Signal (Wires, I.Key) then
             N := N or K;
          end if;
+
+         if Debug then
+            Put_Line
+              (Standard_Error,
+               "I " & I.Key'Image & ", K " & K'Image & ", N " & N'Image);
+         end if;
+
          I := I.Next;
          K := K * 2;
       end loop;
+
       return N;
    end Output;
 

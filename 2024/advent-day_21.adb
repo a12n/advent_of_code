@@ -1,7 +1,44 @@
 package body Advent.Day_21 is
-   function Get_Code (File : File_Type) return Numeric_Presses is
+   function To_Bounded (Keys : Numeric_Keys) return Bounded_Numeric_Keys is
+   begin
+      return Result : Bounded_Numeric_Keys do
+         Result.Length                      := Keys'Length;
+         Result.Elements (1 .. Keys'Length) := Keys;
+      end return;
+   end To_Bounded;
+
+   function To_String (Keys : Numeric_Keys) return String is
+   begin
+      return Result : String (Keys'Range) do
+         for I in Keys'Range loop
+            Result (I) := To_Character (Keys (I));
+         end loop;
+      end return;
+   end To_String;
+
+   --  TODO: generic unconstrained to bounded function.
+   function To_Bounded
+     (Keys : Directional_Keys) return Bounded_Directional_Keys
+   is
+   begin
+      return Result : Bounded_Directional_Keys do
+         Result.Length                      := Keys'Length;
+         Result.Elements (1 .. Keys'Length) := Keys;
+      end return;
+   end To_Bounded;
+
+   function To_String (Keys : Directional_Keys) return String is
+   begin
+      return Result : String (Keys'Range) do
+         for I in Keys'Range loop
+            Result (I) := To_Character (Keys (I));
+         end loop;
+      end return;
+   end To_String;
+
+   function Get_Code (File : File_Type) return Numeric_Keys is
       Line : constant String := Get_Line (File);
-      Keys : Numeric_Presses (Line'Range);
+      Keys : Numeric_Keys (Line'Range);
    begin
       for I in Line'Range loop
          case Line (I) is
@@ -18,25 +55,23 @@ package body Advent.Day_21 is
       return Keys;
    end Get_Code;
 
-   function Revert (Keys : Directional_Presses) return Directional_Presses is
-      Revert_Key : constant array (Directional_Key) of Directional_Key :=
-        ['v' => '^', '<' => '>', '>' => '<', '^' => 'v', 'A' => 'A'];
-      Reverted   : Directional_Presses (Keys'Range);
+   function Revert (Keys : Directional_Keys) return Directional_Keys is
    begin
-      for I in Keys'Range loop
-         Reverted (Reverted'Last - (I - Keys'First)) := Revert_Key (Keys (I));
-      end loop;
-      return Reverted;
+      return Result : Directional_Keys (Keys'Range) do
+         for I in Keys'Range loop
+            Result (Result'Last - (I - Keys'First)) := Revert (Keys (I));
+         end loop;
+      end return;
    end Revert;
 
-   function To_Number (Code : Numeric_Presses) return Natural is
+   function To_Number (Code : Numeric_Keys) return Natural is
    begin
       return
         (Numeric_Key'Pos (Code (1)) * 100 + Numeric_Key'Pos (Code (2)) * 10 +
          Numeric_Key'Pos (Code (3)));
    end To_Number;
 
-   function Translate (From, To : Numeric_Key) return Directional_Presses is
+   function Translate (From, To : Numeric_Key) return Directional_Keys is
    begin
       if From = To then
          return "";
@@ -44,7 +79,7 @@ package body Advent.Day_21 is
          return Revert (Translate (From => To, To => From));
       end if;
 
-      case Numeric_Presses'[From, To] is
+      case Numeric_Keys'[From, To] is
          when "01" =>
             return "^<";
          when "02" =>
@@ -170,23 +205,22 @@ package body Advent.Day_21 is
       end case;
    end Translate;
 
-   function Translate (Keys : Numeric_Presses) return Directional_Presses is
+   function Translate (Keys : Numeric_Keys) return Directional_Keys is
       Current : Numeric_Key := 'A';
    begin
       return Translate (Keys, Current);
    end Translate;
 
    function Translate
-     (Keys : Numeric_Presses; Current : in out Numeric_Key)
-      return Directional_Presses
+     (Keys : Numeric_Keys; Current : in out Numeric_Key)
+      return Directional_Keys
    is
-      Result : Directional_Presses (1 .. (Keys'Length * 5 + Keys'Length));
+      Result : Directional_Keys (1 .. (Keys'Length * 5 + Keys'Length));
       Offset : Positive := Result'First;
    begin
       for Next of Keys loop
          declare
-            Derived : constant Directional_Presses :=
-              Translate (Current, Next);
+            Derived : constant Directional_Keys := Translate (Current, Next);
          begin
             Result (Offset .. Offset + Derived'Length - 1) := Derived;
 
@@ -199,8 +233,7 @@ package body Advent.Day_21 is
       return Result (1 .. Offset - 1);
    end Translate;
 
-   function Translate (From, To : Directional_Key) return Directional_Presses
-   is
+   function Translate (From, To : Directional_Key) return Directional_Keys is
    begin
       if From = To then
          return "";
@@ -208,7 +241,7 @@ package body Advent.Day_21 is
          return Revert (Translate (From => To, To => From));
       end if;
 
-      case Directional_Presses'[From, To] is
+      case Directional_Keys'[From, To] is
          when "v<" =>
             return "<";
          when "v>" =>
@@ -238,24 +271,22 @@ package body Advent.Day_21 is
       end case;
    end Translate;
 
-   function Translate (Keys : Directional_Presses) return Directional_Presses
-   is
+   function Translate (Keys : Directional_Keys) return Directional_Keys is
       Current : Directional_Key := 'A';
    begin
       return Translate (Keys, Current);
    end Translate;
 
    function Translate
-     (Keys : Directional_Presses; Current : in out Directional_Key)
-      return Directional_Presses
+     (Keys : Directional_Keys; Current : in out Directional_Key)
+      return Directional_Keys
    is
-      Result : Directional_Presses (1 .. (Keys'Length * 3 + Keys'Length));
+      Result : Directional_Keys (1 .. (Keys'Length * 3 + Keys'Length));
       Offset : Positive := Result'First;
    begin
       for Next of Keys loop
          declare
-            Derived : constant Directional_Presses :=
-              Translate (Current, Next);
+            Derived : constant Directional_Keys := Translate (Current, Next);
          begin
             Result (Offset .. Offset + Derived'Length - 1) := Derived;
 

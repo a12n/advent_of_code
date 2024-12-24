@@ -84,8 +84,7 @@ package body Advent.Day_24 is
       return Wires;
    end Get_Wires;
 
-   function Signal (Wires : in out Wire_Map; Name : Wire_Name) return Boolean
-   is
+   function Signal (Wires : Wire_Map; Name : Wire_Name) return Boolean is
       Wire : constant Wire_Type := Wires.Element (Name);
    begin
       case Wire.Gate is

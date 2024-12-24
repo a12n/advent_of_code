@@ -17,5 +17,5 @@ package Advent.Day_24 is
 
    function Get_Wires (File : File_Type) return Wire_Map;
 
-   function Signal (Wires : in out Wire_Map; Name : Wire_Name) return Boolean;
+   function Signal (Wires : Wire_Map; Name : Wire_Name) return Boolean;
 end Advent.Day_24;

@@ -19,6 +19,9 @@ package Advent.Day_21 is
       Elements : Numeric_Keys (1 .. Numeric_Keys_Capacity);
    end record;
 
+   type Numeric_Keys_Array is
+     array (Positive range <>) of Bounded_Numeric_Keys;
+
    function To_Bounded (Keys : Numeric_Keys) return Bounded_Numeric_Keys;
 
    --      +---+---+
@@ -34,6 +37,9 @@ package Advent.Day_21 is
       Length   : Natural;
       Elements : Directional_Keys (1 .. Directional_Keys_Capacity);
    end record;
+
+   type Directional_Keys_Array is
+     array (Positive range <>) of Bounded_Directional_Keys;
 
    function To_Bounded
      (Keys : Directional_Keys) return Bounded_Directional_Keys;

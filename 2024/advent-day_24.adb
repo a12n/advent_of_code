@@ -87,6 +87,11 @@ package body Advent.Day_24 is
    function Signal (Wires : Wire_Map; Name : Wire_Name) return Boolean is
       Wire : constant Wire_Type := Wires.Element (Name);
    begin
+      if Debug then
+         Put_Line
+           (Standard_Error, "Name " & Name'Image & ", Wire " & Wire'Image);
+      end if;
+
       case Wire.Gate is
          when '0' =>
             return False;

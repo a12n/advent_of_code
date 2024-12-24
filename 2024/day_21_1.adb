@@ -8,9 +8,8 @@ procedure Day_21_1 is
 begin
    loop
       declare
-         Code : constant Numeric_Presses := Get_Code (Standard_Input);
-
-         Presses : constant Directional_Presses :=
+         Code : constant Numeric_Keys     := Get_Code (Standard_Input);
+         Keys : constant Directional_Keys :=
            Translate (Translate (Translate (Code)));
 
          -- FIXME: Multiple translations of "379A", each of these
@@ -21,11 +20,11 @@ begin
          if Debug then
             Put_Line
               (Standard_Error,
-               Code'Image & Numeric_Code'Image & " =>" & Presses'Image &
-               Presses'Length'Image);
+               Code'Image & Numeric_Code'Image & " =>" & Keys'Image &
+               Keys'Length'Image);
          end if;
 
-         Total := Total + Numeric_Code * Presses'Length;
+         Total := Total + Numeric_Code * Keys'Length;
       end;
    end loop;
 exception

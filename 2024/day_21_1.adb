@@ -54,6 +54,9 @@ begin
          -- <A >A <A A v<A A >>^A
          -- v<<A >>^A vA ^A v<<A >>^A A <vA <A >>^A A vA A ^<A >A
       begin
+         if Debug then
+            Put_Line (Standard_Error, "N " & N'Image);
+         end if;
          Total := Total + N * Keys'Length;
       end;
    end loop;

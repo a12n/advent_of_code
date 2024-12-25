@@ -1,5 +1,14 @@
 package body Advent.Day_21 is
    package body Numeric is
+      function Distance (Keys : Key_Array) return Natural is
+      begin
+         return N : Natural := 0 do
+            for I in Keys'First + 1 .. Keys'Last loop
+               N := N + Distance (Keys (I - 1), Keys (I));
+            end loop;
+         end return;
+      end Distance;
+
       function Get_Code (File : File_Type) return Code_Type is
          Line : constant String := Get_Line (File);
          Code : Code_Type;
@@ -45,6 +54,15 @@ package body Advent.Day_21 is
    end Numeric;
 
    package body Directional is
+      function Distance (Keys : Key_Array) return Natural is
+      begin
+         return N : Natural := 0 do
+            for I in Keys'First + 1 .. Keys'Last loop
+               N := N + Distance (Keys (I - 1), Keys (I));
+            end loop;
+         end return;
+      end Distance;
+
       function Revert (Keys : Key_Array) return Key_Array is
       begin
          return Result : Key_Array (Keys'Range) do

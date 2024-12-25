@@ -79,6 +79,8 @@ package Advent.Day_21 is
              (case To is when '0' .. '9' => Distance (From => To, To => From),
                 when 'A' => 0));
 
+      function Distance (Keys : Key_Array) return Natural;
+
       function Get_Code (File : File_Type) return Code_Type;
 
       function To_Character (Key : Key_Type) return Character is
@@ -134,6 +136,8 @@ package Advent.Day_21 is
            when 'A' =>
              (case To is when 'v' .. '^' => Distance (From => To, To => From),
                 when 'A' => 0));
+
+      function Distance (Keys : Key_Array) return Natural;
 
       function Revert (Key : Key_Type) return Key_Type is
         (case Key is when 'v' => '^', when '<' => '>', when '>' => '<',

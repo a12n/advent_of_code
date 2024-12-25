@@ -34,14 +34,11 @@ procedure Day_25 is
 
    function Get_Schematic (File : File_Type) return Schematic_Type is
       C : Character;
-      --  S : Schematic_Type := 0;
       S : Schematic_Type := (False, [others => 0]);
-
    begin
       declare
          Line : constant String := Get_Line (File);
       begin
-         --  Put_Line (Standard_Error, "Line " & Line'Image);
          case Line is
             when "....." =>
                S.Key := True;
@@ -54,11 +51,10 @@ procedure Day_25 is
 
       for Row in 1 .. 5 loop
          declare
-            Line: constant String := Get_Line(File);
+            Line : constant String := Get_Line (File);
          begin
             for Col in 1 .. 5 loop
-               --  Put_Line (Standard_Error, "Char " & Line(Col)'Image);
-               case Line(Col) is
+               case Line (Col) is
                   when '.' =>
                      null;
                   when '#' =>
@@ -70,11 +66,9 @@ procedure Day_25 is
          end;
       end loop;
 
-
       declare
          Line : constant String := Get_Line (File);
       begin
-         --  Put_Line (Standard_Error, "Line " & Line'Image);
          case Line is
             when "....." =>
                if S.Key then
@@ -127,32 +121,8 @@ procedure Day_25 is
    N          : Natural                  := 0;
    Schematics : constant Schematic_Array := Get_Schematics (Standard_Input);
 begin
-   --  for S of Schematics loop
-   --     Put
-   --       (Standard_Error,
-   --        (if Key (S) then "K " elsif Lock (S) then "L " else "? "));
-   --     Schematic_Text_IO.Put (Standard_Error, S, Width => 40, Base => 2);
-   --     New_Line (Standard_Error);
-   --  end loop;
-
    for I in Schematics'First .. Schematics'Last - 1 loop
-      --  Put (Standard_Error, "I ");
-      --  Schematic_Text_IO.Put
-      --    (Standard_Error, Schematics (I), Width => 40, Base => 2);
-      --  New_Line (Standard_Error);
-
       for J in I + 1 .. Schematics'Last loop
-         --  Put (Standard_Error, "J ");
-         --  Schematic_Text_IO.Put
-         --    (Standard_Error, Schematics (J), Width => 40, Base => 2);
-         --  New_Line (Standard_Error);
-         --
-         --  Put (Standard_Error, "^ ");
-         --  Schematic_Text_IO.Put
-         --    (Standard_Error, Schematics (I) xor Schematics (J), Width => 40,
-         --     Base                                                     => 2);
-         --  New_Line (Standard_Error);
-
          if Fit (Schematics (I), Schematics (J)) then
             N := N + 1;
          end if;

@@ -31,14 +31,16 @@ begin
          -- "^A^^<<A>>AvvvA"
          -- "<A>A<AAv<AA>>^AvAA^Av<AAA>^A"
          -- "v<<A>>^AvA^Av<<A>>^AAv<A<A>>^AAvAA^<A>Av<A>^AA<A>Av<A<A>>^AAAvA^<A>A"
-         --
-         -- "37"
-         -- "^^<<"
-         -- "<AAv<AA"
-         --
-         -- "37"
-         -- "<<^^"
-         -- "v<<AA>^AA"
+
+         -- "37" 2
+         -- "^A<<^^A" 7
+         -- "<A>Av<<AA>^AA>A" 15
+         -- "v<<A>>^AvA^A<vA<AA>>^AAvA^<A>AAvA^A" 35
+
+         -- "37" 2
+         -- "^A^^<<A" 7
+         -- "<A>A<AAv<AA>>^A" 15
+         -- "v<<A>>^AvA^Av<<A>>^AA<vA<A>>^AAvAA^<A>A" 39
          Numeric_Code : constant Natural := To_Number (Code);
       begin
          Total := Total + Numeric_Code * Keys'Length;

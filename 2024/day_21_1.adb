@@ -8,9 +8,9 @@ procedure Day_21_1 is
 begin
    loop
       declare
-         Code : constant Numeric_Keys     := Get_Code (Standard_Input);
-         Keys : constant Directional_Keys :=
-           Translate (Translate (Translate (Code)));
+         Code : constant Numeric.Code_Type     := Get_Code (Standard_Input);
+         Keys : constant Directional.Key_Array :=
+           Translate (Translate (Translate (Code (1 .. 2))));
 
          -- FIXME: Multiple translations of "379A", each of these
          -- translations may have multiple translations, these
@@ -41,7 +41,18 @@ begin
          -- "^A^^<<A" 7
          -- "<A>A<AAv<AA>>^A" 15
          -- "v<<A>>^AvA^Av<<A>>^AA<vA<A>>^AAvAA^<A>A" 39
-         Numeric_Code : constant Natural := To_Number (Code);
+
+         -- 3 7
+         -- ^A <<^^A
+         -- <A >A v<<A A >^A A >A
+         -- v<<A >>^A vA ^A <vA <A A >>^A A vA ^<A >A A vA ^A
+
+         -- 3 7
+         -- ^A ^^<<A
+         -- <A >A <A A v<A A >>^A
+         -- v<<A >>^A vA ^A v<<A >>^A A <vA <A >>^A A vA A ^<A >A
+
+         Numeric_Code : constant Natural := Numeric.To_Number (Code);
       begin
          Total := Total + Numeric_Code * Keys'Length;
       end;

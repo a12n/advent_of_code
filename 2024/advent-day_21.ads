@@ -10,84 +10,167 @@ package Advent.Day_21 is
    --  +---+---+---+
    --      | 0 | A |
    --      +---+---+
-   type Numeric_Key is ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A');
-   type Numeric_Keys is array (Positive range <>) of Numeric_Key;
+   package Numeric is
+      type Key_Type is ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A');
+      type Key_Set is array (Key_Type) of Boolean;
+      type Key_Array is array (Positive range <>) of Key_Type;
+      type Bounded_Key_Array is record
+         Length   : Natural := 0;
+         Elements : Key_Array (1 .. 8);
+      end record;
+      type Key_Array_List is array (Positive range <>) of Bounded_Key_Array;
 
-   function To_Character (Key : Numeric_Key) return Character is
-     (case Key is
-        when '0' .. '9' =>
-          Character'Val (Numeric_Key'Pos (Key) + Character'Pos ('0')),
-        when 'A' => 'A');
+      subtype Code_Type is Key_Array (1 .. 4) with
+          Dynamic_Predicate =>
+           (for all I in 1 .. 3 => Code_Type (I) in '0' .. '9') and
+           Code_Type (4) = 'A';
 
-   Numeric_Keys_Capacity : constant := 4;
-   type Bounded_Numeric_Keys is record
-      Length   : Natural;
-      Elements : Numeric_Keys (1 .. Numeric_Keys_Capacity);
-   end record;
+      function Adjacent (Key : Key_Type) return Key_Array is
+        (case Key is when '0' => "2A", when '1' => "24", when '2' => "0135",
+           when '3' => "26A", when '4' => "157", when '5' => "2468",
+           when '6' => "359", when '7' => "48", when '8' => "579",
+           when '9' => "68", when 'A' => "03");
 
-   type Numeric_Keys_Array is
-     array (Positive range <>) of Bounded_Numeric_Keys;
+      function Adjacent (From, To : Key_Type) return Boolean is
+        (for some Key of Adjacent (From) => Key = To);
 
-   function To_Bounded (Keys : Numeric_Keys) return Bounded_Numeric_Keys;
-   function To_String (Keys : Numeric_Keys) return String;
+      function Distance (From, To : Key_Type) return Natural is
+        (case From is
+           when '0' =>
+             (case To is when '0' => 0, when '1' => 2, when '2' => 1,
+                when '3' => 2, when '4' => 3, when '5' => 2, when '6' => 3,
+                when '7' => 4, when '8' => 3, when '9' => 4, when 'A' => 1),
+           when '1' =>
+             (case To is when '0' .. '0' => Distance (From => To, To => From),
+                when '1' => 0, when '2' => 1, when '3' => 2, when '4' => 1,
+                when '5' => 2, when '6' => 3, when '7' => 2, when '8' => 3,
+                when '9' => 4, when 'A' => 3),
+           when '2' =>
+             (case To is when '0' .. '1' => Distance (From => To, To => From),
+                when '2' => 0, when '3' => 1, when '4' => 2, when '5' => 1,
+                when '6' => 2, when '7' => 3, when '8' => 2, when '9' => 3,
+                when 'A' => 2),
+           when '3' =>
+             (case To is when '0' .. '2' => Distance (From => To, To => From),
+                when '3' => 0, when '4' => 3, when '5' => 2, when '6' => 1,
+                when '7' => 4, when '8' => 3, when '9' => 2, when 'A' => 1),
+           when '4' =>
+             (case To is when '0' .. '3' => Distance (From => To, To => From),
+                when '4' => 0, when '5' => 1, when '6' => 2, when '7' => 1,
+                when '8' => 2, when '9' => 3, when 'A' => 4),
+           when '5' =>
+             (case To is when '0' .. '4' => Distance (From => To, To => From),
+                when '5' => 0, when '6' => 1, when '7' => 2, when '8' => 1,
+                when '9' => 2, when 'A' => 3),
+           when '6' =>
+             (case To is when '0' .. '5' => Distance (From => To, To => From),
+                when '6' => 0, when '7' => 3, when '8' => 2, when '9' => 1,
+                when 'A' => 2),
+           when '7' =>
+             (case To is when '0' .. '6' => Distance (From => To, To => From),
+                when '7' => 0, when '8' => 1, when '9' => 2, when 'A' => 5),
+           when '8' =>
+             (case To is when '0' .. '7' => Distance (From => To, To => From),
+                when '8' => 0, when '9' => 1, when 'A' => 4),
+           when '9' =>
+             (case To is when '0' .. '8' => Distance (From => To, To => From),
+                when '9' => 0, when 'A' => 3),
+           when 'A' =>
+             (case To is when '0' .. '9' => Distance (From => To, To => From),
+                when 'A' => 0));
+
+      function To_Character (Key : Key_Type) return Character is
+        (case Key is
+           when '0' .. '9' =>
+             Character'Val
+               (Key_Type'Pos (Key) - Key_Type'Pos ('0') + Character'Pos ('0')),
+           when 'A' => 'A');
+
+      function To_Bounded (Keys : Key_Array) return Bounded_Key_Array;
+
+      function To_Number (Code : Code_Type) return Natural with
+        Post => To_Number'Result < 1_000;
+
+      function To_String (Keys : Key_Array) return String;
+   end Numeric;
 
    --      +---+---+
    --      | ^ | A |
    --  +---+---+---+
    --  | < | v | > |
    --  +---+---+---+
-   type Directional_Key is ('v', '<', '>', '^', 'A');
-   type Directional_Keys is array (Positive range <>) of Directional_Key;
+   package Directional is
+      type Key_Type is ('A', 'v', '<', '>', '^');
+      type Key_Set is array (Key_Type) of Boolean;
+      type Key_Array is array (Positive range <>) of Key_Type;
+      type Bounded_Key_Array is record
+         Length   : Natural;
+         Elements : Key_Array (1 .. 32);
+      end record;
+      type Key_Array_List is array (Positive range <>) of Bounded_Key_Array;
 
-   function To_Character (Key : Directional_Key) return Character is
-     (case Key is when 'v' => 'v', when '<' => '<', when '>' => '>',
-        when '^' => '^', when 'A' => 'A');
+      function Adjacent (Key : Key_Type) return Key_Array is
+        (case Key is when 'A' => ">^", when 'v' => "<>^", when '<' => "v",
+           when '>' => "Av", when '^' => "Av");
 
-   Directional_Keys_Capacity : constant := 4 * 5 * 3 * 3;
-   type Bounded_Directional_Keys is record
-      Length   : Natural;
-      Elements : Directional_Keys (1 .. Directional_Keys_Capacity);
-   end record;
+      function Adjacent (From, To : Key_Type) return Boolean is
+        (for some Key of Adjacent (From) => Key = To);
 
-   type Directional_Keys_Array is
-     array (Positive range <>) of Bounded_Directional_Keys;
+      function Distance (From, To : Key_Type) return Natural is
+        (case From is
+           when 'A' =>
+             (case To is when 'A' => 0, when 'v' => 2, when '<' => 3,
+                when '>' => 1, when '^' => 1),
+           when 'v' =>
+             (case To is when 'v' => 0, when '<' => 1, when '>' => 1,
+                when '^' => 1,
+                when 'A' .. 'A' => Distance (From => To, To => From)),
+           when '<' =>
+             (case To is when '<' => 0, when '>' => 2, when '^' => 2,
+                when 'A' .. 'v' => Distance (From => To, To => From)),
+           when '>' =>
+             (case To is when '>' => 0, when '^' => 2,
+                when 'A' .. '<' => Distance (From => To, To => From)),
+           when '^' =>
+             (case To is when '^' => 0,
+                when 'A' .. '>' => Distance (From => To, To => From)));
 
-   function To_Bounded
-     (Keys : Directional_Keys) return Bounded_Directional_Keys;
-   function To_String (Keys : Directional_Keys) return String;
+      function Revert (Key : Key_Type) return Key_Type is
+        (case Key is when 'v' => '^', when '<' => '>', when '>' => '<',
+           when '^' => 'v', when 'A' => 'A');
 
-   function Valid_Code (Keys : Numeric_Keys) return Boolean is
-     (Keys'Length = 4 and then (for all I in 1 .. 3 => Keys (I) in '0' .. '9')
-      and then Keys (4) = 'A');
+      function Revert (Keys : Key_Array) return Key_Array with
+        Post => Revert'Result'Length = Keys'Length;
 
-   function Get_Code (File : File_Type) return Numeric_Keys with
-     Post => Valid_Code (Get_Code'Result);
+      function To_Character (Key : Key_Type) return Character is
+        (case Key is when 'A' => 'A', when 'v' => 'v', when '<' => '<',
+           when '>' => '>', when '^' => '^');
 
-   function Revert (Key : Directional_Key) return Directional_Key is
-     (case Key is when 'v' => '^', when '<' => '>', when '>' => '<',
-        when '^' => 'v', when 'A' => 'A');
+      function To_Bounded (Keys : Key_Array) return Bounded_Key_Array;
 
-   function Revert (Keys : Directional_Keys) return Directional_Keys with
-     Post => Revert'Result'Length = Keys'Length;
+      function To_String (Keys : Key_Array) return String;
+   end Directional;
 
-   function To_Number (Code : Numeric_Keys) return Natural with
-     Pre => Valid_Code (Code), Post => To_Number'Result < 1_000;
+   function Get_Code (File : File_Type) return Numeric.Code_Type;
 
    --  Button presses needed on the corresponding directional keypad
    --  to move from one button to another on the numeric keypad.
-   function Translate (From, To : Numeric_Key) return Directional_Keys with
-     Post => Translate'Result'Length <= 5;
-   function Translate (Keys : Numeric_Keys) return Directional_Keys;
    function Translate
-     (Keys : Numeric_Keys; Current : in out Numeric_Key)
-      return Directional_Keys;
+     (From, To : Numeric.Key_Type) return Directional.Key_Array with
+     Post => Translate'Result'Length <= 5;
+   function Translate (Keys : Numeric.Key_Array) return Directional.Key_Array;
+   function Translate
+     (Keys : Numeric.Key_Array; Current : in out Numeric.Key_Type)
+      return Directional.Key_Array;
 
    --  Button presses needed on the corresponding directional keypad
    --  to move on the second order directional keypad.
-   function Translate (From, To : Directional_Key) return Directional_Keys with
-     Post => Translate'Result'Length <= 3;
-   function Translate (Keys : Directional_Keys) return Directional_Keys;
    function Translate
-     (Keys : Directional_Keys; Current : in out Directional_Key)
-      return Directional_Keys;
+     (From, To : Directional.Key_Type) return Directional.Key_Array with
+     Post => Translate'Result'Length <= 3;
+   function Translate
+     (Keys : Directional.Key_Array) return Directional.Key_Array;
+   function Translate
+     (Keys : Directional.Key_Array; Current : in out Directional.Key_Type)
+      return Directional.Key_Array;
 end Advent.Day_21;

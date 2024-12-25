@@ -10,8 +10,9 @@ begin
       declare
          Code : constant Numeric.Code_Type     :=
            Numeric.Get_Code (Standard_Input);
+         N    : constant Natural               := Numeric.To_Number (Code);
          Keys : constant Directional.Key_Array :=
-           Translate (Translate (Translate (Code (1 .. 2))));
+           Translate (Translate (Translate (Code)));
 
          -- FIXME: Multiple translations of "379A", each of these
          -- translations may have multiple translations, these
@@ -52,10 +53,8 @@ begin
          -- ^A ^^<<A
          -- <A >A <A A v<A A >>^A
          -- v<<A >>^A vA ^A v<<A >>^A A <vA <A >>^A A vA A ^<A >A
-
-         Numeric_Code : constant Natural := Numeric.To_Number (Code);
       begin
-         Total := Total + Numeric_Code * Keys'Length;
+         Total := Total + N * Keys'Length;
       end;
    end loop;
 exception

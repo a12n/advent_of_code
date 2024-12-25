@@ -33,7 +33,6 @@ procedure Day_25 is
       (for all I in 1 .. 5 => (S.Pins (I) + T.Pins (I)) in Pin_Height'Range));
 
    function Get_Schematic (File : File_Type) return Schematic_Type is
-      C : Character;
       S : Schematic_Type := (False, [others => 0]);
    begin
       declare

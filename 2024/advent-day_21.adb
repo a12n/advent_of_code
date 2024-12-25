@@ -86,18 +86,28 @@ package body Advent.Day_21 is
             return "^";
          when "03" =>
             return "^>";
+            --  return ">^";
          when "04" =>
             return "^^<";
+            --  return "^<^";
          when "05" =>
             return "^^";
          when "06" =>
             return "^^>";
+            --  return ">^^";
+            --  return "^>^";
          when "07" =>
             return "^^^<";
+            --  return "^<^^";
+            --  return "^^<^";
          when "08" =>
             return "^^^";
          when "09" =>
             return "^^^>";
+            --  return ">^^^";
+            --  return "^>^^";
+            --  return "^^>^";
+            --  return "^^^>";
          when "0A" =>
             return ">";
 
@@ -109,25 +119,38 @@ package body Advent.Day_21 is
             return "^";
          when "15" =>
             return "^>";
+            --  return ">^";
          when "16" =>
             return "^>>";
+            --  return ">^>";
+            --  return ">>^";
          when "17" =>
             return "^^";
          when "18" =>
             return "^^>";
+            --  return "^>^";
+            --  return ">^^";
          when "19" =>
             return "^^>>";
+            --  return ">>^^";
+            --  return ">^>^";
+            --  return ">^^>";
+            --  return "^>>^";
+            --  return "^>^>";
          when "1A" =>
             return ">>v";
+            --  return ">v>";
 
          when "23" =>
             return ">";
          when "24" =>
             return "^<";
+            --  return "<^";
          when "25" =>
             return "^";
          when "26" =>
             return "^>";
+            --  return ">^";
          when "27" =>
             return "^^<";
          when "28" =>
@@ -144,7 +167,12 @@ package body Advent.Day_21 is
          when "36" =>
             return "^";
          when "37" =>
-            return "^^<<";
+            --  return "^^<<";              -- +"A", 1+2+3=6 moves
+            return "<<^^";              -- +"A", 3+2+1=6 moves
+            --  return "<^<^";              --  3+2+2+2=9 moves
+            --  return "<^^<";              --  3+2+2=7 moves
+            --  return "^<<^";              --  1+2+2=5 moves
+            --  return "^<^<";
          when "38" =>
             return "^^<";
          when "39" =>
@@ -260,6 +288,7 @@ package body Advent.Day_21 is
             return "^";
          when "vA" =>
             return "^>";
+            --  return ">^";
 
          when "<>" =>
             return ">>";
@@ -267,9 +296,11 @@ package body Advent.Day_21 is
             return ">^";
          when "<A" =>
             return ">>^";
+            --  return ">^>";
 
          when ">^" =>
             return "^<";
+            --  return "<^";
          when ">A" =>
             return "^";
 

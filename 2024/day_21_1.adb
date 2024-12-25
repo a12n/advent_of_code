@@ -28,32 +28,19 @@ begin
          -- "<A>Av<<AA>^AA>AvAA^Av<AAA^>A"
          --
          -- "379A"
-         -- "^A<^<^A>>AvvvA"
-         -- "<A>A<v<A>^Av<A>^A>AvAA^Av<AAA>^A"
-         -- "<A>A<v<A>^Av<A>^A>AvAA^Av<AAA^>A"
-         -- "<A>A<v<A>^Av<A>^A>AvAA^A<vAAA>^A"
-         -- "<A>A<v<A>^Av<A>^A>AvAA^A<vAAA^>A"
-         -- "<A>Av<<A>^Av<A>^A>AvAA^Av<AAA>^A"
-         -- "<A>Av<<A>^Av<A>^A>AvAA^Av<AAA^>A"
-         -- "<A>Av<<A>^Av<A>^A>AvAA^A<vAAA>^A"
-         -- "<A>Av<<A>^Av<A>^A>AvAA^A<vAAA^>A"
-         --
-         -- "379A"
-         -- "^A^<^<A>>AvvvA"
-         -- …
-         --
-         -- "379A"
          -- "^A^^<<A>>AvvvA"
-         -- …
+         -- "<A>A<AAv<AA>>^AvAA^Av<AAA>^A"
+         -- "v<<A>>^AvA^Av<<A>>^AAv<A<A>>^AAvAA^<A>Av<A>^AA<A>Av<A<A>>^AAAvA^<A>A"
+         --
+         -- "37"
+         -- "^^<<"
+         -- "<AAv<AA"
+         --
+         -- "37"
+         -- "<<^^"
+         -- "v<<AA>^AA"
          Numeric_Code : constant Natural := To_Number (Code);
       begin
-         if Debug then
-            Put_Line
-              (Standard_Error,
-               Code'Image & Numeric_Code'Image & " =>" & Keys'Image &
-               Keys'Length'Image);
-         end if;
-
          Total := Total + Numeric_Code * Keys'Length;
       end;
    end loop;

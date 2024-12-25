@@ -101,7 +101,7 @@ package Advent.Day_21 is
    --  | < | v | > |
    --  +---+---+---+
    package Directional is
-      type Key_Type is ('A', 'v', '<', '>', '^');
+      type Key_Type is ('v', '<', '>', '^', 'A');
       type Key_Set is array (Key_Type) of Boolean;
       type Key_Array is array (Positive range <>) of Key_Type;
       type Bounded_Key_Array is record
@@ -111,30 +111,29 @@ package Advent.Day_21 is
       type Key_Array_List is array (Positive range <>) of Bounded_Key_Array;
 
       function Adjacent (Key : Key_Type) return Key_Array is
-        (case Key is when 'A' => ">^", when 'v' => "<>^", when '<' => "v",
-           when '>' => "Av", when '^' => "Av");
+        (case Key is when 'v' => "<>^", when '<' => "v", when '>' => "vA",
+           when '^' => "vA", when 'A' => ">^");
 
       function Adjacent (From, To : Key_Type) return Boolean is
         (for some Key of Adjacent (From) => Key = To);
 
       function Distance (From, To : Key_Type) return Natural is
         (case From is
-           when 'A' =>
-             (case To is when 'A' => 0, when 'v' => 2, when '<' => 3,
-                when '>' => 1, when '^' => 1),
            when 'v' =>
              (case To is when 'v' => 0, when '<' => 1, when '>' => 1,
-                when '^' => 1,
-                when 'A' .. 'A' => Distance (From => To, To => From)),
+                when '^' => 1, when 'A' => 2),
            when '<' =>
-             (case To is when '<' => 0, when '>' => 2, when '^' => 2,
-                when 'A' .. 'v' => Distance (From => To, To => From)),
+             (case To is when 'v' .. 'v' => Distance (From => To, To => From),
+                when '<' => 0, when '>' => 2, when '^' => 2, when 'A' => 3),
            when '>' =>
-             (case To is when '>' => 0, when '^' => 2,
-                when 'A' .. '<' => Distance (From => To, To => From)),
+             (case To is when 'v' .. '<' => Distance (From => To, To => From),
+                when '>' => 0, when '^' => 2, when 'A' => 1),
            when '^' =>
-             (case To is when '^' => 0,
-                when 'A' .. '>' => Distance (From => To, To => From)));
+             (case To is when 'v' .. '>' => Distance (From => To, To => From),
+                when '^' => 0, when 'A' => 1),
+           when 'A' =>
+             (case To is when 'v' .. '^' => Distance (From => To, To => From),
+                when 'A' => 0));
 
       function Revert (Key : Key_Type) return Key_Type is
         (case Key is when 'v' => '^', when '<' => '>', when '>' => '<',
@@ -144,8 +143,8 @@ package Advent.Day_21 is
         Post => Revert'Result'Length = Keys'Length;
 
       function To_Character (Key : Key_Type) return Character is
-        (case Key is when 'A' => 'A', when 'v' => 'v', when '<' => '<',
-           when '>' => '>', when '^' => '^');
+        (case Key is when 'v' => 'v', when '<' => '<', when '>' => '>',
+           when '^' => '^', when 'A' => 'A');
 
       function To_Bounded (Keys : Key_Array) return Bounded_Key_Array;
 

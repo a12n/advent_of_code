@@ -79,6 +79,8 @@ package Advent.Day_21 is
              (case To is when '0' .. '9' => Distance (From => To, To => From),
                 when 'A' => 0));
 
+      function Get_Code (File : File_Type) return Code_Type;
+
       function To_Character (Key : Key_Type) return Character is
         (case Key is
            when '0' .. '9' =>
@@ -150,8 +152,6 @@ package Advent.Day_21 is
 
       function To_String (Keys : Key_Array) return String;
    end Directional;
-
-   function Get_Code (File : File_Type) return Numeric.Code_Type;
 
    --  Button presses needed on the corresponding directional keypad
    --  to move from one button to another on the numeric keypad.

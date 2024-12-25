@@ -8,7 +8,8 @@ procedure Day_21_1 is
 begin
    loop
       declare
-         Code : constant Numeric.Code_Type     := Get_Code (Standard_Input);
+         Code : constant Numeric.Code_Type     :=
+           Numeric.Get_Code (Standard_Input);
          Keys : constant Directional.Key_Array :=
            Translate (Translate (Translate (Code (1 .. 2))));
 

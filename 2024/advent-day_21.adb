@@ -1,5 +1,24 @@
 package body Advent.Day_21 is
    package body Numeric is
+      function Get_Code (File : File_Type) return Code_Type is
+         Line : constant String := Get_Line (File);
+         Code : Code_Type;
+      begin
+         for I in Line'Range loop
+            case Line (I) is
+               when '0' .. '9' =>
+                  Code (Code'First + (I - Line'First)) :=
+                    Key_Type'Val
+                      (Character'Pos (Line (I)) - Character'Pos ('0'));
+               when 'A' =>
+                  Code (I) := 'A';
+               when others =>
+                  raise Constraint_Error with "Invalid character in code";
+            end case;
+         end loop;
+         return Code;
+      end Get_Code;
+
       function To_Bounded (Keys : Key_Array) return Bounded_Key_Array is
       begin
          return Result : Bounded_Key_Array do
@@ -53,25 +72,6 @@ package body Advent.Day_21 is
          end return;
       end To_String;
    end Directional;
-
-   function Get_Code (File : File_Type) return Numeric.Code_Type is
-      Line : constant String := Get_Line (File);
-      Code : Numeric.Code_Type;
-   begin
-      for I in Line'Range loop
-         case Line (I) is
-            when '0' .. '9' =>
-               Code (Code'First + (I - Line'First)) :=
-                 Numeric.Key_Type'Val
-                   (Character'Pos (Line (I)) - Character'Pos ('0'));
-            when 'A' =>
-               Code (I) := 'A';
-            when others =>
-               raise Constraint_Error with "Invalid character in code";
-         end case;
-      end loop;
-      return Code;
-   end Get_Code;
 
    function Translate
      (From, To : Numeric.Key_Type) return Directional.Key_Array

@@ -3,44 +3,111 @@ with Ada.Text_IO;         use Ada.Text_IO;
 
 procedure Day_25 is
    --  Grid of 7×5 bits may be represented as 35-bit number.
-   type Schematic_Type is mod 2**35;
+   --  type Schematic_Type is mod 2**35;
+   --  type Schematic_Array is array (Positive range <>) of Schematic_Type;
+   --
+   --  package Schematic_Text_IO is new Ada.Text_IO.Modular_IO (Schematic_Type);
+   --
+   --  subtype Key_Type is Schematic_Type with
+   --      Dynamic_Predicate => Key (Key_Type);
+   --  subtype Lock_Type is Schematic_Type with
+   --      Dynamic_Predicate => Lock (Lock_Type);
+   --
+   --  function Key (S : Schematic_Type) return Boolean is
+   --    ((S and 2#1_1111#) = 2#1_1111#);
+   --  function Lock (S : Schematic_Type) return Boolean is
+   --    ((S and 2#1_1111#) = 2#0_0000#);
+   --  function Fit (K : Key_Type; L : Lock_Type) return Boolean is
+   --    ((K xor L) = -1);
+
+   type Pin_Height is range 0 .. 5;
+   type Pin_Array is array (1 .. 5) of Pin_Height;
+   type Schematic_Type is record
+      Key  : Boolean;
+      Pins : Pin_Array;
+   end record;
    type Schematic_Array is array (Positive range <>) of Schematic_Type;
 
-   package Schematic_Text_IO is new Ada.Text_IO.Modular_IO (Schematic_Type);
-
-   subtype Key_Type is Schematic_Type with
-       Dynamic_Predicate => Key (Key_Type);
-   subtype Lock_Type is Schematic_Type with
-       Dynamic_Predicate => Lock (Lock_Type);
-
-   function Key (S : Schematic_Type) return Boolean is
-     ((S and 2#1_1111#) = 2#1_1111#);
-   function Lock (S : Schematic_Type) return Boolean is
-     ((S and 2#1_1111#) = 2#0_0000#);
-   function Fit (K : Key_Type; L : Lock_Type) return Boolean is
-     ((K xor L) = -1);
+   function Fit (S, T : Schematic_Type) return Boolean is
+     ((S.Key xor T.Key) and
+      (for all I in 1 .. 5 => (S.Pins (I) + T.Pins (I)) in Pin_Height'Range));
 
    function Get_Schematic (File : File_Type) return Schematic_Type is
       C : Character;
-      S : Schematic_Type := 0;
+      --  S : Schematic_Type := 0;
+      S : Schematic_Type := (False, [others => 0]);
+
    begin
-      for I in 0 .. 35 - 1 loop
-         Get (File, C);
-         case C is
-            when '.' =>
-               S := S * 2;
-            when '#' =>
-               S := S * 2 or 1;
+      declare
+         Line : constant String := Get_Line (File);
+      begin
+         --  Put_Line (Standard_Error, "Line " & Line'Image);
+         case Line is
+            when "....." =>
+               S.Key := True;
+            when "#####" =>
+               S.Key := False;
             when others =>
                raise Constraint_Error;
          end case;
+      end;
+
+      for Row in 1 .. 5 loop
+         declare
+            Line: constant String := Get_Line(File);
+         begin
+            for Col in 1 .. 5 loop
+               --  Put_Line (Standard_Error, "Char " & Line(Col)'Image);
+               case Line(Col) is
+                  when '.' =>
+                     null;
+                  when '#' =>
+                     S.Pins (Col) := @ + 1;
+                  when others =>
+                     raise Constraint_Error;
+               end case;
+            end loop;
+         end;
       end loop;
+
+
+      declare
+         Line : constant String := Get_Line (File);
+      begin
+         --  Put_Line (Standard_Error, "Line " & Line'Image);
+         case Line is
+            when "....." =>
+               if S.Key then
+                  raise Constraint_Error;
+               end if;
+            when "#####" =>
+               if not S.Key then
+                  raise Constraint_Error;
+               end if;
+            when others =>
+               raise Constraint_Error;
+         end case;
+      end;
+
+      --  for I in 0 .. 35 - 1 loop
+      --     Get (File, C);
+      --     case C is
+      --        when '.' =>
+      --           S := S * 2;
+      --        when '#' =>
+      --           S := S * 2 or 1;
+      --        when others =>
+      --           raise Constraint_Error;
+      --     end case;
+      --  end loop;
+
       begin
          Skip_Line (File);
       exception
          when End_Error =>
             null;
       end;
+
       return S;
    end Get_Schematic;
 
@@ -60,33 +127,33 @@ procedure Day_25 is
    N          : Natural                  := 0;
    Schematics : constant Schematic_Array := Get_Schematics (Standard_Input);
 begin
-   for S of Schematics loop
-      Put
-        (Standard_Error,
-         (if Key (S) then "K " elsif Lock (S) then "L " else "? "));
-      Schematic_Text_IO.Put (Standard_Error, S, Width => 40, Base => 2);
-      New_Line (Standard_Error);
-   end loop;
+   --  for S of Schematics loop
+   --     Put
+   --       (Standard_Error,
+   --        (if Key (S) then "K " elsif Lock (S) then "L " else "? "));
+   --     Schematic_Text_IO.Put (Standard_Error, S, Width => 40, Base => 2);
+   --     New_Line (Standard_Error);
+   --  end loop;
 
    for I in Schematics'First .. Schematics'Last - 1 loop
-      Put (Standard_Error, "I ");
-      Schematic_Text_IO.Put
-        (Standard_Error, Schematics (I), Width => 40, Base => 2);
-      New_Line (Standard_Error);
+      --  Put (Standard_Error, "I ");
+      --  Schematic_Text_IO.Put
+      --    (Standard_Error, Schematics (I), Width => 40, Base => 2);
+      --  New_Line (Standard_Error);
 
       for J in I + 1 .. Schematics'Last loop
-         Put (Standard_Error, "J ");
-         Schematic_Text_IO.Put
-           (Standard_Error, Schematics (J), Width => 40, Base => 2);
-         New_Line (Standard_Error);
+         --  Put (Standard_Error, "J ");
+         --  Schematic_Text_IO.Put
+         --    (Standard_Error, Schematics (J), Width => 40, Base => 2);
+         --  New_Line (Standard_Error);
+         --
+         --  Put (Standard_Error, "^ ");
+         --  Schematic_Text_IO.Put
+         --    (Standard_Error, Schematics (I) xor Schematics (J), Width => 40,
+         --     Base                                                     => 2);
+         --  New_Line (Standard_Error);
 
-         Put (Standard_Error, "^ ");
-         Schematic_Text_IO.Put
-           (Standard_Error, Schematics (I) xor Schematics (J), Width => 40,
-            Base                                                     => 2);
-         New_Line (Standard_Error);
-
-         if (Schematics (I) xor Schematics (J)) = -1 then
+         if Fit (Schematics (I), Schematics (J)) then
             N := N + 1;
          end if;
       end loop;

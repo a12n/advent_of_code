@@ -84,8 +84,7 @@ package Advent.Day_21 is
       function To_Character (Key : Key_Type) return Character is
         (case Key is
            when '0' .. '9' =>
-             Character'Val
-               (Key_Type'Pos (Key) - Key_Type'Pos ('0') + Character'Pos ('0')),
+             Character'Val (Key_Type'Pos (Key) + Character'Pos ('0')),
            when 'A' => 'A');
 
       function To_Bounded (Keys : Key_Array) return Bounded_Key_Array;

@@ -20,6 +20,7 @@ package Advent.Day_21 is
       end record;
       type Key_Array_List is array (Positive range <>) of Bounded_Key_Array;
 
+      subtype Digit_Key_Type is Key_Type range '0' .. '9';
       subtype Code_Type is Key_Array (1 .. 4) with
           Dynamic_Predicate =>
            (for all I in 1 .. 3 => Code_Type (I) in '0' .. '9') and

@@ -4,10 +4,12 @@ with Ada.Containers.Ordered_Maps;
 package Advent.Day_24 is
    subtype Wire_Name is String (1 .. 3);
 
+   Empty_Name : constant Wire_Name := "   ";
+
    type Gate_Type is ('0', '1', '&', '|', '^');
    type Wire_Type is record
       Gate : Gate_Type;
-      A, B : Wire_Name := "   ";
+      A, B : Wire_Name := Empty_Name;
    end record;
 
    type Number_Type is mod 2**46;

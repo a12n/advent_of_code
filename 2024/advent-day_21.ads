@@ -183,9 +183,68 @@ package Advent.Day_21 is
 
    --  Button presses needed on the corresponding directional keypad
    --  to move from one button to another on the numeric keypad.
+   --
+   --  The table is generated with minimum distance paths from Move
+   --  function.
    function Translate
-     (From, To : Numeric.Key_Type) return Directional.Key_Array with
-     Post => Translate'Result'Length <= 5;
+     (From, To : Numeric.Key_Type) return Directional.Key_Array is
+     (case From is
+        when '0' =>
+          (case To is when '0' => "", when '1' => "^<", when '2' => "^",
+             when '3' => ">^", when '4' => "^^<", when '5' => "^^",
+             when '6' => ">^^", when '7' => "^^^<", when '8' => "^^^",
+             when '9' => ">^^^", when 'A' => ">"),
+        when '1' =>
+          (case To is when '0' => ">v", when '1' => "", when '2' => ">",
+             when '3' => ">>", when '4' => "^", when '5' => ">^",
+             when '6' => ">>^", when '7' => "^^", when '8' => ">^^",
+             when '9' => ">>^^", when 'A' => ">>v"),
+        when '2' =>
+          (case To is when '0' => "v", when '1' => "<", when '2' => "",
+             when '3' => ">", when '4' => "<^", when '5' => "^",
+             when '6' => ">^", when '7' => "<^^", when '8' => "^^",
+             when '9' => ">^^", when 'A' => "v>"),
+        when '3' =>
+          (case To is when '0' => "<v", when '1' => "<<", when '2' => "<",
+             when '3' => "", when '4' => "<<^", when '5' => "<^",
+             when '6' => "^", when '7' => "<<^^", when '8' => "<^^",
+             when '9' => "^^", when 'A' => "v"),
+        when '4' =>
+          (case To is when '0' => ">vv", when '1' => "v", when '2' => "v>",
+             when '3' => "v>>", when '4' => "", when '5' => ">",
+             when '6' => ">>", when '7' => "^", when '8' => ">^",
+             when '9' => ">>^", when 'A' => ">>vv"),
+        when '5' =>
+          (case To is when '0' => "vv", when '1' => "<v", when '2' => "v",
+             when '3' => "v>", when '4' => "<", when '5' => "",
+             when '6' => ">", when '7' => "<^", when '8' => "^",
+             when '9' => ">^", when 'A' => "vv>"),
+        when '6' =>
+          (case To is when '0' => "<vv", when '1' => "<<v", when '2' => "<v",
+             when '3' => "v", when '4' => "<<", when '5' => "<",
+             when '6' => "", when '7' => "<<^", when '8' => "<^",
+             when '9' => "^", when 'A' => "vv"),
+        when '7' =>
+          (case To is when '0' => ">vvv", when '1' => "vv", when '2' => "vv>",
+             when '3' => "vv>>", when '4' => "v", when '5' => "v>",
+             when '6' => "v>>", when '7' => "", when '8' => ">",
+             when '9' => ">>", when 'A' => ">>vvv"),
+        when '8' =>
+          (case To is when '0' => "vvv", when '1' => "<vv", when '2' => "vv",
+             when '3' => "vv>", when '4' => "<v", when '5' => "v",
+             when '6' => "v>", when '7' => "<", when '8' => "",
+             when '9' => ">", when 'A' => "vvv>"),
+        when '9' =>
+          (case To is when '0' => "<vvv", when '1' => "<<vv",
+             when '2' => "<vv", when '3' => "vv", when '4' => "<<v",
+             when '5' => "<v", when '6' => "v", when '7' => "<<",
+             when '8' => "<", when '9' => "", when 'A' => "vvv"),
+        when 'A' =>
+          (case To is when '0' => "<", when '1' => "^<<", when '2' => "<^",
+             when '3' => "^", when '4' => "^^<<", when '5' => "<^^",
+             when '6' => "^^", when '7' => "^^^<<", when '8' => "<^^^",
+             when '9' => "^^^", when 'A' => ""));
+
    function Translate (Keys : Numeric.Key_Array) return Directional.Key_Array;
    function Translate
      (Keys : Numeric.Key_Array; Current : in out Numeric.Key_Type)

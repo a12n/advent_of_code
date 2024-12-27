@@ -12,13 +12,13 @@ begin
            Numeric.Get_Code (Standard_Input);
          N    : constant Natural               := Numeric.To_Number (Code);
          Keys : constant Directional.Key_Array :=
-         --  You
+         --  You (directional keypad)
          Translate (
-         --  Robot
+         --  Robot (directional keypad)
          Translate (
-         --  Robot
+         --  Robot (directional keypad)
          Translate (
-         --  Robot
+         --  Robot (numeric keypad)
          Code)));
       begin
          if Debug then

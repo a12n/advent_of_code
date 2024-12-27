@@ -1,0 +1,27 @@
+#!/usr/bin/awk -f
+
+function node_attrs(name) {
+  if (name ~ /^x/) {
+    print "\t" name " [style=filled, fillcolor=lightpink];";
+  } else if (name ~ /^y/) {
+    print "\t" name " [style=filled, fillcolor=lightgreen];";
+  } else if (name ~ /^z/) {
+    print "\t" name " [style=filled, fillcolor=lightblue];";
+  }
+}
+
+BEGIN {
+  print "digraph {"
+}
+
+/->/ {
+  node_attrs($1);
+  node_attrs($3);
+  node_attrs($5);
+  print "\t" $5 " -> " $1 ";";
+  print "\t" $5 " -> " $3 ";";
+}
+
+END {
+  print "}"
+}

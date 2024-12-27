@@ -1,3 +1,5 @@
 _build
 day_??_?
+day_25
 !tests/day_??_?/
+!tests/day_25/

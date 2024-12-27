@@ -113,6 +113,8 @@ package Advent.Day_21 is
       end record;
       type Key_Array_List is array (Positive range <>) of Bounded_Key_Array;
 
+      subtype Move_Key_Type is Key_Type range 'v' .. '^';
+
       function Adjacent (Key : Key_Type) return Key_Array is
         (case Key is when 'v' => "<>^", when '<' => "v", when '>' => "vA",
            when '^' => "vA", when 'A' => ">^");
@@ -155,6 +157,29 @@ package Advent.Day_21 is
 
       function To_String (Keys : Key_Array) return String;
    end Directional;
+
+   function Ajdacent
+     (Key : Numeric.Key_Type; Dir : Directional.Move_Key_Type)
+      return Numeric.Key_Type is
+     (case Dir is
+        when 'v' =>
+          (case Key is when '2' => '0', when '3' => 'A', when '4' => '1',
+             when '5' => '2', when '6' => '3', when '7' => '4',
+             when '8' => '5', when '9' => '6',
+             when others => raise Constraint_Error),
+        when '<' =>
+          (case Key is when '2' => '1', when '3' => '2', when '5' => '4',
+             when '6' => '5', when '8' => '7', when '9' => '8',
+             when 'A' => '0', when others => raise Constraint_Error),
+        when '>' =>
+          (case Key is when '0' => 'A', when '1' => '2', when '2' => '3',
+             when '4' => '5', when '5' => '6', when '7' => '8',
+             when '8' => '9', when others => raise Constraint_Error),
+        when '^' =>
+          (case Key is when '0' => '2', when '1' => '4', when '2' => '5',
+             when '3' => '6', when '4' => '7', when '5' => '8',
+             when '6' => '9', when 'A' => '3',
+             when others => raise Constraint_Error));
 
    --  Button presses needed on the corresponding directional keypad
    --  to move from one button to another on the numeric keypad.

@@ -1,4 +1,23 @@
 package body Advent.Day_24 is
+   procedure Iterate
+     (Wires   : Wire_Map; ID : Character;
+      Process : not null access procedure (Position : Wire_Maps.Cursor))
+   is
+      use Wire_Maps;
+      use type Wire_Maps.Cursor;
+
+      I : Cursor := Wires.Find (ID & "00");
+   begin
+      if I = No_Element then
+         raise Constraint_Error with "No wires for " & ID'Image;
+      end if;
+
+      while I /= No_Element and then Key (I) (1) = ID loop
+         Process (I);
+         I := Next (I);
+      end loop;
+   end Iterate;
+
    function Get_Wires (File : File_Type) return Wire_Map is
       Wires : Wire_Map;
 
@@ -88,13 +107,9 @@ package body Advent.Day_24 is
       use Wire_Maps;
       N : Number_Type := 0;
       K : Number_Type := 1;                --  2^0
-      I : Cursor      := Wires.Find (ID & "00");
-   begin
-      if I = No_Element then
-         raise Constraint_Error with "No wires for " & ID'Image;
-      end if;
 
-      while I /= No_Element and then Key (I) (1) = ID loop
+      procedure Process (I : Cursor) is
+      begin
          if Signal (Wires, I.Key) then
             N := N or K;
          end if;
@@ -105,10 +120,10 @@ package body Advent.Day_24 is
                "I " & I.Key'Image & ", K " & K'Image & ", N " & N'Image);
          end if;
 
-         I := I.Next;
          K := K * 2;
-      end loop;
-
+      end Process;
+   begin
+      Iterate (Wires, ID, Process'Access);
       return N;
    end Number;
 

@@ -99,7 +99,7 @@ package body Advent.Day_24 is
             N := N or K;
          end if;
 
-         if Debug then
+         if Debug_Level > 1 then
             Put_Line
               (Standard_Error,
                "I " & I.Key'Image & ", K " & K'Image & ", N " & N'Image);
@@ -115,7 +115,7 @@ package body Advent.Day_24 is
    function Signal (Wires : Wire_Map; Name : Wire_Name) return Boolean is
       Wire : constant Wire_Type := Wires.Element (Name);
    begin
-      if Debug then
+      if Debug_Level > 1 then
          Put_Line
            (Standard_Error, "Name " & Name'Image & ", Wire " & Wire'Image);
       end if;

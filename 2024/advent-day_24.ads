@@ -10,9 +10,9 @@ package Advent.Day_24 is
       A, B : Wire_Name := "   ";
    end record;
 
-   type Output_Type is mod 2**46;
+   type Number_Type is mod 2**46;
 
-   package Output_Text_IO is new Ada.Text_IO.Modular_IO (Output_Type);
+   package Number_Text_IO is new Ada.Text_IO.Modular_IO (Number_Type);
 
    package Wire_Maps is new Ada.Containers.Ordered_Maps
      (Key_Type => Wire_Name, Element_Type => Wire_Type);
@@ -20,7 +20,7 @@ package Advent.Day_24 is
 
    function Get_Wires (File : File_Type) return Wire_Map;
 
-   function Output (Wires : Wire_Map) return Output_Type;
+   function Number (Wires : Wire_Map) return Number_Type;
 
    function Signal (Wires : Wire_Map; Name : Wire_Name) return Boolean;
 end Advent.Day_24;

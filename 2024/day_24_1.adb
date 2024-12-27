@@ -3,13 +3,13 @@ with Advent.Day_24; use Advent.Day_24;
 with Advent;        use Advent;
 
 procedure Day_24_1 is
-   use Output_Text_IO;
+   use Number_Text_IO;
    Wires : constant Wire_Map := Get_Wires (Standard_Input);
 begin
    if Debug then
       Put_Line (Standard_Error, Wires'Image);
    end if;
 
-   Put (Output (Wires), 0);
+   Put (Number (Wires), 0);
    New_Line;
 end Day_24_1;

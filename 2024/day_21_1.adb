@@ -14,9 +14,9 @@ begin
          Keys : constant Directional.Key_Array :=
          --  You (directional keypad)
          Translate (
-         --  Robot (directional keypad)
+         --  Robot 1 (directional keypad)
          Translate (
-         --  Robot (directional keypad)
+         --  Robot 2 (directional keypad)
          Translate (
          --  Robot (numeric keypad)
          Code)));

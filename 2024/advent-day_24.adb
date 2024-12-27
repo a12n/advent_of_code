@@ -84,13 +84,17 @@ package body Advent.Day_24 is
       return Wires;
    end Get_Wires;
 
-   function Number (Wires : Wire_Map) return Number_Type is
+   function Number (Wires : Wire_Map; ID : Character) return Number_Type is
       use Wire_Maps;
       N : Number_Type := 0;
       K : Number_Type := 1;                --  2^0
-      I : Cursor      := Wires.Find ("z00");
+      I : Cursor      := Wires.Find (ID & "00");
    begin
-      while I /= No_Element loop
+      if I = No_Element then
+         raise Constraint_Error with "No wires for " & ID'Image;
+      end if;
+
+      while I /= No_Element and then Key (I) (1) = ID loop
          if Signal (Wires, I.Key) then
             N := N or K;
          end if;

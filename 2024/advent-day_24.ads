@@ -20,7 +20,7 @@ package Advent.Day_24 is
 
    function Get_Wires (File : File_Type) return Wire_Map;
 
-   function Number (Wires : Wire_Map) return Number_Type;
+   function Number (Wires : Wire_Map; ID : Character) return Number_Type;
 
    function Signal (Wires : Wire_Map; Name : Wire_Name) return Boolean;
 end Advent.Day_24;

@@ -10,6 +10,6 @@ begin
       Put_Line (Standard_Error, Wires'Image);
    end if;
 
-   Put (Number (Wires), 0);
+   Put (Number (Wires, 'z'), 0);
    New_Line;
 end Day_24_1;

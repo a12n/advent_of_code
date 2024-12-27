@@ -158,7 +158,7 @@ package Advent.Day_21 is
       function To_String (Keys : Key_Array) return String;
    end Directional;
 
-   function Ajdacent
+   function Move
      (Key : Numeric.Key_Type; Dir : Directional.Move_Key_Type)
       return Numeric.Key_Type is
      (case Dir is

@@ -8,7 +8,7 @@ package Advent.Day_24 is
 
    type Gate_Type is ('0', '1', '&', '|', '^');
    type Wire_Type is record
-      Gate : Gate_Type;
+      Gate : Gate_Type := '0';
       A, B : Wire_Name := Empty_Name;
    end record;
 

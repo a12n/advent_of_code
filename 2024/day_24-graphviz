@@ -1,25 +1,51 @@
 #!/usr/bin/awk -f
 
-function node_attrs(name) {
-  if (name ~ /^x/) {
-    print "\t" name " [style=filled, fillcolor=lightpink];";
-  } else if (name ~ /^y/) {
-    print "\t" name " [style=filled, fillcolor=lightgreen];";
-  } else if (name ~ /^z/) {
-    print "\t" name " [style=filled, fillcolor=lightblue];";
+function node_attrs(id) {
+  if (id ~ /^x/) {
+    print "	" id " [style=filled, fillcolor=lightpink];"
+  } else if (id ~ /^y/) {
+    print "	" id " [style=filled, fillcolor=lightgreen];"
+  } else if (id ~ /^z/) {
+    print "	" id " [style=filled, fillcolor=lightblue];"
   }
+}
+
+function half_adder(x, y, z, c_out) {
+  print "subgraph cluster_" z " {";
+  print "	style=filled; color=lightgray;"
+  print "	" x "; " y "; " z "; " c_out ";"
+  print "}"
+}
+
+function full_adder(x, y, z, c_out, xor1, and1, and2) {
+  print "subgraph cluster_" z " {";
+  print "	style=filled; color=lightgray;"
+  print "	" x "; " y "; " z "; " c_out ";"
+  print "	" xor1 "; " and1 "; " and2 ";"
+  print "}"
 }
 
 BEGIN {
   print "digraph {"
+  print "	node [shape=box];"
+  half_adder("x00", "y00", "z00", "gmk");
+  full_adder("x01", "y01", "z01", "nwk", "vgr", "jvm", "fsm");
+  full_adder("x02", "y02", "z02", "sjn", "gsh", "ksr", "hhn");
+  full_adder("x03", "y03", "z03", "cnv", "btf", "jjg", "ggr");
+  # …
+  full_adder("x41", "y41", "z41", "tqh", "gnj", "qqq", "tmj");
+  full_adder("x42", "y42", "z42", "rfg", "qqj", "vgs", "rmc");
+  full_adder("x43", "y43", "z43", "mdq", "nws", "tsb", "cms");
+  full_adder("x44", "y44", "z44", "z45", "cmk", "jdb", "qdd");
 }
 
 /->/ {
-  node_attrs($1);
-  node_attrs($3);
-  node_attrs($5);
-  print "\t" $5 " -> " $1 ";";
-  print "\t" $5 " -> " $3 ";";
+  node_attrs($1)
+  node_attrs($3)
+  node_attrs($5)
+  print "	" $5 " [label=\"" $5 "\\n" $2 "\"];"
+  print "	" $5 " -> " $1 ";"
+  print "	" $5 " -> " $3 ";"
 }
 
 END {

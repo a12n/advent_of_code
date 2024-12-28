@@ -148,4 +148,49 @@ package body Advent.Day_24 is
             return Signal (Wires, Wire.A) xor Signal (Wires, Wire.B);
       end case;
    end Signal;
+
+   function Full_Adder
+     (Wires : Wire_Map; A, B, S, C_out : Wire_Name; C_in : out Wire_Name)
+      return Boolean
+   is
+      A_Wire     : constant Wire_Type := Wires.Element (A);
+      B_Wire     : constant Wire_Type := Wires.Element (B);
+      S_Wire     : constant Wire_Type := Wires.Element (S);
+      C_out_Wire : constant Wire_Type := Wires.Element (C_out);
+   begin
+      if not A_Wire.Gate in '0' .. '1' or not B_Wire.Gate in '0' .. '1' then
+         --  Input wires for X and Y bits must be constants.
+         return False;
+      end if;
+
+      if S_Wire.Gate /= '^' then
+         --  Sum output is from XOR gate.
+         return False;
+      end if;
+
+      if C_out_Wire.Gate /= '|' then
+         --  Output carry bit is from OR gate.
+         return False;
+      end if;
+
+      --  TODO
+      return False;
+   end Full_Adder;
+
+   function Half_Adder
+     (Wires : Wire_Map; A, B, S, C_out : Wire_Name) return Boolean
+   is
+      A_Wire     : constant Wire_Type := Wires.Element (A);
+      B_Wire     : constant Wire_Type := Wires.Element (B);
+      S_Wire     : constant Wire_Type := Wires.Element (S);
+      C_out_Wire : constant Wire_Type := Wires.Element (C_out);
+   begin
+      return
+        A_Wire.Gate in '0' .. '1' and B_Wire.Gate in '0' .. '1' and
+        S_Wire.Gate = '^' and C_out_Wire.Gate = '&' and
+        ((S_Wire.A = A and S_Wire.B = B) or
+         (S_Wire.A = B and S_Wire.B = A)) and
+        ((C_out_Wire.A = A and C_out_Wire.B = B) or
+         (C_out_Wire.A = B and C_out_Wire.B = A));
+   end Half_Adder;
 end Advent.Day_24;

@@ -25,4 +25,14 @@ package Advent.Day_24 is
    function Number (Wires : Wire_Map; ID : Character) return Number_Type;
 
    function Signal (Wires : Wire_Map; Name : Wire_Name) return Boolean;
+
+   --  Match the specified part of the wires as a full adder. Returns
+   --  True if it's a valid full adder. Carry-in wire is saved to
+   --  C_in.
+   function Full_Adder
+     (Wires : Wire_Map; A, B, S, C_out : Wire_Name; C_in : out Wire_Name)
+      return Boolean;
+
+   function Half_Adder
+     (Wires : Wire_Map; A, B, S, C_out : Wire_Name) return Boolean;
 end Advent.Day_24;

@@ -193,10 +193,7 @@ package body Advent.Day_24 is
    begin
       return
         A_Wire.Gate in '0' .. '1' and B_Wire.Gate in '0' .. '1' and
-        S_Wire.Gate = '^' and C_out_Wire.Gate = '&' and
-        ((S_Wire.A = A and S_Wire.B = B) or
-         (S_Wire.A = B and S_Wire.B = A)) and
-        ((C_out_Wire.A = A and C_out_Wire.B = B) or
-         (C_out_Wire.A = B and C_out_Wire.B = A));
+        (S_Wire.Gate = '^' and S_Wire.A = A and S_Wire.B = B) and
+        (C_out_Wire.Gate = '&' and C_out_Wire.A = A and C_out_Wire.B = B);
    end Half_Adder;
 end Advent.Day_24;

@@ -164,7 +164,7 @@ package body Advent.Day_24 is
       S_Wire     : constant Wire_Type := Wires.Element (S);
       C_out_Wire : constant Wire_Type := Wires.Element (C_out);
    begin
-      if not A_Wire.Gate in '0' .. '1' or not B_Wire.Gate in '0' .. '1' then
+      if A_Wire.Gate not in '0' .. '1' or B_Wire.Gate not in '0' .. '1' then
          --  Input wires for X and Y bits must be constants.
          return False;
       end if;

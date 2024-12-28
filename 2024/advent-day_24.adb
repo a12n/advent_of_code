@@ -21,6 +21,8 @@ package body Advent.Day_24 is
    function Get_Wires (File : File_Type) return Wire_Map is
       Wires : Wire_Map;
 
+      procedure Swap is new Generic_Swap (Wire_Name);
+
       procedure Read_Gate is
          Line : constant String := Get_Line (File);
          Name : Wire_Name;
@@ -52,6 +54,10 @@ package body Advent.Day_24 is
             Wire.B := Line (8 .. 10);
          else
             raise Constraint_Error;
+         end if;
+
+         if Wire.B < Wire.A then
+            Swap (Wire.A, Wire.B);
          end if;
 
          Wires.Include (Name, Wire);

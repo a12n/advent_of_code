@@ -159,13 +159,27 @@ package body Advent.Day_24 is
      (Wires : Wire_Map; A, B, S, C_out : Wire_Name; C_in : out Wire_Name)
       return Boolean
    is
+      procedure Swap is new Generic_Swap (Wire_Type);
+
       A_Wire     : constant Wire_Type := Wires.Element (A);
       B_Wire     : constant Wire_Type := Wires.Element (B);
       S_Wire     : constant Wire_Type := Wires.Element (S);
       C_out_Wire : constant Wire_Type := Wires.Element (C_out);
+
+      C_in_Wire      : Wire_Type;
+      Input_AND_Wire : Wire_Type;
+      Carry_AND_Wire : Wire_Type;
+      OR_Wire        : Wire_Type;
+      XOR_Wire       : Wire_Type;
+      XOR_Name       : Wire_Name;
    begin
-      if A_Wire.Gate not in '0' .. '1' or B_Wire.Gate not in '0' .. '1' then
-         --  Input wires for X and Y bits must be constants.
+      if A_Wire.Gate not in '0' .. '1' then
+         --  Input wire for X bit must be constant.
+         return False;
+      end if;
+
+      if B_Wire.Gate not in '0' .. '1' then
+         --  Input wire for Y bit must be constant.
          return False;
       end if;
 
@@ -179,8 +193,48 @@ package body Advent.Day_24 is
          return False;
       end if;
 
-      --  TODO
-      return False;
+      Input_AND_Wire := Wires.Element (C_out_Wire.A);
+      Carry_AND_Wire := Wires.Element (C_out_Wire.B);
+      if Carry_AND_Wire.A = A and Carry_AND_Wire.B = B then
+         Swap (Carry_AND_Wire, Input_AND_Wire);
+      end if;
+
+      if Input_AND_Wire.Gate /= '&' then
+         return False;
+      end if;
+      if Carry_AND_Wire.Gate /= '&' then
+         return False;
+      end if;
+      if Input_AND_Wire.A /= A or Input_AND_Wire.B /= B then
+         return False;
+      end if;
+
+      XOR_Wire  := Wires.Element (S_Wire.A);
+      C_in_Wire := Wires.Element (S_Wire.B);
+      if C_in_Wire.A = A and C_in_Wire.B = B then
+         Swap (XOR_Wire, C_in_Wire);
+         C_in     := S_Wire.A;
+         XOR_Name := S_Wire.B;
+      else
+         C_in     := S_Wire.B;
+         XOR_Name := S_Wire.A;
+      end if;
+
+      if XOR_Wire.Gate /= '^' then
+         return False;
+      end if;
+      if XOR_Wire.A /= A or XOR_Wire.B /= B then
+         return False;
+      end if;
+
+      if not
+        ((Carry_AND_Wire.A = C_in and Carry_AND_Wire.B = XOR_Name) or
+         (Carry_AND_Wire.A = XOR_Name and Carry_AND_Wire.B = C_in))
+      then
+         return False;
+      end if;
+
+      return True;
    end Full_Adder;
 
    function Half_Adder

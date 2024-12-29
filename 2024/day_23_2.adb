@@ -1,6 +1,5 @@
-with Ada.Text_IO;         use Ada.Text_IO;
-with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Advent.Day_23;       use Advent.Day_23;
+with Ada.Text_IO;   use Ada.Text_IO;
+with Advent.Day_23; use Advent.Day_23;
 
 procedure Day_23_2 is
    Online    : Address_Set;

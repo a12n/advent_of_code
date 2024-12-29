@@ -1,6 +1,6 @@
 with Ada.Text_IO;   use Ada.Text_IO;
 with Advent.Day_13; use Advent.Day_13;
-with Advent;        use Advent;
+with Advent.Debug;  use Advent.Debug;
 
 procedure Day_13_1 is
    use Counter_Text_IO;
@@ -11,7 +11,7 @@ begin
          Machine : constant Claw_Machine := Input_Entry (Standard_Input);
          Pushes  : Push_Count;
       begin
-         if Debug then
+         if Debug_Enabled then
             Put_Line (Standard_Error, Machine'Image);
          end if;
          if Solution (Machine, Pushes) then

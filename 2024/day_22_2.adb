@@ -2,7 +2,7 @@ with Ada.Environment_Variables; use Ada.Environment_Variables;
 with Ada.Integer_Text_IO;       use Ada.Integer_Text_IO;
 with Ada.Text_IO;               use Ada.Text_IO;
 with Advent.Day_22;             use Advent.Day_22;
-with Advent;                    use Advent;
+with Advent.Debug;              use Advent.Debug;
 
 procedure Day_22_2 is
    Max_Numbers : constant Positive :=
@@ -40,7 +40,7 @@ begin
            [others => [others => [others => [others => False]]]];
       begin
          Get (Standard_Input, N);
-         if Debug then
+         if Debug_Enabled then
             Put_Line (Standard_Error, "Buyer " & N'Image);
          end if;
 
@@ -62,7 +62,7 @@ begin
             begin
                --  Derive price from the buyer random number.
                Price := Price_Type (N mod 10);
-               if Debug then
+               if Debug_Enabled then
                   New_Line (Standard_Error);
                   Put_Line
                     (Standard_Error,
@@ -72,7 +72,7 @@ begin
                --  There are at least two prices, can compute change sequence now.
                if I > Natural (Price_Index'First) then
                   Change := Change_Type (Price) - Change_Type (Price_1);
-                  if Debug then
+                  if Debug_Enabled then
                      Put_Line (Standard_Error, "Change " & Change'Image);
                   end if;
                end if;
@@ -89,7 +89,7 @@ begin
                        Buyer_Seen_Changes
                          (Change_3, Change_2, Change_1, Change);
                   begin
-                     if Debug then
+                     if Debug_Enabled then
                         Put_Line
                           (Standard_Error,
                            "Changes " & Change_3'Image & ", " &
@@ -100,7 +100,7 @@ begin
                      if not Seen_Changes then
                         Bananas      := @ + Natural (Price);
                         Seen_Changes := True;
-                        if Debug then
+                        if Debug_Enabled then
                            Put_Line
                              (Standard_Error,
                               "Bananas + " & Price'Image & " = " &
@@ -126,7 +126,7 @@ exception
                   for D in Change_Type'Range loop
                      if Total_Bananas (A, B, C, D) > Max_Bananas then
                         Max_Bananas := Total_Bananas (A, B, C, D);
-                        if Debug then
+                        if Debug_Enabled then
                            Put_Line
                              (Standard_Error,
                               "Sequence " & A'Image & ", " & B'Image & ", " &

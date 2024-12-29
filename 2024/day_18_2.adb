@@ -2,8 +2,8 @@ with Ada.Environment_Variables; use Ada.Environment_Variables;
 with Ada.Integer_Text_IO;       use Ada.Integer_Text_IO;
 with Ada.Text_IO;               use Ada.Text_IO;
 with Advent.Day_18;             use Advent.Day_18;
+with Advent.Debug;              use Advent.Debug;
 with Advent.Grids;              use Advent.Grids;
-with Advent;                    use Advent;
 
 procedure Day_18_2 is
    Size : constant Natural := Natural'Value (Value ("SIZE", "70"));
@@ -23,7 +23,7 @@ begin
       raise Constraint_Error;
    end if;
 
-   if Debug then
+   if Debug_Enabled then
       Put_Line (Standard_Error, "Initial path:");
       Print (Standard_Error, Path);
    end if;

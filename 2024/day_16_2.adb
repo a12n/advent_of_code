@@ -2,7 +2,7 @@ with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Ada.Text_IO;         use Ada.Text_IO;
 with Advent.Day_16;       use Advent.Day_16;
 with Advent.Grids;        use Advent.Grids;
-with Advent;              use Advent;
+with Advent.Debug;        use Advent.Debug;
 
 procedure Day_16_2 is
    Start, Finish : Position;

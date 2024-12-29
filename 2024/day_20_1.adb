@@ -2,8 +2,8 @@ with Ada.Environment_Variables; use Ada.Environment_Variables;
 with Ada.Integer_Text_IO;       use Ada.Integer_Text_IO;
 with Ada.Text_IO;               use Ada.Text_IO;
 with Advent.Day_20;             use Advent.Day_20;
+with Advent.Debug;              use Advent.Debug;
 with Advent.Grids;              use Advent.Grids;
-with Advent;                    use Advent;
 
 --  FIXME: Re-export from Day_20?
 with Advent.Day_16;
@@ -44,7 +44,7 @@ procedure Day_20_1 is
       end if;
 
       --  Cheat saved some time…
-      if Debug then
+      if Debug_Enabled then
          Put_Line
            (Standard_Error,
             "Cheat between path positions [" & P (1)'Image & "," &
@@ -57,7 +57,7 @@ procedure Day_20_1 is
       return (Old_Dist - New_Dist) >= Threshold;
    end Cheat;
 begin
-   if Debug then
+   if Debug_Enabled then
       Print (Standard_Error, Track, Track, Path_Char => ' ');
       Put_Line (Standard_Error, Start'Image);
       Put_Line (Standard_Error, Finish'Image);

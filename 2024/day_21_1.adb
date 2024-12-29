@@ -1,7 +1,7 @@
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Ada.Text_IO;         use Ada.Text_IO;
 with Advent.Day_21;       use Advent.Day_21;
-with Advent;              use Advent;
+with Advent.Debug;        use Advent.Debug;
 
 procedure Day_21_1 is
    Total : Natural := 0;
@@ -21,7 +21,7 @@ begin
          --  Robot (numeric keypad)
          Code)));
       begin
-         if Debug then
+         if Debug_Enabled then
             Put_Line (Standard_Error, "N " & N'Image);
          end if;
          Total := Total + N * Keys'Length;

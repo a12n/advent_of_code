@@ -1,7 +1,7 @@
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Ada.Text_IO;         use Ada.Text_IO;
 with Advent.Day_23;       use Advent.Day_23;
-with Advent;              use Advent;
+with Advent.Debug;        use Advent.Debug;
 
 procedure Day_23_1 is
    Online    : Address_Set;
@@ -20,7 +20,7 @@ begin
                      C in Historian_Address'Range)
                   then
                      N := N + 1;
-                     if Debug then
+                     if Debug_Enabled then
                         Put_Line
                           (Standard_Error,
                            To_String (A) & ',' & To_String (B) & ',' &

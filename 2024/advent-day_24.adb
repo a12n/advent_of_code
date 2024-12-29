@@ -1,3 +1,5 @@
+with Advent.Debug; use Advent.Debug;
+
 package body Advent.Day_24 is
    procedure Iterate
      (Wires   : Wire_Map; ID : Character;

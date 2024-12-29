@@ -1,7 +1,7 @@
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Ada.Text_IO;         use Ada.Text_IO;
 with Advent.Day_12;       use Advent.Day_12;
-with Advent;              use Advent;
+with Advent.Debug;        use Advent.Debug;
 
 procedure Day_12_1 is
    Plants : constant Garden := Input (Standard_Input);
@@ -10,7 +10,7 @@ procedure Day_12_1 is
      [others => [others => False]];
    Price   : Natural                                          := 0;
 begin
-   if Debug then
+   if Debug_Enabled then
       Put_Line (Standard_Error, Plants'Image);
    end if;
    for Row in Plants'Range (1) loop
@@ -20,7 +20,7 @@ begin
                Area, Perimeter : Natural;
             begin
                Analyze (Plants, Row, Col, Visited, Area, Perimeter);
-               if Debug then
+               if Debug_Enabled then
                   Put_Line
                     (Standard_Error,
                      "Pos " & Row'Image & Col'Image & ", Plant " &

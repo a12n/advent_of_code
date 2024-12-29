@@ -1,6 +1,7 @@
 with Ada.Containers.Synchronized_Queue_Interfaces;
 with Ada.Containers.Unbounded_Priority_Queues;
 with Ada.Containers; use Ada.Containers;
+with Advent.Debug;   use Advent.Debug;
 
 package body Advent.Day_20 is
    function Shortest_Path
@@ -80,7 +81,7 @@ package body Advent.Day_20 is
       begin
          Path (Path_Index) := Pos;
          if Pos = Start_Pos then
-            if Debug then
+            if Debug_Enabled then
                Put_Line
                  (Standard_Error,
                   "Path" & Path (Path_Index .. Path'Last)'Image);

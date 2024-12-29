@@ -1,3 +1,5 @@
+with Advent.Debug; use Advent.Debug;
+
 package body Advent.Day_21 is
    package body Numeric is
       function Distance (Keys : Key_Array) return Natural is
@@ -119,7 +121,7 @@ package body Advent.Day_21 is
          end;
       end loop;
 
-      if Debug then
+      if Debug_Enabled then
          Put_Line (Standard_Error, "Translate:");
          Put_Line
            (Standard_Error,
@@ -206,7 +208,7 @@ package body Advent.Day_21 is
          end;
       end loop;
 
-      if Debug then
+      if Debug_Enabled then
          Put_Line (Standard_Error, "Translate:");
          Put_Line
            (Standard_Error,

@@ -1,3 +1,5 @@
+with Advent.Debug; use Advent.Debug;
+
 package body Advent.Day_23 is
    function Length (Set : Address_Set) return Natural is
    begin
@@ -49,7 +51,7 @@ package body Advent.Day_23 is
             I := To_Address (S);
             J := To_Address (T);
 
-            if Debug then
+            if Debug_Enabled then
                Put_Line
                  (Standard_Error,
                   "Line " & Line'Image & ", " & To_String (S) & ' ' &

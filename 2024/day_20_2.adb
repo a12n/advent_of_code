@@ -2,8 +2,8 @@ with Ada.Environment_Variables; use Ada.Environment_Variables;
 with Ada.Integer_Text_IO;       use Ada.Integer_Text_IO;
 with Ada.Text_IO;               use Ada.Text_IO;
 with Advent.Day_20;             use Advent.Day_20;
+with Advent.Debug;              use Advent.Debug;
 with Advent.Grids;              use Advent.Grids;
-with Advent;                    use Advent;
 
 procedure Day_20_2 is
    Threshold : constant Natural := Natural'Value (Value ("THRESHOLD", "100"));
@@ -41,7 +41,7 @@ procedure Day_20_2 is
       --  cheat. So, the cheat is valid.
 
       --  Cheat saved some time…
-      if Debug then
+      if Debug_Enabled then
          Put_Line
            (Standard_Error,
             "Cheat between path positions [" & P (1)'Image & "," &

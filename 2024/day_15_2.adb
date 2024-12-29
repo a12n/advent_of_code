@@ -2,6 +2,7 @@ with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Ada.Text_IO;         use Ada.Text_IO;
 with Advent.ANSI;
 with Advent.Day_15;       use Advent.Day_15;
+with Advent.Debug;        use Advent.Debug;
 with Advent.Grids;        use Advent.Grids;
 with Advent;              use Advent;
 
@@ -14,13 +15,13 @@ procedure Day_15_2 is
    Next_Warehouse :
      Wide_Warehouse_Map (Warehouse'Range (1), Warehouse'Range (2));
 begin
-   if Debug then
+   if Debug_Enabled then
       Put (Standard_Error, ANSI.Cursor.Hide);
    end if;
 
    begin
       for I in Positive'Range loop
-         if Debug then
+         if Debug_Enabled then
             delay 0.012_5;
             Put (Standard_Error, ANSI.Cursor.Position (1, 1));
             Print (Standard_Error, Warehouse);
@@ -40,7 +41,7 @@ begin
          null;
    end;
 
-   if Debug then
+   if Debug_Enabled then
       Put (Standard_Error, ANSI.Cursor.Position (1, 1));
       Print (Standard_Error, Warehouse);
       Put (Standard_Error, ANSI.Cursor.Show);

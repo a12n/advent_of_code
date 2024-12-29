@@ -2,6 +2,7 @@ with Ada.Containers.Synchronized_Queue_Interfaces;
 with Ada.Containers.Unbounded_Priority_Queues;
 with Ada.Containers; use Ada.Containers;
 with Advent.ANSI;
+with Advent.Debug;   use Advent.Debug;
 
 package body Advent.Day_16 is
    function Best_Path

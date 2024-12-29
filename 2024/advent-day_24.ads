@@ -3,6 +3,7 @@ with Ada.Containers.Ordered_Maps;
 
 package Advent.Day_24 is
    subtype Wire_Name is String (1 .. 3);
+   type Wire_Name_Array is array (Positive range <>) of Wire_Name;
 
    Empty_Name : constant Wire_Name := "   ";
 

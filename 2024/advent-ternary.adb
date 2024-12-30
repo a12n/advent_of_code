@@ -46,6 +46,38 @@ package body Advent.Ternary is
       end return;
    end Disambiguate;
 
+   function Generic_To_Modular (A : Ternary_Array) return Modular_Type is
+      N : Modular_Type := 0;
+      K : Modular_Type := 1;            --  2**0
+   begin
+      for I in A'Range loop
+         case A (I) is
+            when False =>
+               null;
+            when True =>
+               N := N or K;
+            when Unknown =>
+               raise Not_Unifiable_Error;
+         end case;
+         K := K * 2;
+      end loop;
+      return N;
+   end Generic_To_Modular;
+
+   function Generic_From_Modular (N : Modular_Type) return Ternary_Array is
+      K : Modular_Type := 1;           --  2**0
+   begin
+      return
+        R : Ternary_Array (0 .. Modular_Type'Size - 1) := [others => False] do
+         for I in R'Range loop
+            if (N and K) /= 0 then
+               R (I) := True;
+            end if;
+            K := K * 2;
+         end loop;
+      end return;
+   end Generic_From_Modular;
+
    function Shift_Left
      (A : Ternary_Array; N : Natural; Shift_In : Ternary := False)
       return Ternary_Array
@@ -81,24 +113,6 @@ package body Advent.Ternary is
          end if;
       end return;
    end Shift_Right;
-
-   function To_Modular (A : Ternary_Array) return Modular_Type is
-      N : Modular_Type := 0;
-      K : Modular_Type := 1;            --  2**0
-   begin
-      for I in A'Range loop
-         case A (I) is
-            when False =>
-               null;
-            when True =>
-               N := N or K;
-            when Unknown =>
-               raise Not_Unifiable_Error;
-         end case;
-         K := K * 2;
-      end loop;
-      return N;
-   end To_Modular;
 
    function To_String (A : Ternary_Array) return String is
    begin

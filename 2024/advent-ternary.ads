@@ -19,7 +19,18 @@ package Advent.Ternary is
    function "or" (A, B : Ternary_Array) return Ternary_Array;
    function "xor" (A, B : Ternary_Array) return Ternary_Array;
 
-   function Disambiguate (A : Ternary_Array; B : Known_Ternary) return Ternary_Array;
+   function Disambiguate
+     (A : Ternary_Array; B : Known_Ternary) return Ternary_Array;
+
+   generic
+      type Modular_Type is mod <>;
+   function Generic_To_Modular (A : Ternary_Array) return Modular_Type with
+     Pre => Modular_Type'Size >= A'Length;
+
+   generic
+      type Modular_Type is mod <>;
+   function Generic_From_Modular (N : Modular_Type) return Ternary_Array with
+     Post => Generic_From_Modular'Result'Length = Modular_Type'Size;
 
    function Shift_Left
      (A : Ternary_Array; N : Natural; Shift_In : Ternary := False)
@@ -31,11 +42,6 @@ package Advent.Ternary is
 
    function To_Character (A : Ternary) return Character is
      (case A is when False => '0', when True => '1', when Unknown => '_');
-
-   generic
-      type Modular_Type is mod <>;
-   function To_Modular (A : Ternary_Array) return Modular_Type with
-     Pre => Modular_Type'Size >= A'Length;
 
    function To_String (A : Ternary_Array) return String;
 

@@ -158,29 +158,48 @@ procedure Day_17_2 is
         Iterate (1, Possible_Patterns (Outputs (Outputs'First + 0), 0 * 3));
    end Possible_Patterns;
 
-   Unused_CPU : constant CPU_Type     := Get_CPU (Standard_Input);
-   Program    : constant Number_Array := Get_Program (Standard_Input);
-   A, Min_A   : Register              := Register'Last;
-begin
-   Put_Line (Standard_Error, "Possible_Patterns:");
+   CPU     : constant CPU_Type     := Get_CPU (Standard_Input);
+   Program : constant Number_Array := Get_Program (Standard_Input);
 
-   for P of Possible_Patterns (Program) loop
-      Put_Line (Standard_Error, "Pattern  " & To_String (P)'Image);
-      Put_Line (Standard_Error, "Trim     " & To_String (Trim (P))'Image);
-      Put_Line
-        (Standard_Error,
-         "Disambig " & To_String (Disambiguate (Trim (P), False))'Image);
+   function Quine (Initial : Register) return Boolean is
+      Temp_CPU : CPU_Type := CPU;
+      Output   : Number;
+   begin
+      Temp_CPU.R (A) := Initial;
+      --  If program outputs itself instructions…
+      for I in Program'Range loop
+         if Temp_CPU.Run (Program, Output) then
+            if Output /= Program (I) then
+               return False;
+            end if;
+         else
+            return False;
+         end if;
+      end loop;
+      --  …and then halts.
+      return not Temp_CPU.Run (Program, Output);
+   end Quine;
+
+   Min_A : Register := Register'Last;
+
+   use Register_Text_IO;
+begin
+   for Pattern of Possible_Patterns (Program) loop
       begin
-         A     := To_Register (Disambiguate (Trim (P), False));
-         --  FIXME: The minimum value doesn't output the last 0 in the program.
-         Min_A := Register'Min (Min_A, A);
-         Put_Line (Standard_Error, "A " & A'Image & ", Min_A " & Min_A'Image);
+         declare
+            Initial_A : constant Register :=
+              To_Register (Disambiguate (Trim (Pattern), False));
+         begin
+            if Quine (Initial_A) and Initial_A < Min_A then
+               Min_A := Initial_A;
+            end if;
+         end;
       exception
          when Not_Unifiable_Error =>
             null;
       end;
-      New_Line (Standard_Error);
    end loop;
 
-   --  TODO
+   Put (Min_A, 0);
+   New_Line;
 end Day_17_2;

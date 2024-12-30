@@ -17,7 +17,7 @@ begin
    begin
       while CPU.Run (Program, Output) loop
          if not First then
-            Put(',');
+            Put (',');
          end if;
          Put (To_Character (Output));
          First := False;

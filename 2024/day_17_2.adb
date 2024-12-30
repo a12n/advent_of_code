@@ -1,6 +1,5 @@
 with Ada.Text_IO;    use Ada.Text_IO;
 with Advent.Day_17;  use Advent.Day_17;
-with Advent.Debug;   use Advent.Debug;
 with Advent.Ternary; use Advent.Ternary;
 with Advent;         use Advent;
 

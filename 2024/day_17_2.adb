@@ -160,18 +160,26 @@ procedure Day_17_2 is
 
    Unused_CPU : constant CPU_Type     := Get_CPU (Standard_Input);
    Program    : constant Number_Array := Get_Program (Standard_Input);
-   Min_A      : Register              := Register'Last;
+   A, Min_A   : Register              := Register'Last;
 begin
    Put_Line (Standard_Error, "Possible_Patterns:");
 
    for P of Possible_Patterns (Program) loop
+      Put_Line (Standard_Error, "Pattern  " & To_String (P)'Image);
+      Put_Line (Standard_Error, "Trim     " & To_String (Trim (P))'Image);
+      Put_Line
+        (Standard_Error,
+         "Disambig " & To_String (Disambiguate (Trim (P), False))'Image);
       begin
-         Min_A := Register'Min (Min_A, To_Register (Trim (P)));
-         Put_Line (Standard_Error, To_String (P)'Image & ", " & Min_A'Image);
+         A     := To_Register (Disambiguate (Trim (P), False));
+         --  FIXME: The minimum value doesn't output the last 0 in the program.
+         Min_A := Register'Min (Min_A, A);
+         Put_Line (Standard_Error, "A " & A'Image & ", Min_A " & Min_A'Image);
       exception
          when Not_Unifiable_Error =>
             null;
       end;
+      New_Line (Standard_Error);
    end loop;
 
    --  TODO

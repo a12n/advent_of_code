@@ -132,16 +132,36 @@ procedure Day_17_2 is
       end loop;
       return Buffer (1 .. Offset - 1);
    end Unify;
+
+   function Possible_Patterns
+     (Outputs : Number_Array) return Ambiguous_Register_Array
+   is
+      function Iterate
+        (I : Natural; Result : Ambiguous_Register_Array)
+         return Ambiguous_Register_Array
+      is
+      begin
+         if I = Outputs'Length then
+            return Result;
+         end if;
+         return
+           Iterate
+             (I + 1,
+              Unify
+                (Result,
+                   Possible_Patterns (Outputs (Outputs'First + I), I * 3)));
+      end Iterate;
+   begin
+      return
+        Iterate (1, Possible_Patterns (Outputs (Outputs'First + 0), 0 * 3));
+   end Possible_Patterns;
+
+   Unused_CPU : constant CPU_Type     := Get_CPU (Standard_Input);
+   Program    : constant Number_Array := Get_Program (Standard_Input);
 begin
    Put_Line (Standard_Error, "Possible_Patterns:");
-   for P of Unify
-     (Unify
-        (Unify
-           (Unify (Possible_Patterns (2, 0 * 3), Possible_Patterns (4, 1 * 3)),
-            Possible_Patterns (1, 2 * 3)),
-         Possible_Patterns (4, 3 * 3)),
-      Possible_Patterns (7, 4 * 3))
-   loop
+
+   for P of Possible_Patterns (Program) loop
       Put_Line (Standard_Error, To_String (P)'Image);
    end loop;
    --  TODO

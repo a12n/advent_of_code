@@ -1,5 +1,7 @@
-with Ada.Text_IO;   use Ada.Text_IO;
-with Advent.Day_21; use Advent.Day_21;
+with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
+with Ada.Text_IO;         use Ada.Text_IO;
+with Advent.Day_21;       use Advent.Day_21;
+with Advent.Debug;        use Advent.Debug;
 
 procedure Day_21_2 is
    Total : Natural := 0;
@@ -54,44 +56,68 @@ procedure Day_21_2 is
 
    use type Numeric.Key_Type;
 begin
-   Put_Line (Standard_Error, "(case From is");
-   for From in Numeric.Key_Type'Range loop
-      Put_Line (Standard_Error, "when " & From'Image & " => (case To is");
-
-      for To in Numeric.Key_Type'Range loop
-         Put
-           (Standard_Error,
-            Character'Val (9) & "when " & To'Image & " => " &
-            Directional.To_String (Min_Translate_Path (From, To))'Image);
-
-         if To < Numeric.Key_Type'Last then
-            Put (Standard_Error, ',');
-         end if;
-         New_Line (Standard_Error);
-      end loop;
-
-      if From < Numeric.Key_Type'Last then
-         Put_Line (Standard_Error, "),");
-      else
-         Put_Line (Standard_Error, ")");
-      end if;
-   end loop;
-   Put_Line (Standard_Error, ")");
-
-   --  for A in Numeric.Digit_Key_Type'Range loop
-   --     for B in Numeric.Digit_Key_Type'Range loop
-   --        for C in Numeric.Digit_Key_Type'Range loop
-   --           declare
-   --              Code : constant Numeric.Code_Type     := [A, B, C, 'A'];
-   --              Keys : constant Directional.Key_Array :=
-   --                Translate (Translate (Translate (Code)));
-   --              Dist : constant Natural := Directional.Distance (Keys);
-   --           begin
-   --              Put_Line (Numeric.To_String (Code) & Dist'Image);
-   --              Total := Total + Dist;
-   --           end;
-   --        end loop;
+   --  Put_Line (Standard_Error, "(case From is");
+   --  for From in Numeric.Key_Type'Range loop
+   --     Put_Line (Standard_Error, "when " & From'Image & " => (case To is");
+   --
+   --     for To in Numeric.Key_Type'Range loop
+   --        Put
+   --          (Standard_Error,
+   --           Character'Val (9) & "when " & To'Image & " => " &
+   --           Directional.To_String (Min_Translate_Path (From, To))'Image);
+   --
+   --        if To < Numeric.Key_Type'Last then
+   --           Put (Standard_Error, ',');
+   --        end if;
+   --        New_Line (Standard_Error);
    --     end loop;
+   --
+   --     if From < Numeric.Key_Type'Last then
+   --        Put_Line (Standard_Error, "),");
+   --     else
+   --        Put_Line (Standard_Error, ")");
+   --     end if;
    --  end loop;
-   Put_Line (Total'Image);
+   --  Put_Line (Standard_Error, ")");
+   loop
+      declare
+         Code : constant Numeric.Code_Type     :=
+           Numeric.Get_Code (Standard_Input);
+         N    : constant Natural               := Numeric.To_Number (Code);
+         Keys : constant Directional.Key_Array :=
+         --  You (directional keypad)
+         Translate (
+         --  Robot 1 (directional keypad)
+         Translate (
+         --  Robot 2 (directional keypad)
+         Translate (
+         --  Robot 3 (directional keypad)
+         Translate (
+         --  Robot 4 (directional keypad)
+         Translate (
+         --  Robot 5 (directional keypad)
+         Translate (
+         --  Robot 6 (directional keypad)
+         Translate (
+         --  Robot 7 (directional keypad)
+         Translate (
+         --  Robot 8 (directional keypad)
+         Translate (
+         --  Robot 9 (directional keypad)
+         Translate (
+         --  Robot 10 (directional keypad)
+         Translate (
+         --  Robot (numeric keypad)
+         Code)))))))))));
+      begin
+         if Debug_Enabled then
+            Put_Line (Standard_Error, "N " & N'Image);
+         end if;
+         Total := Total + N * Keys'Length;
+      end;
+   end loop;
+exception
+   when End_Error =>
+      Put (Total, 0);
+      New_Line;
 end Day_21_2;

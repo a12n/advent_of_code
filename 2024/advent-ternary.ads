@@ -28,12 +28,21 @@ package Advent.Ternary is
 
    function To_Character (A : Ternary) return Character is
      (case A is when False => '0', when True => '1', when Unknown => '_');
+
+   generic
+      type Modular_Type is mod <>;
+   function To_Modular (A : Ternary_Array) return Modular_Type with
+     Pre => Modular_Type'Size >= A'Length;
+
    function To_String (A : Ternary_Array) return String;
+
    function To_Ternary (C : Character) return Ternary is
      (case C is when '0' | 'F' | '.' => False, when '1' | 'T' | '#' => True,
         when '?' | '-' | '_' => Unknown,
         when others => raise Constraint_Error);
+
    function To_Ternary_Array (S : String) return Ternary_Array;
+
    function To_Ternary_Array
      (S : String; N : Positive; Shift_In : Ternary := False)
       return Ternary_Array with

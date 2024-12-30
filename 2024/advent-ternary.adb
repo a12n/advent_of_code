@@ -71,6 +71,24 @@ package body Advent.Ternary is
       end return;
    end Shift_Right;
 
+   function To_Modular (A : Ternary_Array) return Modular_Type is
+      N : Modular_Type := 0;
+      K : Modular_Type := 1;            --  2**0
+   begin
+      for I in A'Range loop
+         case A (I) is
+            when False =>
+               null;
+            when True =>
+               N := N or K;
+            when Unknown =>
+               raise Constraint_Error;
+         end case;
+         K := K * 2;
+      end loop;
+      return N;
+   end To_Modular;
+
    function To_String (A : Ternary_Array) return String is
    begin
       return S : String (1 .. A'Length) do

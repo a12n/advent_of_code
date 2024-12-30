@@ -130,6 +130,7 @@ package body Advent.Day_21 is
            (Standard_Error,
             Directional.To_String (Result (1 .. Offset - 1))'Image &
             Result (1 .. Offset - 1)'Length'Image);
+         New_Line (Standard_Error);
       end if;
 
       return Result (1 .. Offset - 1);
@@ -217,6 +218,7 @@ package body Advent.Day_21 is
            (Standard_Error,
             Directional.To_String (Result (1 .. Offset - 1))'Image &
             Result (1 .. Offset - 1)'Length'Image);
+         New_Line (Standard_Error);
       end if;
 
       return Result (1 .. Offset - 1);

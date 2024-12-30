@@ -48,6 +48,10 @@ package Advent.Ternary is
       return Ternary_Array with
      Pre => N >= S'Length;
 
+   --  Remove any leading Unknown digits from the most significant
+   --  digit side.
+   function Trim (A : Ternary_Array) return Ternary_Array;
+
    Not_Unifiable_Error : exception;
 
    function Unify (A, B : Ternary) return Ternary is

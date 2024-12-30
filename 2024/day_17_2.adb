@@ -134,7 +134,14 @@ procedure Day_17_2 is
    end Unify;
 begin
    Put_Line (Standard_Error, "Possible_Patterns:");
-   for P of Possible_Patterns (2#011#) loop
+   for P of Unify
+     (Unify
+        (Unify
+           (Unify (Possible_Patterns (2, 0 * 3), Possible_Patterns (4, 1 * 3)),
+            Possible_Patterns (1, 2 * 3)),
+         Possible_Patterns (4, 3 * 3)),
+      Possible_Patterns (7, 4 * 3))
+   loop
       Put_Line (Standard_Error, To_String (P)'Image);
    end loop;
    --  TODO

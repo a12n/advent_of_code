@@ -11,6 +11,8 @@ procedure Day_17_2 is
    type Ambiguous_Register_Array is
      array (Positive range <>) of Ambiguous_Register;
 
+   function To_Register is new To_Modular (Register);
+
    function From_String (S : String) return Ambiguous_Register is
       R : constant Ambiguous_Register := To_Ternary_Array (S, Size, Unknown);
    begin
@@ -158,11 +160,19 @@ procedure Day_17_2 is
 
    Unused_CPU : constant CPU_Type     := Get_CPU (Standard_Input);
    Program    : constant Number_Array := Get_Program (Standard_Input);
+   Min_A      : Register              := Register'Last;
 begin
    Put_Line (Standard_Error, "Possible_Patterns:");
 
    for P of Possible_Patterns (Program) loop
-      Put_Line (Standard_Error, To_String (P)'Image);
+      begin
+         Min_A := Register'Min (Min_A, To_Register (Trim (P)));
+         Put_Line (Standard_Error, To_String (P)'Image & ", " & Min_A'Image);
+      exception
+         when Not_Unifiable_Error =>
+            null;
+      end;
    end loop;
+
    --  TODO
 end Day_17_2;

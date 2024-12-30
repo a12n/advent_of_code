@@ -6,9 +6,7 @@ package body Advent.Day_17 is
    begin
       for I in Numbers'Range loop
          --  TODO: Check ','
-         Numbers (I) :=
-           Character'Pos (Chars (Chars'First + 2 * I - 2)) -
-           Character'Pos ('0');
+         Numbers (I) := To_Number (Chars (Chars'First + 2 * I - 2));
       end loop;
       return Numbers;
    end From_String;
@@ -72,7 +70,8 @@ package body Advent.Day_17 is
       while I <= Program'Last loop
          Put
            (File,
-            Natural'Image (I - 1) & ": [" & Program (I)'Image & Program (I + 1)'Image & " ] ");
+            Natural'Image (I - 1) & ": [" & Program (I)'Image &
+            Program (I + 1)'Image & " ] ");
          case Program (I) is
             when 0 =>
                Put_Line (File, "a = a >>" & Combo (Program (I + 1)));
@@ -171,8 +170,7 @@ package body Advent.Day_17 is
       Chars : String (1 .. 2 * Numbers'Length - 1) := [others => ','];
    begin
       for I in Numbers'Range loop
-         Chars (2 * I - 1) :=
-           Character'Val (Character'Pos ('0') + Numbers (I));
+         Chars (2 * I - 1) := To_Character (Numbers (I));
       end loop;
       return Chars;
    end To_String;

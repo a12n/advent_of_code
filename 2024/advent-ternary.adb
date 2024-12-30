@@ -82,7 +82,7 @@ package body Advent.Ternary is
             when True =>
                N := N or K;
             when Unknown =>
-               raise Constraint_Error;
+               raise Not_Unifiable_Error;
          end case;
          K := K * 2;
       end loop;

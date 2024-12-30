@@ -5,45 +5,30 @@ with Advent.Ternary; use Advent.Ternary;
 with Advent;         use Advent;
 
 procedure Day_17_2 is
-   Size : constant := 63;
-
-   subtype Ambiguous_Register is Ternary_Array (0 .. Size - 1);
+   subtype Ambiguous_Register is Ternary_Array (0 .. Register'Size - 1);
    type Ambiguous_Register_Array is
      array (Positive range <>) of Ambiguous_Register;
 
-   function To_Register is new To_Modular (Register);
+   --  Convert to/from Register type.
+   function To_Register is new Generic_To_Modular (Register);
 
-   function From_String (S : String) return Ambiguous_Register is
-      R : constant Ambiguous_Register := To_Ternary_Array (S, Size, Unknown);
+   --  Convert from 3 bit Number type.
+   function From_Number (N : Number) return Ambiguous_Register is
    begin
-      if Debug_Enabled then
-         Put_Line
-           (Standard_Error,
-            "String " & S'Image & " => " & To_String (R)'Image);
-      end if;
-      return R;
-   end From_String;
-
-   function From_Number
-     (N : Number; I : Natural := 0) return Ambiguous_Register
-   is
-      R : Ambiguous_Register := [others => Unknown];
-   begin
-      R (I)     := (if (N and 2#001#) /= 0 then True else False);
-      R (I + 1) := (if (N and 2#010#) /= 0 then True else False);
-      R (I + 2) := (if (N and 2#100#) /= 0 then True else False);
-
-      if Debug_Enabled then
-         Put_Line
-           (Standard_Error,
-            "Number    " & N'Image & " => " & To_String (R)'Image);
-      end if;
-
-      return R;
+      return
+        Ambiguous_Register'
+          [0     => (if (N and 2#001#) /= 0 then True else False),
+          1      => (if (N and 2#010#) /= 0 then True else False),
+          2      => (if (N and 2#100#) /= 0 then True else False),
+          others => Unknown];
    end From_Number;
 
+   --  Convert from String with Unknown values shifted-in.
+   function From_String (S : String) return Ambiguous_Register is
+     (To_Ternary_Array (S, Register'Size, Unknown));
+
    --  XXX: Only for specific puzzle input.
-   function Possible_Patterns
+   function Register_Patterns
      (Output : Number; I : Natural := 0) return Ambiguous_Register_Array
    is
       Buffer : Ambiguous_Register_Array (1 .. 8);
@@ -52,68 +37,68 @@ procedure Day_17_2 is
       Buffer (Offset) :=
         Unify
           (Shift_Left (From_String ("000"), I, Unknown),
-           From_Number (2#000# xor Output, I + 4));
+           Shift_Left (From_Number (2#000# xor Output), I + 4, Unknown));
       Offset          := Offset + 1;
 
       Buffer (Offset) :=
         Unify
           (Shift_Left (From_String ("001"), I, Unknown),
-           From_Number (2#001# xor Output, I + 5));
+           Shift_Left (From_Number (2#001# xor Output), I + 5, Unknown));
       Offset          := Offset + 1;
 
       Buffer (Offset) :=
         Unify
           (Shift_Left (From_String ("010"), I, Unknown),
-           From_Number (2#010# xor Output, I + 6));
+           Shift_Left (From_Number (2#010# xor Output), I + 6, Unknown));
       Offset          := Offset + 1;
 
       Buffer (Offset) :=
         Unify
           (Shift_Left (From_String ("011"), I, Unknown),
-           From_Number (2#011# xor Output, I + 7));
+           Shift_Left (From_Number (2#011# xor Output), I + 7, Unknown));
       Offset          := Offset + 1;
 
       begin
          Buffer (Offset) :=
            Unify
              (Shift_Left (From_String ("100"), I, Unknown),
-              From_Number (2#100# xor Output, I + 0));
+              Shift_Left (From_Number (2#100# xor Output), I + 0, Unknown));
          Offset          := Offset + 1;
       exception
          when Not_Unifiable_Error =>
-            Put_Line (Standard_Error, "Not_Unifiable_Error");
+            null;
       end;
 
       begin
          Buffer (Offset) :=
            Unify
              (Shift_Left (From_String ("101"), I, Unknown),
-              From_Number (2#101# xor Output, I + 1));
+              Shift_Left (From_Number (2#101# xor Output), I + 1, Unknown));
          Offset          := Offset + 1;
       exception
          when Not_Unifiable_Error =>
-            Put_Line (Standard_Error, "Not_Unifiable_Error");
+            null;
       end;
 
       begin
          Buffer (Offset) :=
            Unify
              (Shift_Left (From_String ("110"), I, Unknown),
-              From_Number (2#110# xor Output, I + 2));
+              Shift_Left (From_Number (2#110# xor Output), I + 2, Unknown));
          Offset          := Offset + 1;
       exception
          when Not_Unifiable_Error =>
-            Put_Line (Standard_Error, "Not_Unifiable_Error");
+            null;
       end;
 
       Buffer (Offset) :=
         Unify
           (Shift_Left (From_String ("111"), I, Unknown),
-           From_Number (2#111# xor Output, I + 3));
+           Shift_Left (From_Number (2#111# xor Output), I + 3, Unknown));
       Offset          := Offset + 1;
 
       return Buffer (1 .. Offset - 1);
-   end Possible_Patterns;
+   end Register_Patterns;
 
    function Unify
      (A, B : Ambiguous_Register_Array) return Ambiguous_Register_Array
@@ -135,7 +120,7 @@ procedure Day_17_2 is
       return Buffer (1 .. Offset - 1);
    end Unify;
 
-   function Possible_Patterns
+   function Register_Patterns
      (Outputs : Number_Array) return Ambiguous_Register_Array
    is
       function Iterate
@@ -151,12 +136,12 @@ procedure Day_17_2 is
              (I + 1,
               Unify
                 (Result,
-                   Possible_Patterns (Outputs (Outputs'First + I), I * 3)));
+                   Register_Patterns (Outputs (Outputs'First + I), I * 3)));
       end Iterate;
    begin
       return
-        Iterate (1, Possible_Patterns (Outputs (Outputs'First + 0), 0 * 3));
-   end Possible_Patterns;
+        Iterate (1, Register_Patterns (Outputs (Outputs'First + 0), 0 * 3));
+   end Register_Patterns;
 
    CPU     : constant CPU_Type     := Get_CPU (Standard_Input);
    Program : constant Number_Array := Get_Program (Standard_Input);
@@ -184,7 +169,7 @@ procedure Day_17_2 is
 
    use Register_Text_IO;
 begin
-   for Pattern of Possible_Patterns (Program) loop
+   for Pattern of Register_Patterns (Program) loop
       begin
          declare
             Initial_A : constant Register :=

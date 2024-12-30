@@ -129,7 +129,7 @@ package body Advent.Ternary is
    function Trim (A : Ternary_Array) return Ternary_Array is
       Last : Natural := A'Last;
    begin
-      while A (Last) = Unknown loop
+      while A (Last) = False or A (Last) = Unknown loop
          Last := Last - 1;
       end loop;
       return A (A'First .. Last);

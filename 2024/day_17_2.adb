@@ -40,6 +40,7 @@ procedure Day_17_2 is
       return R;
    end From_Number;
 
+   --  XXX: Only for specific puzzle input.
    function Possible_Patterns
      (Output : Number; I : Natural := 0) return Ambiguous_Register_Array
    is
@@ -49,25 +50,32 @@ procedure Day_17_2 is
       Buffer (Offset) :=
         Unify
           (Shift_Left (From_String ("000"), I, Unknown),
-           From_Number (2#000# xor Output, I => 4));
+           From_Number (2#000# xor Output, I + 4));
       Offset          := Offset + 1;
 
       Buffer (Offset) :=
-        Unify (From_String ("001"), From_Number (2#001# xor Output, I => 5));
+        Unify
+          (Shift_Left (From_String ("001"), I, Unknown),
+           From_Number (2#001# xor Output, I + 5));
       Offset          := Offset + 1;
 
       Buffer (Offset) :=
-        Unify (From_String ("010"), From_Number (2#010# xor Output, I => 6));
+        Unify
+          (Shift_Left (From_String ("010"), I, Unknown),
+           From_Number (2#010# xor Output, I + 6));
       Offset          := Offset + 1;
 
       Buffer (Offset) :=
-        Unify (From_String ("011"), From_Number (2#011# xor Output, I => 7));
+        Unify
+          (Shift_Left (From_String ("011"), I, Unknown),
+           From_Number (2#011# xor Output, I + 7));
       Offset          := Offset + 1;
 
       begin
          Buffer (Offset) :=
            Unify
-             (From_String ("100"), From_Number (2#100# xor Output, I => 0));
+             (Shift_Left (From_String ("100"), I, Unknown),
+              From_Number (2#100# xor Output, I + 0));
          Offset          := Offset + 1;
       exception
          when Not_Unifiable_Error =>
@@ -77,7 +85,8 @@ procedure Day_17_2 is
       begin
          Buffer (Offset) :=
            Unify
-             (From_String ("101"), From_Number (2#101# xor Output, I => 1));
+             (Shift_Left (From_String ("101"), I, Unknown),
+              From_Number (2#101# xor Output, I + 1));
          Offset          := Offset + 1;
       exception
          when Not_Unifiable_Error =>
@@ -87,7 +96,8 @@ procedure Day_17_2 is
       begin
          Buffer (Offset) :=
            Unify
-             (From_String ("110"), From_Number (2#110# xor Output, I => 2));
+             (Shift_Left (From_String ("110"), I, Unknown),
+              From_Number (2#110# xor Output, I + 2));
          Offset          := Offset + 1;
       exception
          when Not_Unifiable_Error =>
@@ -95,7 +105,9 @@ procedure Day_17_2 is
       end;
 
       Buffer (Offset) :=
-        Unify (From_String ("111"), From_Number (2#111# xor Output, I => 3));
+        Unify
+          (Shift_Left (From_String ("111"), I, Unknown),
+           From_Number (2#111# xor Output, I + 3));
       Offset          := Offset + 1;
 
       return Buffer (1 .. Offset - 1);

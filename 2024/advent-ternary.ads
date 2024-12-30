@@ -2,6 +2,7 @@ package Advent.Ternary is
    pragma Pure;
 
    type Ternary is (False, True, Unknown);
+   subtype Known_Ternary is Ternary range False .. True;
 
    --  Least significant digit is at 'First, and the most significant
    --  one at 'Last.
@@ -17,6 +18,8 @@ package Advent.Ternary is
    function "not" (A : Ternary_Array) return Ternary_Array;
    function "or" (A, B : Ternary_Array) return Ternary_Array;
    function "xor" (A, B : Ternary_Array) return Ternary_Array;
+
+   function Disambiguate (A : Ternary_Array; B : Known_Ternary) return Ternary_Array;
 
    function Shift_Left
      (A : Ternary_Array; N : Natural; Shift_In : Ternary := False)

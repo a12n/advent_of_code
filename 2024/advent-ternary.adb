@@ -35,6 +35,17 @@ package body Advent.Ternary is
    function Unify (A, B : Ternary_Array) return Ternary_Array renames
      Unify_Array;
 
+   function Disambiguate
+     (A : Ternary_Array; B : Known_Ternary) return Ternary_Array
+   is
+   begin
+      return R : Ternary_Array (A'Range) do
+         for I in R'Range loop
+            R (I) := (if A (I) in Known_Ternary'Range then A (I) else B);
+         end loop;
+      end return;
+   end Disambiguate;
+
    function Shift_Left
      (A : Ternary_Array; N : Natural; Shift_In : Ternary := False)
       return Ternary_Array

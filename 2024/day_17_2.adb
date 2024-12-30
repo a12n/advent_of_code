@@ -1,78 +1,129 @@
-with Ada.Text_IO;   use Ada.Text_IO;
-with Advent.Day_17; use Advent.Day_17;
-with Advent;        use Advent;
-with Interfaces;    use Interfaces;
+with Ada.Text_IO;    use Ada.Text_IO;
+with Advent.Day_17;  use Advent.Day_17;
+with Advent.Debug;   use Advent.Debug;
+with Advent.Ternary; use Advent.Ternary;
+with Advent;         use Advent;
 
 procedure Day_17_2 is
-   use Register_Text_IO;
-   Initial : constant CPU_Type     := Get_CPU (Standard_Input);
-   Program : constant Number_Array := Get_Program (Standard_Input);
-   Answer  : Unsigned_64           := 0;
+   Size : constant := 63;
 
-   function Compiled
-     (CPU : in out CPU_Type; Output : out Number) return Boolean
-   is
+   subtype Ambiguous_Register is Ternary_Array (0 .. Size - 1);
+   type Ambiguous_Register_Array is
+     array (Positive range <>) of Ambiguous_Register;
+
+   function From_String (S : String) return Ambiguous_Register is
+      R : constant Ambiguous_Register := To_Ternary_Array (S, Size, Unknown);
    begin
-      CPU.R (B) := CPU.R (A) and 2#111#;
-      CPU.R (B) := CPU.R (B) xor 4;
-      CPU.R (C) :=
-        Register (Shift_Right (Unsigned_64 (CPU.R (A)), Natural (CPU.R (B))));
-      CPU.R (B) := CPU.R (B) xor CPU.R (C);
-      CPU.R (B) := CPU.R (B) xor 4;
-      Output    := Number (CPU.R (B) and 2#111#);
-      CPU.R (A) := Register (Shift_Right (Unsigned_64 (CPU.R (A)), 3));
-      return CPU.R (A) /= 0;
-   end Compiled;
-begin
-   Print (Standard_Error, Program);
-   for Value in
-      --  0
-      --  2             2#______________________________10#
-      --  251           2#________________________11111011#
-      --  1_538         2#_____________________11000000010#
-      --  214_267       2#______________110100010011111011#
-      --  218_363       2#______________110101010011111011#
-      --  460_290       2#_____________1110000011000000010#
-      --  42_403_330    2#______10100001110000011000000010#
-      --  115_803_650   2#_____110111001110000011000000010#
-      --  518_456_834   2#___11110111001110000011000000010#
-      --  4_276_553_218 2#11111110111001110000011000000010#
-      4_276_553_218 .. Register'Last loop
-      declare
-         CPU    : CPU_Type := Initial;
-         Output : Number;
+      if Debug_Enabled then
+         Put_Line
+           (Standard_Error,
+            "String " & S'Image & " => " & To_String (R)'Image);
+      end if;
+      return R;
+   end From_String;
+
+   function From_Number
+     (N : Number; I : Natural := 0) return Ambiguous_Register
+   is
+      R : Ambiguous_Register := [others => Unknown];
+   begin
+      R (I)     := (if (N and 2#001#) /= 0 then True else False);
+      R (I + 1) := (if (N and 2#010#) /= 0 then True else False);
+      R (I + 2) := (if (N and 2#100#) /= 0 then True else False);
+
+      if Debug_Enabled then
+         Put_Line
+           (Standard_Error,
+            "Number    " & N'Image & " => " & To_String (R)'Image);
+      end if;
+
+      return R;
+   end From_Number;
+
+   function Possible_Patterns
+     (Output : Number; I : Natural := 0) return Ambiguous_Register_Array
+   is
+      Buffer : Ambiguous_Register_Array (1 .. 8);
+      Offset : Positive := Buffer'First;
+   begin
+      Buffer (Offset) :=
+        Unify
+          (Shift_Left (From_String ("000"), I, Unknown),
+           From_Number (2#000# xor Output, I => 4));
+      Offset          := Offset + 1;
+
+      Buffer (Offset) :=
+        Unify (From_String ("001"), From_Number (2#001# xor Output, I => 5));
+      Offset          := Offset + 1;
+
+      Buffer (Offset) :=
+        Unify (From_String ("010"), From_Number (2#010# xor Output, I => 6));
+      Offset          := Offset + 1;
+
+      Buffer (Offset) :=
+        Unify (From_String ("011"), From_Number (2#011# xor Output, I => 7));
+      Offset          := Offset + 1;
+
       begin
-         CPU.R (A) := Register (Value);
-         if CPU.Run (Program, Output) and then Output = Program (1)
-           and then CPU.Run (Program, Output) and then Output = Program (2)
-           and then CPU.Run (Program, Output) and then Output = Program (3)
-           and then CPU.Run (Program, Output) and then Output = Program (4)
-           and then CPU.Run (Program, Output) and then Output = Program (5)
-           and then CPU.Run (Program, Output) and then Output = Program (6)
-           and then CPU.Run (Program, Output) and then Output = Program (7)
-           and then CPU.Run (Program, Output) and then Output = Program (8)
-           and then CPU.Run (Program, Output) and then Output = Program (9)
-           and then CPU.Run (Program, Output) and then Output = Program (10)
-            --  and then CPU.Run (Program, Output) and then Output = Program (11)
-            --  and then CPU.Run (Program, Output) and then Output = Program (12)
-            --  and then CPU.Run (Program, Output) and then Output = Program (13)
-            --  and then CPU.Run (Program, Output) and then Output = Program (14)
-            --  and then CPU.Run (Program, Output) and then Output = Program (15)
-            --  and then CPU.Run (Program, Output) and then Output = Program (16)
-
-         then
-            Put (Standard_Error, Register (Value), Base => 10);
-            Put (Standard_Error, ' ');
-            Put (Standard_Error, Register (Value), Base => 2, Width => 64);
-            New_Line (Standard_Error);
-
-            --  & Unsigned_64 (Value)'Image &
-            --                   Unsigned_64'Image (Unsigned_64 (Value) and 2#111#));
-            --  Answer :=
-            --    Shift_Left (Answer, 3) or (Unsigned_64 (V) and 2#111#);
-            --  exit;
-         end if;
+         Buffer (Offset) :=
+           Unify
+             (From_String ("100"), From_Number (2#100# xor Output, I => 0));
+         Offset          := Offset + 1;
+      exception
+         when Not_Unifiable_Error =>
+            Put_Line (Standard_Error, "Not_Unifiable_Error");
       end;
+
+      begin
+         Buffer (Offset) :=
+           Unify
+             (From_String ("101"), From_Number (2#101# xor Output, I => 1));
+         Offset          := Offset + 1;
+      exception
+         when Not_Unifiable_Error =>
+            Put_Line (Standard_Error, "Not_Unifiable_Error");
+      end;
+
+      begin
+         Buffer (Offset) :=
+           Unify
+             (From_String ("110"), From_Number (2#110# xor Output, I => 2));
+         Offset          := Offset + 1;
+      exception
+         when Not_Unifiable_Error =>
+            Put_Line (Standard_Error, "Not_Unifiable_Error");
+      end;
+
+      Buffer (Offset) :=
+        Unify (From_String ("111"), From_Number (2#111# xor Output, I => 3));
+      Offset          := Offset + 1;
+
+      return Buffer (1 .. Offset - 1);
+   end Possible_Patterns;
+
+   function Unify
+     (A, B : Ambiguous_Register_Array) return Ambiguous_Register_Array
+   is
+      Buffer : Ambiguous_Register_Array (1 .. A'Length * B'Length);
+      Offset : Positive := Buffer'First;
+   begin
+      for I in A'Range loop
+         for J in B'Range loop
+            begin
+               Buffer (Offset) := Unify (A (I), B (J));
+               Offset          := Offset + 1;
+            exception
+               when Not_Unifiable_Error =>
+                  null;
+            end;
+         end loop;
+      end loop;
+      return Buffer (1 .. Offset - 1);
+   end Unify;
+begin
+   Put_Line (Standard_Error, "Possible_Patterns:");
+   for P of Possible_Patterns (2#011#) loop
+      Put_Line (Standard_Error, To_String (P)'Image);
    end loop;
-   Put_Line (Standard_Error, Answer'Image);
+   --  TODO
 end Day_17_2;

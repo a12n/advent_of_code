@@ -260,4 +260,8 @@ package Advent.Day_21 is
    function Translate
      (Keys : Directional.Key_Array; Current : in out Directional.Key_Type)
       return Directional.Key_Array;
+
+   type Count_Type is range 0 .. 2**64;
+
+   package Count_Text_IO is new Ada.Text_IO.Integer_IO (Count_Type);
 end Advent.Day_21;

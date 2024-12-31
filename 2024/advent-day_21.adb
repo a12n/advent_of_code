@@ -240,13 +240,16 @@ package body Advent.Day_21 is
       for Times in 2 .. Max_Times loop
          for From in Directional.Key_Type'Range loop
             for To in Directional.Key_Type'Range loop
+               Table (Times, From, To) := 0;
                declare
                   Previous : Directional.Key_Type := 'A';
                begin
                   for Key of Translate (From, To) loop
                      --  TODO
-                     null;
-                     Previous := Key;
+                     Table (Times, From, To) :=
+                       @ +
+                       Count_Type (Directional.Distance (Previous, Key) + 1);
+                     Previous                := Key;
                   end loop;
                end;
             end loop;

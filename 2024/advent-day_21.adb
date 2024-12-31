@@ -223,4 +223,43 @@ package body Advent.Day_21 is
 
       return Result (1 .. Offset - 1);
    end Translate;
+
+   function Make_Table (Max_Times : Positive) return Translate_Table is
+      Table :
+        Translate_Table
+          (1 .. Max_Times, Directional.Key_Type'Range,
+           Directional.Key_Type'Range);
+   begin
+      for From in Directional.Key_Type'Range loop
+         for To in Directional.Key_Type'Range loop
+            Table (1, From, To) :=
+              Count_Type (Directional.Distance (From, To)) + 1;
+         end loop;
+      end loop;
+
+      for Times in 2 .. Max_Times loop
+         for From in Directional.Key_Type'Range loop
+            for To in Directional.Key_Type'Range loop
+               --  TODO
+               null;
+            end loop;
+         end loop;
+      end loop;
+
+      return Table;
+   end Make_Table;
+
+   function Translate_Length
+     (Translator : Translator_Type; Keys : Directional.Key_Array;
+      Times      : Positive := 1) return Count_Type
+   is
+      Length   : Count_Type           := 0;
+      Previous : Directional.Key_Type := 'A';
+   begin
+      for Key of Keys loop
+         Length   := Length + Translator.Table (Times, Previous, Key);
+         Previous := Key;
+      end loop;
+      return Length;
+   end Translate_Length;
 end Advent.Day_21;

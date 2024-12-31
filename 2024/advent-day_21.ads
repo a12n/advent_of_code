@@ -264,4 +264,25 @@ package Advent.Day_21 is
    type Count_Type is range 0 .. 2**64;
 
    package Count_Text_IO is new Ada.Text_IO.Integer_IO (Count_Type);
+
+   type Translator_Type (Max_Times : Positive) is limited private;
+
+   function Translate_Length
+     (Translator : Translator_Type; Keys : Directional.Key_Array;
+      Times      : Positive := 1) return Count_Type;
+
+private
+   type Translate_Table is
+     array
+       (Positive range <>, Directional.Key_Type range <>,
+        Directional.Key_Type range <>) of Count_Type;
+
+   function Make_Table (Max_Times : Positive) return Translate_Table;
+
+   type Translator_Type (Max_Times : Positive) is record
+      Table : Translate_Table
+        (1 .. Max_Times, Directional.Key_Type'Range,
+         Directional.Key_Type'Range) :=
+        Make_Table (Max_Times);
+   end record;
 end Advent.Day_21;

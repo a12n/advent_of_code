@@ -245,12 +245,12 @@ package body Advent.Day_21 is
                   Previous : Directional.Key_Type := 'A';
                begin
                   for Key of Translate (From, To) loop
-                     --  TODO
                      Table (Times, From, To) :=
-                       @ +
-                       Count_Type (Directional.Distance (Previous, Key) + 1);
+                       @ + Table (Times - 1, Previous, Key);
                      Previous                := Key;
                   end loop;
+                  Table (Times, From, To) :=
+                    @ + Table (Times - 1, Previous, 'A');
                end;
             end loop;
          end loop;

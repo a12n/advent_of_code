@@ -269,7 +269,8 @@ package Advent.Day_21 is
 
    function Translate_Length
      (Translator : Translator_Type; Keys : Directional.Key_Array;
-      Times      : Positive := 1) return Count_Type;
+      Times      : Positive := 1) return Count_Type with
+     Pre => (Times <= Translator.Max_Times);
 
 private
    type Translate_Table is

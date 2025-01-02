@@ -210,19 +210,19 @@ package Advent.Day_21 is
      (case From is
         when '0' =>
           (case To is when '0' => "", when '1' => "^<", when '2' => "^",
-             when '3' => ">^", when '4' => "^^<", when '5' => "^^",
-             when '6' => ">^^", when '7' => "^^^<", when '8' => "^^^",
-             when '9' => ">^^^", when 'A' => ">"),
+             when '3' => "^>", when '4' => "^^<", when '5' => "^^",
+             when '6' => "^^>", when '7' => "^^^<", when '8' => "^^^",
+             when '9' => "^^^>", when 'A' => ">"),
         when '1' =>
           (case To is when '0' => ">v", when '1' => "", when '2' => ">",
-             when '3' => ">>", when '4' => "^", when '5' => ">^",
-             when '6' => ">>^", when '7' => "^^", when '8' => ">^^",
-             when '9' => ">>^^", when 'A' => ">>v"),
+             when '3' => ">>", when '4' => "^", when '5' => "^>",
+             when '6' => "^>>", when '7' => "^^", when '8' => "^^>",
+             when '9' => "^^>>", when 'A' => ">>v"),
         when '2' =>
           (case To is when '0' => "v", when '1' => "<", when '2' => "",
              when '3' => ">", when '4' => "<^", when '5' => "^",
-             when '6' => ">^", when '7' => "<^^", when '8' => "^^",
-             when '9' => ">^^", when 'A' => "v>"),
+             when '6' => "^>", when '7' => "<^^", when '8' => "^^",
+             when '9' => "^^>", when 'A' => "v>"),
         when '3' =>
           (case To is when '0' => "<v", when '1' => "<<", when '2' => "<",
              when '3' => "", when '4' => "<<^", when '5' => "<^",
@@ -231,13 +231,13 @@ package Advent.Day_21 is
         when '4' =>
           (case To is when '0' => ">vv", when '1' => "v", when '2' => "v>",
              when '3' => "v>>", when '4' => "", when '5' => ">",
-             when '6' => ">>", when '7' => "^", when '8' => ">^",
-             when '9' => ">>^", when 'A' => ">>vv"),
+             when '6' => ">>", when '7' => "^", when '8' => "^>",
+             when '9' => "^>>", when 'A' => ">>vv"),
         when '5' =>
           (case To is when '0' => "vv", when '1' => "<v", when '2' => "v",
              when '3' => "v>", when '4' => "<", when '5' => "",
              when '6' => ">", when '7' => "<^", when '8' => "^",
-             when '9' => ">^", when 'A' => "vv>"),
+             when '9' => "^>", when 'A' => "vv>"),
         when '6' =>
           (case To is when '0' => "<vv", when '1' => "<<v", when '2' => "<v",
              when '3' => "v", when '4' => "<<", when '5' => "<",

@@ -301,6 +301,8 @@ package Advent.Day_21 is
       Times      : Positive := 1) return Count_Type with
      Pre => (Times <= Translator.Max_Times);
 
+   procedure Main (File : File_Type; Times : Natural);
+
 private
    type Translate_Table is
      array

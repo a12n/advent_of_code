@@ -30,14 +30,6 @@ package body Advent.Day_21 is
          return Code;
       end Get_Code;
 
-      function To_Bounded (Keys : Key_Array) return Bounded_Key_Array is
-      begin
-         return Result : Bounded_Key_Array do
-            Result.Length                      := Keys'Length;
-            Result.Elements (1 .. Keys'Length) := Keys;
-         end return;
-      end To_Bounded;
-
       function To_Number (Code : Code_Type) return Natural is
       begin
          return
@@ -73,15 +65,6 @@ package body Advent.Day_21 is
             end loop;
          end return;
       end Revert;
-
-      --  TODO: generic unconstrained to bounded function.
-      function To_Bounded (Keys : Key_Array) return Bounded_Key_Array is
-      begin
-         return Result : Bounded_Key_Array do
-            Result.Length                      := Keys'Length;
-            Result.Elements (1 .. Keys'Length) := Keys;
-         end return;
-      end To_Bounded;
 
       function To_String (Keys : Key_Array) return String is
       begin

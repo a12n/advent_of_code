@@ -12,13 +12,7 @@ package Advent.Day_21 is
    --      +---+---+
    package Numeric is
       type Key_Type is ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A');
-      type Key_Set is array (Key_Type) of Boolean;
       type Key_Array is array (Positive range <>) of Key_Type;
-      type Bounded_Key_Array is record
-         Length   : Natural := 0;
-         Elements : Key_Array (1 .. 8);
-      end record;
-      type Key_Array_List is array (Positive range <>) of Bounded_Key_Array;
 
       subtype Digit_Key_Type is Key_Type range '0' .. '9';
       subtype Code_Type is Key_Array (1 .. 4) with
@@ -90,8 +84,6 @@ package Advent.Day_21 is
              Character'Val (Key_Type'Pos (Key) + Character'Pos ('0')),
            when 'A' => 'A');
 
-      function To_Bounded (Keys : Key_Array) return Bounded_Key_Array;
-
       function To_Number (Code : Code_Type) return Natural with
         Post => To_Number'Result < 1_000;
 
@@ -105,13 +97,7 @@ package Advent.Day_21 is
    --  +---+---+---+
    package Directional is
       type Key_Type is ('v', '<', '>', '^', 'A');
-      type Key_Set is array (Key_Type) of Boolean;
       type Key_Array is array (Positive range <>) of Key_Type;
-      type Bounded_Key_Array is record
-         Length   : Natural := 0;
-         Elements : Key_Array (1 .. 32);
-      end record;
-      type Key_Array_List is array (Positive range <>) of Bounded_Key_Array;
 
       subtype Move_Key_Type is Key_Type range 'v' .. '^';
 
@@ -152,8 +138,6 @@ package Advent.Day_21 is
       function To_Character (Key : Key_Type) return Character is
         (case Key is when 'v' => 'v', when '<' => '<', when '>' => '>',
            when '^' => '^', when 'A' => 'A');
-
-      function To_Bounded (Keys : Key_Array) return Bounded_Key_Array;
 
       function To_String (Keys : Key_Array) return String;
    end Directional;

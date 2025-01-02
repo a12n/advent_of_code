@@ -26,14 +26,14 @@ package Advent.Day_21 is
            (for all I in 1 .. 3 => Code_Type (I) in '0' .. '9') and
            Code_Type (4) = 'A';
 
-      function Adjacent (Key : Key_Type) return Key_Array is
+      function Adjacent_Keys (Key : Key_Type) return Key_Array is
         (case Key is when '0' => "2A", when '1' => "24", when '2' => "0135",
            when '3' => "26A", when '4' => "157", when '5' => "2468",
            when '6' => "359", when '7' => "48", when '8' => "579",
            when '9' => "68", when 'A' => "03");
 
       function Adjacent (From, To : Key_Type) return Boolean is
-        (for some Key of Adjacent (From) => Key = To);
+        (for some Key of Adjacent_Keys (From) => Key = To);
 
       function Distance (From, To : Key_Type) return Natural is
         (case From is
@@ -115,12 +115,12 @@ package Advent.Day_21 is
 
       subtype Move_Key_Type is Key_Type range 'v' .. '^';
 
-      function Adjacent (Key : Key_Type) return Key_Array is
+      function Adjacent_Keys (Key : Key_Type) return Key_Array is
         (case Key is when 'v' => "<>^", when '<' => "v", when '>' => "vA",
            when '^' => "vA", when 'A' => ">^");
 
       function Adjacent (From, To : Key_Type) return Boolean is
-        (for some Key of Adjacent (From) => Key = To);
+        (for some Key of Adjacent_Keys (From) => Key = To);
 
       function Distance (From, To : Key_Type) return Natural is
         (case From is

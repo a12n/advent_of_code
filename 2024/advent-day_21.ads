@@ -266,44 +266,24 @@ package Advent.Day_21 is
 
    --  Button presses needed on the corresponding directional keypad
    --  to move on the second order directional keypad.
-   function New_Translate
-     (From, To : Directional.Key_Type) return Directional.Key_Array is (
-       case From is
-          when 'v' =>
-             (case To is
-               when 'v' => "",
-                when '<' => "<",
-                when '>' => ">",
-                when '^' => "^",
-                when 'A' => ""),
-          when '<' =>
-             (case To is
-               when 'v' => "",
-                when '<' => "",
-                when '>' => "",
-                when '^' => "",
-                when 'A' => ""),
-          when '>' =>
-             (case To is
-               when 'v' => "",
-                when '<' => "",
-                when '>' => "",
-                when '^' => "",
-                when 'A' => ""),
-          when '^' =>
-             (case To is
-               when 'v' => "",
-                when '<' => "",
-                when '>' => "",
-                when '^' => "",
-                when 'A' => ""),
-          when 'A' =>
-             (case To is
-               when 'v' => "",
-                when '<' => "",
-                when '>' => "",
-                when '^' => "",
-                when 'A' => ""));
+   function Translate
+     (From, To : Directional.Key_Type) return Directional.Key_Array is
+     (case From is
+        when 'v' =>
+          (case To is when 'v' => "", when '<' => "<", when '>' => ">",
+             when '^' => "^", when 'A' => "^>"),
+        when '<' =>
+          (case To is when 'v' => ">", when '<' => "", when '>' => ">>",
+             when '^' => ">^", when 'A' => ">>^"),
+        when '>' =>
+          (case To is when 'v' => "<", when '<' => "<<", when '>' => "",
+             when '^' => "<^", when 'A' => "^"),
+        when '^' =>
+          (case To is when 'v' => "v", when '<' => "v<", when '>' => "v>",
+             when '^' => "", when 'A' => ">"),
+        when 'A' =>
+          (case To is when 'v' => "<v", when '<' => "v<<", when '>' => "v",
+             when '^' => "<", when 'A' => ""));
 
    function Translate (Keys : Numeric.Key_Array) return Directional.Key_Array;
 

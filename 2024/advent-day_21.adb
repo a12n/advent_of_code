@@ -137,50 +137,6 @@ package body Advent.Day_21 is
    end Translate;
 
    function Translate
-     (From, To : Directional.Key_Type) return Directional.Key_Array
-   is
-      use type Directional.Key_Type;
-   begin
-      if From = To then
-         return "";
-      elsif From > To then
-         return Directional.Revert (Translate (From => To, To => From));
-      end if;
-
-      case Directional.Key_Array'[From, To] is
-         when "v<" =>
-            return "<";
-         when "v>" =>
-            return ">";
-         when "v^" =>
-            return "^";
-         when "vA" =>
-            return "^>";
-            --  return ">^";
-
-         when "<>" =>
-            return ">>";
-         when "<^" =>
-            return ">^";
-         when "<A" =>
-            return ">>^";
-            --  return ">^>";
-
-         when ">^" =>
-            return "^<";
-            --  return "<^";
-         when ">A" =>
-            return "^";
-
-         when "^A" =>
-            return ">";
-
-         when others =>
-            raise Constraint_Error with "Invalid directional key translation";
-      end case;
-   end Translate;
-
-   function Translate
      (Keys : Directional.Key_Array; Current : in out Directional.Key_Type)
       return Directional.Key_Array
    is

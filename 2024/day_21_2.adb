@@ -1,5 +1,6 @@
 with Ada.Text_IO;   use Ada.Text_IO;
 with Advent.Day_21; use Advent.Day_21;
+with Advent.Debug;  use Advent.Debug;
 
 procedure Day_21_2 is
    use Count_Text_IO;
@@ -16,6 +17,12 @@ begin
          Length : constant Count_Type            :=
            Translate_Length (Translator, Keys, 25);
       begin
+         if Debug_Enabled then
+            Put_Line
+              (Standard_Error,
+               "Keys " & Directional.To_String (Keys)'Image & ", Length " &
+               Length'Image);
+         end if;
          Total := Total + Count_Type (N) * Length;
       end;
    end loop;

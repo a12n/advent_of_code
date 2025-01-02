@@ -93,13 +93,6 @@ package body Advent.Day_21 is
       end To_String;
    end Directional;
 
-   function Translate (Keys : Numeric.Key_Array) return Directional.Key_Array
-   is
-      Current : Numeric.Key_Type := 'A';
-   begin
-      return Translate (Keys, Current);
-   end Translate;
-
    function Translate
      (Keys : Numeric.Key_Array; Current : in out Numeric.Key_Type)
       return Directional.Key_Array
@@ -134,6 +127,13 @@ package body Advent.Day_21 is
       end if;
 
       return Result (1 .. Offset - 1);
+   end Translate;
+
+   function Translate (Keys : Numeric.Key_Array) return Directional.Key_Array
+   is
+      Current : Numeric.Key_Type := 'A';
+   begin
+      return Translate (Keys, Current);
    end Translate;
 
    function Translate
@@ -181,14 +181,6 @@ package body Advent.Day_21 is
    end Translate;
 
    function Translate
-     (Keys : Directional.Key_Array) return Directional.Key_Array
-   is
-      Current : Directional.Key_Type := 'A';
-   begin
-      return Translate (Keys, Current);
-   end Translate;
-
-   function Translate
      (Keys : Directional.Key_Array; Current : in out Directional.Key_Type)
       return Directional.Key_Array
    is
@@ -222,6 +214,14 @@ package body Advent.Day_21 is
       end if;
 
       return Result (1 .. Offset - 1);
+   end Translate;
+
+   function Translate
+     (Keys : Directional.Key_Array) return Directional.Key_Array
+   is
+      Current : Directional.Key_Type := 'A';
+   begin
+      return Translate (Keys, Current);
    end Translate;
 
    function Make_Table (Max_Times : Positive) return Translate_Table is

@@ -246,9 +246,6 @@ package Advent.Day_21 is
              when '9' => "^^^", when 'A' => ""));
 
    function Translate (Keys : Numeric.Key_Array) return Directional.Key_Array;
-   function Translate
-     (Keys : Numeric.Key_Array; Current : in out Numeric.Key_Type)
-      return Directional.Key_Array;
 
    --  Button presses needed on the corresponding directional keypad
    --  to move on the second order directional keypad.
@@ -257,9 +254,6 @@ package Advent.Day_21 is
      Post => Translate'Result'Length <= 3;
    function Translate
      (Keys : Directional.Key_Array) return Directional.Key_Array;
-   function Translate
-     (Keys : Directional.Key_Array; Current : in out Directional.Key_Type)
-      return Directional.Key_Array;
 
    type Count_Type is range 0 .. 2**64;
 

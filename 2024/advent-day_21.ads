@@ -108,7 +108,7 @@ package Advent.Day_21 is
       type Key_Set is array (Key_Type) of Boolean;
       type Key_Array is array (Positive range <>) of Key_Type;
       type Bounded_Key_Array is record
-         Length   : Natural;
+         Length   : Natural := 0;
          Elements : Key_Array (1 .. 32);
       end record;
       type Key_Array_List is array (Positive range <>) of Bounded_Key_Array;

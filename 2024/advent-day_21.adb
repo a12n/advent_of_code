@@ -57,15 +57,6 @@ package body Advent.Day_21 is
          end return;
       end Distance;
 
-      function Revert (Keys : Key_Array) return Key_Array is
-      begin
-         return Result : Key_Array (Keys'Range) do
-            for I in Keys'Range loop
-               Result (Result'Last - (I - Keys'First)) := Revert (Keys (I));
-            end loop;
-         end return;
-      end Revert;
-
       function To_String (Keys : Key_Array) return String is
       begin
          return Result : String (Keys'Range) do

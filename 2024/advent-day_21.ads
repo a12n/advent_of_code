@@ -128,13 +128,6 @@ package Advent.Day_21 is
 
       function Distance (Keys : Key_Array) return Natural;
 
-      function Revert (Key : Key_Type) return Key_Type is
-        (case Key is when 'v' => '^', when '<' => '>', when '>' => '<',
-           when '^' => 'v', when 'A' => 'A');
-
-      function Revert (Keys : Key_Array) return Key_Array with
-        Post => Revert'Result'Length = Keys'Length;
-
       function To_Character (Key : Key_Type) return Character is
         (case Key is when 'v' => 'v', when '<' => '<', when '>' => '>',
            when '^' => '^', when 'A' => 'A');

@@ -181,6 +181,23 @@ package Advent.Day_21 is
              when '6' => '9', when 'A' => '3',
              when others => raise Constraint_Error));
 
+   function Move
+     (Key : Directional.Key_Type; Dir : Directional.Move_Key_Type)
+      return Directional.Key_Type is
+     (case Dir is
+        when 'v' =>
+          (case Key is when '^' => 'v', when 'A' => '>',
+             when others => raise Constraint_Error),
+        when '<' =>
+          (case Key is when 'v' => '<', when '>' => 'v', when 'A' => '^',
+             when others => raise Constraint_Error),
+        when '>' =>
+          (case Key is when 'v' => '>', when '<' => 'v', when '^' => 'A',
+             when others => raise Constraint_Error),
+        when '^' =>
+          (case Key is when 'v' => '^', when '>' => 'A',
+             when others => raise Constraint_Error));
+
    --  Button presses needed on the corresponding directional keypad
    --  to move from one button to another on the numeric keypad.
    --

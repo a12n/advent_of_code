@@ -262,13 +262,49 @@ package Advent.Day_21 is
              when '6' => "^^", when '7' => "^^^<<", when '8' => "<^^^",
              when '9' => "^^^", when 'A' => ""));
 
-   function Translate (Keys : Numeric.Key_Array) return Directional.Key_Array;
-
    --  Button presses needed on the corresponding directional keypad
    --  to move on the second order directional keypad.
-   function Translate
-     (From, To : Directional.Key_Type) return Directional.Key_Array with
-     Post => Translate'Result'Length <= 3;
+   function New_Translate
+     (From, To : Directional.Key_Type) return Directional.Key_Array is (
+       case From is
+          when 'v' =>
+             (case To is
+               when 'v' => "",
+                when '<' => "<",
+                when '>' => ">",
+                when '^' => "^",
+                when 'A' => ""),
+          when '<' =>
+             (case To is
+               when 'v' => "",
+                when '<' => "",
+                when '>' => "",
+                when '^' => "",
+                when 'A' => ""),
+          when '>' =>
+             (case To is
+               when 'v' => "",
+                when '<' => "",
+                when '>' => "",
+                when '^' => "",
+                when 'A' => ""),
+          when '^' =>
+             (case To is
+               when 'v' => "",
+                when '<' => "",
+                when '>' => "",
+                when '^' => "",
+                when 'A' => ""),
+          when 'A' =>
+             (case To is
+               when 'v' => "",
+                when '<' => "",
+                when '>' => "",
+                when '^' => "",
+                when 'A' => ""));
+
+   function Translate (Keys : Numeric.Key_Array) return Directional.Key_Array;
+
    function Translate
      (Keys : Directional.Key_Array) return Directional.Key_Array;
 

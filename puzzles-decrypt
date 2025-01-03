@@ -1,0 +1,3 @@
+#!/bin/sh
+
+find . -type f -name puzzle\*.in.gpg | gpg --batch --decrypt --multifile --no --quiet

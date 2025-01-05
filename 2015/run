@@ -1,0 +1,7 @@
+#!/usr/bin/env tclsh
+
+package require Tcl 8.6
+
+lassign [split [file tail $argv0] -] day part
+
+source [file join [file dirname $argv0] $day.tcl]

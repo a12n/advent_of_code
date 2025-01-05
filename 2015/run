@@ -2,6 +2,6 @@
 
 package require Tcl 8.6
 
-lassign [split [file tail $argv0] -] day part
+lassign [split [file tail $argv0] -] puzzle(day) puzzle(part)
 
-source [file join [file dirname $argv0] $day.tcl]
+source [file join [file dirname $argv0] $puzzle(day).tcl]

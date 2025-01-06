@@ -69,4 +69,9 @@ proc distance {distances path} {
     return $total
 }
 
-puts [tcl::mathfunc::min {*}[lmap path [paths $distances] { distance $distances $path }]]
+switch $puzzle(part) {
+    1 { set reduce tcl::mathfunc::min }
+    2 { set reduce tcl::mathfunc::max }
+}
+
+puts [$reduce {*}[lmap path [paths $distances] { distance $distances $path }]]

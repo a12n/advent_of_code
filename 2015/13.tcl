@@ -13,6 +13,14 @@ while {[gets stdin line] >= 0} {
     dict set happiness $guest $neighbor $gain
 }
 
+if {$puzzle(part) == 2} {
+    foreach guest [dict keys $happiness] {
+        dict set happiness $guest You 0
+        dict set happiness You $guest 0
+    }
+    puts stderr "happiness $happiness"
+}
+
 proc permutations elts {
     set n [llength $elts]
 

@@ -31,6 +31,3 @@ let total_calibration_value lines =
   Seq.map String.to_list lines
   |> Seq.filter_map calibration_value
   |> Seq.fold_left ( + ) 0
-
-let () =
-  print_endline (string_of_int (total_calibration_value (input_lines stdin)))

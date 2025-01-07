@@ -1,6 +1,6 @@
-(executable
- (name day_01)
- (modules day_01)
+(executables
+ (names day_01_1 day_01_2)
+ (modules day_01 day_01_1 day_01_2)
  (libraries advent))
 
 (executables
@@ -119,6 +119,6 @@
  (libraries advent zarith))
 
 (executables
- (names day_25_1 day_25_2)
- (modules day_25 day_25_1 day_25_2)
+ (names day_25)
+ (modules day_25)
  (libraries advent))

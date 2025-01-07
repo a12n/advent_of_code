@@ -6,10 +6,13 @@
 
 -spec script_info(string()) -> {day(), part()}.
 script_info(ScriptName) ->
-    <<"day_", DayStr:2/bytes, "_", PartStr:1/bytes>> =
-        list_to_binary(filename:basename(ScriptName)),
-    case {binary_to_integer(DayStr), binary_to_integer(PartStr)} of
-        {Day, Part} when Day >= 1, Day =< 25, Part >= 1, Part =< 2 -> {Day, Part}
+    case list_to_binary(filename:basename(ScriptName)) of
+        <<"day_", DayStr:2/bytes, "_", PartStr:1/bytes>> ->
+            case {binary_to_integer(DayStr), binary_to_integer(PartStr)} of
+                {Day, Part} when Day >= 1, Day =< 24, Part >= 1, Part =< 2 -> {Day, Part}
+            end;
+        <<"day_25">> ->
+            {25, 1}
     end.
 
 -spec day_module(day()) -> module().

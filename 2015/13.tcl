@@ -1,6 +1,6 @@
 #!/usr/bin/env tclsh
 
-set guests [dict create]
+set happiness [dict create]
 
 while {[gets stdin line] >= 0} {
     lassign [string map {
@@ -8,27 +8,50 @@ while {[gets stdin line] >= 0} {
         "would lose " "-"
         "happiness units by sitting next to " ""
         "." ""
-    } $line] guest happiness neighbor
+    } $line] guest gain neighbor
 
-    puts stderr "line \"$line\""
-    puts stderr "guest \"$guest\", happiness $happiness, neighbor \"$neighbor\""
-
-    dict set guests $guest $neighbor $happiness
+    dict set happiness $guest $neighbor $gain
 }
 
-puts stderr "guests $guests"
+proc permutations elts {
+    set n [llength $elts]
 
-set pairs {}
-foreach guest [dict keys $guests] {
-    foreach neighbor [dict keys $guests] {
-        if {$guest >= $neighbor} {
-            continue
+    if {$n < 2} {
+        return $elts
+    }
+
+    set ans {}
+
+    for {set i 0} {$i < $n} {incr i} {
+        set elt [lindex $elts $i]
+        foreach sub [permutations [lreplace $elts $i $i]] {
+            lappend ans [concat $elt $sub]
         }
+    }
 
-        set happiness [expr {[dict get $guests $guest $neighbor] + [dict get $guests $neighbor $guest]}]
-        puts stderr "$guest $neighbor = $happiness"
+    return $ans
+}
 
-        lappend pairs [list $happiness $guest $neighbor]
+proc pairwise {happiness first second} {
+    expr {[dict get $happiness $first $second] + [dict get $happiness $second $first]}
+}
+
+proc evaluate {happiness arrangement} {
+    set sum 0
+    foreach a [lrange $arrangement 0 end-1] b [lrange $arrangement 1 end] {
+        incr sum [pairwise $happiness $a $b]
+    }
+    incr sum [pairwise $happiness [lindex $arrangement 0] [lindex $arrangement end]]
+    return $sum
+}
+
+foreach arrangement [permutations [dict keys $happiness]] {
+    set h [evaluate $happiness $arrangement]
+    if {[info exists optimal]} {
+        set optimal [expr {max($optimal, $h)}]
+    } else {
+        set optimal $h
     }
 }
-puts stderr "pairs [lsort -decreasing -index 0 -integer $pairs]"
+
+puts $optimal

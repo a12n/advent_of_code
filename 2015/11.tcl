@@ -3,9 +3,8 @@
 namespace eval ::password {
     namespace export \
         fromString \
-        toString
-    namespace export \
         next \
+        toString \
         valid
 }
 

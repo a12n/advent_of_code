@@ -31,7 +31,7 @@ for IN_FILE in $PROG_ID/*.in; do
     TEST_ID=${IN_FILE%.*}
     ENV_FILE=$TEST_ID.env
     OUT_FILE=$TEST_ID.out
-    if [ ! -f $OUT_FILE ]; then
+    if [ ! -f $OUT_FILE -o ! -r $IN_FILE ]; then
         continue
     fi
     if [ -r $ENV_FILE ]; then

@@ -109,10 +109,53 @@ proc ::json::tokens channelID {
 
 coroutine next json::tokens stdin
 
-set sum 0
+switch $puzzle(part) {
+    1 {
+        set sum 0
 
-while {[set token [next]] ne {}} {
-    catch { incr sum $token }
+        while {[set token [next]] ne {}} {
+            catch { incr sum $token }
+        }
+
+        puts $sum
+    }
+    2 {
+        set current [dict create red no sum 0]
+        set member no
+        set objects {}
+
+        while {[set token [next]] ne {}} {
+            switch -- $token {
+                \{ {
+                    lappend objects $current
+                    set current [dict create red no sum 0]
+                    set member no
+                }
+                \} {
+                    set child $current
+                    set current [lindex $objects end]
+                    if {![dict get $child red]} {
+                        dict incr current sum [dict get $child sum]
+                    }
+                    set objects [lreplace $objects end end]
+                    set member no
+                }
+                : {
+                    set member yes
+                }
+                red {
+                    if {$member} {
+                        dict set current red yes
+                    }
+                    set member no
+                }
+                default {
+                    catch { dict incr current sum $token }
+                    set member no
+                }
+            }
+        }
+
+        puts [dict get $current sum]
+    }
 }
-
-puts $sum

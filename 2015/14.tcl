@@ -1,7 +1,7 @@
 #!/usr/bin/env tclsh
 
-set duration 2503
-catch { set duration $env(DURATION) }
+set tEnd 2503
+catch { set tEnd $env(DURATION) }
 
 while {[gets stdin line] >= 0} {
     lassign [string map {
@@ -20,8 +20,8 @@ set best 0
 foreach reindeer $reindeers {
     lassign $reindeer name speed fly rest
     set cycle [expr {$fly + $rest}]
-    set n [expr {$duration / $cycle}]
-    set rem [expr {$duration % $cycle}]
+    set n [expr {$tEnd / $cycle}]
+    set rem [expr {$tEnd % $cycle}]
     set dist [expr {$speed * ($fly * $n + min($rem, $fly))}]
     set best [expr {max($best, $dist)}]
 }

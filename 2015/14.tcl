@@ -3,6 +3,14 @@
 set tEnd 2503
 catch { set tEnd $env(DURATION) }
 
+proc distance {reindeer t} {
+    lassign $reindeer name speed fly rest
+    set cycle [expr {$fly + $rest}]
+    set n [expr {$t / $cycle}]
+    set rem [expr {$t % $cycle}]
+    expr {$speed * ($fly * $n + min($rem, $fly))}
+}
+
 while {[gets stdin line] >= 0} {
     lassign [string map {
         " can fly" ""
@@ -16,13 +24,4 @@ while {[gets stdin line] >= 0} {
     lappend reindeers [list $name $speed $fly $rest]
 }
 
-set best 0
-foreach reindeer $reindeers {
-    lassign $reindeer name speed fly rest
-    set cycle [expr {$fly + $rest}]
-    set n [expr {$tEnd / $cycle}]
-    set rem [expr {$tEnd % $cycle}]
-    set dist [expr {$speed * ($fly * $n + min($rem, $fly))}]
-    set best [expr {max($best, $dist)}]
-}
-puts $best
+puts [tcl::mathfunc::max {*}[lmap reindeer $reindeers { distance $reindeer $tEnd }]]

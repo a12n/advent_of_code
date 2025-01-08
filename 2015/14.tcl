@@ -13,12 +13,12 @@ while {[gets stdin line] >= 0} {
         "." ""
     } $line] name speed fly rest
 
-    lappend reindeers [list $speed $fly $rest]
+    lappend reindeers [list $name $speed $fly $rest]
 }
 
 set best 0
 foreach reindeer $reindeers {
-    lassign $reindeer speed fly rest
+    lassign $reindeer name speed fly rest
     set cycle [expr {$fly + $rest}]
     set n [expr {$duration / $cycle}]
     set rem [expr {$duration % $cycle}]

@@ -24,13 +24,22 @@ while {[gets stdin line] >= 0} {
     lappend reindeers [list $name $speed $fly $rest]
 }
 
+puts stderr "reindeers $reindeers"
+
 puts [tcl::mathfunc::max {*}[lmap reindeer $reindeers { distance $reindeer $tEnd }]]
 
-set events {}
+set stopFlying {}
 foreach reindeer $reindeers {
     lassign $reindeer name speed fly rest
 
-    lappend events $fly [expr {$fly + $rest}]
+    lappend stopFlying $fly
+    for {set k 1} {1} {incr k} {
+        set t [expr {$k * ($rest + $fly)}]
+        if {($t - $fly) >= $tEnd} {
+            break
+        }
+        lappend stopFlying $t
+    }
 }
 
-puts stderr "events [lsort -integer -unique $events]"
+puts stderr "stopFlying [lsort -integer -unique $stopFlying]"

@@ -28,18 +28,18 @@ puts stderr "reindeers $reindeers"
 
 puts [tcl::mathfunc::max {*}[lmap reindeer $reindeers { distance $reindeer $tEnd }]]
 
-set stopFlying {}
-foreach reindeer $reindeers {
-    lassign $reindeer name speed fly rest
-
-    lappend stopFlying $fly
-    for {set k 1} {1} {incr k} {
-        set t [expr {$k * ($rest + $fly)}]
-        if {($t - $fly) >= $tEnd} {
-            break
+set n [llength $reindeers]
+set points [lrepeat $n 0]
+for {set t 1} {$t <= $tEnd} {incr t} {
+    set distances [lmap reindeer $reindeers { distance $reindeer $t }]
+    set lead 0
+    for {set i 1} {$i < $n} {incr i} {
+        if {[lindex $distances $i] > [lindex $distances $lead]} {
+            set lead $i
         }
-        lappend stopFlying $t
     }
+    lset points $lead [expr {[lindex $points $lead] + 1}]
+    puts stderr "$t: points $points"
 }
 
-puts stderr "stopFlying [lsort -integer -unique $stopFlying]"
+puts [tcl::mathfunc::max {*}$points]

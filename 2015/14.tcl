@@ -25,3 +25,12 @@ while {[gets stdin line] >= 0} {
 }
 
 puts [tcl::mathfunc::max {*}[lmap reindeer $reindeers { distance $reindeer $tEnd }]]
+
+set events {}
+foreach reindeer $reindeers {
+    lassign $reindeer name speed fly rest
+
+    lappend events $fly [expr {$fly + $rest}]
+}
+
+puts stderr "events [lsort -integer -unique $events]"

@@ -60,3 +60,10 @@ switch $puzzle(part) {
 # (x1 * d1 + x2 * d2 + x3 * d3 + … + xN * dN) *
 # (x1 * f1 + x2 * f2 + x3 * f3 + … + xN * fN) *
 # (x1 * t1 + x2 * t2 + x3 * t3 + … + xN * tN)
+
+# Plot example in Gnuplot:
+# max0(x) = (x + abs(x)) / 2
+# y(x) = 100 - x
+# plot [0:100] max0(-1 * x + 2 * y(x)) * max0(-2 * x + 3 * y(x)) * max0(6 * x - 2 * y(x)) * max0(3 * x - 1 * y(x))
+
+# Local search from an initial solution?

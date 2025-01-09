@@ -8,9 +8,15 @@ while {[gets stdin line] >= 0} {
 
 proc multipliy {nums ingredients} {
     set n [llength $ingredients]
-    set cookie {capacity 0 durability 0 flavor 0 texture 0}
+    set cookie {
+        calories 0
+        capacity 0
+        durability 0
+        flavor 0
+        texture 0
+    }
 
-    for {set i 0} {$i < 4} {incr i} {
+    for {set i 0} {$i < 5} {incr i} {
         # Index of property with stride 2.
         set i2 [expr {2 * $i + 1}]
 
@@ -27,7 +33,9 @@ proc multipliy {nums ingredients} {
 proc score cookie {
     set prod 1
     foreach {key value} $cookie {
-        set prod [expr {$prod * max(0, $value)}]
+        if {$key != {calories}} {
+            set prod [expr {$prod * max(0, $value)}]
+        }
     }
     return $prod
 }
@@ -102,8 +110,6 @@ proc localSearch {ingredients nums} {
 
 switch $puzzle(part) {
     1 {
-        # Filter out calories for part 1.
-        set ingredients [lmap ingredient $ingredients { dict remove $ingredient calories }]
         # Local search from arbitrary initial solution.
         puts [localSearch $ingredients [initial [llength $ingredients]]]
     }

@@ -32,6 +32,11 @@ proc score cookie {
     return $prod
 }
 
+proc score2 cookie {
+    set calories [dict get $cookie calories]
+    expr {[score $cookie] - abs(500 - $calories)}
+}
+
 proc initial n {
     set k [expr {100 / $n}]
     set m [expr {100 % $n}]

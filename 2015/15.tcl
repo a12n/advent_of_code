@@ -32,12 +32,75 @@ proc score cookie {
     return $prod
 }
 
+proc initial n {
+    set k [expr {100 / $n}]
+    set m [expr {100 % $n}]
+    list {*}[lrepeat [expr {$n - 1}] $k] [expr {$k + $m}]
+}
+
+proc neighbors nums {
+    set n [llength $nums]
+    set result {}
+    for {set i 0} {$i < $n} {incr i} {
+        set atI [expr {[lindex $nums $i] + 1}]
+
+        for {set j 0} {$j < $n} {incr j} {
+            if {$i == $j} {
+                continue
+            }
+
+            set atJ [expr {[lindex $nums $j] - 1}]
+
+            lappend result [lreplace [lreplace $nums $i $i $atI] $j $j $atJ]
+        }
+    }
+    return $result
+}
+
+proc localSearch {ingredients nums} {
+    set cache [dict create]
+    set queue [list $nums]
+
+    puts stderr "localSearch: initial $nums"
+
+    while {$queue ne {}} {
+        set elt [lindex $queue 0]
+        set queue [lreplace $queue 0 0]
+
+        puts stderr "localSearch: elt $elt queue $queue"
+
+        if {[catch {dict get $cache $elt} value]} {
+            set value [score [multipliy $elt $ingredients]]
+            dict set cache $elt $value
+        }
+
+        puts stderr "localSearch: value $value"
+
+        if {[info exists bestScore] && $value < $bestScore} {
+            puts stderr "localSearch: bestScore $bestScore"
+            continue
+        }
+
+        set best $elt
+        set bestScore $value
+
+        foreach move [neighbors $elt] {
+            if {![dict exists $cache $move]} {
+                puts stderr "localSearch: move $move"
+                lappend queue $move
+            }
+        }
+    }
+
+    return $bestScore
+}
+
 switch $puzzle(part) {
     1 {
         # Filter out calories for part 1.
         set ingredients [lmap ingredient $ingredients { dict remove $ingredient calories }]
-        puts stderr "ingredients $ingredients"
-        puts stderr "score [score [multipliy {44 56} $ingredients]]"
+        # Local search from arbitrary initial solution.
+        puts [localSearch $ingredients [initial [llength $ingredients]]]
     }
 }
 

@@ -40,7 +40,6 @@ while {[gets stdin line] >= 0} {
 
     lappend reindeers [list $name $speed $fly $rest]
 }
-puts stderr "reindeers $reindeers"
 
 switch $puzzle(part) {
     1 {
@@ -50,6 +49,7 @@ switch $puzzle(part) {
         set n [llength $reindeers]
         set scores [lrepeat $n 0]
 
+        # TODO: Evaluate only at stop time instants?
         for {set t 1} {$t <= $tEnd} {incr t} {
             set distances [lmap reindeer $reindeers { distance $reindeer $t }]
             set leaders 0

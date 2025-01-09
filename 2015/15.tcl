@@ -3,7 +3,7 @@
 set ingredients {}
 while {[gets stdin line] >= 0} {
     set ingredient [lrange [string map {, {} : {}} $line] 1 end]
-    lappend ingredients [lsort -index 1 -stride 2 $ingredient]
+    lappend ingredients [lsort -index 0 -stride 2 $ingredient]
 }
 
 switch $puzzle(part) {

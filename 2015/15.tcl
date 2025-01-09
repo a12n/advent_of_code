@@ -40,9 +40,8 @@ proc score cookie {
     return $prod
 }
 
-proc score2 cookie {
-    set calories [dict get $cookie calories]
-    expr {[score $cookie] - abs(500 - $calories)}
+proc caloriesPenalty {cookie {optimal 500}} {
+    expr {abs($optimal - [dict get $cookie calories])}
 }
 
 proc initial n {

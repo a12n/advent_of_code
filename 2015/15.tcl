@@ -54,14 +54,18 @@ proc neighbors nums {
     set n [llength $nums]
     set result {}
     for {set i 0} {$i < $n} {incr i} {
-        set atI [expr {[lindex $nums $i] + 1}]
+        if {[set atI [expr {[lindex $nums $i] + 1}]] > 100} {
+            continue
+        }
 
         for {set j 0} {$j < $n} {incr j} {
             if {$i == $j} {
                 continue
             }
 
-            set atJ [expr {[lindex $nums $j] - 1}]
+            if {[set atJ [expr {[lindex $nums $j] - 1}]] < 0} {
+                continue
+            }
 
             lappend result [lreplace [lreplace $nums $i $i $atI] $j $j $atJ]
         }

@@ -46,3 +46,9 @@ switch $puzzle(part) {
 #
 # Σ x = 100
 # max Π B
+
+# Maximize the following:
+# (x1 * c1 + x2 * c2 + x3 * c3 + … + xN * cN) *
+# (x1 * d1 + x2 * d2 + x3 * d3 + … + xN * dN) *
+# (x1 * f1 + x2 * f2 + x3 * f3 + … + xN * fN) *
+# (x1 * t1 + x2 * t2 + x3 * t3 + … + xN * tN)

@@ -15,12 +15,15 @@ switch $puzzle(part) {
 }
 
 # N = number of ingredients
+#
+# x = [x1 x2 … xN]
 # A = [
-#   capacity1   capacity2 …   capacityN;
-# durability1 durability2 … durabilityN;
-#     flavor1     flavor2 …     flavorN;
-#    texture1    texture2 …    textureN
+# capacity1 durability1 flavor1 texture1;
+# capacity2 durability2 flavor2 texture2;
+# …
+# capacityN durabilityN flavorN textureN
 # ]
-# x = [x1; x2; …; xN]
-# A x = B = [capacity; durability; flavor; texture]
+# x A = B = [capacity durability flavor texture]
+#
+# Σ x = 100
 # max Π B

@@ -6,11 +6,30 @@ while {[gets stdin line] >= 0} {
     lappend ingredients [lsort -index 0 -stride 2 $ingredient]
 }
 
+proc multipliy {nums ingredients} {
+    set n [llength $ingredients]
+    set prod {capacity 0 durability 0 flavor 0 texture 0}
+
+    for {set i 0} {$i < 4} {incr i} {
+        # Index of property with stride 2.
+        set i2 [expr {2 * $i + 1}]
+
+        for {set j 0} {$j < $n} {incr j} {
+            set x [lindex $nums $j]
+            set a [lindex [lindex $ingredients $j] $i2]
+            lset prod $i2 [expr {[lindex $prod $i2] + $x * $a}]
+        }
+    }
+
+    return $prod
+}
+
 switch $puzzle(part) {
     1 {
         # Filter out calories for part 1.
         set ingredients [lmap ingredient $ingredients { dict remove $ingredient calories }]
         puts stderr "ingredients $ingredients"
+        puts stderr "multipliy [multipliy {44 56} $ingredients]"
     }
 }
 

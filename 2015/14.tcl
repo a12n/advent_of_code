@@ -1,14 +1,31 @@
 #!/usr/bin/env tclsh
 
+# Total time limit.
 set tEnd 2503
 catch { set tEnd $env(DURATION) }
 
+# Absolute position offset of the reindeer after t seconds.
 proc distance {reindeer t} {
     lassign $reindeer name speed fly rest
     set cycle [expr {$fly + $rest}]
     set n [expr {$t / $cycle}]
     set rem [expr {$t % $cycle}]
     expr {$speed * ($fly * $n + min($rem, $fly))}
+}
+
+# Time instants (under the specified total time limit) at which the
+# reindeer will stop for rest.
+proc stops {reindeer duration} {
+    lassign $reindeer name speed fly rest
+    set times $fly
+    for {set i 1} {1} {incr i} {
+        set t [expr {$i * ($rest + $fly)}]
+        if {($t - $fly) >= $duration)} {
+            break
+        }
+        lappend times $t
+    }
+    return $times
 }
 
 while {[gets stdin line] >= 0} {

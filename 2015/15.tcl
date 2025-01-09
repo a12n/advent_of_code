@@ -8,7 +8,7 @@ while {[gets stdin line] >= 0} {
 
 proc multipliy {nums ingredients} {
     set n [llength $ingredients]
-    set prod {capacity 0 durability 0 flavor 0 texture 0}
+    set cookie {capacity 0 durability 0 flavor 0 texture 0}
 
     for {set i 0} {$i < 4} {incr i} {
         # Index of property with stride 2.
@@ -17,10 +17,18 @@ proc multipliy {nums ingredients} {
         for {set j 0} {$j < $n} {incr j} {
             set x [lindex $nums $j]
             set a [lindex [lindex $ingredients $j] $i2]
-            lset prod $i2 [expr {[lindex $prod $i2] + $x * $a}]
+            lset cookie $i2 [expr {[lindex $cookie $i2] + $x * $a}]
         }
     }
 
+    return $cookie
+}
+
+proc score cookie {
+    set prod 1
+    foreach {key value} $cookie {
+        set prod [expr {$prod * max(0, $value)}]
+    }
     return $prod
 }
 
@@ -29,7 +37,7 @@ switch $puzzle(part) {
         # Filter out calories for part 1.
         set ingredients [lmap ingredient $ingredients { dict remove $ingredient calories }]
         puts stderr "ingredients $ingredients"
-        puts stderr "multipliy [multipliy {44 56} $ingredients]"
+        puts stderr "score [score [multipliy {44 56} $ingredients]]"
     }
 }
 

@@ -23,27 +23,37 @@ while {[gets stdin line] >= 0} {
 
     lappend reindeers [list $name $speed $fly $rest]
 }
-
 puts stderr "reindeers $reindeers"
 
-puts [tcl::mathfunc::max {*}[lmap reindeer $reindeers { distance $reindeer $tEnd }]]
+switch $puzzle(part) {
+    1 {
+        puts [tcl::mathfunc::max {*}[lmap reindeer $reindeers { distance $reindeer $tEnd }]]
+    }
+    2 {
+        set n [llength $reindeers]
+        set scores [lrepeat $n 0]
 
-set n [llength $reindeers]
-set points [lrepeat $n 0]
-for {set t 1} {$t <= $tEnd} {incr t} {
-    set distances [lmap reindeer $reindeers { distance $reindeer $t }]
-    set lead 0
-    for {set i 1} {$i < $n} {incr i} {
-        if {[lindex $distances $i] > [lindex $distances [lindex $lead 0]]} {
-            set lead $i
-        } elseif {[lindex $distances $i] == [lindex $distances [lindex $lead 0]]} {
-            lappend lead $i
+        for {set t 1} {$t <= $tEnd} {incr t} {
+            set distances [lmap reindeer $reindeers { distance $reindeer $t }]
+            set leaders 0
+
+            for {set i 1} {$i < $n} {incr i} {
+                set reindeer [lindex $reindeers $i]
+                set best [lindex $distances [lindex $leaders 0]]
+                set this [lindex $distances $i]
+
+                if {$this > $best} {
+                    set leaders $i
+                } elseif {$this == $best} {
+                    lappend leaders $i
+                }
+            }
+
+            foreach i $leaders {
+                lset scores $i [expr {[lindex $scores $i] + 1}]
+            }
         }
-    }
-    foreach i $lead {
-        lset points $i [expr {[lindex $points $i] + 1}]
-    }
-    puts stderr "$t: points $points"
-}
 
-puts [tcl::mathfunc::max {*}$points]
+        puts [tcl::mathfunc::max {*}$scores]
+    }
+}

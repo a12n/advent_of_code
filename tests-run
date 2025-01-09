@@ -36,10 +36,10 @@ for IN_FILE in $PROG_ID/*.in; do
     fi
     if [ -r $ENV_FILE ]; then
         echo "==== $TEST_ID < $ENV_FILE ===="
-        PROG_OUT=$(export $(xargs < $ENV_FILE) && $PROG < $IN_FILE | $OUT_CMD)
+        PROG_OUT=$(export $(xargs < $ENV_FILE) && $PROG < $IN_FILE 2> /dev/null | $OUT_CMD)
     else
         echo "==== $TEST_ID ===="
-        PROG_OUT=$($PROG < $IN_FILE | $OUT_CMD)
+        PROG_OUT=$($PROG < $IN_FILE 2> /dev/null | $OUT_CMD)
     fi
     EXPECT_OUT=$($OUT_CMD $OUT_FILE)
     if [ "$PROG_OUT" != "$EXPECT_OUT" ]; then

@@ -29,15 +29,6 @@ proc unifyRange {reference record} {
     return yes
 }
 
-proc unifies {reference record} {
-    foreach {key value} $record {
-        if {[dict get $reference $key] > $value} {
-            return no
-        }
-    }
-    return yes
-}
-
 proc distanceRange {reference record {ignored {cats goldfish pomeranians trees}}} {
     set dist 0
     foreach {key value} $record {

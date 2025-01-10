@@ -80,8 +80,7 @@ proc localSearch {ingredients nums} {
     puts stderr "localSearch: initial $nums"
 
     while {$queue ne {}} {
-        set elt [lindex $queue 0]
-        set queue [lreplace $queue 0 0]
+        set queue [lassign $queue elt]
 
         puts stderr "localSearch: elt $elt queue $queue"
 

@@ -38,12 +38,19 @@ proc unifies {reference record} {
     return yes
 }
 
-proc distance {reference record} {
+proc distanceRange {reference record {ignored {cats goldfish pomeranians trees}}} {
     set dist 0
     foreach {key value} $record {
+        if {$key in $ignored} {
+            continue
+        }
         incr dist [expr {abs([dict get $reference $key] - $value)}]
     }
     return $dist
+}
+
+proc distanceExact {reference record} {
+    distanceRange $reference $record {}
 }
 
 set sample \
@@ -69,8 +76,14 @@ while {[gets stdin line] >= 0} {
 }
 
 switch $puzzle(part) {
-    1 { set unify unifyExact }
-    2 { set unify unifyRange }
+    1 {
+        set distance distanceExact
+        set unify unifyExact
+    }
+    2 {
+        set distance distanceRange
+        set unify unifyRange
+    }
 }
 
 foreach note $notes {
@@ -82,7 +95,7 @@ foreach note $notes {
         continue
     }
 
-    set dist [distance $sample $record]
+    set dist [$distance $sample $record]
 
     puts stderr "$id: record $record: distance $dist"
 

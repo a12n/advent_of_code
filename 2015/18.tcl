@@ -119,9 +119,22 @@ set steps 100
 catch { set steps $env(STEPS) }
 
 lassign [lights::read stdin] grid size
+lassign $size width height
+
+switch $puzzle(part) {
+    1 {
+        set alwaysOn {}
+    }
+    2 {
+        set xMax [expr {$width - 1}]
+        set yMax [expr {$height - 1}]
+        set alwaysOn [list [list 0 0] [list 0 $xMax] [list $yMax 0] [list $yMax $xMax]]
+    }
+}
+set grid [lights::update $grid on {*}$alwaysOn]
 
 puts stderr "grid $grid size $size steps $steps"
 for {set i 0} {$i < $steps} {incr i} {
-    set grid [lights::animate $grid $size]
+    set grid [lights::update [lights::animate $grid $size] on {*}$alwaysOn]
 }
 puts [lights::lit $grid]

@@ -4,7 +4,7 @@ namespace eval lights {
     namespace eval position {
         namespace export add neighbours
     }
-    namespace export animate lit read state
+    namespace export animate lit read state update
 }
 
 proc ::lights::position::add {p u} {
@@ -106,6 +106,13 @@ proc ::lights::state {grid p} {
     } else {
         return off
     }
+}
+
+proc ::lights::update {grid flag args} {
+    foreach p $args {
+        set grid [dict replace $grid $p $flag]
+    }
+    return $grid
 }
 
 set steps 100

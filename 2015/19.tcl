@@ -8,17 +8,21 @@ while {[gets stdin line] > 0} {
 
 set molecule [gets stdin]
 
-puts stderr "replacements [array get replacements], molecule $molecule"
+puts stderr "replacements [array get replacements] [array size replacements], molecule $molecule [string length $molecule]"
 
-set replaced {}
+array set replaced {}
 foreach {from toList} [array get replacements] {
-    set pos 0
-    while {[set pos [string first $from $molecule $pos]] != -1} {
+    set n [string length $from]
+    set first 0
+    while {[set first [string first $from $molecule $first]] != -1} {
+        set last [expr {$first + $n - 1}]
         foreach to $toList {
-            dict set replaced [list $pos $to] yes
+            set replaced([string replace $molecule $first $last $to]) yes
         }
-        incr pos
+        incr first
     }
 }
 
-puts stderr "replaced $replaced"
+puts stderr "replaced [lsort -index 0 -stride 2 [array get replaced]] [array size replaced]"
+
+puts [array size replaced]

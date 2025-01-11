@@ -71,7 +71,7 @@ set boss [lsort -index 0 -stride 2 [string map {
 } [read stdin]]]
 set player [lsort -index 0 -stride 2 {hp 100 damage 0 armor 0}]
 
-proc leastGold {player0 boss} {
+proc goldAmount {player0 boss} {
     global weaponItems armorItems ringItems
 
     set armorItems0 [lreplace $armorItems -1 -1 {name "None" cost 0 damage 0 armor 0}]
@@ -91,13 +91,17 @@ proc leastGold {player0 boss} {
                         if {![info exists least] || $cost < $least} {
                             set least $cost
                         }
+                    } else {
+                        if {![info exists most] || $cost > $most} {
+                            set most $cost
+                        }
                     }
                 }
             }
         }
     }
 
-    return $least
+    return [list $least $most]
 }
 
-puts [leastGold $player $boss]
+puts [lindex [goldAmount $player $boss] 0]

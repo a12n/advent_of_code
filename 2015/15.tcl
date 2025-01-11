@@ -133,29 +133,38 @@ proc localSearch {ingredients nums} {
     return $bestScore
 }
 
+# List of cookies from the specified ingredients with 500 calories each.
+proc caloriesCookies ingredients {
+    set cookies {}
+    set n [llength $ingredients]
+    set nums0 [lrepeat [expr {$n - 1}] 0]
+
+    while {1} {
+        if {![catch { set nums [unnormalize $nums0] }]} {
+            set cookie [multipliy $nums $ingredients]
+
+            if {[caloriesPenalty $cookie] == 0} {
+                lappend cookies $cookie
+            }
+        }
+
+        if {[catch { set nums0 [increment $nums0] }]} {
+            break
+        }
+    }
+
+    return $cookies
+}
+
 switch $puzzle(part) {
     1 {
         # Local search from arbitrary initial solution.
         puts [localSearch $ingredients [initial [llength $ingredients]]]
     }
     2 {
-        set nums0 [lrepeat [expr {[llength $ingredients] - 1}] 0]
-        while {1} {
-            if {![catch { set nums [unnormalize $nums0] }]} {
-                set cookie [multipliy $nums $ingredients]
-                if {[caloriesPenalty $cookie] == 0} {
-                    set value [score $cookie]
-                    puts stderr "nums $nums score $value"
-                    if {![info exists bestScore] || $value > $bestScore} {
-                        set bestScore $value
-                    }
-                }
-            }
-            if {[catch { set nums0 [increment $nums0] }]} {
-                break
-            }
-        }
-        puts $bestScore
+        puts [tcl::mathfunc::max {*}[lmap cookie [caloriesCookies $ingredients] {
+            score $cookie
+        }]]
     }
 }
 

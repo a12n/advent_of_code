@@ -61,14 +61,16 @@ proc increment nums {
     return $nums
 }
 
-proc normalize nums0 {
-    set xN 100
-    foreach x $nums0 {
-        if {[set xN [expr {$xN - $x}]] < 0} {
+# Convert normalized "barycentric" vector [x1 x2 … xN-1] to
+# [x1 x2 … xN-1 xN].
+proc unnormalize nums {
+    set last 100
+    foreach x $nums {
+        if {[set last [expr {$last - $x}]] < 0} {
             error "invalid coefficients"
         }
     }
-    lreplace $nums0 end+1 end+1 $xN
+    lreplace $nums end+1 end+1 $last
 }
 
 proc neighbors nums {
@@ -139,7 +141,7 @@ switch $puzzle(part) {
     2 {
         set nums0 [lrepeat [expr {[llength $ingredients] - 1}] 0]
         while {1} {
-            if {![catch { set nums [normalize $nums0] }]} {
+            if {![catch { set nums [unnormalize $nums0] }]} {
                 set cookie [multipliy $nums $ingredients]
                 if {[caloriesPenalty $cookie] == 0} {
                     set value [score $cookie]

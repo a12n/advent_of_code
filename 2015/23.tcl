@@ -5,7 +5,11 @@ while {[gets stdin line] >= 0} {
     lappend program [string map {, {}} $line]
 }
 
-set cpu [dict create a 0 b 0]
+switch $puzzle(part) {
+    1 { set cpu [dict create a 0 b 0] }
+    2 { set cpu [dict create a 1 b 0] }
+}
+
 puts stderr "cpu $cpu"
 for {set pc 0} {$pc < [llength $program]} {} {
     lassign [lindex $program $pc] opcode fst snd

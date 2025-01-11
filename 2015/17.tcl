@@ -24,4 +24,20 @@ proc combinations {capacities liters {used {}}} {
         [combinations $capacitiesLeft $liters $used]
 }
 
-puts [llength [combinations $capacities $liters]]
+switch $puzzle(part) {
+    1 {
+        puts [llength [combinations $capacities $liters]]
+    }
+    2 {
+        set freqs [dict create]
+        foreach comb [combinations $capacities $liters] {
+            set n [llength $comb]
+            dict incr freqs $n
+            if {![info exists minN] || $n < $minN} {
+                set minN $n
+            }
+        }
+        puts stderr "freqs $freqs"
+        puts [dict get $freqs $minN]
+    }
+}

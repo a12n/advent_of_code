@@ -50,6 +50,27 @@ proc initial n {
     list {*}[lrepeat [expr {$n - 1}] $k] [expr {$k + $m}]
 }
 
+proc increment nums {
+    set n [llength $nums]
+    set pos 0
+    while {[set value [lindex $nums $pos]] == 100} {
+        lset nums $pos 0
+        incr pos
+    }
+    lset nums $pos [incr value]
+    return $nums
+}
+
+proc normalize nums0 {
+    set xN 100
+    foreach x $nums0 {
+        if {[set xN [expr {$xN - $x}]] < 0} {
+            error "invalid coefficients"
+        }
+    }
+    lreplace $nums0 end+1 end+1 $xN
+}
+
 proc neighbors nums {
     set n [llength $nums]
     set result {}
@@ -114,6 +135,25 @@ switch $puzzle(part) {
     1 {
         # Local search from arbitrary initial solution.
         puts [localSearch $ingredients [initial [llength $ingredients]]]
+    }
+    2 {
+        set nums0 [lrepeat [expr {[llength $ingredients] - 1}] 0]
+        while {1} {
+            if {![catch { set nums [normalize $nums0] }]} {
+                set cookie [multipliy $nums $ingredients]
+                if {[caloriesPenalty $cookie] == 0} {
+                    set value [score $cookie]
+                    puts stderr "nums $nums score $value"
+                    if {![info exists bestScore] || $value > $bestScore} {
+                        set bestScore $value
+                    }
+                }
+            }
+            if {[catch { set nums0 [increment $nums0] }]} {
+                break
+            }
+        }
+        puts $bestScore
     }
 }
 

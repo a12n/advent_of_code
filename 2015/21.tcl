@@ -42,7 +42,7 @@ proc wear {player item} {
     return $player
 }
 
-# decrease in HP due to an attack.
+# Decrease in HP due to an attack.
 proc hits {attacker defender} {
     expr {max(1, [dict get $attacker damage] - [dict get $defender armor])}
 }
@@ -56,8 +56,8 @@ proc fight {player boss} {
 
     # Number of rounds player/boss will keep the damage, in 1/100000
     # of a round.
-    set playerRounds [expr {100000 * $playerHP / $bossHits}]
     set bossRounds [expr {100000 * $bossHP / $playerHits}]
+    set playerRounds [expr {100000 * $playerHP / $bossHits}]
 
     expr {$playerRounds >= $bossRounds}
 }

@@ -42,24 +42,24 @@ proc wear {player item} {
     return $player
 }
 
-# Increase (decrease actually, since it's negative) in HP due to an
-# attack.
+# decrease in HP due to an attack.
 proc hits {attacker defender} {
-    expr {-min(1, [dict get $attacker damage] - [dict get $defender armor])}
+    expr {max(1, [dict get $attacker damage] - [dict get $defender armor])}
 }
 
-# Returns number of player hit points at the end of fight.
+# Returns true if player wins the fight.
 proc fight {player boss} {
-    # TODO: don't loop
-    for {set round 0} {1} {incr round} {
-        if {[dict incr $boss hp [hits $player $boss]] < 0} {
-            break
-        }
-        if {[dict incr $player hp [hits $boss $player]] < 0} {
-            break
-        }
-    }
-    dict get $player hp
+    set bossHP [dict get $boss hp]
+    set bossHits [hits $boss $player]
+    set playerHP [dict get $player hp]
+    set playerHits [hits $player $boss]
+
+    # Number of rounds player/boss will keep the damage, in 1/100000
+    # of a round.
+    set playerRounds [expr {100000 * $playerHP / $bossHits}]
+    set bossRounds [expr {100000 * $bossHP / $playerHits}]
+
+    expr {$playerRounds >= $bossRounds}
 }
 
 set boss [lsort -index 0 -stride 2 [string map {

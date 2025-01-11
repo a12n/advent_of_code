@@ -8,12 +8,23 @@ while {[gets stdin line] > 0} {
     }
 }
 
+proc invert replacements {
+    set result {}
+    dict for {from toList} $replacements {
+        foreach to $toList {
+            lappend result $to $from
+        }
+    }
+    return [lsort -decreasing -command {apply {{a b} { expr {[string length $a] - [string length $b]} }}} -stride 2 $result]
+}
+
 set molecule [gets stdin]
 
 puts stderr "replacements $replacements [dict size $replacements], molecule $molecule [string length $molecule]"
 
 proc calibrate {replacements molecule} {
     set replaced [dict create]
+
     dict for {from toList} $replacements {
         set n [string length $from]
         set first 0
@@ -31,46 +42,69 @@ proc calibrate {replacements molecule} {
     return [dict size $replaced]
 }
 
-proc fabricate {replacements start finish} {
-    set queue [list [list 0 $start]]
-    set seen [dict create]
+proc fabricate {replacements molecule finish {seenName {}} {cacheName {}}} {
+    # puts stderr "fabricate: molecule \"$molecule\""
 
-    while {$queue ne {}} {
-        set queue [lassign $queue elt]
-        lassign $elt dist molecule
-
-        puts stderr "fabricate: dist $dist molecule \"$molecule\" queue [llength $queue]"
-
-        # TODO: keep only "changes" in the queue, not the whole strings?
-        # TODO: A* with some edit distance heuristic?
-        if {$molecule eq $finish} {
-            return $dist
-        }
-
-        dict for {from toList} $replacements {
-            set n [string length $from]
-            set first 0
-            while {[set first [string first $from $molecule $first]] != -1} {
-                set last [expr {$first + $n - 1}]
-                foreach to $toList {
-                    set dist2 [expr {$dist + 1}]
-                    set molecule2 [string replace $molecule $first $last $to]
-                    if {![dict exists $seen $molecule2]} {
-                        lappend queue [list $dist2 $molecule2]
-                        dict set seen $molecule2 yes
-                    }
-                }
-                incr first
-            }
-        }
-
-        set queue [lsort -index 0 -integer $queue]
+    if {$molecule eq $finish} {
+        puts stderr "fabricate: found $finish"
+        return 0
     }
 
-    error "fabricate: no path from $start to $finish"
+    if {$seenName ne {}} {
+        upvar $seenName seen
+    } else {
+        set seen [dict create]
+    }
+
+    dict set seen $molecule yes
+
+    if {$cacheName ne {}} {
+        upvar $cacheName cache
+    } else {
+        set cache [dict create]
+    }
+
+    if {[dict exists $cache $molecule]} {
+        puts stderr "fabricate: found \"$molecule\" in cache"
+        return [dict get $cache $molecule]
+    }
+
+    set minDist {}
+
+    dict for {from to} $replacements {
+        set first 0
+        set n [string length $from]
+
+        for {set first 0} {[set first [string first $from $molecule $first]] != -1} {incr first} {
+            set last [expr {$first + $n - 1}]
+            set molecule2 [string replace $molecule $first $last $to]
+
+            if {[dict exists $seen $molecule2]} {
+                continue
+            }
+
+            if {[set dist [fabricate $replacements $molecule2 $finish seen cache [expr {$depth + 1}]]] ne {}} {
+                incr dist
+                if {$minDist eq {} || $dist < $minDist} {
+                    set minDist $dist
+                }
+            }
+        }
+    }
+
+    puts stderr "fabricate: molecule $molecule minDist $minDist"
+    dict set cache $molecule $minDist
+
+    return $minDist
 }
 
 switch $puzzle(part) {
-    1 { puts [calibrate $replacements $molecule] }
-    2 { puts [fabricate $replacements e $molecule] }
+    1 {
+        puts [calibrate $replacements $molecule]
+    }
+    2 {
+        set replacements [invert $replacements]
+        puts stderr "invert $replacements"
+        puts [fabricate $replacements $molecule e]
+    }
 }

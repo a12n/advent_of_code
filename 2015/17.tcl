@@ -7,24 +7,21 @@ puts stderr "liters $liters"
 set capacities [lsort -decreasing -integer [read stdin]]
 puts stderr "capacities $capacities"
 
-proc combinations {capacities liters} {
+proc combinations {capacities liters {used {}}} {
     puts stderr "combinations: capacities $capacities liters $liters"
 
     if {$liters == 0} {
-        return 1
-    } elseif {$capacities eq {}} {
-        return 0
+        puts stderr "combinations: used $used"
+        return [list $used]
+    } elseif {$liters < 0 || $capacities eq {}} {
+        return {}
     }
 
-    set capacities2 [lassign $capacities cap]
-    set sum 0
+    set capacitiesLeft [lassign $capacities cap]
 
-    if {$liters >= $cap} {
-        incr sum [combinations $capacities2 [expr {$liters - $cap}]]
-    }
-    incr sum [combinations $capacities2 $liters]
-
-    return $sum
+    concat \
+        [combinations $capacitiesLeft [expr {$liters - $cap}] [lreplace $used end+1 end+1 $cap]] \
+        [combinations $capacitiesLeft $liters $used]
 }
 
-puts [combinations $capacities $liters]
+puts [llength [combinations $capacities $liters]]

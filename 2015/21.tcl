@@ -35,6 +35,13 @@ set rings {
 # 2^16 combinations (most of which are invalid).
 # Valid: 5*6*22=660
 
+proc wear {player item} {
+    foreach stat {armor damage} {
+        dict incr player $stat [dict get $item $stat]
+    }
+    return $player
+}
+
 # Increase (decrease actually, since it's negative) in HP due to an
 # attack.
 proc hits {attacker defender} {
@@ -43,6 +50,7 @@ proc hits {attacker defender} {
 
 # Returns number of player hit points at the end of fight.
 proc fight {player boss} {
+    # TODO: don't loop
     for {set round 0} {1} {incr round} {
         if {[dict incr $boss hp [hits $player $boss]] < 0} {
             break

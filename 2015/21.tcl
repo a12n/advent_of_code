@@ -104,4 +104,4 @@ proc goldAmount {player0 boss} {
     return [list $least $most]
 }
 
-puts [lindex [goldAmount $player $boss] 0]
+puts [lindex [goldAmount $player $boss] [expr {$puzzle(part) - 1}]]

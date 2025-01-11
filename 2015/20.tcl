@@ -48,9 +48,9 @@ proc factors::sum powers {
 }
 
 set limit [expr {[gets stdin] / 10}]
-for {set n 0} {1} {incr n} {
+for {set n 1} {1} {incr n} {
     set sum [factors::sum [factors::powers $n]]
-    # puts stderr "$n: $sum"
+    # puts stderr "$n: $sum $limit"
     if {$sum >= $limit} {
         break
     }

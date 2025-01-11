@@ -2,7 +2,7 @@
 
 # You must buy exactly one weapon.
 # 5 combinations
-set weapons {
+set weaponItems {
     {name "Dagger"     cost  8 damage 4 armor 0}
     {name "Greataxe"   cost 74 damage 8 armor 0}
     {name "Longsword"  cost 40 damage 7 armor 0}
@@ -12,7 +12,7 @@ set weapons {
 
 # Armor is optional, but you can't use more than one.
 # 1+5=6 combinations.
-set armor {
+set armorItems {
     {name "Leather"    cost  13 damage 0 armor 1}
     {name "Chainmail"  cost  31 damage 0 armor 2}
     {name "Splintmail" cost  53 damage 0 armor 3}
@@ -22,7 +22,7 @@ set armor {
 
 # You can buy 0-2 rings.
 # 1+6+15=22 combinations.
-set rings {
+set ringItems {
     {name "Damage +1"  cost  25 damage 1 armor 0}
     {name "Damage +2"  cost  50 damage 2 armor 0}
     {name "Damage +3"  cost 100 damage 3 armor 0}
@@ -35,9 +35,11 @@ set rings {
 # 2^16 combinations (most of which are invalid).
 # Valid: 5*6*22=660
 
-proc wear {player item} {
-    foreach stat {armor damage} {
-        dict incr player $stat [dict get $item $stat]
+proc wear {player args} {
+    foreach item $args {
+        foreach stat {armor damage} {
+            dict incr player $stat [dict get $item $stat]
+        }
     }
     return $player
 }
@@ -69,5 +71,33 @@ set boss [lsort -index 0 -stride 2 [string map {
 } [read stdin]]]
 set player [lsort -index 0 -stride 2 {hp 100 damage 0 armor 0}]
 
-puts stderr "boss $boss"
-puts stderr "player $player"
+proc leastGold {player0 boss} {
+    global weaponItems armorItems ringItems
+
+    set armorItems0 [lreplace $armorItems -1 -1 {name "None" cost 0 damage 0 armor 0}]
+    set ringItems0 [lreplace $ringItems -1 -1 {name "None" cost 0 damage 0 armor 0}]
+
+    foreach weapon $weaponItems {
+        foreach armor $armorItems0 {
+            foreach ring1 $ringItems0 {
+                foreach ring2 $ringItems0 {
+                    set cost \
+                        [expr {[dict get $weapon cost] + \
+                               [dict get $armor cost] + \
+                               [dict get $ring1 cost] + \
+                               [dict get $ring2 cost]}]
+                    set player [wear $player0 $weapon $armor $ring1 $ring2]
+                    if {[fight $player $boss]} {
+                        if {![info exists least] || $cost < $least} {
+                            set least $cost
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return $least
+}
+
+puts [leastGold $player $boss]

@@ -34,6 +34,7 @@ proc factors::powers n {
     return $powers
 }
 
+# Finding the Sum of the Factors of a Number:
 # https://web.archive.org/web/20180128170647/http://mathforum.org/library/drmath/view/71550.html
 proc factors::sum powers {
     set prod 1
@@ -59,7 +60,25 @@ proc 1 limit {
 }
 
 proc 2 limit {
-    # TODO
+    puts [factors::powers 8]
+    # 2 3
+    # 2^0 = 1
+    # 2^1 = 2
+    # 2^2 = 4
+    # 2^3 = 8
+    # 8+4+2+1=15
+    # If elfs visit only 5 houses:
+    # 8+4+0+0=12
+    exit
+    set table [dict create]
+    for {set e 1} {$e <= 100} {incr e} {
+        for {set n 1} {$n <= 50} {incr n} {
+            dict incr table [expr {$e * $n}] $e
+        }
+    }
+    foreach {k v} $table {
+        puts "$k: $v $limit"
+    }
 }
 
 $puzzle(part) [expr {[gets stdin]}]

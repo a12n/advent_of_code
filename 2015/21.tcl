@@ -2,7 +2,7 @@
 
 # You must buy exactly one weapon.
 # 5 combinations
-set weaponItems {
+set weapons {
     {name "Dagger"     cost  8 damage 4 armor 0}
     {name "Greataxe"   cost 74 damage 8 armor 0}
     {name "Longsword"  cost 40 damage 7 armor 0}
@@ -12,7 +12,7 @@ set weaponItems {
 
 # Armor is optional, but you can't use more than one.
 # 1+5=6 combinations.
-set armorItems {
+set armors {
     {name "Leather"    cost  13 damage 0 armor 1}
     {name "Chainmail"  cost  31 damage 0 armor 2}
     {name "Splintmail" cost  53 damage 0 armor 3}
@@ -22,7 +22,7 @@ set armorItems {
 
 # You can buy 0-2 rings.
 # 1+6+15=22 combinations.
-set ringItems {
+set rings {
     {name "Damage +1"  cost  25 damage 1 armor 0}
     {name "Damage +2"  cost  50 damage 2 armor 0}
     {name "Damage +3"  cost 100 damage 3 armor 0}
@@ -72,15 +72,15 @@ set boss [lsort -index 0 -stride 2 [string map {
 set player [lsort -index 0 -stride 2 {hp 100 damage 0 armor 0}]
 
 proc goldAmount {player0 boss} {
-    global weaponItems armorItems ringItems
+    global weapons armors rings
 
-    set armorItems0 [lreplace $armorItems -1 -1 {name "None" cost 0 damage 0 armor 0}]
-    set ringItems0 [lreplace $ringItems -1 -1 {name "None" cost 0 damage 0 armor 0}]
+    set armors0 [lreplace $armors -1 -1 {name "None" cost 0 damage 0 armor 0}]
+    set rings0 [lreplace $rings -1 -1 {name "None" cost 0 damage 0 armor 0}]
 
-    foreach weapon $weaponItems {
-        foreach armor $armorItems0 {
-            foreach ring1 $ringItems0 {
-                foreach ring2 $ringItems0 {
+    foreach weapon $weapons {
+        foreach armor $armors0 {
+            foreach ring1 $rings0 {
+                foreach ring2 $rings0 {
                     set cost \
                         [expr {[dict get $weapon cost] + \
                                [dict get $armor cost] + \

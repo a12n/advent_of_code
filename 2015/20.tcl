@@ -11,6 +11,17 @@
 #
 # Find the smallest N which factors sum to at least L/10.
 
+# …factors of a number N, such that:
+# N = p^a * q^b * r^c
+# Where, p, q and r are prime factors of the number N; a, b and c are non-negative power.
+#
+# Number of factors of N = (a + 1) * (b + 1) * (c + 1)
+# Product of factors of N = N^(No. of factors/2)
+# Sum of factors: ( p^0+p^1+...+p^a) ( q^0+ q^1+....+q^b) (r^0+r^1+...+r^c) / (p^a-1)(q^b-1)(r^c-1)
+
+# Formula for sum of divisors:
+# https://planetmath.org/formulaforsumofdivisors
+
 namespace eval ::factors {
     namespace export powers sum
 }
@@ -44,6 +55,7 @@ proc factors::sum powers {
             set sum [expr {$sum + $p**$i}]
         }
         set prod [expr {$prod * $sum}]
+        # TODO: if needed to sum only part of factors, subtract some expressions here?
     }
     return $prod
 }
@@ -76,12 +88,17 @@ proc 2 limit {
     # 8+4+2+0=14
     #
     # Elves visit only N=5 next houses
+    #
     # Elf E=2 visits houses 2 4 6 8 10
     # At house H=8, sum factors up to (H=8 - E=2 * N=5) = -2 backward.
     # At house H=10, sum factors up to (H=10 - E=2 * N=5) = 0 backward.
     # At house H=12 (first house of E=2 which he doesn't visit), sum factors up to (H=12 - E=2 * N=5) = 2 backward.
+    #
+    # Elf E=3 visits houses 3 6 9 12 15
+    # At house H=12 elves E={12 6 4 3} deliver
+    # 12+6+4+3=25
     set table [dict create]
-    for {set e 1} {$e <= 10} {incr e} {
+    for {set e 1} {$e <= 12} {incr e} {
         for {set n 1} {$n <= 5} {incr n} {
             set k [expr {$e * $n}]
             dict incr table $k $e

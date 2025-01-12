@@ -67,17 +67,29 @@ proc 2 limit {
     # 2^2 = 4
     # 2^3 = 8
     # 8+4+2+1=15
-    # If elfs visit only 5 houses:
-    # 8+4+0+0=12
-    exit
+    #
+    # If elves visit only 5 houses:
+    # 2^0 = 1 no
+    # 2^1 = 2
+    # 2^2 = 4
+    # 2^3 = 8
+    # 8+4+2+0=14
+    #
+    # Elves visit only N=5 next houses
+    # Elf E=2 visits houses 2 4 6 8 10
+    # At house H=8, sum factors up to (H=8 - E=2 * N=5) = -2 backward.
+    # At house H=10, sum factors up to (H=10 - E=2 * N=5) = 0 backward.
+    # At house H=12 (first house of E=2 which he doesn't visit), sum factors up to (H=12 - E=2 * N=5) = 2 backward.
     set table [dict create]
-    for {set e 1} {$e <= 100} {incr e} {
-        for {set n 1} {$n <= 50} {incr n} {
-            dict incr table [expr {$e * $n}] $e
+    for {set e 1} {$e <= 10} {incr e} {
+        for {set n 1} {$n <= 5} {incr n} {
+            set k [expr {$e * $n}]
+            dict incr table $k $e
+            puts "elf $e delivers $e to $k = [dict get $table $k]"
         }
     }
-    foreach {k v} $table {
-        puts "$k: $v $limit"
+    foreach {k v} [lsort -stride 2 -index 0 -integer $table] {
+        puts "$k: $v [expr {$limit / 11}]"
     }
 }
 

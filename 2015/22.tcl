@@ -100,6 +100,7 @@ proc play {player boss} {
     set queue [list [list 0 0 $player $boss {}]]
 
     set minSpent [expr {2**64 + 1}]
+    set seen [dict create]
 
     while {$queue ne {}} {
         puts stderr "play: queue [llength $queue]"
@@ -117,6 +118,21 @@ proc play {player boss} {
         if {$spent > $minSpent} {
             puts stderr "play $turn: spent $spent more than min $minSpent"
             continue
+        }
+
+        set stateKey \
+            [list \
+                 [lsort -stride 2 -index 0 $player] \
+                 [lsort -stride 2 -index 0 $boss] \
+                 [lsort -stride 2 -index 0 \
+                      [dict map {name effect} $effects \
+                           { dict get $effect turns }]]]
+        puts stderr "stateKey $stateKey"
+        if {[dict exists $seen $stateKey]} {
+            puts stderr "play $turn: stateKey $stateKey already seen"
+            continue
+        } else {
+            dict set $seen $stateKey yes
         }
 
         # A final state.

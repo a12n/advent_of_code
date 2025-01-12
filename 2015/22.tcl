@@ -160,6 +160,7 @@ proc play {player boss} {
 
             # Undo non-cumulative effects as they deactivate.
             if {[dict incr effect turns -1] == 0} {
+                # FIXME: the decrement isn't reflected in the effects.
                 puts stderr "play $turn: effects of \"$name\" ended"
                 if {![game::effect::isCumulative $effect]} {
                     set boss [game::effect::remove [game::effect::applicable $effect boss] $boss]

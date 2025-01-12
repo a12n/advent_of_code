@@ -3,32 +3,32 @@
 # You must buy exactly one weapon.
 # 5 combinations
 set weapons {
-    {name "Dagger"     cost  8 damage 4 armor 0}
-    {name "Greataxe"   cost 74 damage 8 armor 0}
-    {name "Longsword"  cost 40 damage 7 armor 0}
-    {name "Shortsword" cost 10 damage 5 armor 0}
-    {name "Warhammer"  cost 25 damage 6 armor 0}
+    "Dagger"     {cost  8 damage 4 armor 0}
+    "Greataxe"   {cost 74 damage 8 armor 0}
+    "Longsword"  {cost 40 damage 7 armor 0}
+    "Shortsword" {cost 10 damage 5 armor 0}
+    "Warhammer"  {cost 25 damage 6 armor 0}
 }
 
 # Armor is optional, but you can't use more than one.
 # 1+5=6 combinations.
 set armors {
-    {name "Leather"    cost  13 damage 0 armor 1}
-    {name "Chainmail"  cost  31 damage 0 armor 2}
-    {name "Splintmail" cost  53 damage 0 armor 3}
-    {name "Bandedmail" cost  75 damage 0 armor 4}
-    {name "Platemail"  cost 102 damage 0 armor 5}
+    "Leather"    {cost  13 damage 0 armor 1}
+    "Chainmail"  {cost  31 damage 0 armor 2}
+    "Splintmail" {cost  53 damage 0 armor 3}
+    "Bandedmail" {cost  75 damage 0 armor 4}
+    "Platemail"  {cost 102 damage 0 armor 5}
 }
 
 # You can buy 0-2 rings.
 # 1+6+15=22 combinations.
 set rings {
-    {name "Damage +1"  cost  25 damage 1 armor 0}
-    {name "Damage +2"  cost  50 damage 2 armor 0}
-    {name "Damage +3"  cost 100 damage 3 armor 0}
-    {name "Defense +1" cost  20 damage 0 armor 1}
-    {name "Defense +2" cost  40 damage 0 armor 2}
-    {name "Defense +3" cost  80 damage 0 armor 3}
+    "Damage +1"  {cost  25 damage 1 armor 0}
+    "Damage +2"  {cost  50 damage 2 armor 0}
+    "Damage +3"  {cost 100 damage 3 armor 0}
+    "Defense +1" {cost  20 damage 0 armor 1}
+    "Defense +2" {cost  40 damage 0 armor 2}
+    "Defense +3" {cost  80 damage 0 armor 3}
 }
 
 # There's only 16 items. Each of them may be taken or not. It's only
@@ -74,13 +74,13 @@ set player [lsort -index 0 -stride 2 {hp 100 damage 0 armor 0}]
 proc goldAmount {player0 boss} {
     global weapons armors rings
 
-    set armors0 [lreplace $armors -1 -1 {name "None" cost 0 damage 0 armor 0}]
-    set rings0 [lreplace $rings -1 -1 {name "None" cost 0 damage 0 armor 0}]
+    set armors0 [lreplace $armors -1 -1 "None" {cost 0 damage 0 armor 0}]
+    set rings0 [lreplace $rings -1 -1 "None" {cost 0 damage 0 armor 0}]
 
-    foreach weapon $weapons {
-        foreach armor $armors0 {
-            foreach ring1 $rings0 {
-                foreach ring2 $rings0 {
+    dict for {_ weapon} $weapons {
+        dict for {_ armor} $armors0 {
+            dict for {_ ring1} $rings0 {
+                dict for {_ ring2} $rings0 {
                     set cost \
                         [expr {[dict get $weapon cost] + \
                                [dict get $armor cost] + \

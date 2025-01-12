@@ -95,10 +95,15 @@ proc 2 limit {
     # At house H=12 (first house of E=2 which he doesn't visit), sum factors up to (H=12 - E=2 * N=5) = 2 backward.
     #
     # Elf E=3 visits houses 3 6 9 12 15
-    # At house H=12 elves E={12 6 4 3} deliver
+    # At house H=12 elves E={12 6 4 3} deliver and E={2 1} don't
     # 12+6+4+3=25
+    #
+    # At house H only the biggest N=5-1 dividers deliver?
+    #
+    # At house=20, dividers [20 10 5 4 2 1]. So, only dividers [20 10 5 4] deliver?
+    # So, the sum will be 20+10+5+4+2=39?
     set table [dict create]
-    for {set e 1} {$e <= 12} {incr e} {
+    for {set e 1} {$e <= 25} {incr e} {
         for {set n 1} {$n <= 5} {incr n} {
             set k [expr {$e * $n}]
             dict incr table $k $e

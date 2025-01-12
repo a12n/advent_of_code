@@ -1,12 +1,5 @@
 #!/usr/bin/env tclsh
 
-set liters 150
-catch { set liters $env(LITERS) }
-puts stderr "liters $liters"
-
-set capacities [lsort -decreasing -integer [read stdin]]
-puts stderr "capacities $capacities"
-
 proc combinations {capacities liters {used {}}} {
     puts stderr "combinations: capacities $capacities liters $liters"
 
@@ -24,20 +17,28 @@ proc combinations {capacities liters {used {}}} {
         [combinations $capacitiesLeft $liters $used]
 }
 
-switch $puzzle(part) {
-    1 {
-        puts [llength [combinations $capacities $liters]]
-    }
-    2 {
-        set freqs [dict create]
-        foreach comb [combinations $capacities $liters] {
-            set n [llength $comb]
-            dict incr freqs $n
-            if {![info exists minN] || $n < $minN} {
-                set minN $n
-            }
-        }
-        puts stderr "freqs $freqs"
-        puts [dict get $freqs $minN]
-    }
+proc 1 {capacities liters} {
+    puts [llength [combinations $capacities $liters]]
 }
+
+proc 2 {capacities liters} {
+    set freqs [dict create]
+    foreach comb [combinations $capacities $liters] {
+        set n [llength $comb]
+        dict incr freqs $n
+        if {![info exists minN] || $n < $minN} {
+            set minN $n
+        }
+    }
+    puts stderr "freqs $freqs"
+    puts [dict get $freqs $minN]
+}
+
+set liters 150
+catch { set liters $env(LITERS) }
+puts stderr "liters $liters"
+
+set capacities [lsort -decreasing -integer [read stdin]]
+puts stderr "capacities $capacities"
+
+$puzzle(part) $capacities $liters

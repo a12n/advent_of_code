@@ -8,208 +8,228 @@ set spells {
     "Recharge" { mana 229 turns 5 cumulative yes player { mana +101 } }
 }
 
-namespace eval ::character {
-    proc isDead character {
-        expr {[dict get $character hp] <= 0}
-    }
-
-    proc takeMeleeDamage {character damage} {
-        if {[dict exists $character armor]} {
-            set armor [dict get $character armor]
-        } else {
-            set armor 0
+namespace eval game {
+    namespace eval character {
+        proc isDead character {
+            expr {[dict get $character hp] <= 0}
         }
 
-        set hits [expr {-max(1, $damage - $armor)}]
+        proc magicDamage {character damage} {
+            set hits [expr {-$damage}]
 
-        dict incr character hp $hits
+            dict incr character hp $hits
 
-        return $character
-    }
-}
-
-namespace eval ::effect {
-    proc isCumulative effect {
-        if {[dict exists $effect cumulative]} {
-            dict get $effect cumulative
-        } else {
-            return no
+            return $character
         }
-    }
 
-    proc isProlonged effect {
-        if {[dict exists $effect turns]} {
-            expr {[dict get $effect turns] > 0}
-        } else {
-            return no
+        proc meleeDamage {character damage} {
+            if {[dict exists $character armor]} {
+                set armor [dict get $character armor]
+            } else {
+                set armor 0
+            }
+
+            set hits [expr {-max(1, $damage - $armor)}]
+
+            dict incr character hp $hits
+
+            return $character
         }
     }
 
-    proc applicable {effect entityName} {
-        if {[dict exists $effect $entityName]} {
-            dict get $effect $entityName
-        } else {
-            return {}
-        }
-    }
-
-    proc add {effect entity {mult 1}} {
-        foreach {key value} $effect {
-            if {$key in {armor hp mana}} {
-                dict incr entity $key [expr {$value * $mult}]
+    namespace eval effect {
+        proc isCumulative effect {
+            if {[dict exists $effect cumulative]} {
+                dict get $effect cumulative
+            } else {
+                return no
             }
         }
-        return $entity
+
+        proc isProlonged effect {
+            if {[dict exists $effect turns]} {
+                expr {[dict get $effect turns] > 0}
+            } else {
+                return no
+            }
+        }
+
+        proc applicable {effect entityName} {
+            if {[dict exists $effect $entityName]} {
+                dict get $effect $entityName
+            } else {
+                return {}
+            }
+        }
+
+        proc add {effect entity {mult 1}} {
+            foreach {key value} $effect {
+                if {$key in {armor hp mana}} {
+                    dict incr entity $key [expr {$value * $mult}]
+                }
+            }
+            return $entity
+        }
+
+        proc remove {effect entity} {
+            add $effect $entity -1
+        }
     }
 
-    proc remove {effect entity} {
-        add $effect $entity -1
+    namespace eval state {
+        # Game state is a list {turn spent player boss effects}.
+        # Compare by mana spent and then (if mana spent is the same)
+        # by boss HP.
+        proc compare {s t} {
+            # if {[set a [lindex $s 1]] != [set b [lindex $t 1]]} {
+            #     expr {$a - $b}
+            # } else {
+            #     expr {[dict get [lindex $s 3] hp] - [dict get [lindex $t 3] hp]}
+            # }
+
+            expr {([lindex $s 0] + [lindex $s 1] + [dict get [lindex $s 3] hp]) - \
+                      ([lindex $t 0] + [lindex $t 1] + [dict get [lindex $t 3] hp])}
+        }
     }
 }
 
-set globalManaSpentMin [expr {2**64 + 1}]
-
-proc play {player boss {turn 0} {manaSpent 0} {effects {}}} {
-    global globalManaSpentMin
+proc play {player boss} {
     global spells
 
-    if {$manaSpent > $globalManaSpentMin} {
-        puts stderr "play $turn: manaSpent $manaSpent is greater than globalManaSpentMin $globalManaSpentMin"
-        return {}
-    }
+    # Initial state: {turn spent player boss effects}
+    set queue [list [list 0 0 $player $boss {}]]
 
-    puts stderr "play $turn: player {$player} boss {$boss} manaSpent $manaSpent effects $effects"
+    set minSpent [expr {2**64 + 1}]
 
-    # Apply effects
-    set effects [dict filter $effects script {name effect} {
-        # Cumulative effects apply each turn while active.
-        if {[effect::isCumulative $effect]} {
-            puts stderr "play $turn: applying cumulative effect \"$name\""
+    while {$queue ne {}} {
+        puts stderr "play: queue [llength $queue]"
 
-            set boss [effect::add [effect::applicable $effect boss] $boss]
-            set player [effect::add [effect::applicable $effect player] $player]
+        # Dequeue the minimum state: breadth first.
+        # set queue [lassign $queue state]
 
-            if {[character::isDead $boss]} {
-                puts stderr "play $turn: boss is dead"
-                return $manaSpent
-            }
+        # Dequeue the minimum state: depth first.
+        set state [lindex $queue end]
+        set queue [lreplace $queue end end]
 
-            if {[character::isDead $player]} {
-                puts stderr "play $turn: player is dead"
-                return {}
-            }
+        lassign $state turn spent player boss effects
+        puts stderr "play $turn: spent $spent player $player boss $boss effects $effects"
+
+        if {$spent > $minSpent} {
+            puts stderr "play $turn: spent $spent more than min $minSpent"
+            continue
         }
 
-        if {[dict incr effect turns -1] == 0} {
-            # Undo non-cumulative effects as they deactivate.
-            if {![effect::isCumulative $effect]} {
-                puts stderr "play $turn: effect \"$name\" ended, unapplying"
-
-                set boss [effect::remove [effect::applicable $effect boss] $boss]
-                set player [effect::remove [effect::applicable $effect player] $player]
-
-                if {[character::isDead $boss]} {
-                    puts stderr "play $turn: boss is dead"
-                    return $manaSpent
-                }
-                if {[character::isDead $player]} {
-                    puts stderr "play $turn: player is dead"
-                    return {}
-                }
-            }
-            # Remove the effect
-            expr no
-        } else {
-            # Keep the effect
-            expr yes
-        }
-    }]
-
-    if {$turn % 2 == 0} {
-        puts stderr "play $turn: player turn"
-
-        set manaSpentMin {}
-
-        # Player turn, try each possible spell.
-        dict for {name spell} $spells {
-            if {$name in [dict keys $effects]} {
-                # You cannot cast a spell that would start an effect
-                # which is already active.
-                puts stderr "play $turn: can't cast \"$name\", effect already active"
-                continue
-            }
-
-            set spellMana [dict get $spell mana]
-
-            if {$spellMana > [dict get $player mana]} {
-                puts stderr "play $turn: can't cast \"$name\", takes $spellMana"
-                continue
-            }
-
-            set playerNext $player
-            set bossNext $boss
-            set manaSpentNext [expr {$manaSpent + $spellMana}]
-            set effectsNext $effects
-
-            puts stderr "play $turn: player casts \"$name\""
-
-            dict incr playerNext mana [expr {0 - $spellMana}]
-
-            if {[effect::isProlonged $spell]} {
-                if {![effect::isCumulative $spell]} {
-                    set bossNext [effect::add [effect::applicable $spell boss] $bossNext]
-                    set playerNext [effect::add [effect::applicable $spell player] $playerNext]
-                }
-                dict set effectsNext $name $spell
-            } else {
-                set bossNext [effect::add [effect::applicable $spell boss] $bossNext]
-                set playerNext [effect::add [effect::applicable $spell player] $playerNext]
-            }
-
-            # TODO: Check at the top of the command.
-            if {[character::isDead $bossNext]} {
-                puts stderr "play $turn: boss is dead"
-                return $manaSpentNext
-            }
-            if {[character::isDead $playerNext]} {
-                puts stderr "play $turn: player is dead"
-                return {}
-            }
-
-            set manaSpentChild [play $playerNext $bossNext [expr {$turn + 1}] $manaSpentNext $effectsNext]
-            if {$manaSpentMin eq {} || $manaSpentChild < $manaSpentMin} {
-                set manaSpentMin $manaSpentChild
-            }
-            if {$manaSpentMin ne {} && $manaSpentMin < $globalManaSpentMin} {
-                set globalManaSpentMin $manaSpentMin
-            }
-        }
-
-        puts stderr "play $turn: player waits"
-        set manaSpentChild [play $player $boss [expr {$turn + 1}] $manaSpent $effects]
-        if {$manaSpentMin eq {} || $manaSpentChild < $manaSpentMin} {
-            set manaSpentMin $manaSpentChild
-        }
-        if {$manaSpentMin ne {} && $manaSpentMin < $globalManaSpentMin} {
-            set globalManaSpentMin $manaSpentMin
-        }
-
-        # Minimum of all possible outcomes.
-        puts stderr "play $turn: min mana spent on all possible actions: $manaSpentMin"
-        return $manaSpentMin
-    } else {
-        puts stderr "play $turn: boss turn"
-
-        set damage [dict get $boss damage]
-        puts stderr "play $turn: boss attacks with $damage"
-        set playerNext [character::takeMeleeDamage $player $damage]
-        if {[character::isDead $playerNext]} {
+        # A final state.
+        if {[game::character::isDead $boss]} {
+            puts stderr "play $turn: boss is dead, spent $spent"
+            set minSpent [expr {min($minSpent, $spent)}]
+            continue
+        } elseif {[game::character::isDead $player]} {
             puts stderr "play $turn: player is dead"
-            return {}
+            continue
         }
 
-        play $playerNext $boss [incr turn] $manaSpent $effects
+        # Apply effects.
+        set effects [dict filter $effects script {name effect} {
+            # Cumulative effects apply each turn while active.
+            if {[game::effect::isCumulative $effect]} {
+                puts stderr "play $turn: applying cumulative \"$name\""
+                set boss [game::effect::add [game::effect::applicable $effect boss] $boss]
+                set player [game::effect::add [game::effect::applicable $effect player] $player]
+                if {[game::character::isDead $boss] || [game::character::isDead $player]} {
+                    # There's no point in updating the game state.
+                    break
+                }
+            }
+
+            # Undo non-cumulative effects as they deactivate.
+            if {[dict incr effect turns -1] == 0} {
+                puts stderr "play $turn: effects of \"$name\" ended"
+                if {![game::effect::isCumulative $effect]} {
+                    set boss [game::effect::remove [game::effect::applicable $effect boss] $boss]
+                    set player [game::effect::remove [game::effect::applicable $effect player] $player]
+                    if {[game::character::isDead $boss] || [game::character::isDead $player]} {
+                        break
+                    }
+                }
+
+                # Remove the effect
+                expr no
+            } else {
+                # Keep the effect
+                expr yes
+            }
+        }]
+
+        # Either of characters may be dead after applying effects.
+        if {[game::character::isDead $boss]} {
+            puts stderr "play $turn: boss killed by effects, spent $spent"
+            set minSpent [expr {min($minSpent, $spent)}]
+            continue
+        } elseif {[game::character::isDead $player]} {
+            puts stderr "play $turn: player killed by effects"
+            continue
+        }
+
+        set turn2 [expr {$turn + 1}]
+
+        if {$turn % 2 == 0} {
+            # …or just wait.
+            lappend queue [list $turn2 $spent $player $boss $effects]
+
+            # Player turn. Cast a spell…
+            dict for {name spell} $spells {
+                if {$name in [dict keys $effects]} {
+                    # You cannot cast a spell that would start an effect
+                    # which is already active. Try next spell.
+                    puts stderr "play $turn: can't cast \"$name\", effect already active"
+                    continue
+                }
+
+                set mana [dict get $spell mana]
+                if {$mana > [dict get $player mana]} {
+                    # Not enough mana for the spell. Try next spell.
+                    puts stderr "play $turn: can't cast \"$name\", requires $mana mana"
+                    continue
+                }
+
+                set effects2 $effects
+                set player2 $player
+                set boss2 $boss
+
+                # Spend mana.
+                set spent2 [expr {$spent + $mana}]
+                dict incr $player2 mana [expr {-$mana}]
+                puts stderr "play $turn: player casts \"$name\" for $mana"
+
+                if {[game::effect::isProlonged $spell]} {
+                    dict set effects2 $name $spell
+                }
+
+                if {![game::effect::isCumulative $spell]} {
+                    # Cumulative spell effects must be applied at the
+                    # begining of the turn. Non-cumulative spells must
+                    # be applied right away.
+                    set boss2 [game::effect::add [game::effect::applicable $spell boss] $boss2]
+                    set player2 [game::effect::add [game::effect::applicable $spell player] $player2]
+                }
+
+                lappend queue [list $turn2 $spent2 $player2 $boss2 $effects2]
+            }
+        } else {
+            # Boss turn
+            set damage [dict get $boss damage]
+            set player2 [game::character::meleeDamage $player $damage]
+            puts stderr "play $turn: boss attacks with damage $damage"
+            lappend queue [list $turn2 $spent $player2 $boss $effects]
+        }
+
+        # FIXME: Priority queue.
+        # set queue [lsort -command game::state::compare $queue]
     }
+
+    # error "play: player win infeasible"
+    return $minSpent
 }
 
 set player [dict create armor 0 hp 50 mana 500]
@@ -220,5 +240,4 @@ set boss [lsort -index 0 -stride 2 [string map {
 
 puts stderr "player $player"
 puts stderr "boss $boss"
-play $player $boss
-puts $globalManaSpentMin
+puts [play $player $boss]

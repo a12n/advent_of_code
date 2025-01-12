@@ -1,11 +1,5 @@
 #!/usr/bin/env tclsh
 
-set ingredients {}
-while {[gets stdin line] >= 0} {
-    set ingredient [lrange [string map {, {} : {}} $line] 1 end]
-    lappend ingredients [lsort -index 0 -stride 2 $ingredient]
-}
-
 proc multipliy {nums ingredients} {
     set n [llength $ingredients]
     set cookie {
@@ -156,17 +150,24 @@ proc caloriesCookies ingredients {
     return $cookies
 }
 
-switch $puzzle(part) {
-    1 {
-        # Local search from arbitrary initial solution.
-        puts [localSearch $ingredients [initial [llength $ingredients]]]
-    }
-    2 {
-        puts [tcl::mathfunc::max {*}[lmap cookie [caloriesCookies $ingredients] {
-            score $cookie
-        }]]
-    }
+proc 1 ingredients {
+    # Local search from arbitrary initial solution.
+    puts [localSearch $ingredients [initial [llength $ingredients]]]
 }
+
+proc 2 ingredients {
+    puts [tcl::mathfunc::max {*}[lmap cookie [caloriesCookies $ingredients] {
+        score $cookie
+    }]]
+}
+
+set ingredients {}
+while {[gets stdin line] >= 0} {
+    set ingredient [lrange [string map {, {} : {}} $line] 1 end]
+    lappend ingredients [lsort -index 0 -stride 2 $ingredient]
+}
+
+$puzzle(part) $ingredients
 
 # N = number of ingredients
 #

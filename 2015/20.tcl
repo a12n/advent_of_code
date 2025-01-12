@@ -47,12 +47,19 @@ proc factors::sum powers {
     return $prod
 }
 
-set limit [expr {[gets stdin] / 10}]
-for {set n 1} {1} {incr n} {
-    set sum [factors::sum [factors::powers $n]]
-    # puts stderr "$n: $sum $limit"
-    if {$sum >= $limit} {
-        break
+proc 1 limit {
+    for {set n 1} {1} {incr n} {
+        set sum [factors::sum [factors::powers $n]]
+        # puts stderr "$n: $sum $limit"
+        if {$sum >= ($limit / 10)} {
+            break
+        }
     }
+    puts $n
 }
-puts $n
+
+proc 2 limit {
+    # TODO
+}
+
+$puzzle(part) [expr {[gets stdin]}]

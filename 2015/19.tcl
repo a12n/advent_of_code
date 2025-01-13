@@ -17,13 +17,16 @@ proc recursive2 {from to} {
 }
 
 proc invert replacements {
-    set result {}
+    set result [dict create]
     dict for {from toList} $replacements {
         foreach to $toList {
-            lappend result $to $from
+            if {[dict exists $result $to]} {
+                error "invert: duplicate $to"
+            }
+            dict set result $to $from
         }
     }
-    return [lsort -decreasing -command {apply {{a b} { expr {[string length $a] - [string length $b]} }}} -stride 2 $result]
+    return $result
 }
 
 set molecule [gets stdin]

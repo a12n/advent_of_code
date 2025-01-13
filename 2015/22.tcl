@@ -30,6 +30,7 @@ namespace eval game {
             }
 
             set hits [expr {-max(1, $damage - $armor)}]
+            puts stderr "meleeDamage: hits $hits"
 
             dict incr character hp $hits
 
@@ -65,7 +66,9 @@ namespace eval game {
         proc add {effect entity {mult 1}} {
             foreach {key value} $effect {
                 if {$key in {armor hp mana}} {
-                    dict incr entity $key [expr {$value * $mult}]
+                    set increment [expr {$value * $mult}]
+                    dict incr entity $key $increment
+                    puts stderr "effect::add: $key increment $increment"
                 }
             }
             return $entity
@@ -165,7 +168,7 @@ proc play {player boss} {
         set effects [dict filter $effects script {name effect} {
             # Undo non-cumulative effects as they deactivate.
             if {[set n [dict get $effect turns]] == 0} {
-                puts stderr "play $turn: effects of \"$name\" ended"
+                puts stderr "play $turn: effects \"$name\" wears off"
                 if {![game::effect::isCumulative $effect]} {
                     set boss [game::effect::remove [game::effect::applicable $effect boss] $boss]
                     set player [game::effect::remove [game::effect::applicable $effect player] $player]
@@ -178,7 +181,7 @@ proc play {player boss} {
                 expr no
             } else {
                 # Keep the effect
-                puts stderr "play $turn: effect \"$name\" for more $n turns"
+                puts stderr "play $turn: effect \"$name\" timer is now $n"
                 expr yes
             }
         }]
@@ -243,8 +246,8 @@ proc play {player boss} {
         } else {
             # Boss turn
             set damage [dict get $boss damage]
-            set player2 [game::character::meleeDamage $player $damage]
             puts stderr "play $turn: boss attacks with damage $damage"
+            set player2 [game::character::meleeDamage $player $damage]
             lappend queue [list $turn2 $spent $player2 $boss $effects]
         }
 

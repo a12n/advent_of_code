@@ -81,14 +81,11 @@ namespace eval game {
         # Compare by mana spent and then (if mana spent is the same)
         # by boss HP.
         proc compare {s t} {
-            # if {[set a [lindex $s 1]] != [set b [lindex $t 1]]} {
-            #     expr {$a - $b}
-            # } else {
-            #     expr {[dict get [lindex $s 3] hp] - [dict get [lindex $t 3] hp]}
-            # }
-
-            expr {([lindex $s 0] + [lindex $s 1] + [dict get [lindex $s 3] hp]) - \
-                      ([lindex $t 0] + [lindex $t 1] + [dict get [lindex $t 3] hp])}
+            if {[set a [lindex $s 1]] != [set b [lindex $t 1]]} {
+                expr {$a - $b}
+            } else {
+                expr {[dict get [lindex $s 3] hp] - [dict get [lindex $t 3] hp]}
+            }
         }
     }
 }
@@ -106,11 +103,11 @@ proc play {player boss} {
         puts stderr "play: queue [llength $queue]"
 
         # Dequeue the minimum state: breadth first.
-        # set queue [lassign $queue state]
+        set queue [lassign $queue state]
 
         # Dequeue the minimum state: depth first.
-        set state [lindex $queue end]
-        set queue [lreplace $queue end end]
+        # set state [lindex $queue end]
+        # set queue [lreplace $queue end end]
 
         lassign $state turn spent player boss effects
         puts stderr "play $turn: spent $spent player $player boss $boss effects $effects"
@@ -139,7 +136,8 @@ proc play {player boss} {
         if {[game::character::isDead $boss]} {
             puts stderr "play $turn: boss is dead, spent $spent"
             set minSpent [expr {min($minSpent, $spent)}]
-            continue
+            # continue
+            return $spent
         } elseif {[game::character::isDead $player]} {
             puts stderr "play $turn: player is dead"
             continue
@@ -189,7 +187,8 @@ proc play {player boss} {
         if {[game::character::isDead $boss]} {
             puts stderr "play $turn: boss killed by effects, spent $spent"
             set minSpent [expr {min($minSpent, $spent)}]
-            continue
+            # continue
+            return $spent
         } elseif {[game::character::isDead $player]} {
             puts stderr "play $turn: player killed by effects"
             continue
@@ -249,7 +248,7 @@ proc play {player boss} {
         }
 
         # FIXME: Priority queue.
-        # set queue [lsort -command game::state::compare $queue]
+        set queue [lsort -command game::state::compare $queue]
     }
 
     # error "play: player win infeasible"

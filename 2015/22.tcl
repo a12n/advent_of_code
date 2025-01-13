@@ -221,7 +221,7 @@ proc play {player boss} {
 
                 # Spend mana.
                 set spent2 [expr {$spent + $mana}]
-                dict incr $player2 mana [expr {-$mana}]
+                dict incr player2 mana [expr {-$mana}]
                 puts stderr "play $turn: player casts \"$name\" for $mana"
 
                 if {[game::effect::isProlonged $spell]} {

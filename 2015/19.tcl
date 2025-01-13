@@ -51,18 +51,20 @@ proc calibrate {replacements molecule} {
 }
 
 proc fabricate {replacements molecule finish} {
+    puts stderr "fabricate: replacements [dict size $replacements] finish \"$finish\""
+
     set queue [list [list 0 $molecule]]
     set seen [dict create]
 
     while {$queue ne {}} {
-        puts stderr "queue [llength $queue] seen [dict size $seen]"
+        puts stderr "fabricate: queue [llength $queue] seen [dict size $seen]"
 
         set state [lindex $queue end]
         set queue [lreplace $queue end end]
 
         lassign $state dist molecule
 
-        puts stderr "$dist \"$molecule\""
+        puts stderr "fabricate: $dist \"$molecule\""
 
         if {$molecule eq $finish} {
             if {[info exists minDist]} {
@@ -77,7 +79,7 @@ proc fabricate {replacements molecule finish} {
 
         set dist2 [expr {$dist + 1}]
 
-        dict map {to from} $replacements {
+        dict for {to from} $replacements {
             set first 0
             set n [string length $to]
 

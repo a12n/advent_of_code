@@ -93,7 +93,7 @@ namespace eval game {
     }
 }
 
-proc play {player boss} {
+proc play {player boss {hard no}} {
     global spells
 
     # Initial state: {turn spent player boss effects}
@@ -134,6 +134,11 @@ proc play {player boss} {
             continue
         } else {
             dict set seen $stateKey yes
+        }
+
+        if {$hard} {
+            puts stderr "play $turn: player lose 1 HP"
+            dict incr player hp -1
         }
 
         # A final state.
@@ -262,6 +267,11 @@ set boss [lsort -index 0 -stride 2 [string map {
 catch { dict set player hp $env(PLAYER_HP) }
 catch { dict set player mana $env(PLAYER_MANA) }
 
+switch $puzzle(part) {
+    1 { set hard no }
+    2 { set hard yes }
+}
+
 puts stderr "player $player"
 puts stderr "boss $boss"
-puts [play $player $boss]
+puts [play $player $boss $hard]

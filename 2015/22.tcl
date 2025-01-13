@@ -198,9 +198,6 @@ proc play {player boss} {
         set turn2 [expr {$turn + 1}]
 
         if {$turn % 2 == 0} {
-            # …or just wait.
-            lappend queue [list $turn2 $spent $player $boss $effects]
-
             # Player turn. Cast a spell…
             dict for {name spell} $spells {
                 if {$name in [dict keys $effects]} {
@@ -240,6 +237,9 @@ proc play {player boss} {
 
                 lappend queue [list $turn2 $spent2 $player2 $boss2 $effects2]
             }
+
+            # …or just wait.
+            lappend queue [list $turn2 $spent $player $boss $effects]
         } else {
             # Boss turn
             set damage [dict get $boss damage]

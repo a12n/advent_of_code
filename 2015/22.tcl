@@ -146,7 +146,7 @@ proc play {player boss} {
         }
 
         # Apply effects.
-        set effects [dict filter $effects script {name effect} {
+        dict for {name effect} $effects {
             # Cumulative effects apply each turn while active.
             if {[game::effect::isCumulative $effect]} {
                 puts stderr "play $turn: applying cumulative \"$name\""
@@ -157,10 +157,16 @@ proc play {player boss} {
                     break
                 }
             }
-
+        }
+        # End effects.
+        foreach name [dict keys $effects] {
+            set n [dict get $effects $name turns]
+            dict set effects $name turns [expr {$n - 1}]
+        }
+        # Remove effects.
+        set effects [dict filter $effects script {name effect} {
             # Undo non-cumulative effects as they deactivate.
-            if {[dict incr effect turns -1] == 0} {
-                # FIXME: the decrement isn't reflected in the effects.
+            if {[set n [dict get $effect turns]] == 0} {
                 puts stderr "play $turn: effects of \"$name\" ended"
                 if {![game::effect::isCumulative $effect]} {
                     set boss [game::effect::remove [game::effect::applicable $effect boss] $boss]
@@ -174,6 +180,7 @@ proc play {player boss} {
                 expr no
             } else {
                 # Keep the effect
+                puts stderr "play $turn: effect \"$name\" for more $n turns"
                 expr yes
             }
         }]

@@ -8,6 +8,14 @@ while {[gets stdin line] > 0} {
     }
 }
 
+proc recursive {from to} {
+    expr {[string first $from $to] != -1}
+}
+
+proc recursive2 {from to} {
+    expr {"$to" eq "$from$from"}
+}
+
 proc invert replacements {
     set result {}
     dict for {from toList} $replacements {

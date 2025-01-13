@@ -100,7 +100,7 @@ proc play {player boss} {
     set seen [dict create]
 
     while {$queue ne {}} {
-        puts stderr "play: queue [llength $queue]"
+        puts stderr "play: queue [llength $queue] seen [dict size $seen]"
 
         # Dequeue the minimum state: breadth first.
         set queue [lassign $queue state]
@@ -119,6 +119,7 @@ proc play {player boss} {
 
         set stateKey \
             [list \
+                 [expr {$turn % 2}] \
                  [lsort -stride 2 -index 0 $player] \
                  [lsort -stride 2 -index 0 $boss] \
                  [lsort -stride 2 -index 0 \

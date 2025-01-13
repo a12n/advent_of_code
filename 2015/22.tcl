@@ -127,12 +127,12 @@ proc play {player boss} {
                  [lsort -stride 2 -index 0 \
                       [dict map {name effect} $effects \
                            { dict get $effect turns }]]]
-        puts stderr "stateKey $stateKey"
+        # puts stderr "stateKey $stateKey"
         if {[dict exists $seen $stateKey]} {
             puts stderr "play $turn: stateKey $stateKey already seen"
             continue
         } else {
-            dict set $seen $stateKey yes
+            dict set seen $stateKey yes
         }
 
         # A final state.

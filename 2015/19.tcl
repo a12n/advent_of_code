@@ -50,6 +50,35 @@ proc calibrate {replacements molecule} {
     return [dict size $replaced]
 }
 
+proc unrecur2 {replacementsName molecule} {
+    upvar $replacementsName replacements
+
+    puts stderr "unrecur2: replacements [dict size $replacements]"
+
+    dict for {to from} $replacements {
+        if {![recursive2 $from $to]} {
+            continue
+        }
+
+        set first 0
+        set n [string length $to]
+
+        for {set first 0} {[set first [string first $to $molecule $first]] != -1} {incr first} {
+            set last [expr {$first + $n - 1}]
+            puts stderr "unrecur: replace \"$to\" with \"$from\""
+            puts stderr $molecule
+            set molecule [string replace $molecule $first $last $from]
+            puts stderr $molecule
+        }
+
+        dict unset replacements $to
+    }
+
+    puts stderr "unrecur2: replacements [dict size $replacements]"
+
+    return $molecule
+}
+
 proc fabricate {replacements molecule finish} {
     puts stderr "fabricate: replacements [dict size $replacements] finish \"$finish\""
 
@@ -110,6 +139,7 @@ switch $puzzle(part) {
     2 {
         set replacements [invert $replacements]
         puts stderr "invert $replacements"
+        set molecule [unrecur2 replacements $molecule]
         puts [fabricate $replacements $molecule e]
     }
 }

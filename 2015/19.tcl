@@ -42,60 +42,55 @@ proc calibrate {replacements molecule} {
     return [dict size $replaced]
 }
 
-proc fabricate {replacements molecule finish {seenName {}} {cacheName {}}} {
-    # puts stderr "fabricate: molecule \"$molecule\""
+proc fabricate {replacements molecule finish} {
+    set queue [list [list 0 $molecule]]
+    set seen [dict create]
 
-    if {$molecule eq $finish} {
-        puts stderr "fabricate: found $finish"
-        return 0
-    }
+    while {$queue ne {}} {
+        puts stderr "queue [llength $queue] seen [dict size $seen]"
 
-    if {$seenName ne {}} {
-        upvar $seenName seen
-    } else {
-        set seen [dict create]
-    }
+        set state [lindex $queue end]
+        set queue [lreplace $queue end end]
 
-    dict set seen $molecule yes
+        lassign $state dist molecule
 
-    if {$cacheName ne {}} {
-        upvar $cacheName cache
-    } else {
-        set cache [dict create]
-    }
+        puts stderr "$dist \"$molecule\""
 
-    if {[dict exists $cache $molecule]} {
-        puts stderr "fabricate: found \"$molecule\" in cache"
-        return [dict get $cache $molecule]
-    }
-
-    set minDist {}
-
-    dict for {from to} $replacements {
-        set first 0
-        set n [string length $from]
-
-        for {set first 0} {[set first [string first $from $molecule $first]] != -1} {incr first} {
-            set last [expr {$first + $n - 1}]
-            set molecule2 [string replace $molecule $first $last $to]
-
-            if {[dict exists $seen $molecule2]} {
-                continue
+        if {$molecule eq $finish} {
+            if {[info exists minDist]} {
+                set minDist [expr {min($dist, $minDist)}]
+            } else {
+                set minDist $dist
             }
+            continue
+        }
 
-            if {[set dist [fabricate $replacements $molecule2 $finish seen cache [expr {$depth + 1}]]] ne {}} {
-                incr dist
-                if {$minDist eq {} || $dist < $minDist} {
-                    set minDist $dist
+        dict set seen $molecule yes
+
+        set dist2 [expr {$dist + 1}]
+
+        dict map {to from} $replacements {
+            set first 0
+            set n [string length $to]
+
+            for {set first 0} {[set first [string first $to $molecule $first]] != -1} {incr first} {
+                set last [expr {$first + $n - 1}]
+                set molecule2 [string replace $molecule $first $last $from]
+
+                if {[dict exists $seen $molecule2]} {
+                    continue
                 }
+
+                lappend queue [list $dist2 $molecule2]
             }
         }
     }
 
-    puts stderr "fabricate: molecule $molecule minDist $minDist"
-    dict set cache $molecule $minDist
-
-    return $minDist
+    if {[info exists minDist]} {
+        return $minDist
+    } else {
+        error "fabricate: infeasible \"$finish\""
+    }
 }
 
 switch $puzzle(part) {

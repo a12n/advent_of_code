@@ -103,11 +103,11 @@ proc play {player boss} {
         puts stderr "play: queue [llength $queue] seen [dict size $seen]"
 
         # Dequeue the minimum state: breadth first.
-        set queue [lassign $queue state]
+        # set queue [lassign $queue state]
 
-        # Dequeue the minimum state: depth first.
-        # set state [lindex $queue end]
-        # set queue [lreplace $queue end end]
+        # Dequeue the next state: depth first.
+        set state [lindex $queue end]
+        set queue [lreplace $queue end end]
 
         lassign $state turn spent player boss effects
         puts stderr "play $turn: spent $spent player $player boss $boss effects $effects"
@@ -137,8 +137,7 @@ proc play {player boss} {
         if {[game::character::isDead $boss]} {
             puts stderr "play $turn: boss is dead, spent $spent"
             set minSpent [expr {min($minSpent, $spent)}]
-            # continue
-            return $spent
+            continue
         } elseif {[game::character::isDead $player]} {
             puts stderr "play $turn: player is dead"
             continue
@@ -188,8 +187,7 @@ proc play {player boss} {
         if {[game::character::isDead $boss]} {
             puts stderr "play $turn: boss killed by effects, spent $spent"
             set minSpent [expr {min($minSpent, $spent)}]
-            # continue
-            return $spent
+            continue
         } elseif {[game::character::isDead $player]} {
             puts stderr "play $turn: player killed by effects"
             continue
@@ -254,7 +252,6 @@ proc play {player boss} {
         set queue [lsort -command game::state::compare $queue]
     }
 
-    # error "play: player win infeasible"
     return $minSpent
 }
 

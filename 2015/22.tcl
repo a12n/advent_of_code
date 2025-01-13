@@ -264,6 +264,9 @@ set boss [lsort -index 0 -stride 2 [string map {
     "Hit Points:" hp
 } [read stdin]]]
 
+catch { dict set player hp $env(PLAYER_HP) }
+catch { dict set player mana $env(PLAYER_MANA) }
+
 puts stderr "player $player"
 puts stderr "boss $boss"
 puts [play $player $boss]

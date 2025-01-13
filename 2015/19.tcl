@@ -112,13 +112,13 @@ proc fabricate {replacements molecule finish} {
 
         set dist2 [expr {$dist + 1}]
 
-        dict for {to from} $replacements {
+        dict for {from to} $replacements {
             set first 0
-            set n [string length $to]
+            set n [string length $from]
 
-            for {set first 0} {[set first [string first $to $molecule $first]] != -1} {incr first} {
+            for {set first 0} {[set first [string first $from $molecule $first]] != -1} {incr first} {
                 set last [expr {$first + $n - 1}]
-                set molecule2 [string replace $molecule $first $last $from]
+                set molecule2 [string replace $molecule $first $last $to]
 
                 if {[dict exists $seen $molecule2]} {
                     continue

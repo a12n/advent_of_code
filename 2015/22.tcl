@@ -252,7 +252,7 @@ proc play {player boss} {
         }
 
         # FIXME: Priority queue.
-        set queue [lsort -command game::state::compare $queue]
+        # set queue [lsort -command game::state::compare $queue]
     }
 
     return $minSpent

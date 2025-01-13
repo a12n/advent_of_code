@@ -199,7 +199,7 @@ proc play {player boss} {
         set turn2 [expr {$turn + 1}]
 
         if {$turn % 2 == 0} {
-            # Player turn. Cast a spell…
+            # Player turn.
             dict for {name spell} $spells {
                 if {$name in [dict keys $effects]} {
                     # You cannot cast a spell that would start an effect
@@ -237,11 +237,6 @@ proc play {player boss} {
                 }
 
                 lappend queue [list $turn2 $spent2 $player2 $boss2 $effects2]
-            }
-
-            # …or just wait.
-            if {[llength $effects] > 0} {
-                lappend queue [list $turn2 $spent $player $boss $effects]
             }
         } else {
             # Boss turn

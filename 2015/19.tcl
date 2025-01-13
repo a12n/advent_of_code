@@ -53,7 +53,7 @@ proc calibrate {replacements molecule} {
 proc unrecur2 {replacementsName molecule} {
     upvar $replacementsName replacements
 
-    puts stderr "unrecur2: replacements [dict size $replacements]"
+    puts stderr "unrecur2: replacements [dict size $replacements] molecule [string length $molecule]"
 
     dict for {to from} $replacements {
         if {![recursive2 $from $to]} {
@@ -74,13 +74,13 @@ proc unrecur2 {replacementsName molecule} {
         dict unset replacements $to
     }
 
-    puts stderr "unrecur2: replacements [dict size $replacements]"
+    puts stderr "unrecur2: replacements [dict size $replacements] molecule [string length $molecule]"
 
     return $molecule
 }
 
 proc fabricate {replacements molecule finish} {
-    puts stderr "fabricate: replacements [dict size $replacements] finish \"$finish\""
+    puts stderr "fabricate: replacements [dict size $replacements] molecule [string length $molecule] finish \"$finish\""
 
     set queue [list [list 0 $molecule]]
     set seen [dict create]

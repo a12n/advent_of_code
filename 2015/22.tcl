@@ -239,7 +239,9 @@ proc play {player boss} {
             }
 
             # …or just wait.
-            lappend queue [list $turn2 $spent $player $boss $effects]
+            if {[llength $effects] > 0} {
+                lappend queue [list $turn2 $spent $player $boss $effects]
+            }
         } else {
             # Boss turn
             set damage [dict get $boss damage]

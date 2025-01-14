@@ -77,22 +77,20 @@ switch $puzzle(part) {
     2 { set n 4 }
 }
 
-if {$totalWeight % $n != 0} {
+if {$totalWeight % $n == 0} {
+    set groupWeight [expr {$totalWeight / $n}]
+} else {
     error "invalid weights $weights"
 }
 
-lassign [searchGroup $weights [expr {$totalWeight / $n}]] first firstQE weights
-puts stderr "first $first firstSum [tcl::mathop::+ {*}$first] firstQE $firstQE"
-lassign [searchGroup $weights [expr {$totalWeight / $n}]] second _ weights
-puts stderr "second $second secondSum [tcl::mathop::+ {*}$second]"
-switch $n {
-    3 {
-        puts stderr "third $weights thirdSum [tcl::mathop::+ {*}$weights]"
+for {} {$n > 1} {incr n -1} {
+    lassign [searchGroup $weights $groupWeight] group groupQE weights
+    if {[tcl::mathop::+ {*}$group] != $groupWeight} {
+        error "invalid solution: group $group weights $weights"
     }
-    4 {
-        lassign [searchGroup $weights [expr {$totalWeight / $n}]] third _ fourth
-        puts stderr "third $third thirdSum [tcl::mathop::+ {*}$third]"
-        puts stderr "fourth $fourth fourthSum [tcl::mathop::+ {*}$fourth]"
+    if {![info exists firstQE]} {
+        set firstQE $groupQE
     }
 }
+
 puts $firstQE

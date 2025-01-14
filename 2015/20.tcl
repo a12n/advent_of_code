@@ -22,6 +22,30 @@
 # Formula for sum of divisors:
 # https://planetmath.org/formulaforsumofdivisors
 
+# XXX: The upper limit is arbirary, may not work for all inputs?
+set primes [lrepeat 300000 1]
+
+puts -nonewline stderr "List of primes up to [llength $primes]: "
+set n [llength $primes]
+for {set i 2} {($i * $i) <= $n} {incr i} {
+    if {[lindex $primes $i]} {
+        for {set j [expr {$i * $i}]} {$j <= $n} {incr j $i} {
+            lset primes $j 0
+        }
+    }
+}
+
+set m 0
+for {set i 2} {$i <= $n} {incr i} {
+    if {[lindex $primes $i]} {
+        lset primes $m $i
+        incr m
+    }
+}
+set primes [lrange $primes 0 [expr {$m - 1}]]
+unset i j m n
+puts stderr "[llength $primes] numbers"
+
 namespace eval ::factors {
     namespace export powers sum
 }

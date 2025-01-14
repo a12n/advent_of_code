@@ -6,6 +6,7 @@ puts stderr "weights $weights totalWeight $totalWeight"
 
 proc searchGroup {weights target} {
     set queue [list [list 0 1 {} $weights]]
+    set solutions 0
 
     while {$queue ne {}} {
         puts stderr "searchGroup: queue [llength $queue]"
@@ -45,7 +46,11 @@ proc searchGroup {weights target} {
             set bestGroup $group
             set bestGroupProd $prod
             set leftoverWeights $weights
-            continue
+            if {[incr solutions] >= 5} {
+                break
+            } else {
+                continue
+            }
         }
 
         # Try to select each possible package into the group.

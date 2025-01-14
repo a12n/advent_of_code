@@ -1,6 +1,6 @@
 #!/usr/bin/env tclsh
 
-set weights [lsort -decreasing -integer [read stdin]]
+set weights [lsort -integer [read stdin]]
 set totalWeight [tcl::mathop::+ {*}$weights]
 puts stderr "weights $weights totalWeight $totalWeight"
 

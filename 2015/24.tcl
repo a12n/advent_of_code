@@ -4,6 +4,7 @@ set weights [lsort -integer [read stdin]]
 set totalWeight [tcl::mathop::+ {*}$weights]
 puts stderr "weights $weights totalWeight $totalWeight"
 
+# Weights should be lsorted in -increasing order.
 proc searchGroup {weights target} {
     set queue [list [list 0 1 {} $weights]]
     set nSolutions 0
@@ -69,25 +70,6 @@ proc searchGroup {weights target} {
     } else {
         error "searchGroup: infeasible target $target"
     }
-}
-
-# Greedy first group for minimal number of weights.
-proc firstGroup {weights groupWeight {group {}} {accum 0}} {
-    if {$accum == $groupWeight} {
-        return [list $group $weights]
-    } elseif {$accum > $groupWeight} {
-        return {}
-    }
-
-    for {set i 0} {$i < [llength $weights]} {incr i} {
-        set weight [lindex $weights $i]
-        set result [firstGroup [lreplace $weights $i $i] $groupWeight [lreplace $group end+1 end+1 $weight] [expr {$accum + $weight}]]
-        if {$result ne {}} {
-            return $result
-        }
-    }
-
-    return {}
 }
 
 switch $puzzle(part) {

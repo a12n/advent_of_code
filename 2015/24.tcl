@@ -47,6 +47,7 @@ proc searchGroup {weights target} {
             set bestGroupProd $prod
             set leftoverWeights $weights
             if {[incr solutions] >= 5} {
+                # XXX: The solution still might be sub-optimal?
                 break
             } else {
                 continue

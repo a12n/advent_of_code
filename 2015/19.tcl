@@ -1,5 +1,22 @@
 #!/usr/bin/env tclsh
 
+proc tokens str {
+    set last 0
+    set result {}
+    for {set i 0} {$i < [string length $str]} {incr i} {
+        if {[string is upper [string index $str $i]]} {
+            if {$i > $last} {
+                lappend result [string range $str $last [expr {$i - 1}]]
+            }
+            set last $i
+        }
+    }
+    if {$i > $last} {
+        lappend result [string range $str $last [expr {$i - 1}]]
+    }
+    return $result
+}
+
 set replacements [dict create]
 while {[gets stdin line] > 0} {
     lassign [string map {" => " " "} $line] from to
@@ -31,7 +48,7 @@ proc invert replacements {
 
 set molecule [gets stdin]
 
-puts stderr "replacements $replacements [dict size $replacements], molecule $molecule [string length $molecule]"
+# puts stderr "replacements $replacements [dict size $replacements], molecule $molecule [string length $molecule]"
 
 proc calibrate {replacements molecule} {
     set replaced [dict create]

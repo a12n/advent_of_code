@@ -199,22 +199,22 @@ proc replaceRnAr {rules molecule what} {
     dict for {from to} $rules {
         if {$what eq {rnar}} {
             if {[string first "Rn" $from] == -1 || [string first "Ar" $from] == -1} {
-                puts stderr "replaceRnAr: ignore non-Rn/Ar rule \"$from\" \"$to\""
+                # puts stderr "replaceRnAr: ignore non-Rn/Ar rule \"$from\" \"$to\""
                 continue
             }
         } elseif {$what eq {recursive}} {
             if {![recursive $to $from]} {
-                puts stderr "replaceRnAr: ignore non-recursive rule \"$from\" \"$to\""
+                # puts stderr "replaceRnAr: ignore non-recursive rule \"$from\" \"$to\""
                 continue
             }
         } elseif {$what eq {notrnar}} {
             if {[string first "Rn" $from] != -1 && [string first "Ar" $from] != -1} {
-                puts stderr "replaceRnAr: ignore Rn/Ar rule \"$from\" \"$to\""
+                # puts stderr "replaceRnAr: ignore Rn/Ar rule \"$from\" \"$to\""
                 continue
             }
         }
 
-        puts stderr "replaceRnAr: trying to replace \"$from\" with \"$to\""
+        # puts stderr "replaceRnAr: trying to replace \"$from\" with \"$to\""
 
         set first 0
         set n [string length $from]
@@ -222,7 +222,7 @@ proc replaceRnAr {rules molecule what} {
         for {set first 0} {[set first [string first $from $molecule $first]] != -1} {incr first} {
             set last [expr {$first + $n - 1}]
             set molecule2 [string replace $molecule $first $last $to]
-            puts stderr "$molecule -> $molecule2"
+            # puts stderr "$molecule -> $molecule2"
             set molecule $molecule2
         }
     }
@@ -255,72 +255,75 @@ switch $puzzle(part) {
     }
     2 {
         set replacements [invert $replacements]
-        printFreqs $molecule
-        printNotCovered $replacements $molecule
+        # printFreqs $molecule
+        # printNotCovered $replacements $molecule
         printRnAr $molecule
 
         while {[set molecule2 [replaceRnAr $replacements $molecule rnar]] != $molecule} {
             set molecule $molecule2
         }
-        puts stderr "After replaceRnAr rnar 1"
-
-        while {[set molecule2 [replaceRnAr $replacements $molecule recursive]] != $molecule} {
-            set molecule $molecule2
-        }
-        puts stderr "After replaceRnAr recursive 2"
-
-        while {[set molecule2 [replaceRnAr $replacements $molecule notrnar]] != $molecule} {
-            set molecule $molecule2
-        }
-        puts stderr "After replaceRnAr notrnar 3"
-
-        while {[set molecule2 [replaceRnAr $replacements $molecule rnar]] != $molecule} {
-            set molecule $molecule2
-        }
-        puts stderr "After replaceRnAr rnar 4"
-
-        while {[set molecule2 [replaceRnAr $replacements $molecule recursive]] != $molecule} {
-            set molecule $molecule2
-        }
-        puts stderr "After replaceRnAr recursive 5"
-
-        while {[set molecule2 [replaceRnAr $replacements $molecule notrnar]] != $molecule} {
-            set molecule $molecule2
-        }
-        puts stderr "After replaceRnAr notrnar 6"
-
-        while {[set molecule2 [replaceRnAr $replacements $molecule rnar]] != $molecule} {
-            set molecule $molecule2
-        }
-        puts stderr "After replaceRnAr rnar 7"
-
-        while {[set molecule2 [replaceRnAr $replacements $molecule recursive]] != $molecule} {
-            set molecule $molecule2
-        }
-        puts stderr "After replaceRnAr recursive 8"
-
-        while {[set molecule2 [replaceRnAr $replacements $molecule notrnar]] != $molecule} {
-            set molecule $molecule2
-        }
-        puts stderr "After replaceRnAr notrnar 9"
-
-
-        while {[set molecule2 [replaceRnAr $replacements $molecule rnar]] != $molecule} {
-            set molecule $molecule2
-        }
-        puts stderr "After replaceRnAr rnar 10"
-
-        while {[set molecule2 [replaceRnAr $replacements $molecule recursive]] != $molecule} {
-            set molecule $molecule2
-        }
-        puts stderr "After replaceRnAr recursive 11"
-
-        while {[set molecule2 [replaceRnAr $replacements $molecule notrnar]] != $molecule} {
-            set molecule $molecule2
-        }
-        puts stderr "After replaceRnAr notrnar 12"
-
+        puts stderr "\nAfter replaceRnAr rnar 1"
         printRnAr $molecule
-        puts [fabricate $replacements $molecule e]
+
+        while {[set molecule2 [replaceRnAr $replacements $molecule recursive]] != $molecule} {
+            set molecule $molecule2
+        }
+        puts stderr "\nAfter replaceRnAr recursive 2"
+        printRnAr $molecule
+
+        # while {[set molecule2 [replaceRnAr $replacements $molecule notrnar]] != $molecule} {
+        #     set molecule $molecule2
+        # }
+        # puts stderr "After replaceRnAr notrnar 3"
+        #
+        # while {[set molecule2 [replaceRnAr $replacements $molecule rnar]] != $molecule} {
+        #     set molecule $molecule2
+        # }
+        # puts stderr "After replaceRnAr rnar 4"
+        #
+        # while {[set molecule2 [replaceRnAr $replacements $molecule recursive]] != $molecule} {
+        #     set molecule $molecule2
+        # }
+        # puts stderr "After replaceRnAr recursive 5"
+        #
+        # while {[set molecule2 [replaceRnAr $replacements $molecule notrnar]] != $molecule} {
+        #     set molecule $molecule2
+        # }
+        # puts stderr "After replaceRnAr notrnar 6"
+        #
+        # while {[set molecule2 [replaceRnAr $replacements $molecule rnar]] != $molecule} {
+        #     set molecule $molecule2
+        # }
+        # puts stderr "After replaceRnAr rnar 7"
+        #
+        # while {[set molecule2 [replaceRnAr $replacements $molecule recursive]] != $molecule} {
+        #     set molecule $molecule2
+        # }
+        # puts stderr "After replaceRnAr recursive 8"
+        #
+        # while {[set molecule2 [replaceRnAr $replacements $molecule notrnar]] != $molecule} {
+        #     set molecule $molecule2
+        # }
+        # puts stderr "After replaceRnAr notrnar 9"
+        #
+        #
+        # while {[set molecule2 [replaceRnAr $replacements $molecule rnar]] != $molecule} {
+        #     set molecule $molecule2
+        # }
+        # puts stderr "After replaceRnAr rnar 10"
+        #
+        # while {[set molecule2 [replaceRnAr $replacements $molecule recursive]] != $molecule} {
+        #     set molecule $molecule2
+        # }
+        # puts stderr "After replaceRnAr recursive 11"
+        #
+        # while {[set molecule2 [replaceRnAr $replacements $molecule notrnar]] != $molecule} {
+        #     set molecule $molecule2
+        # }
+        # puts stderr "After replaceRnAr notrnar 12"
+
+        # set molecule [unrecur2 replacements $molecule]
+        # puts [fabricate $replacements $molecule e]
+        fabricate $replacements "TiMg" "e"
     }
 }

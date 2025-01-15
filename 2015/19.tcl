@@ -195,12 +195,33 @@ proc printRnAr molecule {
     puts stderr "Rn/Ar balance $n"
 }
 
+proc printFreqs molecule {
+    set freqs [dict create]
+    foreach t [tokens $molecule] {
+        dict incr freqs $t
+    }
+    puts stderr "Token frequencies: $freqs"
+    puts stderr "Tokens with the same frequency:"
+    foreach t [dict keys $freqs] {
+        foreach s [dict keys $freqs] {
+            if {$t >= $s} {
+                continue
+            }
+            if {[set n [dict get $freqs $t]] == [dict get $freqs $s]} {
+                puts stderr "$n $t $s"
+            }
+        }
+    }
+    puts stderr ""
+}
+
 switch $puzzle(part) {
     1 {
         puts [calibrate $replacements $molecule]
     }
     2 {
         set replacements [invert $replacements]
+        printFreqs $molecule
         printNotCovered $replacements $molecule
         printRnAr $molecule
         puts [fabricate $replacements $molecule e]

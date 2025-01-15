@@ -195,6 +195,27 @@ proc printRnAr molecule {
     puts stderr "Rn/Ar balance $n"
 }
 
+proc replaceRnAr {rules molecule} {
+    dict for {from to} $rules {
+        if {[string first "Rn" $from] == -1 || [string first "Ar" $from] == -1} {
+            continue
+        }
+
+        puts stderr "replaceRnAr: trying to replace \"$from\" with \"$to\""
+
+        set first 0
+        set n [string length $from]
+
+        for {set first 0} {[set first [string first $from $molecule $first]] != -1} {incr first} {
+            set last [expr {$first + $n - 1}]
+            set molecule2 [string replace $molecule $first $last $to]
+            puts stderr "$molecule -> $molecule2"
+            set molecule $molecule2
+        }
+    }
+    return $molecule
+}
+
 proc printFreqs molecule {
     set freqs [dict create]
     foreach t [tokens $molecule] {
@@ -223,6 +244,11 @@ switch $puzzle(part) {
         set replacements [invert $replacements]
         printFreqs $molecule
         printNotCovered $replacements $molecule
+        printRnAr $molecule
+        while {[set molecule2 [replaceRnAr $replacements $molecule]] != $molecule} {
+            set molecule $molecule2
+        }
+        puts stderr "After replaceRnAr"
         printRnAr $molecule
         puts [fabricate $replacements $molecule e]
     }

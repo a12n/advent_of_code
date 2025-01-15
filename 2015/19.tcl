@@ -129,13 +129,16 @@ proc fabricate {replacements molecule finish} {
 
         puts stderr "fabricate: $dist \"$molecule\""
 
+        if {[info exists minDist]} {
+            if {$dist > $minDist} {
+                puts stderr "fabricate: $dist already greater than $minDist"
+                continue
+            }
+        }
+
         if {$molecule eq $finish} {
             puts stderr "fabricate: found \"$finish\" after $dist replacements"
-            if {[info exists minDist]} {
-                set minDist [expr {min($dist, $minDist)}]
-            } else {
-                set minDist $dist
-            }
+            set minDist $dist
             continue
         }
 

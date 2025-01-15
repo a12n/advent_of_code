@@ -60,22 +60,9 @@ proc calibrate {replacements molecule} {
     return [dict size $replaced]
 }
 
-proc fabricate {replacements molecule finish} {
-    puts stderr "fabricate: replacements [dict size $replacements] molecule [string length $molecule] finish \"$finish\""
+proc fabricate {anchorRules otherRules molecule finish} {
 
-    set anchorRules [dict create]
-    set otherRules [dict create]
-
-    dict for {right left} $replacements {
-        if {[string first "Rn" $right] != -1 && [string first "Ar" $right] != -1} {
-            dict set anchorRules $right $left
-        } else {
-            dict set otherRules $right $left
-        }
-    }
-    puts stderr "fabricate: replacements $replacements"
-    puts stderr "fabricate: anchorRules $anchorRules"
-    puts stderr "fabricate: otherRules $otherRules"
+    puts stderr "fabricate: finish \"$finish\""
 
     set queue [list [list 0 $molecule]]
     set seen [dict create]
@@ -165,11 +152,31 @@ proc printFreqs molecule {
     puts stderr ""
 }
 
+proc partitionRules {rules beginToken endToken} {
+    set anchorRules [dict create]
+    set otherRules [dict create]
+
+    dict for {right left} $rules {
+        if {[set first [string first $beginToken $right]] != -1 && [string first $endToken $right $first] != -1} {
+            dict set anchorRules $right $left
+        } else {
+            dict set otherRules $right $left
+        }
+    }
+    puts stderr "partitionRules: rules $rules"
+    puts stderr "partitionRules: anchorRules $anchorRules"
+    puts stderr "partitionRules: otherRules $otherRules"
+
+    return [list $anchorRules $otherRules]
+}
+
 switch $puzzle(part) {
     1 {
         puts [calibrate $replacements $molecule]
     }
     2 {
-        puts [fabricate [invert $replacements] $molecule e]
+        # FIXME: Rn/Ar are input specific.
+        lassign [partitionRules [invert $replacements] "Rn" "Ar"] anchorRules otherRules
+        puts [fabricate $anchorRules $otherRules $molecule e]
     }
 }

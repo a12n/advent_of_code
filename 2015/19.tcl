@@ -177,6 +177,18 @@ proc printNotCovered {rulesInv molecule} {
     puts stderr ""
 }
 
+proc balanceRnAr molecule {
+    set n 0
+    foreach t [tokens $molecule] {
+        if {$t == "Rn"} {
+            incr n
+        } elseif {$t == "Ar"} {
+            incr n -1
+        }
+    }
+    return $n
+}
+
 switch $puzzle(part) {
     1 {
         puts [calibrate $replacements $molecule]
@@ -184,6 +196,7 @@ switch $puzzle(part) {
     2 {
         set replacements [invert $replacements]
         printNotCovered $replacements $molecule
+        puts stderr [balanceRnAr $molecule]
         puts [fabricate $replacements $molecule e]
     }
 }

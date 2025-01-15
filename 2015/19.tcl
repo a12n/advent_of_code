@@ -153,14 +153,37 @@ proc fabricate {replacements molecule finish} {
     }
 }
 
+proc printNotCovered {rulesInv molecule} {
+    set covered [dict create]
+
+    dict for {from to} $rulesInv {
+        set first 0
+        set n [string length $from]
+
+        for {set first 0} {[set first [string first $from $molecule $first]] != -1} {incr first} {
+            for {set last [expr {$first + $n - 1}]} {$last >= $first} {incr last -1} {
+                dict set covered $last yes
+            }
+        }
+    }
+
+    for {set i 0} {$i < [string length $molecule]} {incr i} {
+        if {[dict exists $covered $i]} {
+            puts -nonewline stderr [string index $molecule $i]
+        } else {
+            puts -nonewline stderr "\x1b\[31m[string index $molecule $i]\x1b\[0m"
+        }
+    }
+    puts stderr ""
+}
+
 switch $puzzle(part) {
     1 {
         puts [calibrate $replacements $molecule]
     }
     2 {
         set replacements [invert $replacements]
-        puts stderr "invert $replacements"
-        set molecule [unrecur2 replacements $molecule]
+        printNotCovered $replacements $molecule
         puts [fabricate $replacements $molecule e]
     }
 }

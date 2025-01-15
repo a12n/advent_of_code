@@ -19,20 +19,20 @@ proc tokens str {
 
 set replacements [dict create]
 while {[gets stdin line] > 0} {
-    lassign [string map {" => " " "} $line] from to
-    dict update replacements $from toList {
-        lappend toList $to
+    lassign [string map {" => " " "} $line] left right
+    dict update replacements $left rightList {
+        lappend rightList $right
     }
 }
 
 proc invert replacements {
     set result [dict create]
-    dict for {from toList} $replacements {
-        foreach to $toList {
-            if {[dict exists $result $to]} {
-                error "invert: duplicate $to"
+    dict for {left rightList} $replacements {
+        foreach right $rightList {
+            if {[dict exists $result $right]} {
+                error "invert: duplicate $right"
             }
-            dict set result $to $from
+            dict set result $right $left
         }
     }
     return $result
@@ -43,13 +43,13 @@ set molecule [gets stdin]
 proc calibrate {replacements molecule} {
     set replaced [dict create]
 
-    dict for {from toList} $replacements {
-        set n [string length $from]
+    dict for {left rightList} $replacements {
+        set n [string length $left]
         set first 0
-        while {[set first [string first $from $molecule $first]] != -1} {
+        while {[set first [string first $left $molecule $first]] != -1} {
             set last [expr {$first + $n - 1}]
-            foreach to $toList {
-                dict set replaced [string replace $molecule $first $last $to] yes
+            foreach right $rightList {
+                dict set replaced [string replace $molecule $first $last $right] yes
             }
             incr first
         }

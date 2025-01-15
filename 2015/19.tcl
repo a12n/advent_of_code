@@ -25,14 +25,6 @@ while {[gets stdin line] > 0} {
     }
 }
 
-proc recursive {from to} {
-    expr {[string first $from $to] != -1}
-}
-
-proc recursive2 {from to} {
-    expr {"$to" eq "$from$from"}
-}
-
 proc invert replacements {
     set result [dict create]
     dict for {from toList} $replacements {
@@ -47,8 +39,6 @@ proc invert replacements {
 }
 
 set molecule [gets stdin]
-
-# puts stderr "replacements $replacements [dict size $replacements], molecule $molecule [string length $molecule]"
 
 proc calibrate {replacements molecule} {
     set replaced [dict create]
@@ -68,35 +58,6 @@ proc calibrate {replacements molecule} {
     puts stderr "replaced [lsort -index 0 -stride 2 $replaced] [dict size $replaced]"
 
     return [dict size $replaced]
-}
-
-proc unrecur2 {replacementsName molecule} {
-    upvar $replacementsName replacements
-
-    puts stderr "unrecur2: replacements [dict size $replacements] molecule [string length $molecule]"
-
-    dict for {to from} $replacements {
-        if {![recursive2 $from $to]} {
-            continue
-        }
-
-        set first 0
-        set n [string length $to]
-
-        for {set first 0} {[set first [string first $to $molecule $first]] != -1} {incr first} {
-            set last [expr {$first + $n - 1}]
-            puts stderr "unrecur: replace \"$to\" with \"$from\""
-            puts stderr $molecule
-            set molecule [string replace $molecule $first $last $from]
-            puts stderr $molecule
-        }
-
-        dict unset replacements $to
-    }
-
-    puts stderr "unrecur2: replacements [dict size $replacements] molecule [string length $molecule]"
-
-    return $molecule
 }
 
 proc fabricate {replacements molecule finish} {
@@ -182,82 +143,6 @@ proc fabricate {replacements molecule finish} {
     } else {
         error "fabricate: infeasible \"$finish\""
     }
-}
-
-proc printNotCovered {rulesInv molecule} {
-    set covered [dict create]
-
-    dict for {from to} $rulesInv {
-        set first 0
-        set n [string length $from]
-
-        for {set first 0} {[set first [string first $from $molecule $first]] != -1} {incr first} {
-            for {set last [expr {$first + $n - 1}]} {$last >= $first} {incr last -1} {
-                dict set covered $last yes
-            }
-        }
-    }
-
-    for {set i 0} {$i < [string length $molecule]} {incr i} {
-        if {[dict exists $covered $i]} {
-            puts -nonewline stderr [string index $molecule $i]
-        } else {
-            puts -nonewline stderr "\x1b\[31m[string index $molecule $i]\x1b\[0m"
-        }
-    }
-    puts stderr "\n"
-}
-
-proc printRnAr molecule {
-    set n 0
-    foreach t [tokens $molecule] {
-        if {$t == "Rn"} {
-            puts -nonewline stderr "\x1b\[32m$t"
-            incr n
-        } elseif {$t == "Ar"} {
-            puts -nonewline stderr "\x1b\[31m$t"
-            incr n -1
-        } else {
-            puts -nonewline stderr "$t"
-        }
-        puts -nonewline stderr "\x1b\[0m"
-    }
-    puts stderr ""
-    puts stderr "Rn/Ar balance $n"
-}
-
-proc replaceRnAr {rules molecule what} {
-    dict for {from to} $rules {
-        if {$what eq {rnar}} {
-            if {[string first "Rn" $from] == -1 || [string first "Ar" $from] == -1} {
-                # puts stderr "replaceRnAr: ignore non-Rn/Ar rule \"$from\" \"$to\""
-                continue
-            }
-        } elseif {$what eq {recursive}} {
-            if {![recursive $to $from]} {
-                # puts stderr "replaceRnAr: ignore non-recursive rule \"$from\" \"$to\""
-                continue
-            }
-        } elseif {$what eq {notrnar}} {
-            if {[string first "Rn" $from] != -1 && [string first "Ar" $from] != -1} {
-                # puts stderr "replaceRnAr: ignore Rn/Ar rule \"$from\" \"$to\""
-                continue
-            }
-        }
-
-        # puts stderr "replaceRnAr: trying to replace \"$from\" with \"$to\""
-
-        set first 0
-        set n [string length $from]
-
-        for {set first 0} {[set first [string first $from $molecule $first]] != -1} {incr first} {
-            set last [expr {$first + $n - 1}]
-            set molecule2 [string replace $molecule $first $last $to]
-            # puts stderr "$molecule -> $molecule2"
-            set molecule $molecule2
-        }
-    }
-    return $molecule
 }
 
 proc printFreqs molecule {

@@ -174,19 +174,25 @@ proc printNotCovered {rulesInv molecule} {
             puts -nonewline stderr "\x1b\[31m[string index $molecule $i]\x1b\[0m"
         }
     }
-    puts stderr ""
+    puts stderr "\n"
 }
 
-proc balanceRnAr molecule {
+proc printRnAr molecule {
     set n 0
     foreach t [tokens $molecule] {
         if {$t == "Rn"} {
+            puts -nonewline stderr "\x1b\[32m$t"
             incr n
         } elseif {$t == "Ar"} {
+            puts -nonewline stderr "\x1b\[31m$t"
             incr n -1
+        } else {
+            puts -nonewline stderr "$t"
         }
+        puts -nonewline stderr "\x1b\[0m"
     }
-    return $n
+    puts stderr ""
+    puts stderr "Rn/Ar balance $n"
 }
 
 switch $puzzle(part) {
@@ -196,7 +202,7 @@ switch $puzzle(part) {
     2 {
         set replacements [invert $replacements]
         printNotCovered $replacements $molecule
-        puts stderr [balanceRnAr $molecule]
+        printRnAr $molecule
         puts [fabricate $replacements $molecule e]
     }
 }

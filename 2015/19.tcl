@@ -61,8 +61,9 @@ proc calibrate {replacements molecule} {
 }
 
 proc fabricate {anchorRules otherRules molecule finish} {
+    set nSolutions [llength [dict values $otherRules $finish]]
 
-    puts stderr "fabricate: finish \"$finish\""
+    puts stderr "fabricate: finish \"$finish\" nSolutions $nSolutions"
 
     set queue [list [list 0 $molecule]]
     set seen [dict create]
@@ -87,7 +88,11 @@ proc fabricate {anchorRules otherRules molecule finish} {
         if {$molecule eq $finish} {
             puts stderr "fabricate: found \"$finish\" after $dist replacements"
             set minDist $dist
-            continue
+            if {[incr nSolutions -1] == 0} {
+                break
+            } else {
+                continue
+            }
         }
 
         dict set seen $molecule yes

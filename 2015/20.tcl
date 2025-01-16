@@ -19,40 +19,9 @@
 # Product of factors of N = N^(No. of factors/2)
 # Sum of factors: ( p^0+p^1+...+p^a) ( q^0+ q^1+....+q^b) (r^0+r^1+...+r^c) / (p^a-1)(q^b-1)(r^c-1)
 
-# Formula for sum of divisors:
-# https://planetmath.org/formulaforsumofdivisors
-
-# XXX: The upper limit is arbirary, may not work for all inputs?
-set primes [lrepeat 300000 1]
-
-puts -nonewline stderr "List of primes up to [llength $primes]: "
-set n [llength $primes]
-for {set i 2} {($i * $i) <= $n} {incr i} {
-    if {[lindex $primes $i]} {
-        for {set j [expr {$i * $i}]} {$j <= $n} {incr j $i} {
-            lset primes $j 0
-        }
-    }
-}
-
-set m 0
-for {set i 2} {$i <= $n} {incr i} {
-    if {[lindex $primes $i]} {
-        lset primes $m $i
-        incr m
-    }
-}
-set primes [lrange $primes 0 [expr {$m - 1}]]
-unset i j m n
-puts stderr "[llength $primes] numbers"
-
-namespace eval ::factors {
-    namespace export powers sum
-}
-
 # Prime factorization of N. Returns canonical representation as
 # dictionary {p a q b r c …} such that N = p^a * q^b * r^c * ….
-proc factors::powers n {
+proc factorPowers n {
     set p 2
     set powers [dict create]
     while {$p * $p <= $n} {
@@ -71,7 +40,9 @@ proc factors::powers n {
 
 # Finding the Sum of the Factors of a Number:
 # https://web.archive.org/web/20180128170647/http://mathforum.org/library/drmath/view/71550.html
-proc factors::sum powers {
+# Formula for sum of divisors:
+# https://planetmath.org/formulaforsumofdivisors
+proc factorPowersSum powers {
     set prod 1
     foreach {p n} $powers {
         set sum 1
@@ -86,7 +57,7 @@ proc factors::sum powers {
 
 proc 1 limit {
     for {set n 1} {1} {incr n} {
-        set sum [factors::sum [factors::powers $n]]
+        set sum [factorPowersSum [factorPowers $n]]
         # puts stderr "$n: $sum $limit"
         if {$sum >= ($limit / 10)} {
             break

@@ -66,48 +66,22 @@ proc 1 limit {
     puts $n
 }
 
-proc 2 limit {
-    puts [factors::powers 8]
-    # 2 3
-    # 2^0 = 1
-    # 2^1 = 2
-    # 2^2 = 4
-    # 2^3 = 8
-    # 8+4+2+1=15
-    #
-    # If elves visit only 5 houses:
-    # 2^0 = 1 no
-    # 2^1 = 2
-    # 2^2 = 4
-    # 2^3 = 8
-    # 8+4+2+0=14
-    #
-    # Elves visit only N=5 next houses
-    #
-    # Elf E=2 visits houses 2 4 6 8 10
-    # At house H=8, sum factors up to (H=8 - E=2 * N=5) = -2 backward.
-    # At house H=10, sum factors up to (H=10 - E=2 * N=5) = 0 backward.
-    # At house H=12 (first house of E=2 which he doesn't visit), sum factors up to (H=12 - E=2 * N=5) = 2 backward.
-    #
-    # Elf E=3 visits houses 3 6 9 12 15
-    # At house H=12 elves E={12 6 4 3} deliver and E={2 1} don't
-    # 12+6+4+3=25
-    #
-    # At house H only the biggest N=5-1 dividers deliver?
-    #
-    # At house=20, dividers [20 10 5 4 2 1]. So, only dividers [20 10 5 4] deliver?
-    # So, the sum will be 20+10+5+4+2=39?
-    set table [dict create]
-    for {set e 1} {$e <= 25} {incr e} {
-        for {set n 1} {$n <= 5} {incr n} {
-            set k [expr {$e * $n}]
-            dict incr table $k $e
-            puts "elf $e delivers $e to $k = [dict get $table $k]"
+# From Sieve of Eratosthenes.
+proc 2 {limit {houses 50}} {
+    set sums [lrepeat [expr {2 * $limit}] 1]
+
+    for {set n 2} {$n < $limit} {incr n} {
+        lset sums $n [expr {[lindex $sums $n] + $n}]
+
+        for {set k [expr {2 * $n}]} {$k <= ($houses * $n)} {incr k $n} {
+            lset sums $k [expr {[lindex $sums $k] + $n}]
+        }
+
+        if {(11 * [lindex $sums $n]) >= $limit} {
+            break
         }
     }
-    foreach {k v} [lsort -stride 2 -index 0 -integer $table] {
-        puts "$k: $v [expr {$limit / 11}]"
-    }
+    puts $n
 }
 
 $puzzle(part) [expr {[gets stdin]}]

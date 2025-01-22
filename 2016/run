@@ -1,0 +1,10 @@
+#!/usr/bin/env julia
+# -*- mode: julia -*-
+
+if (fname = basename(PROGRAM_FILE)) == "25"
+    day, part = "25", "1"
+else
+    day, part = split(fname, '-')
+end
+include("$day.jl")
+eval(Meta.parse("Day$day.part$part(stdin, stdout)"))

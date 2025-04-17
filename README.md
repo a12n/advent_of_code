@@ -1,4 +1,4 @@
-<!--; export this_file=$(readlink -f $0); export script_lines=54; sed -n 2,${script_lines}p $this_file | sh; exit
+<!--; export this_file=$(readlink -f $0); export script_lines=55; sed -n 2,${script_lines}p $this_file | sh; exit
 this_dir=$(dirname $this_file)
 tmp_file=$(mktemp $this_file.XXXXX)
 head -n $((script_lines + 1)) $this_file > $tmp_file
@@ -6,7 +6,6 @@ printf "As of \`$(date --rfc-3339=seconds --utc)\` the following puzzles are sol
 find $this_dir -type f -name puzzle.out | gawk '
 BEGIN {
   FS = "/"
-  PROCINFO["sorted_in"] = "@ind_str_desc"
   solved_char = "▓"
   unsolved_char = "░"
 }
@@ -30,7 +29,9 @@ END {
   printf("%6s", "")
   for (i = 1; i <= 25; ++i) printf(" %02d", i)
   printf("\n")
-  for (year in year_solved) {
+  split(strftime("%Y %m", systime()), max_date)
+  if (max_date[2] < 12) max_date[1] -= 1
+  for (year = max_date[1]; year >= 2015; --year) {
     printf("[%04d] ", year)
     for (day = 1; day <= 25; ++day) {
       for (part = 1; part <= 2; ++part) {

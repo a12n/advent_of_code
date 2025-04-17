@@ -6,6 +6,7 @@
 
 :- pred read_input(io.res(list(int))::out, io::di, io::uo) is det.
 :- pred sums_to(int::in, list(int)::in, int::out, int::out) is cc_nondet.
+:- pred sums_to(int::in, list(int)::in, int::out, int::out, int::out) is cc_nondet.
 
 :- implementation.
 
@@ -28,5 +29,15 @@ sums_to(Sum, Numbers, First, Second) :-
       member_index0(M, Numbers, J),
       I \= J, N + M = Sum ->
       First = N, Second = M
+    ; fail
+    ).
+
+sums_to(Sum, Numbers, First, Second, Third) :-
+    ( member_index0(N, Numbers, I),
+      member_index0(M, Numbers, J),
+      member_index0(L, Numbers, K),
+      I \= J, I \= K, J \= K,
+      N + M + L = Sum ->
+      First = N, Second = M, Third = L
     ; fail
     ).

@@ -12,7 +12,8 @@
 
 error_exit(Status, Message, !IO) :-
     set_exit_status(Status, !IO),
-    write_string(stderr_stream, Message, !IO).
+    write_string(stderr_stream, Message, !IO),
+    nl(!IO).
 
 read_lines_as_strings(Result, !IO) :-
     read_lines_as_strings([], Result, !IO).

@@ -9,7 +9,7 @@
 :- implementation.
 
 :- import_module char, int, list, string.
-:- import_module io_ext.
+:- import_module io_ext, string_ext.
 
 :- type password ---> password(string).
 :- type policy --->	policy(min_times :: int, max_times :: int, letter :: char).
@@ -48,9 +48,3 @@ valid(policy(MinTimes, MaxTimes, Letter), password(Password)) :-
     contains_char(Password, Letter, Times),
     Times >= MinTimes,
     Times =< MaxTimes.
-
-:- pred contains_char(string, char, int).
-:- mode contains_char(in, in, out) is det.
-%% :- mode contains_char(in, out, in) is nondet.
-contains_char(String, Char, Times) :-
-    Times = foldl((func(C, N) = (C = Char -> N + 1; N)), String, 0).

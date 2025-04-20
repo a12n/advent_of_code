@@ -51,7 +51,7 @@ END {
   }
 }
 ' >> $tmp_file
-tail -n 1 $this_file >> $tmp_file
+tail -n 2 $this_file >> $tmp_file
 mv $tmp_file $this_file
 -->
 As of `2025-04-17 00:24:13+00:00` the following puzzles are solved:

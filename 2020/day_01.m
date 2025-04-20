@@ -26,13 +26,13 @@ read_input(Result, !IO) :-
 
 sums_to(Sum, Numbers, First, Second) :-
     member_index0(N, Numbers, I),
-    member_index0(M, Numbers, J), J \= I,
+    member_index0(M, Numbers, J), J > I,
     N + M = Sum,
     First = N, Second = M.
 
 sums_to(Sum, Numbers, First, Second, Third) :-
     member_index0(N, Numbers, I),
-    member_index0(M, Numbers, J), J \= I,
-    member_index0(L, Numbers, K), K \= I, K \= J,
+    member_index0(M, Numbers, J), J > I,
+    member_index0(L, Numbers, K), K > J,
     N + M + L = Sum,
     First = N, Second = M, Third = L.

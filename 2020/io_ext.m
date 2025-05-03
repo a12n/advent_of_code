@@ -8,6 +8,9 @@
 :- pred error_exit(int::in, string::in, io::di, io::uo) is det.
 :- pred read_lines_as_strings(io.res(list(string))::out, io::di, io::uo) is det.
 
+:- pred lines_foldl(pred(string, T, T), T, maybe_partial_res(T), io, io).
+:- mode lines_foldl((pred(in, in, out) is semidet), in, out, di, uo) is det.
+
 :- implementation.
 
 error_exit(Status, Message, !IO) :-
@@ -28,4 +31,17 @@ read_lines_as_strings(Accum, Result, !IO) :-
       Result = ok(reverse(Accum))
     ; ReadResult = error(Error),
       Result = error(Error)
+    ).
+
+lines_foldl(Pred, Accum, Result, !IO) :-
+    read_line_as_string(ReadResult, !IO),
+    ( ReadResult = ok(Line),
+      ( Pred(Line, Accum, Accum2) ->
+        lines_foldl(Pred, Accum2, Result, !IO)
+      ; Result = error(Accum, make_io_error("Predicate failed"))
+      )
+    ; ReadResult = eof,
+      Result = ok(Accum)
+    ; ReadResult = error(Error),
+      Result = error(Accum, Error)
     ).

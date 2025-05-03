@@ -17,16 +17,18 @@
 :- type eye_color ---> amb; blu; brn; gry; grn; hzl; oth.
 :- type passport_id ---> passport_id(string).
 :- type country_id ---> country_id(string).
-:- type field ---> byr(year); iyr(year); eyr(year); hgt(height);
-   hcl(color); ecl(eye_color); pid(passport_id); cid(country_id).
+:- type field --->
+   byr(year); iyr(year); eyr(year); hgt(height);
+   hcl(color); ecl(eye_color); pid(passport_id);
+   cid(country_id).
 :- type passport == list(field).
 
 :- pred year_string(string, year).
 :- mode year_string(in, out) is semidet.
 year_string(String, year(Number)) :-
     length(String, 4),
-    to_int(String, Number),
-    Number >= 0, Number =< 9999.
+    is_all_digits(String),
+    to_int(String, Number).
 
 :- pred height_string(string, height).
 :- mode height_string(in, out) is semidet.
@@ -101,12 +103,16 @@ valid_field(ecl(_Valid)).
 valid_field(pid(passport_id(ID))) :- length(ID, 9), is_all_digits(ID).
 valid_field(cid(_Valid)).
 
-:- pred valid_passport(passport::in) is semidet.
-valid_passport(Fields) :-
+:- pred complete_passport(passport::in) is semidet.
+complete_passport(Fields) :-
     member(byr(_), Fields), member(iyr(_), Fields), member(eyr(_), Fields),
     member(hgt(_), Fields),
     member(hcl(_), Fields), member(ecl(_), Fields),
-    member(pid(_), Fields),
+    member(pid(_), Fields).
+
+:- pred valid_passport(passport::in) is semidet.
+valid_passport(Fields) :-
+    complete_passport(Fields),
     all_true(valid_field, Fields).
 
 :- pred read_passport_string(result(string)::out, string::in, io::di, io::uo) is det.

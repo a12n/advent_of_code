@@ -2,7 +2,7 @@
 :- module day_05.
 :- interface.
 
-:- type seat_id == uint.
+:- type seat_id == int.
 
 :- pred seat_id_string(string, seat_id).
 :- mode seat_id_string(in, out) is semidet.
@@ -18,4 +18,4 @@ seat_id_string(String0, ID) :-
     String2 = replace_all(String1, "B", "1"),
     String3 = replace_all(String2, "L", "0"),
     String4 = replace_all(String3, "R", "1"),
-    base_string_to_uint(2, String4, ID).
+    base_string_to_int(2, String4, ID).

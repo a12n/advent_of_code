@@ -8,7 +8,7 @@
 
 :- implementation.
 
-:- import_module string, uint.
+:- import_module int, string.
 :- import_module day_05, io_ext.
 
 main(!IO) :-
@@ -16,9 +16,9 @@ main(!IO) :-
         (pred(Line::in, PrevMax::in, NextMax::out) is semidet :-
              seat_id_string(chomp(Line), ID),
              NextMax = max(PrevMax, ID)
-        ), 0u, Result, !IO),
+        ), 0, Result, !IO),
     ( Result = ok(MaxID),
-      write_uint(MaxID, !IO), nl(!IO)
+      write_int(MaxID, !IO), nl(!IO)
     ; Result = error(_, Error),
       error_exit(1, error_message(Error), !IO)
     ).

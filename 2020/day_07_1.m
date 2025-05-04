@@ -82,7 +82,8 @@ main_loop(Mapping, !IO) :-
       ; error_exit(1, "Couldn't parse string", !IO)
       )
     ; ReadResult = eof,
-      print_line(Mapping, !IO)
+      to_assoc_list(Mapping, AssocList),
+      print_line(AssocList, !IO)
     ; ReadResult = error(Error),
       error_exit(1, error_message(Error), !IO)
     ).

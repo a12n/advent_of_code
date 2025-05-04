@@ -73,15 +73,16 @@ main_loop(Mapping, !IO) :-
       format("\"%s\" -> \"%s\"\n", [s(String0), s(String1)], !IO),
       ( contain_string(String1, Bag, ContainBags) ->
         format("Bag \"%s\" ", [s(Bag)], !IO),
-        print_line(ContainBags, !IO)
-      ; print_line("Couldn't parse string", !IO)
-      ),
-      %% ( [Bag, Other] = split_at_string(" bags contain ", String0) ->
-      %%   format("Bag \"%s\", Other \"%s\"\n", [s(Bag), s(Other)], !IO)
-      %% ; format("Couldn't split string \"%s\"\n", [s(String0)], !IO)
-      %% ),
-      main_loop(Mapping, !IO)
-    ; ReadResult = eof
+        print_line(ContainBags, !IO),
+
+        map((pred({_, ChildBag}::in, ChildBag::out) is det), ContainBags, ChildBags),
+        foldl(set(Bag), ChildBags, Mapping, Mapping2),
+
+        main_loop(Mapping2, !IO)
+      ; error_exit(1, "Couldn't parse string", !IO)
+      )
+    ; ReadResult = eof,
+      print_line(Mapping, !IO)
     ; ReadResult = error(Error),
       error_exit(1, error_message(Error), !IO)
     ).

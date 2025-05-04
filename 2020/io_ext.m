@@ -4,12 +4,16 @@
 
 :- import_module io.
 :- import_module list.
+:- import_module maybe.
 
 :- pred error_exit(int::in, string::in, io::di, io::uo) is det.
 :- pred read_lines_as_strings(io.res(list(string))::out, io::di, io::uo) is det.
 
 :- pred lines_foldl(pred(string, T, T), T, maybe_partial_res(T), io, io).
 :- mode lines_foldl((pred(in, in, out) is semidet), in, out, di, uo) is det.
+
+:- pred lines_foldl2(pred(maybe(string), T, T, U, U), T, U, maybe_partial_res(T), io, io).
+:- mode lines_foldl2((pred(in, in, out, in, out) is semidet), in, in, out, di, uo) is det.
 
 :- implementation.
 
@@ -42,6 +46,22 @@ lines_foldl(Pred, Accum, Result, !IO) :-
       )
     ; ReadResult = eof,
       Result = ok(Accum)
+    ; ReadResult = error(Error),
+      Result = error(Accum, Error)
+    ).
+
+lines_foldl2(Pred, Accum, State, Result, !IO) :-
+    read_line_as_string(ReadResult, !IO),
+    ( ReadResult = ok(Line),
+      ( Pred(yes(Line), Accum, Accum2, State, State2) ->
+        lines_foldl2(Pred, Accum2, State2, Result, !IO)
+      ; Result = error(Accum, make_io_error("Predicate failed"))
+      )
+    ; ReadResult = eof,
+      ( Pred(no, Accum, Accum2, State, State2) ->
+        Result = ok(Accum2)
+      ; Result = error(Accum, make_io_error("Predicate failed"))
+      )
     ; ReadResult = error(Error),
       Result = error(Accum, Error)
     ).

@@ -8,7 +8,7 @@
 
 :- implementation.
 
-:- import_module int, list, solutions, string.
+:- import_module int, list, map, solutions, string.
 :- import_module io_ext.
 
 :- pred contain(string, string).
@@ -64,9 +64,8 @@ contain_string(String, Bag, ContainBags) :-
         ContainBags
        ).
 
-main(!IO) :-
-    %% %% solutions(eventually_contain_shiny_gold, Bags),
-    %% %% print_line(Bags, !IO).
+:- pred main_loop(map(string, string)::in, io::di, io::uo) is det.
+main_loop(Mapping, !IO) :-
     read_line_as_string(ReadResult, !IO),
     ( ReadResult = ok(Line),
       String0 = chomp(Line),
@@ -81,8 +80,13 @@ main(!IO) :-
       %%   format("Bag \"%s\", Other \"%s\"\n", [s(Bag), s(Other)], !IO)
       %% ; format("Couldn't split string \"%s\"\n", [s(String0)], !IO)
       %% ),
-      main(!IO)
+      main_loop(Mapping, !IO)
     ; ReadResult = eof
     ; ReadResult = error(Error),
       error_exit(1, error_message(Error), !IO)
     ).
+
+main(!IO) :-
+    %% %% solutions(eventually_contain_shiny_gold, Bags),
+    %% %% print_line(Bags, !IO).
+    main_loop(init, !IO).

@@ -55,11 +55,14 @@ preprocessed(String0, String) :-
 :- pred contain_string(string::in, string::out, list({int, string})::out) is semidet.
 contain_string(String, Bag, ContainBags) :-
     [Bag, String1] = split_at_char(':', String),
-    filter_map((pred(String2::in, {N, ChildBag}::out) is semidet :-
+    map((pred(String2::in, {N, ChildBag}::out) is semidet :-
              replace(String2, " ", "=", String3),
              [NumString, ChildBag] = split_at_char('=', String3),
              to_int(NumString, N)
-        ), split_at_char(',', String1), ContainBags).
+        ),
+        negated_filter(is_empty, split_at_char(',', String1)),
+        ContainBags
+       ).
 
 main(!IO) :-
     %% %% solutions(eventually_contain_shiny_gold, Bags),

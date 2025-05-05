@@ -16,9 +16,8 @@
 
 :- pred program_input(res::out, program::array_uo, io::di, io::uo) is det.
 
-:- pred instruction_run(instruction::in, int::in, int::out, int::in, int::out) is det.
-
-:- pred run(program::in, int::in, int::out, int::in, int::out) is semidet.
+:- pred run_instruction(instruction::in, int::in, int::out, int::in, int::out) is det.
+:- pred run_program(program::in, int::in, int::out, int::in, int::out) is semidet.
 
 :- implementation.
 
@@ -52,21 +51,21 @@ program_input(Result, IP, !Program, !IO) :-
       Result = error(Error)
     ).
 
-instruction_run({acc, Arg}, !Acc, !IP) :- !:Acc = !.Acc + Arg, !:IP = !.IP + 1.
-instruction_run({jmp, Arg}, !Acc, !IP) :- !:Acc = !.Acc, !:IP = !.IP + Arg.
-instruction_run({nop, _}, !Acc, !IP) :- !:Acc = !.Acc, !:IP = !.IP + 1.
+run_instruction({acc, Arg}, !Acc, !IP) :- !:Acc = !.Acc + Arg, !:IP = !.IP + 1.
+run_instruction({jmp, Arg}, !Acc, !IP) :- !:IP = !.IP + Arg.
+run_instruction({nop, _}, !Acc, !IP) :- !:IP = !.IP + 1.
 
-run(Program, !Acc, !IP) :-
-    run(Program, empty, !Acc, !IP).
+run_program(Program, !Acc, !IP) :-
+    run_program(Program, empty, !Acc, !IP).
 
-:- pred run(program::in, ranges::in, int::in, int::out, int::in, int::out) is semidet.
-run(Program, Seen0, !Acc, !IP) :-
+:- pred run_program(program::in, ranges::in, int::in, int::out, int::in, int::out) is semidet.
+run_program(Program, Seen0, !Acc, !IP) :-
     ( member(!.IP, Seen0) ->
       %% Loop found, stop.
       true
     ; %% Run next instruction.
       semidet_lookup(Program, !.IP, Instruction),
       insert(!.IP, Seen0, Seen),
-      instruction_run(Instruction, !Acc, !IP),
-      run(Program, Seen, !Acc, !IP)
+      run_instruction(Instruction, !Acc, !IP),
+      run_program(Program, Seen, !Acc, !IP)
     ).

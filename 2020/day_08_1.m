@@ -13,7 +13,7 @@
 main(!IO) :-
     program_input(ReadResult, Program, !IO),
     ( ReadResult = ok,
-      ( run(Program, 0, Acc, 0, _) ->
+      ( run_program(Program, 0, Acc, 0, _) ->
         write_int(Acc, !IO), nl(!IO)
       ; error_exit(1, "Program error", !IO)
       )

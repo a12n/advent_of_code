@@ -13,8 +13,11 @@
 main(!IO) :-
     program_input(ReadResult, Program, !IO),
     ( ReadResult = ok,
-      %% TODO
-      print_line(Program, !IO)
+      print_line(Program, !IO),
+      ( run(Program, 0, Acc, 0, _) ->
+        write_int(Acc, !IO), nl(!IO)
+      ; error_exit(1, "Program error", !IO)
+      )
     ; ReadResult = error(Error),
       error_exit(1, error_message(Error), !IO)
     ).

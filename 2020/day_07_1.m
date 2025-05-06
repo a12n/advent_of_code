@@ -42,9 +42,9 @@ eventually_contain(X, Y) :-
 eventually_contain_shiny_gold(Y) :-
     eventually_contain(Y, "shiny gold").
 
-:- pred preprocessed(string, string).
-:- mode preprocessed(in, out) is det.
-preprocessed(!String) :-
+:- pred simplified(string, string).
+:- mode simplified(in, out) is det.
+simplified(!String) :-
     replace_all(!.String, " bags contain ", ":", !:String),
     replace_all(!.String, " bags", "", !:String),
     replace_all(!.String, " bag", "", !:String),
@@ -69,7 +69,7 @@ main_loop(Mapping, !IO) :-
     read_line_as_string(ReadResult, !IO),
     ( ReadResult = ok(Line),
       String0 = chomp(Line),
-      preprocessed(String0, String1),
+      simplified(String0, String1),
       format("\"%s\" -> \"%s\"\n", [s(String0), s(String1)], !IO),
       ( contain_string(String1, Bag, ContainBags) ->
         format("Bag \"%s\" ", [s(Bag)], !IO),

@@ -44,13 +44,13 @@ eventually_contain_shiny_gold(Y) :-
 
 :- pred preprocessed(string, string).
 :- mode preprocessed(in, out) is det.
-preprocessed(String0, String) :-
-    String1 = replace_all(String0, " bags contain ", ":"),
-    String2 = replace_all(String1, " bags", ""),
-    String3 = replace_all(String2, " bag", ""),
-    String4 = replace_all(String3, "no other", ""),
-    String5 = replace_all(String4, ".", ""),
-    String = replace_all(String5, ", ", ",").
+preprocessed(!String) :-
+    replace_all(!.String, " bags contain ", ":", !:String),
+    replace_all(!.String, " bags", "", !:String),
+    replace_all(!.String, " bag", "", !:String),
+    replace_all(!.String, "no other", "", !:String),
+    replace_all(!.String, ".", "", !:String),
+    replace_all(!.String, ", ", ",", !:String).
 
 :- pred contain_string(string::in, string::out, list({int, string})::out) is semidet.
 contain_string(String, Bag, ContainBags) :-

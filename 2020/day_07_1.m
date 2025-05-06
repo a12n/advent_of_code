@@ -76,9 +76,7 @@ main_loop(Mapping, !IO) :-
     ( ReadResult = ok(Line),
       String0 = chomp(Line),
       simplified(String0, String1),
-      format("\"%s\" -> \"%s\"\n", [s(String0), s(String1)], !IO),
       ( contain_string(String1, Bag, Contains) ->
-        format("Bag \"%s\" ", [s(Bag)], !IO),
 
         foldl((pred(UpLevel::in, Map0::in, Map::out) is det :-
                    add(UpLevel, Bag, Map0, Map)),

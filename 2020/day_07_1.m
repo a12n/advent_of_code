@@ -21,25 +21,26 @@ simplified(!String) :-
     replace_all(!.String, ".", "", !:String),
     replace_all(!.String, ", ", ",", !:String).
 
-:- pred contain_string(string::in, string::out, list(string)::out) is semidet.
+:- pred contain_string(string::in, string::out, list({int, string})::out) is semidet.
 contain_string(String, Bag, Contains) :-
     [Bag, String1] = split_at_char(':', String),
-    map((pred(String2::in, ChildBag::out) is semidet :-
+    map((pred(String2::in, {N, ChildBag}::out) is semidet :-
              replace(String2, " ", "=", String3),
-             [_, ChildBag] = split_at_char('=', String3)
+             [NumString, ChildBag] = split_at_char('=', String3),
+             to_int(NumString, N)
         ),
         negated_filter(is_empty, split_at_char(',', String1)),
         Contains
        ).
 
-:- pred outermost(multi_map(string, string)::in, string::in, string::out) is nondet.
+:- pred outermost(multi_map(string, {int, string})::in, string::in, string::out) is nondet.
 outermost(Mapping, Bag, OuterBag) :-
-    member(Mapping, OtherBag, Bag),
+    member(Mapping, OtherBag, {_, Bag}),
     ( OuterBag = OtherBag
     ; outermost(Mapping, OtherBag, OuterBag)
     ).
 
-:- pred contain(string::in, multi_map(string, string)::in, multi_map(string, string)::out) is semidet.
+:- pred contain(string::in, multi_map(string, {int, string})::in, multi_map(string, {int, string})::out) is semidet.
 contain(String0, !Mapping) :-
     simplified(chomp(String0), String),
     contain_string(String, Bag, ContainBags),

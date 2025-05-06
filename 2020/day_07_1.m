@@ -87,8 +87,7 @@ main_loop(Mapping, !IO) :-
       )
     ; ReadResult = eof,
       solutions(outermost(Mapping, "shiny gold"), Solutions),
-      length(Solutions, N),
-      print_line(N, !IO)
+      write_int(length(Solutions), !IO), nl(!IO)
     ; ReadResult = error(Error),
       error_exit(1, error_message(Error), !IO)
     ).

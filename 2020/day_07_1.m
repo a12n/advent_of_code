@@ -79,7 +79,6 @@ main_loop(Mapping, !IO) :-
       format("\"%s\" -> \"%s\"\n", [s(String0), s(String1)], !IO),
       ( contain_string(String1, Bag, Contains) ->
         format("Bag \"%s\" ", [s(Bag)], !IO),
-        print_line(Contains, !IO),
 
         foldl((pred(UpLevel::in, Map0::in, Map::out) is det :-
                    add(UpLevel, Bag, Map0, Map)),
@@ -89,8 +88,6 @@ main_loop(Mapping, !IO) :-
       ; error_exit(1, "Couldn't parse string", !IO)
       )
     ; ReadResult = eof,
-      to_assoc_list(Mapping, AssocList),
-      print_line(AssocList, !IO),
       solutions(contained(Mapping, "shiny gold"), Solutions),
       length(Solutions, N),
       print_line(N, !IO)

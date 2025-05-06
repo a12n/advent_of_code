@@ -63,11 +63,11 @@ contain_string(String, Bag, Contains) :-
         Contains
        ).
 
-:- pred contained(multi_map(string, string)::in, string::in, string::out) is nondet.
-contained(Parents, Bag, Result) :-
-    nondet_search(Parents, Bag, Parent),
-    ( Result = Parent
-    ; contained(Parents, Parent, Result)
+:- pred outermost(multi_map(string, string)::in, string::in, string::out) is nondet.
+outermost(Mapping, Bag, OuterBag) :-
+    nondet_search(Mapping, Bag, OtherBag),
+    ( OuterBag = OtherBag
+    ; outermost(Mapping, OtherBag, OuterBag)
     ).
 
 :- pred main_loop(multi_map(string, string)::in, io::di, io::uo) is det.
@@ -88,7 +88,7 @@ main_loop(Mapping, !IO) :-
       ; error_exit(1, "Couldn't parse string", !IO)
       )
     ; ReadResult = eof,
-      solutions(contained(Mapping, "shiny gold"), Solutions),
+      solutions(outermost(Mapping, "shiny gold"), Solutions),
       length(Solutions, N),
       print_line(N, !IO)
     ; ReadResult = error(Error),

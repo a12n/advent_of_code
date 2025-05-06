@@ -65,32 +65,22 @@ contain_string(String, Bag, Contains) :-
 
 :- pred outermost(multi_map(string, string)::in, string::in, string::out) is nondet.
 outermost(Mapping, Bag, OuterBag) :-
-    nondet_search(Mapping, Bag, OtherBag),
+    member(Mapping, OtherBag, Bag),
     ( OuterBag = OtherBag
     ; outermost(Mapping, OtherBag, OuterBag)
     ).
 
-:- pred main_loop(multi_map(string, string)::in, io::di, io::uo) is det.
-main_loop(Mapping, !IO) :-
-    read_line_as_string(ReadResult, !IO),
-    ( ReadResult = ok(Line),
-      String0 = chomp(Line),
-      simplified(String0, String1),
-      ( contain_string(String1, Bag, Contains) ->
-
-        foldl((pred(UpLevel::in, Map0::in, Map::out) is det :-
-                   add(UpLevel, Bag, Map0, Map)),
-              Contains, Mapping, Mapping2),
-
-        main_loop(Mapping2, !IO)
-      ; error_exit(1, "Couldn't parse string", !IO)
-      )
-    ; ReadResult = eof,
-      solutions(outermost(Mapping, "shiny gold"), Solutions),
-      write_int(length(Solutions), !IO), nl(!IO)
-    ; ReadResult = error(Error),
-      error_exit(1, error_message(Error), !IO)
-    ).
+:- pred contain(string::in, multi_map(string, string)::in, multi_map(string, string)::out) is semidet.
+contain(String0, !Mapping) :-
+    simplified(chomp(String0), String),
+    contain_string(String, Bag, ContainBags),
+    foldl(add(Bag), ContainBags, !Mapping).
 
 main(!IO) :-
-    main_loop(init, !IO).
+    lines_foldl(contain, init, Result, !IO),
+    ( Result = ok(Mapping),
+      solutions(outermost(Mapping, "shiny gold"), Solutions),
+      write_int(length(Solutions), !IO), nl(!IO)
+    ; Result = error(_, Error),
+      error_exit(1, error_message(Error), !IO)
+    ).

@@ -40,12 +40,12 @@ program_input(Result, IP, !Program, !IO) :-
     read_line_as_string(ReadResult, !IO),
     ( ReadResult = ok(Line),
       ( instruction_string(chomp(Line), Instruction) ->
-        set(IP, Instruction, !.Program, !:Program),
+        set(IP, Instruction, !Program),
         program_input(Result, IP + 1, !Program, !IO)
       ; Result = error(make_io_error("Invalid instruction"))
       )
     ; ReadResult = eof,
-      resize(IP, {nop, 0}, !.Program, !:Program),
+      resize(IP, {nop, 0}, !Program),
       Result = ok
     ; ReadResult = error(Error),
       Result = error(Error)

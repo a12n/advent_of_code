@@ -92,16 +92,18 @@ exec_program(Program, Halts, Seen0, !Acc, !IP) :-
     ).
 
 exec_program_nondet(Program, Halts, !Acc, !IP) :-
-    exec_program_nondet(Program, Halts, empty, !Acc, !IP).
+    exec_program_nondet(Program, Halts, empty, no, !Acc, !IP).
 
-:- pred exec_program_nondet(program::in, bool::out, ranges::in, int::in, int::out, int::in, int::out) is nondet.
-exec_program_nondet(Program, Halts, Seen0, !Acc, !IP) :-
+:- pred exec_program_nondet(program::in, bool::out, ranges::in, bool::in, int::in, int::out, int::in, int::out) is nondet.
+%% :- pragma memo(exec_program_nondet/8, [specified([promise_implied, output, promise_implied, value, promise_implied, output, value, output])]).
+exec_program_nondet(Program, Halts, Seen0, Det0, !Acc, !IP) :-
+    trace [io(!IO)] format("%d %d\n", [i(!.Acc), i(!.IP)], !IO),
     ( member(!.IP, Seen0) ->
       Halts = no
     ; (!.IP < size(Program)) ->
       lookup(Program, !.IP, Instr),
       insert(!.IP, Seen0, Seen),
-      exec_instr_nondet(Instr, !Acc, !IP),
-      exec_program_nondet(Program, Halts, Seen, !Acc, !IP)
+      exec_instr_nondet(Instr, Det0, Det, !Acc, !IP),
+      exec_program_nondet(Program, Halts, Seen, Det, !Acc, !IP)
     ; Halts = yes
     ).

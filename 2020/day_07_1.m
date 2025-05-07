@@ -8,49 +8,18 @@
 
 :- implementation.
 
-:- import_module list, multi_map, solutions, string.
-:- import_module io_ext.
-
-:- pred simplified(string, string).
-:- mode simplified(in, out) is det.
-simplified(!String) :-
-    replace_all(!.String, " bags contain ", ":", !:String),
-    replace_all(!.String, " bags", "", !:String),
-    replace_all(!.String, " bag", "", !:String),
-    replace_all(!.String, "no other", "", !:String),
-    replace_all(!.String, ".", "", !:String),
-    replace_all(!.String, ", ", ",", !:String).
-
-:- pred contain_string(string::in, string::out, list({int, string})::out) is semidet.
-contain_string(String, Bag, Contains) :-
-    [Bag, String1] = split_at_char(':', String),
-    map((pred(String2::in, {N, ChildBag}::out) is semidet :-
-             replace(String2, " ", "=", String3),
-             [NumString, ChildBag] = split_at_char('=', String3),
-             to_int(NumString, N)
-        ),
-        negated_filter(is_empty, split_at_char(',', String1)),
-        Contains
-       ).
-
-:- pred outermost(multi_map(string, {int, string})::in, string::in, string::out) is nondet.
-outermost(Mapping, Bag, OuterBag) :-
-    member(Mapping, OtherBag, {_, Bag}),
-    ( OuterBag = OtherBag
-    ; outermost(Mapping, OtherBag, OuterBag)
-    ).
-
-:- pred contain(string::in, multi_map(string, {int, string})::in, multi_map(string, {int, string})::out) is semidet.
-contain(String0, !Mapping) :-
-    simplified(chomp(String0), String),
-    contain_string(String, Bag, ContainBags),
-    foldl(add(Bag), ContainBags, !Mapping).
+:- import_module list, solutions.
+:- import_module day_07, io_ext.
 
 main(!IO) :-
-    lines_foldl(contain, init, Result, !IO),
+    read_bags(Result, !IO),
     ( Result = ok(Mapping),
       solutions(outermost(Mapping, "shiny gold"), Solutions),
       write_int(length(Solutions), !IO), nl(!IO)
-    ; Result = error(_, Error),
+      %% ( total_bags(Mapping, "shiny gold", N) ->
+      %%   write_int(N, !IO), nl(!IO)
+      %% ; error_exit(1, "No solution", !IO)
+      %% )
+    ; Result = error(Error),
       error_exit(1, error_message(Error), !IO)
     ).

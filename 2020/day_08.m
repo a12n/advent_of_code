@@ -20,7 +20,9 @@
 :- pred program_input(res::out, program::array_uo, io::di, io::uo) is det.
 
 :- pred exec_instr(instr::in, int::in, int::out, int::in, int::out) is det.
+:- pred exec_instr_nondet(instr::in, int::in, int::out, int::in, int::out) is multi.
 :- pred exec_program(program::in, bool::out, int::in, int::out, int::in, int::out) is det.
+:- pred exec_program_nondet(program::in, bool::out, int::in, int::out, int::in, int::out) is nondet.
 
 :- implementation.
 
@@ -58,6 +60,10 @@ exec_instr((acc - Arg), !Acc, !IP) :- !:Acc = !.Acc + Arg, !:IP = !.IP + 1.
 exec_instr((jmp - Arg), !Acc, !IP) :- !:IP = !.IP + Arg.
 exec_instr((nop - _), !Acc, !IP) :- !:IP = !.IP + 1.
 
+exec_instr_nondet((acc - Arg), !Acc, !IP) :- exec_instr((acc - Arg), !Acc, !IP).
+exec_instr_nondet((jmp - Arg), !Acc, !IP) :- exec_instr((jmp - Arg), !Acc, !IP); exec_instr((nop - Arg), !Acc, !IP).
+exec_instr_nondet((nop - Arg), !Acc, !IP) :- exec_instr((nop - Arg), !Acc, !IP); exec_instr((jmp - Arg), !Acc, !IP).
+
 exec_program(Program, Halts, !Acc, !IP) :-
     exec_program(Program, Halts, empty, !Acc, !IP).
 
@@ -70,5 +76,20 @@ exec_program(Program, Halts, Seen0, !Acc, !IP) :-
       insert(!.IP, Seen0, Seen),
       exec_instr(Instr, !Acc, !IP),
       exec_program(Program, Halts, Seen, !Acc, !IP)
+    ; Halts = yes
+    ).
+
+exec_program_nondet(Program, Halts, !Acc, !IP) :-
+    exec_program_nondet(Program, Halts, empty, !Acc, !IP).
+
+:- pred exec_program_nondet(program::in, bool::out, ranges::in, int::in, int::out, int::in, int::out) is nondet.
+exec_program_nondet(Program, Halts, Seen0, !Acc, !IP) :-
+    ( member(!.IP, Seen0) ->
+      Halts = no
+    ; (!.IP < size(Program)) ->
+      lookup(Program, !.IP, Instr),
+      insert(!.IP, Seen0, Seen),
+      exec_instr_nondet(Instr, !Acc, !IP),
+      exec_program_nondet(Program, Halts, Seen, !Acc, !IP)
     ; Halts = yes
     ).

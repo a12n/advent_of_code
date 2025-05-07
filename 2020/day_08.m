@@ -5,7 +5,7 @@
 :- import_module array, bool, io.
 
 :- type opcode ---> acc; jmp; nop.
-:- type instruction ---> {opcode, int}.
+:- type instruction == {opcode, int}.
 :- type program == array(instruction).
 
 :- pred opcode_string(string, opcode).

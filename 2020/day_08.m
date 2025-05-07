@@ -64,6 +64,18 @@ exec_instr_nondet((acc - Arg), !Acc, !IP) :- exec_instr((acc - Arg), !Acc, !IP).
 exec_instr_nondet((jmp - Arg), !Acc, !IP) :- exec_instr((jmp - Arg), !Acc, !IP); exec_instr((nop - Arg), !Acc, !IP).
 exec_instr_nondet((nop - Arg), !Acc, !IP) :- exec_instr((nop - Arg), !Acc, !IP); exec_instr((jmp - Arg), !Acc, !IP).
 
+%% Like exec_instr_nondet/5, but only allows single instruction
+%% replacement.
+:- pred exec_instr_nondet(instr::in, bool::in, bool::out, int::in, int::out, int::in, int::out) is multi.
+exec_instr_nondet((Opcode - Arg) @ Instr, !Det, !Acc, !IP) :-
+    ( !.Det = yes, exec_instr(Instr, !Acc, !IP)
+    ; Opcode = acc, exec_instr(Instr, !Acc, !IP)
+    ; Opcode = jmp, ( exec_instr(Instr, !Acc, !IP)
+                    ; exec_instr((nop - Arg), !Acc, !IP), !:Det = yes )
+    ; Opcode = nop, ( exec_instr(Instr, !Acc, !IP)
+                    ; exec_instr((jmp - Arg), !Acc, !IP), !:Det = yes )
+    ).
+
 exec_program(Program, Halts, !Acc, !IP) :-
     exec_program(Program, Halts, empty, !Acc, !IP).
 

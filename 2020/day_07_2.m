@@ -8,7 +8,6 @@
 
 :- implementation.
 
-:- import_module list, solutions.
 :- import_module day_07, io_ext.
 
 main(!IO) :-

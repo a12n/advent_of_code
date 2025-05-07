@@ -14,10 +14,10 @@
 main(!IO) :-
     program_input(ReadResult, Program, !IO),
     ( ReadResult = ok,
-      run_program(Program, Loop, 0, Acc, 0, _),
-      ( Loop = yes ->
+      exec_program(Program, Halts, 0, Acc, 0, _),
+      ( Halts = no ->
         write_int(Acc, !IO), nl(!IO)
-      ; error_exit(1, "Program terminates", !IO)
+      ; error_exit(1, "Program halts", !IO)
       )
     ; ReadResult = error(Error),
       error_exit(1, error_message(Error), !IO)

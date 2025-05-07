@@ -2,22 +2,25 @@
 :- module day_08.
 :- interface.
 
-:- import_module array, bool, io.
+:- import_module array, bool, io, pair.
 
 :- type opcode ---> acc; jmp; nop.
-:- type instruction == {opcode, int}.
-:- type program == array(instruction).
+:- type operand == int.
+:- type instr == pair(opcode, operand).
+:- type program == array(instr).
 
 :- pred opcode_string(string, opcode).
 :- mode opcode_string(in, out) is semidet.
 :- mode opcode_string(out, in) is det.
 
-:- pred instruction_string(string::in, instruction::out) is semidet.
+:- pred instr_string(string, instr).
+:- mode instr_string(in, out) is semidet.
+%% :- mode instr_string(out, in) is det.
 
 :- pred program_input(res::out, program::array_uo, io::di, io::uo) is det.
 
-:- pred run_instruction(instruction::in, int::in, int::out, int::in, int::out) is det.
-:- pred run_program(program::in, bool::out, int::in, int::out, int::in, int::out) is det.
+:- pred exec_instr(instr::in, int::in, int::out, int::in, int::out) is det.
+:- pred exec_program(program::in, bool::out, int::in, int::out, int::in, int::out) is det.
 
 :- implementation.
 
@@ -27,45 +30,45 @@ opcode_string("acc", acc).
 opcode_string("jmp", jmp).
 opcode_string("nop", nop).
 
-instruction_string(String, {Opcode, Arg}) :-
-    [OpcodeString, ArgString] = words(String),
-    opcode_string(OpcodeString, Opcode),
-    to_int(ArgString, Arg).
+instr_string(String, (Opcode - Arg)) :-
+    [OpcodeStr, ArgStr] = words(String),
+    opcode_string(OpcodeStr, Opcode),
+    to_int(ArgStr, Arg).
 
 program_input(Result, Program, !IO) :-
-    program_input(Result, 0, init(1000, {nop, 0}), Program, !IO).
+    program_input(Result, 0, init(1000, (nop - 0)), Program, !IO).
 
 :- pred program_input(res::out, int::in, program::array_di, program::array_uo, io::di, io::uo) is det.
 program_input(Result, IP, !Program, !IO) :-
     read_line_as_string(ReadResult, !IO),
     ( ReadResult = ok(Line),
-      ( instruction_string(chomp(Line), Instruction) ->
-        set(IP, Instruction, !Program),
+      ( instr_string(chomp(Line), Instr) ->
+        set(IP, Instr, !Program),
         program_input(Result, IP + 1, !Program, !IO)
       ; Result = error(make_io_error("Invalid instruction"))
       )
     ; ReadResult = eof,
-      resize(IP, {nop, 0}, !Program),
+      resize(IP, (nop - 0), !Program),
       Result = ok
     ; ReadResult = error(Error),
       Result = error(Error)
     ).
 
-run_instruction({acc, Arg}, !Acc, !IP) :- !:Acc = !.Acc + Arg, !:IP = !.IP + 1.
-run_instruction({jmp, Arg}, !Acc, !IP) :- !:IP = !.IP + Arg.
-run_instruction({nop, _}, !Acc, !IP) :- !:IP = !.IP + 1.
+exec_instr((acc - Arg), !Acc, !IP) :- !:Acc = !.Acc + Arg, !:IP = !.IP + 1.
+exec_instr((jmp - Arg), !Acc, !IP) :- !:IP = !.IP + Arg.
+exec_instr((nop - _), !Acc, !IP) :- !:IP = !.IP + 1.
 
-run_program(Program, Loop, !Acc, !IP) :-
-    run_program(Program, Loop, empty, !Acc, !IP).
+exec_program(Program, Halts, !Acc, !IP) :-
+    exec_program(Program, Halts, empty, !Acc, !IP).
 
-:- pred run_program(program::in, bool::out, ranges::in, int::in, int::out, int::in, int::out) is det.
-run_program(Program, Loop, Seen0, !Acc, !IP) :-
+:- pred exec_program(program::in, bool::out, ranges::in, int::in, int::out, int::in, int::out) is det.
+exec_program(Program, Halts, Seen0, !Acc, !IP) :-
     ( member(!.IP, Seen0) ->
-      Loop = yes
+      Halts = no
     ; !.IP < size(Program) ->
-      lookup(Program, !.IP, Instruction),
+      lookup(Program, !.IP, Instr),
       insert(!.IP, Seen0, Seen),
-      run_instruction(Instruction, !Acc, !IP),
-      run_program(Program, Loop, Seen, !Acc, !IP)
-    ; Loop = no
+      exec_instr(Instr, !Acc, !IP),
+      exec_program(Program, Halts, Seen, !Acc, !IP)
+    ; Halts = yes
     ).

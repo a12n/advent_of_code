@@ -81,11 +81,9 @@ exec_program(Program, Halts, !Acc, !IP) :-
 
 :- pred exec_program(program::in, bool::out, array(bool)::array_di, array(bool)::array_uo, int::in, int::out, int::in, int::out) is det.
 exec_program(Program, Halts, !Seen, !Acc, !IP) :-
-    trace [io(!IO)] format("exec_program: %d %d\n", [i(!.Acc), i(!.IP)], !IO),
     ( (!.IP < size(Program)) ->
       ( lookup(!.Seen, !.IP, no) ->
         lookup(Program, !.IP, Instr),
-        trace [io(!IO)] format("exec_program: %s\n", [s(string(Instr))], !IO),
         set(!.IP, yes, !Seen),
         exec_instr(Instr, !Acc, !IP),
         exec_program(Program, Halts, !Seen, !Acc, !IP)
@@ -95,7 +93,6 @@ exec_program(Program, Halts, !Seen, !Acc, !IP) :-
     ).
 
 repair_program(!Program, !Acc, !IP) :-
-    trace [io(!IO)] format("repair_program: %d %d\n", [i(!.Acc), i(!.IP)], !IO),
     ( (!.IP < size(!.Program)) ->
       lookup(!.Program, !.IP, (Opcode - Arg) @ Instr),
       trace [io(!IO)] format("repair_program: %s %d\n", [s(string(Opcode)), i(Arg)], !IO),

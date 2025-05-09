@@ -19,8 +19,6 @@
 
 :- pred program_input(res::out, program::array_uo, io::di, io::uo) is det.
 
-:- pred exec_instr(instr::in, int::in, int::out, int::in, int::out) is det.
-:- pred exec_instr_nondet(instr::in, int::in, int::out, int::in, int::out) is multi.
 :- pred exec_program(program::in, bool::out, int::in, int::out, int::in, int::out) is det.
 :- pred repair_program(program::array_di, program::array_uo, int::in, int::out, int::in, int::out) is semidet.
 
@@ -56,25 +54,10 @@ program_input(Result, IP, !Program, !IO) :-
       Result = error(Error)
     ).
 
+:- pred exec_instr(instr::in, int::in, int::out, int::in, int::out) is det.
 exec_instr((acc - Arg), !Acc, !IP) :- !:Acc = !.Acc + Arg, !:IP = !.IP + 1.
 exec_instr((jmp - Arg), !Acc, !IP) :- !:IP = !.IP + Arg.
 exec_instr((nop - _), !Acc, !IP) :- !:IP = !.IP + 1.
-
-exec_instr_nondet((acc - Arg), !Acc, !IP) :- exec_instr((acc - Arg), !Acc, !IP).
-exec_instr_nondet((jmp - Arg), !Acc, !IP) :- exec_instr((jmp - Arg), !Acc, !IP); exec_instr((nop - Arg), !Acc, !IP).
-exec_instr_nondet((nop - Arg), !Acc, !IP) :- exec_instr((nop - Arg), !Acc, !IP); exec_instr((jmp - Arg), !Acc, !IP).
-
-%% Like exec_instr_nondet/5, but only allows single instruction
-%% replacement.
-:- pred exec_instr_nondet(instr::in, bool::in, bool::out, int::in, int::out, int::in, int::out) is multi.
-exec_instr_nondet((Opcode - Arg) @ Instr, !Det, !Acc, !IP) :-
-    ( !.Det = yes, exec_instr(Instr, !Acc, !IP)
-    ; Opcode = acc, exec_instr(Instr, !Acc, !IP)
-    ; Opcode = jmp, ( exec_instr(Instr, !Acc, !IP)
-                    ; exec_instr((nop - Arg), !Acc, !IP), !:Det = yes )
-    ; Opcode = nop, ( exec_instr(Instr, !Acc, !IP)
-                    ; exec_instr((jmp - Arg), !Acc, !IP), !:Det = yes )
-    ).
 
 exec_program(Program, Halts, !Acc, !IP) :-
     exec_program(Program, Halts, init(size(Program), no), _, !Acc, !IP).

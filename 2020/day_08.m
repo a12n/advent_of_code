@@ -22,7 +22,7 @@
 :- pred exec_instr(instr::in, int::in, int::out, int::in, int::out) is det.
 :- pred exec_instr_nondet(instr::in, int::in, int::out, int::in, int::out) is multi.
 :- pred exec_program(program::in, bool::out, int::in, int::out, int::in, int::out) is det.
-:- pred exec_program_nondet(program::in, bool::out, int::in, int::out, int::in, int::out) is nondet.
+:- pred repair_program(program::array_di, program::array_uo, int::in, int::out, int::in, int::out) is semidet.
 
 :- implementation.
 
@@ -81,29 +81,45 @@ exec_program(Program, Halts, !Acc, !IP) :-
 
 :- pred exec_program(program::in, bool::out, array(bool)::array_di, array(bool)::array_uo, int::in, int::out, int::in, int::out) is det.
 exec_program(Program, Halts, !Seen, !Acc, !IP) :-
-    ( lookup(!.Seen, !.IP, yes) ->
-      Halts = no
-    ; !.IP < size(Program) ->
-      lookup(Program, !.IP, Instr),
-      set(!.IP, yes, !Seen),
-      exec_instr(Instr, !Acc, !IP),
-      exec_program(Program, Halts, !Seen, !Acc, !IP)
+    trace [io(!IO)] format("exec_program: %d %d\n", [i(!.Acc), i(!.IP)], !IO),
+    ( (!.IP < size(Program)) ->
+      ( lookup(!.Seen, !.IP, no) ->
+        lookup(Program, !.IP, Instr),
+        trace [io(!IO)] format("exec_program: %s\n", [s(string(Instr))], !IO),
+        set(!.IP, yes, !Seen),
+        exec_instr(Instr, !Acc, !IP),
+        exec_program(Program, Halts, !Seen, !Acc, !IP)
+      ; Halts = no
+      )
     ; Halts = yes
     ).
 
-exec_program_nondet(Program, Halts, !Acc, !IP) :-
-    exec_program_nondet(Program, Halts, empty, no, !Acc, !IP).
-
-:- pred exec_program_nondet(program::in, bool::out, ranges::in, bool::in, int::in, int::out, int::in, int::out) is nondet.
-%% :- pragma memo(exec_program_nondet/8, [specified([promise_implied, output, promise_implied, value, promise_implied, output, value, output])]).
-exec_program_nondet(Program, Halts, Seen0, Det0, !Acc, !IP) :-
-    trace [io(!IO)] format("%d %d\n", [i(!.Acc), i(!.IP)], !IO),
-    ( member(!.IP, Seen0) ->
-      Halts = no
-    ; (!.IP < size(Program)) ->
-      lookup(Program, !.IP, Instr),
-      insert(!.IP, Seen0, Seen),
-      exec_instr_nondet(Instr, Det0, Det, !Acc, !IP),
-      exec_program_nondet(Program, Halts, Seen, Det, !Acc, !IP)
-    ; Halts = yes
+repair_program(!Program, !Acc, !IP) :-
+    trace [io(!IO)] format("repair_program: %d %d\n", [i(!.Acc), i(!.IP)], !IO),
+    ( (!.IP < size(!.Program)) ->
+      lookup(!.Program, !.IP, (Opcode - Arg) @ Instr),
+      trace [io(!IO)] format("repair_program: %s %d\n", [s(string(Opcode)), i(Arg)], !IO),
+      ( Opcode = acc,
+        exec_instr(Instr, !Acc, !IP),
+        repair_program(!Program, !Acc, !IP)
+      ; Opcode = jmp,
+        set(!.IP, (nop - Arg), !Program),
+        ( exec_program(!.Program, yes, !.Acc, Acc0, !.IP, _) ->
+          trace [io(!IO)] format("halts, %d\n", [i(Acc0)], !IO),
+          !:Acc = Acc0
+        ; set(!.IP, Instr, !Program),
+          exec_instr(Instr, !Acc, !IP),
+          repair_program(!Program, !Acc, !IP)
+        )
+      ; Opcode = nop,
+        set(!.IP, (jmp - Arg), !Program),
+        ( exec_program(!.Program, yes, !.Acc, Acc0, !.IP, _) ->
+          trace [io(!IO)] format("halts, %d\n", [i(Acc0)], !IO),
+          !:Acc = Acc0
+        ; set(!.IP, Instr, !Program),
+          exec_instr(Instr, !Acc, !IP),
+          repair_program(!Program, !Acc, !IP)
+        )
+      )
+    ; true
     ).

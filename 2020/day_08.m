@@ -92,6 +92,10 @@ exec_program(Program, Halts, !Seen, !Acc, !IP) :-
     ; Halts = yes
     ).
 
+:- pred repair_opcode(opcode::in, opcode::out) is semidet.
+repair_opcode(jmp, nop).
+repair_opcode(nop, jmp).
+
 repair_program(!Program, !Acc, !IP) :-
     ( (!.IP < size(!.Program)) ->
       lookup(!.Program, !.IP, (Opcode - Arg) @ Instr),

@@ -11,7 +11,7 @@
 
 :- pred program_input(res::out, program::array_uo, io::di, io::uo) is det.
 :- pred exec_program(program::in, bool::out, int::in, int::out, int::in, int::out) is det.
-:- pred repair_program(program::array_di, program::array_uo, int::in, int::out, int::in, int::out) is semidet.
+:- pred repair_program(program::array_di, program::array_uo, int::in, int::out, int::in, int::out) is det.
 
 :- implementation.
 

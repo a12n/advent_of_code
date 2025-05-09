@@ -14,8 +14,7 @@
 main(!IO) :-
     program_input(ReadResult, Program, !IO),
     ( ReadResult = ok,
-      exec_program(Program, Halts, 0, Acc, 0, _),
-      ( Halts = no ->
+      ( exec_program(Program, no, 0, Acc, 0, _) ->
         write_int(Acc, !IO), nl(!IO)
       ; error("Program halts")
       )

@@ -9,16 +9,7 @@
 :- type instr == pair(opcode, operand).
 :- type program == array(instr).
 
-:- pred opcode_string(string, opcode).
-:- mode opcode_string(in, out) is semidet.
-:- mode opcode_string(out, in) is det.
-
-:- pred instr_string(string, instr).
-:- mode instr_string(in, out) is semidet.
-%% :- mode instr_string(out, in) is det.
-
 :- pred program_input(res::out, program::array_uo, io::di, io::uo) is det.
-
 :- pred exec_program(program::in, bool::out, int::in, int::out, int::in, int::out) is det.
 :- pred repair_program(program::array_di, program::array_uo, int::in, int::out, int::in, int::out) is semidet.
 
@@ -26,10 +17,16 @@
 
 :- import_module int, list, ranges, string.
 
+:- pred opcode_string(string, opcode).
+:- mode opcode_string(in, out) is semidet.
+:- mode opcode_string(out, in) is det.
 opcode_string("acc", acc).
 opcode_string("jmp", jmp).
 opcode_string("nop", nop).
 
+:- pred instr_string(string, instr).
+:- mode instr_string(in, out) is semidet.
+%% :- mode instr_string(out, in) is det.
 instr_string(String, (Opcode - Arg)) :-
     [OpcodeStr, ArgStr] = words(String),
     opcode_string(OpcodeStr, Opcode),

@@ -8,7 +8,7 @@
 
 :- implementation.
 
-:- import_module bool.
+:- import_module bool, require.
 :- import_module day_08, io_ext.
 
 main(!IO) :-
@@ -17,8 +17,8 @@ main(!IO) :-
       exec_program(Program, Halts, 0, Acc, 0, _),
       ( Halts = no ->
         write_int(Acc, !IO), nl(!IO)
-      ; error_exit(1, "Program halts", !IO)
+      ; error("Program halts")
       )
     ; ReadResult = error(Error),
-      error_exit(1, error_message(Error), !IO)
+      error(error_message(Error))
     ).

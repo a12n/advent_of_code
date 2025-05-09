@@ -99,28 +99,16 @@ repair_opcode(nop, jmp).
 repair_program(!Program, !Acc, !IP) :-
     ( (!.IP < size(!.Program)) ->
       lookup(!.Program, !.IP, (Opcode - Arg) @ Instr),
-      trace [io(!IO)] format("repair_program: %s %d\n", [s(string(Opcode)), i(Arg)], !IO),
-      ( Opcode = acc,
-        exec_instr(Instr, !Acc, !IP),
+      ( repair_opcode(Opcode, OtherOpcode) ->
+        set(!.IP, (OtherOpcode - Arg), !Program),
+        ( exec_program(!.Program, yes, !Acc, !.IP, _) ->
+          true
+        ; set(!.IP, Instr, !Program),
+          exec_instr(Instr, !Acc, !IP),
+          repair_program(!Program, !Acc, !IP)
+        )
+      ; exec_instr(Instr, !Acc, !IP),
         repair_program(!Program, !Acc, !IP)
-      ; Opcode = jmp,
-        set(!.IP, (nop - Arg), !Program),
-        ( exec_program(!.Program, yes, !.Acc, Acc0, !.IP, _) ->
-          trace [io(!IO)] format("halts, %d\n", [i(Acc0)], !IO),
-          !:Acc = Acc0
-        ; set(!.IP, Instr, !Program),
-          exec_instr(Instr, !Acc, !IP),
-          repair_program(!Program, !Acc, !IP)
-        )
-      ; Opcode = nop,
-        set(!.IP, (jmp - Arg), !Program),
-        ( exec_program(!.Program, yes, !.Acc, Acc0, !.IP, _) ->
-          trace [io(!IO)] format("halts, %d\n", [i(Acc0)], !IO),
-          !:Acc = Acc0
-        ; set(!.IP, Instr, !Program),
-          exec_instr(Instr, !Acc, !IP),
-          repair_program(!Program, !Acc, !IP)
-        )
       )
     ; true
     ).

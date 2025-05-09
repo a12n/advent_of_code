@@ -77,17 +77,17 @@ exec_instr_nondet((Opcode - Arg) @ Instr, !Det, !Acc, !IP) :-
     ).
 
 exec_program(Program, Halts, !Acc, !IP) :-
-    exec_program(Program, Halts, empty, !Acc, !IP).
+    exec_program(Program, Halts, init(size(Program), no), _, !Acc, !IP).
 
-:- pred exec_program(program::in, bool::out, ranges::in, int::in, int::out, int::in, int::out) is det.
-exec_program(Program, Halts, Seen0, !Acc, !IP) :-
-    ( member(!.IP, Seen0) ->
+:- pred exec_program(program::in, bool::out, array(bool)::array_di, array(bool)::array_uo, int::in, int::out, int::in, int::out) is det.
+exec_program(Program, Halts, !Seen, !Acc, !IP) :-
+    ( lookup(!.Seen, !.IP, yes) ->
       Halts = no
     ; !.IP < size(Program) ->
       lookup(Program, !.IP, Instr),
-      insert(!.IP, Seen0, Seen),
+      set(!.IP, yes, !Seen),
       exec_instr(Instr, !Acc, !IP),
-      exec_program(Program, Halts, Seen, !Acc, !IP)
+      exec_program(Program, Halts, !Seen, !Acc, !IP)
     ; Halts = yes
     ).
 

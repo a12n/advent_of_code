@@ -8,18 +8,16 @@
 
 :- implementation.
 
-:- import_module bool, solutions.
-:- import_module day_08, io_ext.
-
-:- pred exec(program::in, int::out) is nondet.
-exec(Program, Acc) :- exec_program_nondet(Program, yes, 0, Acc, 0, _).
+:- import_module require.
+:- import_module day_08.
 
 main(!IO) :-
     program_input(ReadResult, Program, !IO),
     ( ReadResult = ok,
-      %% TODO
-      solutions(exec(Program), Solutions),
-      print_line(Solutions, !IO)
+      ( repair_program(Program, _, 0, Acc, 0, _) ->
+        write_int(Acc, !IO), nl(!IO)
+      ; error("Program failed")
+      )
     ; ReadResult = error(Error),
-      error_exit(1, error_message(Error), !IO)
+      error(error_message(Error))
     ).

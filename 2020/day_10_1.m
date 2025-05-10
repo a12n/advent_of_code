@@ -15,29 +15,30 @@
 
 :- import_module io_ext.
 
-:- func solution(list(int)) = int is semidet.
-solution(Numbers) = Result :-
-    sort(Numbers, Sorted),
-
-    last(Sorted, Max),
-    Diffs = map_corresponding(
-        minus,
-        Sorted ++ [Max + 3],
-        [0 | Sorted]
-    ),
-
-    filter(unify(1), Diffs, Diffs1),
-    filter(unify(3), Diffs, Diffs3),
-
-    Result = length(Diffs1) * length(Diffs3).
-
 main(!IO) :-
     input_lines(Result, !IO),
     ( Result = ok(Lines),
-      ( map(to_int, map(chomp, Lines), Numbers), N = solution(Numbers)->
-        write_int(N, !IO), nl(!IO)
+      ( map(to_int, map(chomp, Lines), Jolts) ->
+        ( sort(Jolts, SortedJolts),
+          jolt_differences(SortedJolts, Num1, Num3) ->
+          write_int(Num1 * Num3, !IO), nl(!IO)
+        ; error("No solution")
+        )
       ; error("Invalid input")
       )
     ; Result = error(Error),
       error(error_message(Error))
     ).
+
+:- pred jolt_differences(list(int)::in, int::out, int::out) is semidet.
+jolt_differences(Adapters, Num1, Num3) :- jolt_differences(0, Adapters, 0, Num1, 1, Num3).
+
+:- pred jolt_differences(int::in, list(int)::in, int::in, int::out, int::in, int::out) is semidet.
+jolt_differences(_, [], !Num1, !Num3).
+jolt_differences(Prev, [Next | Adapters], !Num1, !Num3) :-
+    Diff = Next - Prev,
+    ( Diff = 1, !:Num1 = !.Num1 + 1
+    ; Diff = 2
+    ; Diff = 3, !:Num3 = !.Num3 + 1
+    ),
+    jolt_differences(Next, Adapters, !Num1, !Num3).

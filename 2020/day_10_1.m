@@ -20,8 +20,8 @@ main(!IO) :-
     ( Result = ok(Lines),
       ( map(to_int, map(chomp, Lines), Jolts) ->
         ( sort(Jolts, SortedJolts),
-          jolt_differences(SortedJolts, Num1, Num3) ->
-          write_int(Num1 * Num3, !IO), nl(!IO)
+          jolt_differences(SortedJolts, Diff1, Diff3) ->
+          write_int(Diff1 * Diff3, !IO), nl(!IO)
         ; error("No solution")
         )
       ; error("Invalid input")
@@ -31,13 +31,13 @@ main(!IO) :-
     ).
 
 :- pred jolt_differences(list(int)::in, int::out, int::out) is semidet.
-jolt_differences(Adapters, Num1, Num3) :- jolt_differences(0, Adapters, 0, Num1, 1, Num3).
+jolt_differences(Jolts, Diff1, Diff3) :- jolt_differences(0, Jolts, 0, Diff1, 1, Diff3).
 
 :- pred jolt_differences(int::in, list(int)::in, int::in, int::out, int::in, int::out) is semidet.
-jolt_differences(_, [], !Num1, !Num3).
-jolt_differences(Prev, [Next | Adapters], !Num1, !Num3) :-
+jolt_differences(_, [], !Diff1, !Diff3).
+jolt_differences(Prev, [Next | Jolts], !Diff1, !Diff3) :-
     Diff = Next - Prev,
-    ( Diff = 1, !:Num1 = !.Num1 + 1
-    ; Diff = 3, !:Num3 = !.Num3 + 1
+    ( Diff = 1, !:Diff1 = !.Diff1 + 1
+    ; Diff = 3, !:Diff3 = !.Diff3 + 1
     ),
-    jolt_differences(Next, Adapters, !Num1, !Num3).
+    jolt_differences(Next, Jolts, !Diff1, !Diff3).

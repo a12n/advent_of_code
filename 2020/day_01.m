@@ -14,7 +14,7 @@
 :- import_module io_ext.
 
 read_input(Result, !IO) :-
-    read_lines_as_strings(ReadResult, !IO),
+    input_lines(ReadResult, !IO),
     ( ReadResult = ok(Lines),
       ( map(to_int, map(rstrip, Lines), Numbers) ->
         Result = ok(Numbers)

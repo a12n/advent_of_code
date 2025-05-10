@@ -38,7 +38,6 @@ jolt_differences(_, [], !Num1, !Num3).
 jolt_differences(Prev, [Next | Adapters], !Num1, !Num3) :-
     Diff = Next - Prev,
     ( Diff = 1, !:Num1 = !.Num1 + 1
-    ; Diff = 2
     ; Diff = 3, !:Num3 = !.Num3 + 1
     ),
     jolt_differences(Next, Adapters, !Num1, !Num3).

@@ -8,14 +8,16 @@
 
 :- implementation.
 
-:- import_module int, list, string.
+:- import_module int.
+:- import_module list.
 :- import_module require.
-:- import_module day_01, io_ext.
+
+:- import_module io_ext.
 
 main(!IO) :-
-    read_input(ReadResult, !IO),
+    input_int_list(ReadResult, !IO),
     ( ReadResult = ok(Numbers),
-      ( sums_to(2020, Numbers, N, M) ->
+      ( member(N, Numbers), member(M, Numbers), N + M = 2020 ->
         write_int(N * M, !IO), nl(!IO)
       ; error("No solution")
       )

@@ -8,7 +8,7 @@
 
 :- pred error_exit(int::in, string::in, io::di, io::uo) is det.
 :- pred input_int_list(res(list(int))::out, io::di, io::uo) is det.
-:- pred input_lines(res(list(string))::out, io::di, io::uo) is det.
+:- pred input_string_lines(res(list(string))::out, io::di, io::uo) is det.
 
 :- pred lines_foldl(pred(string, T, T), T, maybe_partial_res(T), io, io).
 :- mode lines_foldl((pred(in, in, out) is semidet), in, out, di, uo) is det.
@@ -26,7 +26,7 @@ error_exit(Status, Message, !IO) :-
     nl(!IO).
 
 input_int_list(Result, !IO) :-
-    input_lines(ReadResult, !IO),
+    input_string_lines(ReadResult, !IO),
     ( ReadResult = ok(Lines),
       ( map(to_int, map(chomp, Lines), Numbers) ->
         Result = ok(Numbers)
@@ -36,13 +36,15 @@ input_int_list(Result, !IO) :-
       Result = error(Error)
     ).
 
-input_lines(Result, !IO) :- input_lines(Result, [], !IO).
 
-:- pred input_lines(res(list(string))::out, list(string)::in, io::di, io::uo) is det.
-input_lines(Result, Lines, !IO) :-
+
+input_string_lines(Result, !IO) :- input_string_lines(Result, [], !IO).
+
+:- pred input_string_lines(res(list(string))::out, list(string)::in, io::di, io::uo) is det.
+input_string_lines(Result, Lines, !IO) :-
     read_line_as_string(ReadResult, !IO),
     ( ReadResult = ok(Line),
-      input_lines(Result, [Line | Lines], !IO)
+      input_string_lines(Result, [Line | Lines], !IO)
     ; ReadResult = eof,
       Result = ok(reverse(Lines))
     ; ReadResult = error(Error),

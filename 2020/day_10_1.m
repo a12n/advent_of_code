@@ -16,7 +16,7 @@
 :- import_module io_ext.
 
 main(!IO) :-
-    input_lines(Result, !IO),
+    input_string_lines(Result, !IO),
     ( Result = ok(Lines),
       ( map(to_int, map(chomp, Lines), Jolts) ->
         ( sort(Jolts, SortedJolts),

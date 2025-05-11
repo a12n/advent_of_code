@@ -7,6 +7,7 @@
 :- import_module maybe.
 
 :- pred error_exit(int::in, string::in, io::di, io::uo) is det.
+:- pred input_int_list(res(list(int))::out, io::di, io::uo) is det.
 :- pred input_lines(res(list(string))::out, io::di, io::uo) is det.
 
 :- pred lines_foldl(pred(string, T, T), T, maybe_partial_res(T), io, io).
@@ -17,10 +18,23 @@
 
 :- implementation.
 
+:- import_module string.
+
 error_exit(Status, Message, !IO) :-
     set_exit_status(Status, !IO),
     write_string(stderr_stream, Message, !IO),
     nl(!IO).
+
+input_int_list(Result, !IO) :-
+    input_lines(ReadResult, !IO),
+    ( ReadResult = ok(Lines),
+      ( map(to_int, map(chomp, Lines), Numbers) ->
+        Result = ok(Numbers)
+      ; Result = error(make_io_error("Invalid input"))
+      )
+    ; ReadResult = error(Error),
+      Result = error(Error)
+    ).
 
 input_lines(Result, !IO) :- input_lines(Result, [], !IO).
 

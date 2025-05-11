@@ -16,6 +16,12 @@
 :- pred semidet_lookup(array2d(T), int, int, T).
 :- mode semidet_lookup(in, in, in, out) is semidet.
 
+%% Von Neumann neighborhood of an element in the grid.
+:- pred neighbor(array2d(T)::in, int::in, int::in, T::out) is nondet.
+
+%% Moore neighborhood of an element in the grid.
+:- pred moore_neighbor(array2d(T)::in, int::in, int::in, T::out) is nondet.
+
 :- implementation.
 
 :- import_module int.
@@ -46,3 +52,18 @@ map(Pred, !Array) :-
 semidet_lookup(Array, Row, Col, Elt) :-
     in_bounds(Array, Row, Col),
     unsafe_lookup(Array, Row, Col, Elt).
+
+neighbor(Array, Row, Col, Elt) :-
+    ( semidet_lookup(Array, Row - 1,     Col, Elt)
+    ; semidet_lookup(Array,     Row, Col - 1, Elt)
+    ; semidet_lookup(Array,     Row, Col + 1, Elt)
+    ; semidet_lookup(Array, Row + 1,     Col, Elt)
+    ).
+
+moore_neighbor(Array, Row, Col, Elt) :-
+    ( neighbor(Array, Row, Col, Elt)
+    ; semidet_lookup(Array, Row - 1, Col - 1, Elt)
+    ; semidet_lookup(Array, Row - 1, Col + 1, Elt)
+    ; semidet_lookup(Array, Row + 1, Col - 1, Elt)
+    ; semidet_lookup(Array, Row + 1, Col + 1, Elt)
+    ).

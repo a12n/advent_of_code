@@ -24,12 +24,18 @@
 
 :- implementation.
 
+:- import_module array.
 :- import_module int.
 :- import_module unit.
 
-map_foldl(Pred, !Array, !Accum) :-
-    bounds(!.Array, NumRows, NumCols),
-    map_foldl(Pred, !Array, !Accum, 0, 0, NumRows, NumCols).
+map_foldl(Pred, Array0, Array, !Accum) :-
+    bounds(Array0, NumRows, NumCols),
+    ( NumRows * NumCols =< 0 ->
+      Array = from_array(0, 0, make_empty_array)
+    ; unsafe_lookup(Array0, 0, 0, Elt0),
+      Pred(0, 0, Elt0, Elt, !Accum),
+      map_foldl(Pred, init(NumRows, NumCols, Elt), Array, !Accum, 0, 1, NumRows, NumCols)
+    ).
 
 :- pred map_foldl(pred(int, int, T, T, A, A), array2d(T), array2d(T), A, A, int, int, int, int).
 :- mode map_foldl(in(pred(in, in, in, out, in, out) is det), array2d_di, array2d_uo, in, out, in, in, in, in) is det.

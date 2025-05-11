@@ -9,6 +9,7 @@
 :- implementation.
 
 :- import_module int, list, string.
+:- import_module require.
 :- import_module day_01, io_ext.
 
 main(!IO) :-
@@ -16,8 +17,8 @@ main(!IO) :-
     ( ReadResult = ok(Numbers),
       ( sums_to(2020, Numbers, N, M) ->
         write_int(N * M, !IO), nl(!IO)
-      ; error_exit(1, "no solution", !IO)
+      ; error("No solution")
       )
     ; ReadResult = error(Error),
-      error_exit(1, error_message(Error), !IO)
+      error(error_message(Error))
     ).

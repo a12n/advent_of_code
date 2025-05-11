@@ -6,7 +6,7 @@
 
 :- pred map_foldl(pred(int, int, T, T, A, A), array2d(T), array2d(T), A, A).
 :- mode map_foldl(in(pred(in, in, in, out, in, out) is det), array2d_di, array2d_uo, in, out) is det.
-%% :- mode map_foldl(in(pred(in, in, in, out, in, out) is semidet), array2d_di, array2d_uo, in, out) is semidet.
+:- mode map_foldl(in(pred(in, in, in, out, in, out) is semidet), array2d_di, array2d_uo, in, out) is semidet.
 
 :- implementation.
 
@@ -18,6 +18,7 @@ map_foldl(Pred, !Array, !Accum) :-
 
 :- pred map_foldl(pred(int, int, T, T, A, A), array2d(T), array2d(T), A, A, int, int, int, int).
 :- mode map_foldl(in(pred(in, in, in, out, in, out) is det), array2d_di, array2d_uo, in, out, in, in, in, in) is det.
+:- mode map_foldl(in(pred(in, in, in, out, in, out) is semidet), array2d_di, array2d_uo, in, out, in, in, in, in) is semidet.
 map_foldl(Pred, !Array, !Accum, Row, Col, NumRows, NumCols) :-
     ( Row = NumRows ->
       true

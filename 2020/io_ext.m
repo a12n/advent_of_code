@@ -2,11 +2,13 @@
 :- module io_ext.
 :- interface.
 
+:- import_module char.
 :- import_module io.
 :- import_module list.
 :- import_module maybe.
 
 :- pred error_exit(int::in, string::in, io::di, io::uo) is det.
+:- pred input_chars_lines(res(list(list(char)))::out, io::di, io::uo) is det.
 :- pred input_int_list(res(list(int))::out, io::di, io::uo) is det.
 :- pred input_string_lines(res(list(string))::out, io::di, io::uo) is det.
 
@@ -36,7 +38,18 @@ input_int_list(Result, !IO) :-
       Result = error(Error)
     ).
 
+input_chars_lines(Result, !IO) :- input_chars_lines(Result, [], !IO).
 
+:- pred input_chars_lines(res(list(list(char)))::out, list(list(char))::in, io::di, io::uo) is det.
+input_chars_lines(Result, Lines, !IO) :-
+    read_line(ReadResult, !IO),
+    ( ReadResult = ok(Line0),
+      input_chars_lines(Result, [(split_last(Line0, Line, '\n') -> Line; Line0) | Lines], !IO)
+    ; ReadResult = eof,
+      Result = ok(reverse(Lines))
+    ; ReadResult = error(Error),
+      Result = error(Error)
+    ).
 
 input_string_lines(Result, !IO) :- input_string_lines(Result, [], !IO).
 

@@ -13,6 +13,9 @@
 :- mode map_foldl(in(pred(in, in, in, out, in, out) is det), array2d_di, array2d_uo, in, out) is det.
 :- mode map_foldl(in(pred(in, in, in, out, in, out) is semidet), array2d_di, array2d_uo, in, out) is semidet.
 
+:- pred semidet_lookup(array2d(T), int, int, T).
+:- mode semidet_lookup(in, in, in, out) is semidet.
+
 :- implementation.
 
 :- import_module int.
@@ -39,3 +42,7 @@ map_foldl(Pred, !Array, !Accum, Row, Col, NumRows, NumCols) :-
 map(Pred, !Array) :-
     FoldPred = (pred(Row::in, Col::in, !.Elt::in, !:Elt::out, !.Accum::in, !:Accum::out) is det :- Pred(Row, Col, !Elt)),
     map_foldl(FoldPred, !Array, unit, _).
+
+semidet_lookup(Array, Row, Col, Elt) :-
+    in_bounds(Array, Row, Col),
+    unsafe_lookup(Array, Row, Col, Elt).

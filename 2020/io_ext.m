@@ -44,7 +44,7 @@ input_string_lines(Result, !IO) :- input_string_lines(Result, [], !IO).
 input_string_lines(Result, Lines, !IO) :-
     read_line_as_string(ReadResult, !IO),
     ( ReadResult = ok(Line),
-      input_string_lines(Result, [Line | Lines], !IO)
+      input_string_lines(Result, [chomp(Line) | Lines], !IO)
     ; ReadResult = eof,
       Result = ok(reverse(Lines))
     ; ReadResult = error(Error),

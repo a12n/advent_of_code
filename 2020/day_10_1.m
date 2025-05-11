@@ -18,7 +18,7 @@
 main(!IO) :-
     input_string_lines(Result, !IO),
     ( Result = ok(Lines),
-      ( map(to_int, map(chomp, Lines), Jolts) ->
+      ( map(to_int, Lines, Jolts) ->
         ( sort(Jolts, SortedJolts),
           jolt_differences(SortedJolts, Diff1, Diff3) ->
           write_int(Diff1 * Diff3, !IO), nl(!IO)

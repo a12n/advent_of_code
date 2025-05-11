@@ -23,7 +23,7 @@ main(!IO) :-
     ),
     input_int_list(Result, !IO),
     ( Result = ok(Numbers),
-      ( weakness_number(from_list(Numbers), Preamble, N) ->
+      ( invalid_number(from_list(Numbers), Preamble, N) ->
         write_int(N, !IO), nl(!IO)
       ; error("No solution")
       )

@@ -6,12 +6,12 @@
 
 %% XXX: map_pred type
 :- pred map(pred(int, int, T, T), array2d(T), array2d(T)).
-:- mode map(in(pred(in, in, in, out) is det), array2d_di, array2d_uo) is det.
+:- mode map(in(pred(in, in, in, out) is det), in, array2d_uo) is det.
 %% :- mode map(in(pred(in, in, in, out) is semidet), array2d_di, array2d_uo) is semidet.
 
 :- pred map_foldl(pred(int, int, T, T, A, A), array2d(T), array2d(T), A, A).
-:- mode map_foldl(in(pred(in, in, in, out, in, out) is det), array2d_di, array2d_uo, in, out) is det.
-:- mode map_foldl(in(pred(in, in, in, out, in, out) is semidet), array2d_di, array2d_uo, in, out) is semidet.
+:- mode map_foldl(in(pred(in, in, in, out, in, out) is det), in, array2d_uo, in, out) is det.
+:- mode map_foldl(in(pred(in, in, in, out, in, out) is semidet), in, array2d_uo, in, out) is semidet.
 
 :- pred semidet_lookup(array2d(T), int, int, T).
 :- mode semidet_lookup(in, in, in, out) is semidet.

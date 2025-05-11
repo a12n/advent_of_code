@@ -16,12 +16,6 @@
 :- pred semidet_lookup(array2d(T), int, int, T).
 :- mode semidet_lookup(in, in, in, out) is semidet.
 
-%% Von Neumann neighborhood of an element in the grid.
-:- pred neighbor(array2d(T)::in, int::in, int::in, T::out) is nondet.
-
-%% Moore neighborhood of an element in the grid.
-:- pred moore_neighbor(array2d(T)::in, int::in, int::in, T::out) is nondet.
-
 :- implementation.
 
 :- import_module array.
@@ -58,28 +52,3 @@ map(Pred, !Array) :-
 semidet_lookup(Array, Row, Col, Elt) :-
     in_bounds(Array, Row, Col),
     unsafe_lookup(Array, Row, Col, Elt).
-
-neighbor(Array, Row, Col, Elt) :-
-    neighbor_pos(Array, Row, Col, RowAdj, ColAdj),
-    unsafe_lookup(Array, RowAdj, ColAdj, Elt).
-
-moore_neighbor(Array, Row, Col, Elt) :-
-    moore_neighbor_pos(Array, Row, Col, RowAdj, ColAdj),
-    unsafe_lookup(Array, RowAdj, ColAdj, Elt).
-
-:- pred neighbor_pos(array2d(T)::in, int::in, int::in, int::out, int::out) is nondet.
-neighbor_pos(Array, Row, Col, RowAdj, ColAdj) :-
-    ( RowAdj = Row - 1, ColAdj =     Col, in_bounds(Array, RowAdj, ColAdj)
-    ; RowAdj =     Row, ColAdj = Col - 1, in_bounds(Array, RowAdj, ColAdj)
-    ; RowAdj =     Row, ColAdj = Col + 1, in_bounds(Array, RowAdj, ColAdj)
-    ; RowAdj = Row + 1, ColAdj =     Col, in_bounds(Array, RowAdj, ColAdj)
-    ).
-
-:- pred moore_neighbor_pos(array2d(T)::in, int::in, int::in, int::out, int::out) is nondet.
-moore_neighbor_pos(Array, Row, Col, RowAdj, ColAdj) :-
-    ( neighbor_pos(Array, Row, Col, RowAdj, ColAdj)
-    ; RowAdj = Row - 1, ColAdj = Col - 1, in_bounds(Array, RowAdj, ColAdj)
-    ; RowAdj = Row - 1, ColAdj = Col + 1, in_bounds(Array, RowAdj, ColAdj)
-    ; RowAdj = Row + 1, ColAdj = Col - 1, in_bounds(Array, RowAdj, ColAdj)
-    ; RowAdj = Row + 1, ColAdj = Col + 1, in_bounds(Array, RowAdj, ColAdj)
-    ).

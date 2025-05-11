@@ -34,21 +34,21 @@ map_foldl(Pred, Array0, Array, !Accum) :-
       Array = from_array(0, 0, make_empty_array)
     ; unsafe_lookup(Array0, 0, 0, Elt0),
       Pred(0, 0, Elt0, Elt, !Accum),
-      map_foldl(Pred, init(NumRows, NumCols, Elt), Array, !Accum, 0, 1, NumRows, NumCols)
+      map_foldl(Pred, Array0, init(NumRows, NumCols, Elt), Array, !Accum, 0, 1, NumRows, NumCols)
     ).
 
-:- pred map_foldl(pred(int, int, T, T, A, A), array2d(T), array2d(T), A, A, int, int, int, int).
-:- mode map_foldl(in(pred(in, in, in, out, in, out) is det), array2d_di, array2d_uo, in, out, in, in, in, in) is det.
-:- mode map_foldl(in(pred(in, in, in, out, in, out) is semidet), array2d_di, array2d_uo, in, out, in, in, in, in) is semidet.
-map_foldl(Pred, !Array, !Accum, Row, Col, NumRows, NumCols) :-
+:- pred map_foldl(pred(int, int, T, T, A, A), array2d(T), array2d(T), array2d(T), A, A, int, int, int, int).
+:- mode map_foldl(in(pred(in, in, in, out, in, out) is det), in, array2d_di, array2d_uo, in, out, in, in, in, in) is det.
+:- mode map_foldl(in(pred(in, in, in, out, in, out) is semidet), in, array2d_di, array2d_uo, in, out, in, in, in, in) is semidet.
+map_foldl(Pred, Array0, !Array, !Accum, Row, Col, NumRows, NumCols) :-
     ( Row = NumRows ->
       true
     ; Col = NumCols ->
-      map_foldl(Pred, !Array, !Accum, Row + 1, 0, NumRows, NumCols)
-    ; unsafe_lookup(!.Array, Row, Col, Elt0),
+      map_foldl(Pred, Array0, !Array, !Accum, Row + 1, 0, NumRows, NumCols)
+    ; unsafe_lookup(Array0, Row, Col, Elt0),
       Pred(Row, Col, Elt0, Elt, !Accum),
       unsafe_set(Row, Col, Elt, !Array),
-      map_foldl(Pred, !Array, !Accum, Row, Col + 1, NumRows, NumCols)
+      map_foldl(Pred, Array0, !Array, !Accum, Row, Col + 1, NumRows, NumCols)
     ).
 
 map(Pred, !Array) :-

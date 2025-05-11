@@ -18,6 +18,7 @@
 :- import_module list.
 :- import_module string.
 
+:- import_module array2d_ext.
 :- import_module io_ext.
 
 :- pred seat_char(char, maybe(seat)).
@@ -39,5 +40,10 @@ input_seat_layout(Result, !IO) :-
     ).
 
 simulate(!Seats) :-
-    %% TODO
-    true.
+    map_foldl(
+        (pred(Row::in, Col::in, !.Elt::in, !:Elt::out, !.N::in, !:N::out) is det :-
+             %% TODO
+             true
+        ), !Seats, 0, N
+    ),
+    ( N \= 0 -> simulate(!Seats); true ).

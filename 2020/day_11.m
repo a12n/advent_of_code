@@ -10,6 +10,7 @@
 :- type seat_layout == array2d(maybe(seat)).
 
 :- pred input_seat_layout(res(seat_layout)::out, io::di, io::uo) is det.
+:- pred simulate(seat_layout::array2d_di, seat_layout::array2d_uo) is det.
 
 :- implementation.
 
@@ -36,3 +37,7 @@ input_seat_layout(Result, !IO) :-
     ; ReadResult = error(Error),
       Result = error(Error)
     ).
+
+simulate(!Seats) :-
+    %% TODO
+    true.

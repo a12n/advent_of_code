@@ -4,12 +4,17 @@
 
 :- import_module list.
 
-%% Position on 2D cartesian grid.
+%% Position and direction on 2D cartesian grid.
 :- type pos ---> pos(int, int).
-%% :- type vec ---> vec(int, int).
+:- type vec ---> vec(int, int).
 
 %% Grid extent as [Begin, End) positions.
 :- type extent ---> extent(pos, pos).
+
+%% Position and direction operators.
+:- func minus(pos, vec) = pos.
+:- func minus_pos(pos, pos) = vec.
+:- func plus(pos, vec) = pos.
 
 %% Iterate over all extent positions.
 :- pred foldl(pred(pos, A, A), extent, A, A).
@@ -33,6 +38,12 @@
 
 :- import_module int.
 :- import_module unit.
+
+minus(pos(X, Y), vec(Xv, Yv)) = pos(X - Xv, Y - Yv).
+
+minus_pos(pos(Xa, Ya), pos(Xb, Yb)) = vec(Xa - Xb, Ya - Yb).
+
+plus(pos(X, Y), vec(Xv, Yv)) = pos(X + Xv, Y + Yv).
 
 foldl(Pred, Extent, !A) :-
     foldl2((pred(Pos::in, !.I::in, !:I::out, !.A::in, !:A::out) is det :- Pred(Pos, !A)), Extent, unit, _, !A).

@@ -43,8 +43,8 @@ foldl2(Pred, extent(Pos0, _) @ Extent, !A, !B) :- foldl2(Pred, Extent, Pos0, !A,
 %% :- mode foldl2(pred(in, in, out, di,  uo) is det, in, in, in, out, di,  uo) is det.
 :- mode foldl2(pred(in, in, out, in, out) is det, in, in, in, out, in, out) is det.
 foldl2(Pred, extent(pos(X0, _), pos(Xn, Yn)) @ Extent, pos(X, Y) @ Pos, !A, !B) :-
-    ( Y = Yn -> true
-    ; X = Xn -> foldl2(Pred, Extent, pos(X0, Y + 1), !A, !B)
+    ( Y >= Yn -> true
+    ; X >= Xn -> foldl2(Pred, Extent, pos(X0, Y + 1), !A, !B)
     ; Pred(Pos, !A, !B), foldl2(Pred, Extent, pos(X + 1, Y), !A, !B)
     ).
 

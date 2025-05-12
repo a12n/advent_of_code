@@ -46,6 +46,7 @@ simulate(!Seats) :- simulate(bounds(!.Seats), !Seats).
 
 :- pred simulate(extent::in, seat_layout::in, seat_layout::out) is det.
 simulate(Extent, !Seats) :-
+    %% XXX: Update in-place.
     map_foldl(
         (pred(Row::in, Col::in, !.Elt::in, !:Elt::out, !.Changed::in, !:Changed::out) is det :-
              NeighborPos = filter(in_bounds(Extent), moore_neighbors(pos(Col, Row))),

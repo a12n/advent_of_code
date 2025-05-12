@@ -50,9 +50,9 @@ simulate(Extent, !Seats) :-
     map_foldl(
         (pred(Row::in, Col::in, !.Elt::in, !:Elt::out, !.Changed::in, !:Changed::out) is det :-
              NeighborPos = filter(in_bounds(Extent), moore_neighbors(pos(Col, Row))),
-             Num = length(filter(unify(yes(occupied)), map(lookup(!.Seats), NeighborPos))),
-             ( !.Elt = yes(empty),    Num = 0 -> !:Elt = yes(occupied), !:Changed = yes
-             ; !.Elt = yes(occupied), Num > 3 -> !:Elt = yes(empty),    !:Changed = yes
+             NumOccupied = length(filter(unify(yes(occupied)), map(lookup(!.Seats), NeighborPos))),
+             ( !.Elt = yes(empty),    NumOccupied = 0 -> !:Elt = yes(occupied), !:Changed = yes
+             ; !.Elt = yes(occupied), NumOccupied > 3 -> !:Elt = yes(empty),    !:Changed = yes
              ; true
              )
         ), !Seats, no, Changed

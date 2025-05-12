@@ -13,8 +13,12 @@
 
 %% Iterate over all extent positions.
 :- pred foldl(pred(pos, A, A), extent, A, A).
+%% :- mode foldl(pred(in, di,  uo) is det, in, di,  uo) is det.
 :- mode foldl(pred(in, in, out) is det, in, in, out) is det.
-:- mode foldl(pred(in, in, out) is semidet, in, in, out) is semidet.
+
+:- pred foldl2(pred(pos, A, A, B, B), extent, A, A, B, B).
+%% :- mode foldl2(pred(in, in, out, di,  uo) is det, in, in, out, di,  uo) is det.
+:- mode foldl2(pred(in, in, out, in, out) is det, in, in, out, in, out) is det.
 
 %% True if position is within grid extent.
 :- pred in_bounds(extent::in, pos::in) is semidet.
@@ -28,17 +32,20 @@
 :- implementation.
 
 :- import_module int.
+:- import_module unit.
 
-foldl(Pred, extent(Pos, _) @ Extent, !Accum) :-
-    foldl(Pred, Extent, Pos, !Accum).
+foldl(Pred, Extent, !A) :-
+    foldl2((pred(Pos::in, !.I::in, !:I::out, !.A::in, !:A::out) is det :- Pred(Pos, !A)), Extent, unit, _, !A).
 
-:- pred foldl(pred(pos, A, A), extent, pos, A, A).
-:- mode foldl(in(pred(in, in, out) is det), in, in, in, out) is det.
-:- mode foldl(in(pred(in, in, out) is semidet), in, in, in, out) is semidet.
-foldl(Pred, extent(pos(X0, _), pos(Xn, Yn)) @ Extent, pos(X, Y) @ Pos, !Accum) :-
+foldl2(Pred, extent(Pos0, _) @ Extent, !A, !B) :- foldl2(Pred, Extent, Pos0, !A, !B).
+
+:- pred foldl2(pred(pos, A, A, B, B), extent, pos, A, A, B, B).
+%% :- mode foldl2(pred(in, in, out, di,  uo) is det, in, in, in, out, di,  uo) is det.
+:- mode foldl2(pred(in, in, out, in, out) is det, in, in, in, out, in, out) is det.
+foldl2(Pred, extent(pos(X0, _), pos(Xn, Yn)) @ Extent, pos(X, Y) @ Pos, !A, !B) :-
     ( Y = Yn -> true
-    ; X = Xn -> foldl(Pred, Extent, pos(X0, Y + 1), !Accum)
-    ; Pred(Pos, !Accum), foldl(Pred, Extent, pos(X + 1, Y), !Accum)
+    ; X = Xn -> foldl2(Pred, Extent, pos(X0, Y + 1), !A, !B)
+    ; Pred(Pos, !A, !B), foldl2(Pred, Extent, pos(X + 1, Y), !A, !B)
     ).
 
 in_bounds(extent(pos(X0, Y0), pos(Xn, Yn)), pos(X, Y)) :-

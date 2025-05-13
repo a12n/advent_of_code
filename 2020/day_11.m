@@ -21,6 +21,7 @@
 :- func sight_map(seat_layout) = sight_map.
 
 :- func num_occupied_neighbors(seat_layout, pos) = int.
+:- func num_occupied_visible(sight_map, seat_layout, pos) = int.
 
 :- implementation.
 
@@ -50,12 +51,21 @@ input_seat_layout(Result, !IO) :-
       Result = error(Error)
     ).
 
+:- pred count_occupied(maybe(seat)::in, int::in, int::out) is det.
+count_occupied(yes(occupied), !N) :- !:N = !.N + 1.
+count_occupied(yes(empty), !N).
+count_occupied(no, !N).
 
 num_occupied_neighbors(Seats, Pos) = N :-
     filter_map(semidet_lookup(Seats), moore_neighbors(Pos), Neighbors),
-    foldl((pred(Seat::in, !.N::in, !:N::out) is det :-
-               ( Seat = yes(occupied) -> !:N = !.N + 1; true )
-          ), Neighbors, 0, N).
+    foldl(count_occupied, Neighbors, 0, N).
+
+num_occupied_visible(SightMap, Seats, Pos) = N :-
+    filter_map((pred(Dir::in, ToPos::out) is semidet :-
+                    search(SightMap, (Pos - Dir), ToPos)
+               ), moore_neighbor_dirs, VisiblePositions),
+    filter_map(semidet_lookup(Seats), VisiblePositions, Visible),
+    foldl(count_occupied, Visible, 0, N).
 
 simulate(NumOccupied, MaxOccupied, !Seats) :-
     %% XXX: Update in-place.

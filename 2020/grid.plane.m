@@ -41,6 +41,8 @@
    '←';      '→';
         '↓'.
 
+:- func adjacent(pos, moore_dir) = pos.
+
 :- func moore_neighbor_dirs = list(vec).
 :- func moore_neighbors(pos) = list(pos).
 
@@ -79,6 +81,8 @@ minus_pos(pos(Xa, Ya), pos(Xb, Yb)) = vec(Xa - Xb, Ya - Yb).
 
 :- pragma inline(plus/2).
 plus(pos(X, Y), vec(Xv, Yv)) = pos(X + Xv, Y + Yv).
+
+adjacent(Pos, Dir) = plus(Pos, to_vec(Dir)).
 
 foldl(Pred, Extent, !A) :-
     foldl2((pred(Pos::in, !.I::in, !:I::out, !.A::in, !:A::out) is det :- Pred(Pos, !A)), Extent, unit, _, !A).

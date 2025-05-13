@@ -63,6 +63,10 @@ simulate(Extent, !Seats) :-
 :- func lookup(seat_layout, pos) = maybe(seat).
 lookup(Array, pos(Col, Row)) = array2d.lookup(Array, Row, Col).
 
+:- pred semidet_lookup(seat_layout::in, pos::in, maybe(seat)::out) is semidet.
+semidet_lookup(Array, pos(Col, Row), Elt) :-
+    array2d_ext.semidet_lookup(Array, Row, Col, Elt).
+
 :- func bounds(seat_layout) = extent.
 bounds(Array) = extent(pos(0, 0), pos(NumCols, NumRows)) :-
     array2d.bounds(Array, NumRows, NumCols).

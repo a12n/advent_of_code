@@ -26,6 +26,8 @@
 %% :- mode foldl2(pred(in, in, out, di,  uo) is det, in, in, out, di,  uo) is det.
 :- mode foldl2(pred(in, in, out, in, out) is det, in, in, out, in, out) is det.
 
+:- func taxicab_dist(pos, pos) = int.
+
 %%---------------------------------------------------------------------------
 %% Directions (restricted)
 
@@ -69,11 +71,15 @@
 :- func minus_pos(pos, pos) = vec.
 :- func plus(pos, vec) = pos.
 
+:- func taxicab_norm(vec) = int.
+
 %%---------------------------------------------------------------------------
 :- implementation.
 
 :- import_module int.
 :- import_module unit.
+
+taxicab_dist(A, B) = taxicab_norm(minus_pos(A, B)).
 
 in_bounds(extent(pos(X0, Y0), pos(EndX, EndY)), pos(X, Y)) :-
     X >= X0, X < EndX,
@@ -134,3 +140,5 @@ minus_pos(pos(Xa, Ya), pos(Xb, Yb)) = vec(Xa - Xb, Ya - Yb).
 
 :- pragma inline(plus/2).
 plus(pos(X, Y), vec(Xv, Yv)) = pos(X + Xv, Y + Yv).
+
+taxicab_norm(vec(X, Y)) = abs(X) + abs(Y).

@@ -53,6 +53,8 @@
 :- mode opposite(in, out) is det.
 :- mode opposite(out, in) is det.
 
+:- func rotate_dir(int, dir) = dir.
+
 :- func moore_neighbor_dirs = list(moore_dir).
 :- func moore_neighbors(pos) = list(pos).
 
@@ -115,6 +117,34 @@ opposite('↓', '↑').
 opposite('↘', '↖').
 
 opposite(From) = To :- opposite(From, To).
+
+%% rotate_dir( 1, '↑') = '→'.
+%% rotate_dir( 1, '←') = '↑'.
+%% rotate_dir( 1, '→') = '↓'.
+%% rotate_dir( 1, '↓') = '←'.
+%%
+%% rotate_dir(-1, '↑') = '←'.
+%% rotate_dir(-1, '←') = '↓'.
+%% rotate_dir(-1, '→') = '↑'.
+%% rotate_dir(-1, '↓') = '→'.
+%%
+%% rotate_dir( 0, Dir) = Dir.
+%% XXX
+rotate_dir(N, Dir) = Ans :-
+    ( N < 0 ->
+      ( Dir = '↑', Ans = rotate_dir(N + 1, '←')
+      ; Dir = '←', Ans = rotate_dir(N + 1, '↓')
+      ; Dir = '→', Ans = rotate_dir(N + 1, '↑')
+      ; Dir = '↓', Ans = rotate_dir(N + 1, '→')
+      )
+    ; N > 0 ->
+      ( Dir = '↑', Ans = rotate_dir(N - 1, '→')
+      ; Dir = '←', Ans = rotate_dir(N - 1, '↑')
+      ; Dir = '→', Ans = rotate_dir(N - 1, '↓')
+      ; Dir = '↓', Ans = rotate_dir(N - 1, '←')
+      )
+    ; Ans = Dir
+    ).
 
 neighbor_dirs = [ '↑', '←', '→', '↓' ].
 neighbors(Pos) = map(adjacent(Pos), coerce(neighbor_dirs)).

@@ -176,6 +176,8 @@ minus_pos(pos(Xa, Ya), pos(Xb, Yb)) = vec(Xa - Xb, Ya - Yb).
 :- pragma inline(plus/2).
 plus(pos(X, Y), vec(Xv, Yv)) = pos(X + Xv, Y + Yv).
 
+:- pragma inline(times/2).
 times(vec(X, Y), N) = vec(X * N, Y * N).
 
+:- pragma inline(taxicab_norm/1).
 taxicab_norm(vec(X, Y)) = abs(X) + abs(Y).

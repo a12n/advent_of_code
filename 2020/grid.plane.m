@@ -53,6 +53,7 @@
 :- type vec ---> vec(int, int).
 
 :- func minus(pos, vec) = pos.
+:- func minus(vec) = vec.
 :- func minus_pos(pos, pos) = vec.
 :- func plus(pos, vec) = pos.
 
@@ -63,6 +64,8 @@
 :- import_module unit.
 
 minus(pos(X, Y), vec(Xv, Yv)) = pos(X - Xv, Y - Yv).
+
+minus(vec(X, Y)) = vec(-X, -Y).
 
 minus_pos(pos(Xa, Ya), pos(Xb, Yb)) = vec(Xa - Xb, Ya - Yb).
 

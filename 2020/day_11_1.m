@@ -18,7 +18,7 @@
 main(!IO) :-
     input_seat_layout(Result, !IO),
     ( Result = ok(Seats),
-      simulate(Seats, FinalSeats),
+      simulate(num_occupied_neighbors, 3, Seats, FinalSeats),
       N = length(filter(unify(yes(occupied)), condense(lists(FinalSeats)))),
       write_int(N, !IO), nl(!IO)
     ; Result = error(Error),

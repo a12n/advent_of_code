@@ -15,10 +15,12 @@
 :- type seat_layout == array2d(maybe(seat)).
 
 :- pred input_seat_layout(res(seat_layout)::out, io::di, io::uo) is det.
-:- pred simulate(seat_layout::in, seat_layout::array2d_uo) is det.
+:- pred simulate((func(seat_layout, pos) = int)::in, int::in, seat_layout::in, seat_layout::out) is det.
 
 :- type sight_map == map(pair(pos, moore_dir), pos).
 :- pred sight_map(seat_layout::in, sight_map::out) is det.
+
+:- func num_occupied_neighbors(seat_layout, pos) = int.
 
 :- implementation.
 
@@ -48,16 +50,13 @@ input_seat_layout(Result, !IO) :-
       Result = error(Error)
     ).
 
-simulate(!Seats) :- simulate(num_occupied_neighbors, 3, !Seats).
 
-:- func num_occupied_neighbors(seat_layout, pos) = int.
 num_occupied_neighbors(Seats, Pos) = N :-
     filter_map(semidet_lookup(Seats), moore_neighbors(Pos), Neighbors),
     foldl((pred(Seat::in, !.N::in, !:N::out) is det :-
                ( Seat = yes(occupied) -> !:N = !.N + 1; true )
           ), Neighbors, 0, N).
 
-:- pred simulate((func(seat_layout, pos) = int)::in, int::in, seat_layout::in, seat_layout::out) is det.
 simulate(NumOccupied, MaxOccupied, !Seats) :-
     %% XXX: Update in-place.
     map_foldl(

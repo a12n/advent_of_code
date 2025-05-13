@@ -43,6 +43,11 @@
 
 :- func adjacent(pos, moore_dir) = pos.
 
+:- func opposite(moore_dir) = moore_dir.
+:- pred opposite(moore_dir, moore_dir).
+:- mode opposite(in, out) is det.
+:- mode opposite(out, in) is det.
+
 :- func moore_neighbor_dirs = list(moore_dir).
 :- func moore_neighbors(pos) = list(pos).
 
@@ -89,6 +94,17 @@ foldl2(Pred, extent(pos(X0, _), pos(EndX, EndY)) @ Extent, pos(X, Y) @ Pos, !A, 
     ).
 
 adjacent(Pos, Dir) = plus(Pos, to_vec(Dir)).
+
+opposite('↖', '↘').
+opposite('↑', '↓').
+opposite('↗', '↙').
+opposite('←', '→').
+opposite('→', '←').
+opposite('↙', '↗').
+opposite('↓', '↑').
+opposite('↘', '↖').
+
+opposite(From) = To :- opposite(From, To).
 
 neighbor_dirs = [ '↑', '←', '→', '↓' ].
 neighbors(Pos) = map(adjacent(Pos), coerce(neighbor_dirs)).

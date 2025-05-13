@@ -63,12 +63,16 @@
 :- import_module int.
 :- import_module unit.
 
+:- pragma inline(minus/2).
 minus(pos(X, Y), vec(Xv, Yv)) = pos(X - Xv, Y - Yv).
 
+:- pragma inline(minus/1).
 minus(vec(X, Y)) = vec(-X, -Y).
 
+:- pragma inline(minus_pos/2).
 minus_pos(pos(Xa, Ya), pos(Xb, Yb)) = vec(Xa - Xb, Ya - Yb).
 
+:- pragma inline(plus/2).
 plus(pos(X, Y), vec(Xv, Yv)) = pos(X + Xv, Y + Yv).
 
 foldl(Pred, Extent, !A) :-

@@ -75,6 +75,7 @@
 :- func minus(vec) = vec.
 :- func minus_pos(pos, pos) = vec.
 :- func plus(pos, vec) = pos.
+:- func times(vec, int) = vec.
 
 :- func taxicab_norm(vec) = int.
 
@@ -174,5 +175,7 @@ minus_pos(pos(Xa, Ya), pos(Xb, Yb)) = vec(Xa - Xb, Ya - Yb).
 
 :- pragma inline(plus/2).
 plus(pos(X, Y), vec(Xv, Yv)) = pos(X + Xv, Y + Yv).
+
+times(vec(X, Y), N) = vec(X * N, Y * N).
 
 taxicab_norm(vec(X, Y)) = abs(X) + abs(Y).

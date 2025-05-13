@@ -10,14 +10,10 @@
 :- pred command_string(command, string).
 :- mode command_string(out, in) is semidet.
 
-:- pred basic_navigation(command::in, pos::in, pos::out, dir::in, dir::out) is det.
-
 :- implementation.
 
 :- import_module char.
 :- import_module int.
-:- import_module list.
-:- import_module require.
 :- import_module string.
 
 command_string(Command, String) :-
@@ -30,7 +26,3 @@ command_string(Command, String) :-
     ; Char = 'R', ( Arg = 90; Arg = 180; Arg = 270 ), Command = rotate(Arg / 90)
     ; Char = 'F', Command = rel_move(Arg)
     ).
-
-basic_navigation(abs_move(Dir, N), !Pos, !Dir) :- !:Pos = plus(!.Pos, times(to_vec(coerce(Dir)), N)).
-basic_navigation(rotate(K), !Pos, !Dir)        :- !:Dir = rotate_dir(K, !.Dir).
-basic_navigation(rel_move(N), !Pos, !Dir)      :- basic_navigation(abs_move(!.Dir, N), !Pos, !Dir).

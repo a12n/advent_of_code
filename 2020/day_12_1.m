@@ -22,7 +22,7 @@ main(!ShipPos, !ShipDir, !IO) :-
     read_line_as_string(ReadResult, !IO),
     ( ReadResult = ok(Line),
       ( command_string(Command, chomp(Line)) ->
-        basic_navigation(Command, !ShipPos, !ShipDir),
+        navigation(Command, !ShipPos, !ShipDir),
         main(!ShipPos, !ShipDir, !IO)
       ; error("Invalid input")
       )
@@ -31,3 +31,8 @@ main(!ShipPos, !ShipDir, !IO) :-
     ; ReadResult = error(Error),
       error(error_message(Error))
     ).
+
+:- pred navigation(command::in, pos::in, pos::out, dir::in, dir::out) is det.
+navigation(abs_move(Dir, N), !Pos, !Dir) :- !:Pos = plus(!.Pos, times(to_vec(coerce(Dir)), N)).
+navigation(rotate(K), !Pos, !Dir)        :- !:Dir = rotate_dir(K, !.Dir).
+navigation(rel_move(N), !Pos, !Dir)      :- navigation(abs_move(!.Dir, N), !Pos, !Dir).

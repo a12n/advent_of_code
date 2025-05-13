@@ -52,6 +52,11 @@
 
 :- type vec ---> vec(int, int).
 
+:- pred dir_vec(moore_dir, vec).
+:- mode dir_vec(in, out) is det.
+%% :- mode dir_vec(out, in) is semidet.
+:- func to_vec(moore_dir) = vec.
+
 :- func minus(pos, vec) = pos.
 :- func minus(vec) = vec.
 :- func minus_pos(pos, pos) = vec.
@@ -108,3 +113,14 @@ neighbor_dirs = [ vec( 0, -1),
                   vec( 0,  1) ].
 
 neighbors(P) = map(plus(P), neighbor_dirs).
+
+dir_vec('↖', vec(-1,  1)).
+dir_vec('↑', vec( 0,  1)).
+dir_vec('↗', vec( 1,  1)).
+dir_vec('←', vec(-1,  0)).
+dir_vec('→', vec( 1,  0)).
+dir_vec('↙', vec(-1, -1)).
+dir_vec('↓', vec( 0, -1)).
+dir_vec('↘', vec( 1, -1)).
+
+to_vec(Dir) = Vec :- dir_vec(Dir, Vec).

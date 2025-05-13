@@ -22,7 +22,7 @@ main(!Pos, !Dir, !IO) :-
     read_line_as_string(ReadResult, !IO),
     ( ReadResult = ok(Line),
       ( command_string(Command, chomp(Line)) ->
-        navigation(Command, !Pos, !Dir),
+        basic_navigation(Command, !Pos, !Dir),
         main(!Pos, !Dir, !IO)
       ; error("Invalid input")
       )

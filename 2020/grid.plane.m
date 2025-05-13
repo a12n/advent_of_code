@@ -88,18 +88,6 @@ foldl2(Pred, extent(pos(X0, _), pos(EndX, EndY)) @ Extent, pos(X, Y) @ Pos, !A, 
     ; Pred(Pos, !A, !B), foldl2(Pred, Extent, pos(X + 1, Y), !A, !B)
     ).
 
-:- pragma inline(minus/2).
-minus(pos(X, Y), vec(Xv, Yv)) = pos(X - Xv, Y - Yv).
-
-:- pragma inline(minus/1).
-minus(vec(X, Y)) = vec(-X, -Y).
-
-:- pragma inline(minus_pos/2).
-minus_pos(pos(Xa, Ya), pos(Xb, Yb)) = vec(Xa - Xb, Ya - Yb).
-
-:- pragma inline(plus/2).
-plus(pos(X, Y), vec(Xv, Yv)) = pos(X + Xv, Y + Yv).
-
 adjacent(Pos, Dir) = plus(Pos, to_vec(Dir)).
 
 neighbor_dirs = [ '↑', '←', '→', '↓' ].
@@ -118,3 +106,15 @@ dir_vec('↓', vec( 0, -1)).
 dir_vec('↘', vec( 1, -1)).
 
 to_vec(Dir) = Vec :- dir_vec(Dir, Vec).
+
+:- pragma inline(minus/2).
+minus(pos(X, Y), vec(Xv, Yv)) = pos(X - Xv, Y - Yv).
+
+:- pragma inline(minus/1).
+minus(vec(X, Y)) = vec(-X, -Y).
+
+:- pragma inline(minus_pos/2).
+minus_pos(pos(Xa, Ya), pos(Xb, Yb)) = vec(Xa - Xb, Ya - Yb).
+
+:- pragma inline(plus/2).
+plus(pos(X, Y), vec(Xv, Yv)) = pos(X + Xv, Y + Yv).

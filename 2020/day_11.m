@@ -70,3 +70,11 @@ semidet_lookup(Array, pos(Col, Row), Elt) :-
 :- func bounds(seat_layout) = extent.
 bounds(Array) = extent(pos(0, 0), pos(NumCols, NumRows)) :-
     array2d.bounds(Array, NumRows, NumCols).
+
+:- pred sees(seat_layout::in, pos::in, moore_dir::in, pos::out) is semidet.
+sees(Seats, FromPos, Dir, ToPos) :-
+    AdjPos = adjacent(FromPos, Dir),
+    semidet_lookup(Seats, AdjPos, Seat),
+    ( Seat = yes(_), ToPos = AdjPos
+    ; Seat = no, sees(Seats, AdjPos, Dir, ToPos)
+    ).

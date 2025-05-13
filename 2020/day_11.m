@@ -48,7 +48,7 @@ input_seat_layout(Result, !IO) :-
       Result = error(Error)
     ).
 
-simulate(!Seats) :- simulate(bounds(!.Seats), !Seats).
+simulate(!Seats) :- simulate(bounds(!.Seats), num_occupied_neighbors, 3, !Seats).
 
 :- func num_occupied_neighbors(seat_layout, pos) = int.
 num_occupied_neighbors(Seats, Pos) = N :-
@@ -57,19 +57,19 @@ num_occupied_neighbors(Seats, Pos) = N :-
                ( Seat = yes(occupied) -> !:N = !.N + 1; true )
           ), Neighbors, 0, N).
 
-:- pred simulate(extent::in, seat_layout::in, seat_layout::out) is det.
-simulate(Extent, !Seats) :-
+:- pred simulate(extent::in, (func(seat_layout, pos) = int)::in, int::in, seat_layout::in, seat_layout::out) is det.
+simulate(Extent, NumOccupied, MaxOccupied, !Seats) :-
     %% XXX: Update in-place.
     map_foldl(
         (pred(Row::in, Col::in, !.Elt::in, !:Elt::out, !.Changed::in, !:Changed::out) is det :-
-             N = num_occupied_neighbors(!.Seats, to_pos(Row, Col)),
-             ( !.Elt = yes(empty),    N = 0 -> !:Elt = yes(occupied), !:Changed = yes
-             ; !.Elt = yes(occupied), N > 3 -> !:Elt = yes(empty),    !:Changed = yes
+             N = NumOccupied(!.Seats, to_pos(Row, Col)),
+             ( !.Elt = yes(empty), N = 0 -> !:Elt = yes(occupied), !:Changed = yes
+             ; !.Elt = yes(occupied), N > MaxOccupied -> !:Elt = yes(empty), !:Changed = yes
              ; true
              )
         ), !Seats, no, Changed
     ),
-    ( Changed = yes -> simulate(Extent, !Seats); true ).
+    ( Changed = yes -> simulate(Extent, NumOccupied, MaxOccupied, !Seats); true ).
 
 :- func lookup(seat_layout, pos) = maybe(seat).
 lookup(Array, pos(Col, Row)) = array2d.lookup(Array, Row, Col).

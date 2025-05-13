@@ -26,6 +26,9 @@
 %% :- mode foldl2(pred(in, in, out, di,  uo) is det, in, in, out, di,  uo) is det.
 :- mode foldl2(pred(in, in, out, in, out) is det, in, in, out, in, out) is det.
 
+%% Taxicab distance from a position to the origin, or between two
+%% positions.
+:- func taxicab_dist(pos) = int.
 :- func taxicab_dist(pos, pos) = int.
 
 %%---------------------------------------------------------------------------
@@ -79,6 +82,7 @@
 :- import_module int.
 :- import_module unit.
 
+taxicab_dist(pos(X, Y)) = taxicab_norm(vec(X, Y)).
 taxicab_dist(A, B) = taxicab_norm(minus_pos(A, B)).
 
 in_bounds(extent(pos(X0, Y0), pos(EndX, EndY)), pos(X, Y)) :-

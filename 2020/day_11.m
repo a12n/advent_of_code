@@ -6,6 +6,9 @@
 :- import_module io.
 :- import_module maybe.
 
+:- import_module grid.
+:- import_module grid.plane.
+
 :- type seat ---> empty; occupied.
 :- type seat_layout == array2d(maybe(seat)).
 
@@ -20,8 +23,6 @@
 :- import_module list.
 
 :- import_module array2d_ext.
-:- import_module grid.
-:- import_module grid.plane.
 :- import_module io_ext.
 
 :- pred seat_char(char, maybe(seat)).

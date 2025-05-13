@@ -4,7 +4,9 @@
 
 :- import_module array2d.
 :- import_module io.
+:- import_module map.
 :- import_module maybe.
+:- import_module pair.
 
 :- import_module grid.
 :- import_module grid.plane.
@@ -14,6 +16,9 @@
 
 :- pred input_seat_layout(res(seat_layout)::out, io::di, io::uo) is det.
 :- pred simulate(seat_layout::in, seat_layout::array2d_uo) is det.
+
+:- type sight_map == map(pair(pos, moore_dir), pos).
+:- pred sight_map(seat_layout::in, sight_map::out) is det.
 
 :- implementation.
 
@@ -77,4 +82,26 @@ sees(Seats, FromPos, Dir, ToPos) :-
     semidet_lookup(Seats, AdjPos, Seat),
     ( Seat = yes(_), ToPos = AdjPos
     ; Seat = no, sees(Seats, AdjPos, Dir, ToPos)
+    ).
+
+sight_map(Seats, Mapping) :-
+    foldl(
+        (pred(FromPos::in, !.Map::in, !:Map::out) is det :-
+             foldl(
+                 (pred(Dir::in, !.Map::in, !:Map::out) is det :-
+                      %% ( not contains(!.Map, (FromPos - Dir)), sees(Seats, FromPos, Dir, ToPos) ->
+                      %%   set((FromPos - Dir), ToPos, !Map),
+                      %%   set((ToPos - opposite(Dir)), FromPos, !Map)
+                      %% ; true
+                      %% )
+                      ( sees(Seats, FromPos, Dir, ToPos) ->
+                        set((FromPos - Dir), ToPos, !Map)
+                      ; true
+                      )
+                 ),
+                 moore_neighbor_dirs,
+                 !Map
+             )
+        ),
+        bounds(Seats), init, Mapping
     ).

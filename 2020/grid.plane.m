@@ -98,9 +98,9 @@ foldl2(Pred, extent(pos(X0, _), pos(EndX, EndY)) @ Extent, pos(X, Y) @ Pos, !A, 
     ; Pred(Pos, !A, !B), foldl2(Pred, Extent, pos(X + 1, Y), !A, !B)
     ).
 
-in_bounds(extent(pos(X0, Y0), pos(Xn, Yn)), pos(X, Y)) :-
-    X >= X0, X < Xn,
-    Y >= Y0, Y < Yn.
+in_bounds(extent(pos(X0, Y0), pos(EndX, EndY)), pos(X, Y)) :-
+    X >= X0, X < EndX,
+    Y >= Y0, Y < EndY.
 
 moore_neighbor_dirs = neighbor_dirs ++ [
                           vec(-1, -1),

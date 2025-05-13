@@ -43,10 +43,10 @@
 
 :- func adjacent(pos, moore_dir) = pos.
 
-:- func moore_neighbor_dirs = list(vec).
+:- func moore_neighbor_dirs = list(moore_dir).
 :- func moore_neighbors(pos) = list(pos).
 
-:- func neighbor_dirs = list(vec).
+:- func neighbor_dirs = list(dir).
 :- func neighbors(pos) = list(pos).
 
 %%---------------------------------------------------------------------------
@@ -102,21 +102,12 @@ in_bounds(extent(pos(X0, Y0), pos(EndX, EndY)), pos(X, Y)) :-
     X >= X0, X < EndX,
     Y >= Y0, Y < EndY.
 
-moore_neighbor_dirs = neighbor_dirs ++ [
-                          vec(-1, -1),
-                          vec( 1, -1),
-                          vec(-1,  1),
-                          vec( 1,  1)
-                      ].
 
-moore_neighbors(P) = map(plus(P), moore_neighbor_dirs).
+neighbor_dirs = [ '↑', '←', '→', '↓' ].
+neighbors(Pos) = map(adjacent(Pos), coerce(neighbor_dirs)).
 
-neighbor_dirs = [ vec( 0, -1),
-                  vec(-1,  0),
-                  vec( 1,  0),
-                  vec( 0,  1) ].
-
-neighbors(P) = map(plus(P), neighbor_dirs).
+moore_neighbor_dirs = coerce(neighbor_dirs) ++ [ '↖', '↗', '↙', '↘' ].
+moore_neighbors(Pos) = map(adjacent(Pos), moore_neighbor_dirs).
 
 dir_vec('↖', vec(-1,  1)).
 dir_vec('↑', vec( 0,  1)).

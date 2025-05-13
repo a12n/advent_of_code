@@ -18,7 +18,7 @@
 :- pred simulate((func(seat_layout, pos) = int)::in, int::in, seat_layout::in, seat_layout::out) is det.
 
 :- type sight_map == map(pair(pos, moore_dir), pos).
-:- pred sight_map(seat_layout::in, sight_map::out) is det.
+:- func sight_map(seat_layout) = sight_map.
 
 :- func num_occupied_neighbors(seat_layout, pos) = int.
 
@@ -92,7 +92,7 @@ sees(Seats, FromPos, Dir, ToPos) :-
     ; Seat = no, sees(Seats, AdjPos, Dir, ToPos)
     ).
 
-sight_map(Seats, Mapping) :-
+sight_map(Seats) = Mapping :-
     foldl(
         (pred(FromPos::in, !.Map::in, !:Map::out) is det :-
              foldl(

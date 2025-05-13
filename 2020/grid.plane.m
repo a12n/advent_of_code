@@ -4,17 +4,18 @@
 
 :- import_module list.
 
-%% Position and direction on 2D cartesian grid.
+%%---------------------------------------------------------------------------
+%% Position and extent
+
+%% Position (x, y) on 2D cartesian grid. -x and +x are left and right,
+%% -y and +y are down and up.
 :- type pos ---> pos(int, int).
-:- type vec ---> vec(int, int).
 
 %% Grid extent as [Begin, End) positions.
 :- type extent ---> extent(pos, pos).
 
-%% Position and direction operators.
-:- func minus(pos, vec) = pos.
-:- func minus_pos(pos, pos) = vec.
-:- func plus(pos, vec) = pos.
+%% True if position is within grid extent.
+:- pred in_bounds(extent::in, pos::in) is semidet.
 
 %% Iterate over all extent positions.
 :- pred foldl(pred(pos, A, A), extent, A, A).
@@ -25,17 +26,37 @@
 %% :- mode foldl2(pred(in, in, out, di,  uo) is det, in, in, out, di,  uo) is det.
 :- mode foldl2(pred(in, in, out, in, out) is det, in, in, out, in, out) is det.
 
-%% True if position is within grid extent.
-:- pred in_bounds(extent::in, pos::in) is semidet.
+%%---------------------------------------------------------------------------
+%% Directions (restricted)
 
 %% Moore neighborhood of a position.
+:- type moore_dir --->
+   '↖'; '↑'; '↗';
+   '←';      '→';
+   '↙'; '↓'; '↘'.
+
+%% Von Neumann neighborhood of a position.
+:- type dir =< moore_dir --->
+        '↑';
+   '←';      '→';
+        '↓'.
+
 :- func moore_neighbor_dirs = list(vec).
 :- func moore_neighbors(pos) = list(pos).
 
-%% Von Neumann neighborhood of a position.
 :- func neighbor_dirs = list(vec).
 :- func neighbors(pos) = list(pos).
 
+%%---------------------------------------------------------------------------
+%% Directions (vectors)
+
+:- type vec ---> vec(int, int).
+
+:- func minus(pos, vec) = pos.
+:- func minus_pos(pos, pos) = vec.
+:- func plus(pos, vec) = pos.
+
+%%---------------------------------------------------------------------------
 :- implementation.
 
 :- import_module int.

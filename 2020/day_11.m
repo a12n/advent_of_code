@@ -50,15 +50,21 @@ input_seat_layout(Result, !IO) :-
 
 simulate(!Seats) :- simulate(bounds(!.Seats), !Seats).
 
+:- func num_occupied_neighbors(seat_layout, pos) = int.
+num_occupied_neighbors(Seats, Pos) = N :-
+    filter_map(semidet_lookup(Seats), moore_neighbors(Pos), Neighbors),
+    foldl((pred(Seat::in, !.N::in, !:N::out) is det :-
+               ( Seat = yes(occupied) -> !:N = !.N + 1; true )
+          ), Neighbors, 0, N).
+
 :- pred simulate(extent::in, seat_layout::in, seat_layout::out) is det.
 simulate(Extent, !Seats) :-
     %% XXX: Update in-place.
     map_foldl(
         (pred(Row::in, Col::in, !.Elt::in, !:Elt::out, !.Changed::in, !:Changed::out) is det :-
-             NeighborPos = filter(in_bounds(Extent), moore_neighbors(pos(Col, Row))),
-             NumOccupied = length(filter(unify(yes(occupied)), map(lookup(!.Seats), NeighborPos))),
-             ( !.Elt = yes(empty),    NumOccupied = 0 -> !:Elt = yes(occupied), !:Changed = yes
-             ; !.Elt = yes(occupied), NumOccupied > 3 -> !:Elt = yes(empty),    !:Changed = yes
+             N = num_occupied_neighbors(!.Seats, to_pos(Row, Col)),
+             ( !.Elt = yes(empty),    N = 0 -> !:Elt = yes(occupied), !:Changed = yes
+             ; !.Elt = yes(occupied), N > 3 -> !:Elt = yes(empty),    !:Changed = yes
              ; true
              )
         ), !Seats, no, Changed

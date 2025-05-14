@@ -16,6 +16,7 @@
 
 :- import_module advent.
 :- import_module day_13.
+:- import_module list_ext.
 
 main(!IO) :-
     input(Result, !IO),
@@ -40,9 +41,6 @@ departure(Arrive, Bus) = Bus * ceil_div(Arrive, Bus).
 
 :- func ceil_div(int, int) = int.
 ceil_div(N, M) = N // M + ( N rem M \= 0 -> 1; 0 ).
-
-:- func reduce((func(T, T) = T), list(T)) = T is semidet.
-reduce(F, [H | T]) = foldl(F, T, H).
 
 :- func min_wait_time(pair(int, int), pair(int, int)) = pair(int, int).
 min_wait_time((_ - WaitTimeA) @ A, (_ - WaitTimeB) @ B) = (WaitTimeA < WaitTimeB -> A; B).

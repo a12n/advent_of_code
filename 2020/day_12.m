@@ -23,7 +23,7 @@ command_string(Command, String) :-
     ; Char = 'E', Command = abs_move('→', Arg)
     ; Char = 'W', Command = abs_move('←', Arg)
     ; Char = 'L', angle_turns(Arg, N), Command = rotate(-N)
-    ; Char = 'R', angle_turns(Arg, N), Command = rotate(N)
+    ; Char = 'R', angle_turns(Arg, N), Command = rotate( N)
     ; Char = 'F', Command = rel_move(Arg)
     ).
 

@@ -15,15 +15,15 @@
 :- import_module grid.
 :- import_module grid.plane.
 
-main(!IO) :- main(pos(0, 0), _, pos(10, 1), _, !IO).
+main(!IO) :- main(pos(0, 0), _, vec(10, 1), _, !IO).
 
-:- pred main(pos::in, pos::out, pos::in, pos::out, io::di, io::uo) is det.
-main(!ShipPos, !WaypointPos, !IO) :-
+:- pred main(pos::in, pos::out, vec::in, vec::out, io::di, io::uo) is det.
+main(!ShipPos, !WaypointVec, !IO) :-
     read_line_as_string(ReadResult, !IO),
     ( ReadResult = ok(Line),
       ( command_string(Command, chomp(Line)) ->
-        %% TODO
-        main(!ShipPos, !WaypointPos, !IO)
+        navigation(Command, !ShipPos, !WaypointVec),
+        main(!ShipPos, !WaypointVec, !IO)
       ; error("Invalid input")
       )
     ; ReadResult = eof,
@@ -31,3 +31,11 @@ main(!ShipPos, !WaypointPos, !IO) :-
     ; ReadResult = error(Error),
       error(error_message(Error))
     ).
+
+:- pred navigation(command::in, pos::in, pos::out, vec::in, vec::out) is det.
+navigation(abs_move(Dir, N), !ShipPos, !WaypointVec) :-
+    !:WaypointVec = plus_vec(!.WaypointVec, times(to_vec(coerce(Dir)), N)).
+navigation(rotate(K), !ShipPos, !WaypointVec) :-
+    !:WaypointVec = rotate_vec(K, !.WaypointVec).
+navigation(rel_move(N), !ShipPos, !WaypointVec) :-
+    !:ShipPos = plus(!.ShipPos, times(!.WaypointVec, N)).

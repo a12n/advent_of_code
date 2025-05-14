@@ -22,7 +22,12 @@ command_string(Command, String) :-
     ; Char = 'S', Command = abs_move('↓', Arg)
     ; Char = 'E', Command = abs_move('→', Arg)
     ; Char = 'W', Command = abs_move('←', Arg)
-    ; Char = 'L', ( Arg = 90; Arg = 180; Arg = 270 ), Command = rotate(-(Arg / 90))
-    ; Char = 'R', ( Arg = 90; Arg = 180; Arg = 270 ), Command = rotate(Arg / 90)
+    ; Char = 'L', angle_turns(Arg, N), Command = rotate(-N)
+    ; Char = 'R', angle_turns(Arg, N), Command = rotate(N)
     ; Char = 'F', Command = rel_move(Arg)
     ).
+
+:- pred angle_turns(int::in, int::out) is semidet.
+angle_turns( 90, 1).
+angle_turns(180, 2).
+angle_turns(270, 3).

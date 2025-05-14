@@ -53,8 +53,6 @@
 :- mode opposite(in, out) is det.
 :- mode opposite(out, in) is det.
 
-:- func rotate_dir(int, dir) = dir.
-
 :- func moore_neighbor_dirs = list(moore_dir).
 :- func moore_neighbors(pos) = list(pos).
 
@@ -78,6 +76,12 @@
 :- func times(vec, int) = vec.
 
 :- func taxicab_norm(vec) = int.
+
+%%---------------------------------------------------------------------------
+%% Rotations
+
+:- func rotate_dir(int, dir) = dir.
+:- func rotate_vec(int, vec) = vec.
 
 %%---------------------------------------------------------------------------
 :- implementation.
@@ -119,34 +123,6 @@ opposite('↘', '↖').
 
 opposite(From) = To :- opposite(From, To).
 
-%% rotate_dir( 1, '↑') = '→'.
-%% rotate_dir( 1, '←') = '↑'.
-%% rotate_dir( 1, '→') = '↓'.
-%% rotate_dir( 1, '↓') = '←'.
-%%
-%% rotate_dir(-1, '↑') = '←'.
-%% rotate_dir(-1, '←') = '↓'.
-%% rotate_dir(-1, '→') = '↑'.
-%% rotate_dir(-1, '↓') = '→'.
-%%
-%% rotate_dir( 0, Dir) = Dir.
-%% XXX
-rotate_dir(N, Dir) = Ans :-
-    ( N < 0 ->
-      ( Dir = '↑', Ans = rotate_dir(N + 1, '←')
-      ; Dir = '←', Ans = rotate_dir(N + 1, '↓')
-      ; Dir = '→', Ans = rotate_dir(N + 1, '↑')
-      ; Dir = '↓', Ans = rotate_dir(N + 1, '→')
-      )
-    ; N > 0 ->
-      ( Dir = '↑', Ans = rotate_dir(N - 1, '→')
-      ; Dir = '←', Ans = rotate_dir(N - 1, '↑')
-      ; Dir = '→', Ans = rotate_dir(N - 1, '↓')
-      ; Dir = '↓', Ans = rotate_dir(N - 1, '←')
-      )
-    ; Ans = Dir
-    ).
-
 neighbor_dirs = [ '↑', '←', '→', '↓' ].
 neighbors(Pos) = map(adjacent(Pos), coerce(neighbor_dirs)).
 
@@ -181,3 +157,37 @@ times(vec(X, Y), N) = vec(X * N, Y * N).
 
 :- pragma inline(taxicab_norm/1).
 taxicab_norm(vec(X, Y)) = abs(X) + abs(Y).
+
+%% rotate_dir( 1, '↑') = '→'.
+%% rotate_dir( 1, '←') = '↑'.
+%% rotate_dir( 1, '→') = '↓'.
+%% rotate_dir( 1, '↓') = '←'.
+%%
+%% rotate_dir(-1, '↑') = '←'.
+%% rotate_dir(-1, '←') = '↓'.
+%% rotate_dir(-1, '→') = '↑'.
+%% rotate_dir(-1, '↓') = '→'.
+%%
+%% rotate_dir( 0, Dir) = Dir.
+%% XXX
+rotate_dir(N, Dir) = Ans :-
+    ( N < 0 ->
+      ( Dir = '↑', Ans = rotate_dir(N + 1, '←')
+      ; Dir = '←', Ans = rotate_dir(N + 1, '↓')
+      ; Dir = '→', Ans = rotate_dir(N + 1, '↑')
+      ; Dir = '↓', Ans = rotate_dir(N + 1, '→')
+      )
+    ; N > 0 ->
+      ( Dir = '↑', Ans = rotate_dir(N - 1, '→')
+      ; Dir = '←', Ans = rotate_dir(N - 1, '↑')
+      ; Dir = '→', Ans = rotate_dir(N - 1, '↓')
+      ; Dir = '↓', Ans = rotate_dir(N - 1, '←')
+      )
+    ; Ans = Dir
+    ).
+
+rotate_vec(N, vec(X, Y) @ Vec) = Ans :-
+    ( N < 0 -> Ans = rotate_vec(N + 1, vec(-Y,  X))
+    ; N > 0 -> Ans = rotate_vec(N - 1, vec( Y, -X))
+    ; Ans = Vec
+    ).

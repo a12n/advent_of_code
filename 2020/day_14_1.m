@@ -12,6 +12,7 @@
 :- import_module pair.
 :- import_module require.
 :- import_module string.
+:- import_module uint.
 
 :- import_module day_14.
 
@@ -27,11 +28,17 @@ main(!Mask, !Memory, !IO) :-
       ; error("Invalid input")
       )
     ; ReadResult = eof,
-      %% TODO
-      write_uint(0u, !IO), nl(!IO)
+      foldl_values(plus, !.Memory, 0u, Sum),
+      write_uint(Sum, !IO), nl(!IO)
     ; ReadResult = error(Error),
       error(error_message(Error))
     ).
 
 :- func init = mask.
 init = pair(0u, 0xF_FFFF_FFFFu).
+
+%% map.foldl_values/4 requires predicate, but uint.plus/2 is a
+%% function.
+:- pred plus(uint, uint, uint).
+:- mode plus(in, in, out) is det.
+plus(A, B, C) :- C = plus(A, B).

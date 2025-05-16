@@ -40,4 +40,4 @@ init = pair(0u, 0xF_FFFF_FFFFu).
 %% function.
 :- pred plus(uint, uint, uint).
 :- mode plus(in, in, out) is det.
-plus(A, B, C) :- C = plus(A, B).
+plus(A, B, plus(A, B)).

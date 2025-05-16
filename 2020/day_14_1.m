@@ -33,9 +33,6 @@ main(!Mask, !Memory, !IO) :-
       error(error_message(Error))
     ).
 
-:- func init = mask.
-init = pair(0u, 0xF_FFFF_FFFFu).
-
 %% map.foldl_values/4 requires predicate, but uint.plus/2 is a
 %% function.
 :- pred plus(uint, uint, uint).

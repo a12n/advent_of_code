@@ -21,7 +21,7 @@ main(!IO) :-
     ( Result = ok(Lines),
       ( map(to_int, map(chomp, Lines), Jolts) ->
         sort(Jolts, SortedJolts),
-        Num = num_arrangements([0 | SortedJolts]),
+        Num = num_arrangements(0, SortedJolts),
         write_int64(Num, !IO), nl(!IO)
       ; error("Invalid input")
       )
@@ -29,20 +29,16 @@ main(!IO) :-
       error(error_message(Error))
     ).
 
-:- func num_arrangements(list(int)) = int64.
-:- pragma memo(num_arrangements/1).
-num_arrangements(Jolts) = Num :-
-    ( Jolts = [] -> Num = 1i64
-    ; Jolts = [_] -> Num = 1i64
-    ; Jolts = [J0, J1 | Jolts2], (J1 - J0) < 4 ->
-      Num = num_arrangements([J1 | Jolts2]) +
-            ( Jolts2 = [J2 | Jolts3], (J2 - J0) < 4 ->
-              num_arrangements(Jolts2) +
-              ( Jolts3 = [J3 | _], (J3 - J0) < 4 ->
-                num_arrangements(Jolts3)
-              ; 0i64
-              )
-            ; 0i64
-            )
-    ; Num = 0i64
-    ).
+:- func num_arrangements(int, list(int)) = int64.
+:- pragma memo(num_arrangements/2).
+num_arrangements(J, Jolts0) =
+    ( Jolts0 = [] -> 1i64
+    ; Jolts0 = [J1 | Jolts1], (J1 - J) < 4 ->
+      num_arrangements(J1, Jolts1) +
+      ( Jolts1 = [J2 | Jolts2], (J2 - J) < 4 ->
+        num_arrangements(J2, Jolts2) +
+        ( Jolts2 = [J3 | Jolts3], (J3 - J) < 4 ->
+          num_arrangements(J3, Jolts3)
+        ; 0i64 )
+      ; 0i64 )
+    ; 0i64 ).

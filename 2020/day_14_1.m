@@ -18,14 +18,11 @@
 main(!IO) :- main(init, _, init, _, !IO).
 
 :- pred main(mask::in, mask::out, memory::in, memory::out, io::di, io::uo) is det.
-main((OrMask - AndMask) @ !.Mask, !:Mask, !Memory, !IO) :-
+main(!Mask, !Memory, !IO) :-
     read_line_as_string(ReadResult, !IO),
     ( ReadResult = ok(Line),
       ( instr_string(Line, Instr) ->
-        ( Instr = mask(!:Mask)
-        ; Instr = store(Address, Value),
-          set(Address, OrMask \/ (AndMask /\ Value), !Memory)
-        ),
+        decoder_chip(Instr, !Mask, !Memory),
         main(!Mask, !Memory, !IO)
       ; error("Invalid input")
       )

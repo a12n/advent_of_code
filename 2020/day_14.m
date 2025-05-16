@@ -21,6 +21,8 @@
 :- pred value_string(string, value).
 :- mode value_string(in, out) is semidet.
 
+:- pred decoder_chip(instr::in, mask::in, mask::out, memory::in, memory::out) is det.
+
 :- implementation.
 
 :- import_module list.
@@ -44,3 +46,9 @@ mask_string(String, pair(Or, And)) :-
 
 value_string(String, Value) :-
     base_string_to_uint(10, strip(String), Value).
+
+decoder_chip(Instr, (OrMask - AndMask) @ !.Mask, !:Mask, !Memory) :-
+    ( Instr = mask(!:Mask)
+    ; Instr = store(Address, Value),
+      set(Address, OrMask \/ (AndMask /\ Value), !Memory)
+    ).

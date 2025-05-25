@@ -15,7 +15,7 @@
 
 :- import_module day_14.
 
-main(!IO) :- main(init, _, init, _, !IO).
+main(!IO) :- main(init_mask, _, init, _, !IO).
 
 :- pred main(mask::in, mask::out, memory::in, memory::out, io::di, io::uo) is det.
 main(!Mask, !Memory, !IO) :-

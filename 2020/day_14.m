@@ -15,8 +15,7 @@
 :- pred instr_string(string, instr).
 :- mode instr_string(in, out) is semidet.
 
-%% Initial mask.
-:- func init = mask.
+:- func init_mask = mask.
 
 :- pred decoder_chip(instr::in, mask::in, mask::out, memory::in, memory::out) is det.
 
@@ -25,7 +24,7 @@
 :- import_module list.
 :- import_module string.
 
-init = pair(0u, 0xF_FFFF_FFFFu).
+init_mask = pair(0u, 0xF_FFFF_FFFFu).
 
 instr_string(String, Instr) :-
     [KeyStr, ValueStr] = split_at_char('=', String),

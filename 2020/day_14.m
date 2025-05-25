@@ -13,8 +13,7 @@
 
 :- func init_mask = mask.
 
-:- pred instr_string(string, instr).
-:- mode instr_string(in, out) is semidet.
+:- pred instr_string(string::in, instr::out) is semidet.
 
 %%---------------------------------------------------------------------------
 %% v1 decoder chip

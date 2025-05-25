@@ -51,14 +51,12 @@ instr_string(String, Instr) :-
     ; fail
     ).
 
-:- pred mask_string(string, mask).
-:- mode mask_string(in, out) is semidet.
+:- pred mask_string(string::in, mask::out) is semidet.
 mask_string(String, pair(OrMask, AndMask)) :-
     base_string_to_uint(2, strip(replace_all(String, "X", "0")), OrMask),
     base_string_to_uint(2, strip(replace_all(replace_all(String, "1", "0"), "X", "1")), AndMask).
 
-:- pred value_string(string, value).
-:- mode value_string(in, out) is semidet.
+:- pred value_string(string::in, value::out) is semidet.
 value_string(String, Value) :-
     base_string_to_uint(10, strip(String), Value).
 

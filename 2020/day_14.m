@@ -10,13 +10,18 @@
 :- type address == value.
 :- type mask == pair(value, value).
 :- type instr ---> mask(mask); store(address, value).
-:- type memory == map(address, value).
+
+:- func init_mask = mask.
 
 :- pred instr_string(string, instr).
 :- mode instr_string(in, out) is semidet.
 
-:- func init_mask = mask.
+%%---------------------------------------------------------------------------
+%% v1 decoder chip
 
+:- type memory == map(address, value).
+
+:- func init_memory = memory.
 :- pred decoder_chip(instr::in, mask::in, mask::out, memory::in, memory::out) is det.
 
 :- implementation.
@@ -38,7 +43,6 @@ instr_string(String, Instr) :-
     ; fail
     ).
 
-
 :- pred mask_string(string, mask).
 :- mode mask_string(in, out) is semidet.
 mask_string(String, pair(OrMask, AndMask)) :-
@@ -49,6 +53,8 @@ mask_string(String, pair(OrMask, AndMask)) :-
 :- mode value_string(in, out) is semidet.
 value_string(String, Value) :-
     base_string_to_uint(10, strip(String), Value).
+
+init_memory = init.
 
 decoder_chip(Instr, (OrMask - AndMask) @ !.Mask, !:Mask, !Memory) :-
     ( Instr = mask(!:Mask)

@@ -27,14 +27,7 @@ main(!Mask, !Memory, !IO) :-
       ; error("Invalid input")
       )
     ; ReadResult = eof,
-      foldl_values(plus, !.Memory, 0u, Sum),
-      write_uint(Sum, !IO), nl(!IO)
+      write_uint(memory_sum(!.Memory), !IO), nl(!IO)
     ; ReadResult = error(Error),
       error(error_message(Error))
     ).
-
-%% map.foldl_values/4 requires predicate, but uint.plus/2 is a
-%% function.
-:- pred plus(uint, uint, uint).
-:- mode plus(in, in, out) is det.
-plus(A, B, plus(A, B)).

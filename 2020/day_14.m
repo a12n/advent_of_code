@@ -21,6 +21,8 @@
 :- type memory == map(address, value).
 
 :- func init_memory = memory.
+:- func memory_sum(memory) = value.
+
 :- pred decoder_chip(instr::in, mask::in, mask::out, memory::in, memory::out) is det.
 
 :- implementation.
@@ -55,8 +57,17 @@ value_string(String, Value) :-
 
 init_memory = init.
 
+memory_sum(Memory) = Sum :-
+    foldl_values(plus, Memory, 0u, Sum).
+
 decoder_chip(Instr, (OrMask - AndMask) @ !.Mask, !:Mask, !Memory) :-
     ( Instr = mask(!:Mask)
     ; Instr = store(Address, Value),
       set(Address, OrMask \/ (AndMask /\ Value), !Memory)
     ).
+
+%% map.foldl_values/4 requires predicate, but uint.plus/2 is a
+%% function.
+:- pred plus(uint, uint, uint).
+:- mode plus(in, in, out) is det.
+plus(A, B, plus(A, B)).

@@ -8,10 +8,7 @@
 
 :- implementation.
 
-:- import_module map.
-:- import_module pair.
 :- import_module require.
-:- import_module uint.
 
 :- import_module day_14.
 

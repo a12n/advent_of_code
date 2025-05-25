@@ -25,9 +25,16 @@
 
 :- pred decoder_chip(instr::in, mask::in, mask::out, memory::in, memory::out) is det.
 
+%%---------------------------------------------------------------------------
+%% v2 decoder chip
+
+:- pred decoder_chip_floating(instr::in, mask::in, mask::out, memory::in, memory::out) is det.
+
+%%---------------------------------------------------------------------------
 :- implementation.
 
 :- import_module list.
+:- import_module solutions.
 :- import_module string.
 
 init_mask = pair(0u, 0xF_FFFF_FFFFu).
@@ -66,8 +73,31 @@ decoder_chip(Instr, (OrMask - AndMask) @ !.Mask, !:Mask, !Memory) :-
       set(Address, OrMask \/ (AndMask /\ Value), !Memory)
     ).
 
+decoder_chip_floating(Instr, (OrMask - AndMask) @ !.Mask, !:Mask, !Memory) :-
+    ( Instr = mask(!:Mask)
+    ; Instr = store(Address, Value),
+      solutions(floating_address(Address \/ OrMask, AndMask), Addresses),
+      foldl(set_value(Value), Addresses, !Memory)
+    ).
+
+:- pred floating_address(address::in, address::in, address::out) is multi.
+floating_address(Address, AndMask, Result) :-
+    ( AndMask = 0u -> Result = Address
+    ; floating_address(Address >> 1, AndMask >> 1, ShiftedResult),
+      ( AndMask /\ 1u = 1u,
+        ( Result = (ShiftedResult << 1) \/ 1u
+        ; Result = (ShiftedResult << 1) \/ 0u
+        )
+      ; Result = (ShiftedResult << 1) \/ (Address /\ 1u)
+      )
+    ).
+
 %% map.foldl_values/4 requires predicate, but uint.plus/2 is a
 %% function.
 :- pred plus(uint, uint, uint).
 :- mode plus(in, in, out) is det.
 plus(A, B, plus(A, B)).
+
+%% Like map.set/4, but with key and value in different order.
+:- pred set_value(V::in, K::in, map(K, V)::in, map(K, V)::out) is det.
+set_value(V, K, !Map) :- set(K, V, !Map).

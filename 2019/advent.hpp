@@ -23,4 +23,23 @@ using std::runtime_error;
 using std::string;
 using std::vector;
 
-#endif  // ADVENT_HPP
+namespace intcode {
+
+using address = size_t;
+using value = int64_t;
+
+enum class opcode {
+    add = 1,
+    mul = 2,
+    halt = 99,
+};
+
+using memory = vector<value>;
+
+void read(istream& in, memory& p);
+
+address run(memory& p, address ip);
+
+} // namespace intcode
+
+#endif // ADVENT_HPP

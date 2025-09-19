@@ -2,7 +2,7 @@
 
 namespace {
 
-using mass_t = long long;
+using mass_t = int64_t;
 
 mass_t fuel_required(mass_t mass)
 {
@@ -29,7 +29,7 @@ int main()
 {
     mass_t mass, total_fuel = 0;
 
-    while (cin >> mass) {
+    while (std::cin >> mass) {
         total_fuel +=
 #if PART == 1
             fuel_required(mass)
@@ -38,7 +38,7 @@ int main()
 #endif // PART
             ;
     }
-    cout << total_fuel << endl;
+    std::cout << total_fuel << '\n';
 
     return 0;
 }

@@ -3,10 +3,10 @@
 #if PART == 2
 namespace {
 
-std::optional<std::pair<intcode::value, intcode::value>> gravity_assist(const intcode::memory& p, intcode::value k)
+std::optional<std::pair<int, int>> gravity_assist(const intcode::memory& p, int k)
 {
-    for (intcode::value noun = 0; noun < 100; ++noun) {
-        for (intcode::value verb = 0; verb < 100; ++verb) {
+    for (int noun = 0; noun < 100; ++noun) {
+        for (int verb = 0; verb < 100; ++verb) {
             intcode::memory t = p;
             t[1] = noun;
             t[2] = verb;
@@ -16,7 +16,7 @@ std::optional<std::pair<intcode::value, intcode::value>> gravity_assist(const in
             }
         }
     }
-    return nullopt;
+    return {};
 }
 
 } // namespace

@@ -121,7 +121,7 @@ enum class opcode {
     halt = 99,
 };
 
-struct memory : public std::vector<int64_t> { };
+using memory = std::vector<int64_t>;
 
 address run(memory& m, address ip);
 

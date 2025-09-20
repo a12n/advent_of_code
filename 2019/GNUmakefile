@@ -13,4 +13,4 @@ clean:
 %-2: %.cpp advent.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -DPART=2 $^ -o $@
 
-advent.o: advent.cpp
+advent.o: advent.hpp advent.cpp

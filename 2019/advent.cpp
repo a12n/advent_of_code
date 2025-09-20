@@ -122,7 +122,7 @@ address run(memory& m, address ip)
 
 std::istream& operator>>(std::istream& in, memory& m)
 {
-    return extract<int64_t>(in, m, ',');
+    return ::operator>><int64_t, ','>(in, m);
 }
 
 } // namespace intcode

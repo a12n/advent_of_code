@@ -23,8 +23,8 @@
 //----------------------------------------------------------------------------
 // I/O Utilities
 
-template <typename item_type>
-std::istream& extract(std::istream& in, std::vector<item_type>& items, char sep = ',')
+template <typename item_type, char sep = ','>
+std::istream& operator>>(std::istream& in, std::vector<item_type>& items)
 {
     items.clear();
 

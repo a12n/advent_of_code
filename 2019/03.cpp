@@ -13,11 +13,27 @@ position_set intersection(const position_set& s, const position_set& t)
     return r;
 }
 
+// Reads "R75 D30 R83 U83 …"
+std::istream& operator>>(std::istream& in, position_set& wire)
+{
+    position p = { 0, 0 };
+    direction dir;
+    int64_t n;
+
+    while (in >> dir >> n) {
+        const auto u = to_offset(dir);
+        for (; n > 0; --n, p += u) {
+            wire.insert(p);
+        }
+    }
+
+    return in;
+}
+
 } // namespace
 
 int main()
 {
-    // TODO
     position_set wire[2];
 
     for (size_t i = 0; i < 2; ++i) {
@@ -30,28 +46,20 @@ int main()
         std::replace(line.begin(), line.end(), ',', ' ');
         std::istringstream in(line);
 
-        position p = { 0, 0 };
-        direction dir;
-        int64_t n;
-
-        while (in >> dir >> n) {
-            const auto u = to_offset(dir);
-            for (; n > 0; --n, p += u) {
-                wire[i].insert(p);
-            }
+        if (!(in >> wire[i]).eof()) {
+            throw std::invalid_argument(line);
         }
-
-        // if (in.fail()) {
-        //     throw std::invalid_argument("segment");
-        // }
     }
 
     std::optional<int64_t> optimal_norm {};
+
     for (const auto& p : intersection(wire[0], wire[1])) {
         const auto n = taxicab_norm(to_offset(p));
+
         if (n == 0) {
             continue;
         }
+
         if (!optimal_norm || n < *optimal_norm) {
             optimal_norm = n;
         }

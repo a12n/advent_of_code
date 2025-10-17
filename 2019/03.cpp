@@ -4,26 +4,37 @@ using namespace grid::planar;
 
 namespace {
 
-using position_set = std::set<position>;
+using position_time = std::map<position, int64_t>;
 
-position_set intersection(const position_set& s, const position_set& t)
+position_time intersection(const position_time& s, const position_time& t)
 {
-    position_set r;
-    std::set_intersection(s.begin(), s.end(), t.begin(), t.end(), std::inserter(r, r.begin()));
+    position_time r;
+    for (auto i = s.begin(), j = t.begin(); i != s.end() && j != t.end();) {
+        if (i->first < j->first) {
+            ++i;
+        } else if (j->first < i->first) {
+            ++j;
+        } else {
+            r.insert({ i->first, i->second + j->second });
+            ++i;
+            ++j;
+        }
+    }
     return r;
 }
 
 // Reads "R75 D30 R83 U83 …"
-std::istream& operator>>(std::istream& in, position_set& wire)
+std::istream& operator>>(std::istream& in, position_time& wire)
 {
     position p = { 0, 0 };
+    int64_t t = 0;
     direction dir;
     int64_t n;
 
     while (in >> dir >> n) {
         const auto u = to_offset(dir);
-        for (; n > 0; --n, p += u) {
-            wire.insert(p);
+        for (; n > 0; --n, ++t, p += u) {
+            wire[p] = t;
         }
     }
 
@@ -34,7 +45,7 @@ std::istream& operator>>(std::istream& in, position_set& wire)
 
 int main()
 {
-    position_set wire[2];
+    position_time wire[2];
 
     for (size_t i = 0; i < 2; ++i) {
         std::string line;
@@ -53,15 +64,12 @@ int main()
 
     std::optional<int64_t> optimal {};
 
-    for (const auto& p : intersection(wire[0], wire[1])) {
-        const auto n = taxicab_norm(to_offset(p));
-
-        if (n == 0) {
-            continue;
-        }
-        if (!optimal || n < *optimal) {
+    for (const auto& [p, t] : intersection(wire[0], wire[1])) {
+#if PART == 1
+        if (const auto n = taxicab_norm(to_offset(p)); n != 0 && (!optimal || n < *optimal)) {
             optimal = n;
         }
+#endif // PART
     }
 
     if (!optimal) {

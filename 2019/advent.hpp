@@ -97,6 +97,9 @@ offset operator-(offset u);
 
 std::istream& operator>>(std::istream& in, direction& dir);
 
+std::ostream& operator<<(std::ostream& out, offset u);
+std::ostream& operator<<(std::ostream& out, position p);
+
 } // namespace grid::planar
 
 template <>

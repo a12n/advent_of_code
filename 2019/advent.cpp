@@ -124,6 +124,16 @@ std::istream& operator>>(std::istream& in, direction& dir)
     return in;
 }
 
+std::ostream& operator<<(std::ostream& out, offset u)
+{
+    return out << '[' << u[0] << ',' << u[1] << ']';
+}
+
+std::ostream& operator<<(std::ostream& out, position p)
+{
+    return out << to_offset(p);
+}
+
 } // namespace grid::planar
 
 namespace intcode {

@@ -51,7 +51,7 @@ int main()
         }
     }
 
-    std::optional<int64_t> optimal_norm {};
+    std::optional<int64_t> optimal {};
 
     for (const auto& p : intersection(wire[0], wire[1])) {
         const auto n = taxicab_norm(to_offset(p));
@@ -59,17 +59,16 @@ int main()
         if (n == 0) {
             continue;
         }
-
-        if (!optimal_norm || n < *optimal_norm) {
-            optimal_norm = n;
+        if (!optimal || n < *optimal) {
+            optimal = n;
         }
     }
 
-    if (!optimal_norm) {
+    if (!optimal) {
         return 1;
     }
 
-    std::cout << *optimal_norm << '\n';
+    std::cout << *optimal << '\n';
 
     return 0;
 }

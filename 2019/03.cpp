@@ -31,10 +31,13 @@ std::istream& operator>>(std::istream& in, position_time& wire)
     direction dir;
     int64_t n;
 
+    wire.clear();
     while (in >> dir >> n) {
         const auto u = to_offset(dir);
         for (; n > 0; --n, ++t, p += u) {
-            wire[p] = t;
+            if (wire.find(p) == wire.end()) {
+                wire[p] = t;
+            }
         }
     }
 

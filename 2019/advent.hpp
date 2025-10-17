@@ -96,18 +96,18 @@ std::istream& operator>>(std::istream& in, direction& dir);
 } // namespace grid::planar
 
 template <>
-struct std::hash<grid::point> {
-    size_t operator()(grid::point p) const noexcept
+struct std::hash<grid::planar::position> {
+    size_t operator()(grid::planar::position p) const noexcept
     {
         return std::hash<int64_t> {}(p[0]) ^ (std::hash<int64_t> {}(p[1]) << 1);
     }
 };
 
 template <>
-struct std::hash<grid::vector> {
-    size_t operator()(grid::vector u) const noexcept
+struct std::hash<grid::planar::offset> {
+    size_t operator()(grid::planar::offset u) const noexcept
     {
-        return std::hash<grid::point> {}(to_point(u));
+        return std::hash<grid::planar::position> {}(to_position(u));
     }
 };
 

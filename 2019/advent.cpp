@@ -1,8 +1,8 @@
 #include "advent.hpp"
 
-namespace grid {
+namespace grid::planar {
 
-int64_t taxicab_norm(vector u)
+int64_t taxicab_norm(offset u)
 {
     return std::abs(u[0]) + std::abs(u[1]);
 }
@@ -27,12 +27,12 @@ direction to_direction(char c)
     }
 }
 
-point to_point(vector u)
+position to_position(offset u)
 {
     return { u[0], u[1] };
 }
 
-vector to_vector(direction d)
+offset to_offset(direction d)
 {
     switch (d) {
     case direction::up:
@@ -48,37 +48,37 @@ vector to_vector(direction d)
     }
 }
 
-vector to_vector(point p)
+offset to_offset(position p)
 {
     return { p[0], p[1] };
 }
 
-vector operator*(int64_t n, vector u)
+offset operator*(int64_t n, offset u)
 {
     return { n * u[0], n * u[1] };
 }
 
-point operator+(point p, vector u)
+position operator+(position p, offset u)
 {
     return { p[0] + u[0], p[1] + u[1] };
 }
 
-vector operator+(vector u, vector v)
+offset operator+(offset u, offset v)
 {
     return { u[0] + v[0], u[1] + v[1] };
 }
 
-vector operator-(point p, point q)
+offset operator-(position p, position q)
 {
     return { p[0] - q[0], p[1] - q[1] };
 }
 
-point operator-(point p, vector u)
+position operator-(position p, offset u)
 {
     return p + (-u);
 }
 
-vector operator-(vector v)
+offset operator-(offset v)
 {
     return { -v[0], -v[1] };
 }
@@ -96,7 +96,7 @@ std::istream& operator>>(std::istream& in, direction& dir)
     return in;
 }
 
-} // namespace grid
+} // namespace grid::planar
 
 namespace intcode {
 

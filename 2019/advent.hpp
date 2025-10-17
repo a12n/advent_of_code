@@ -66,7 +66,7 @@ std::istream& operator>>(std::istream& in, std::vector<item_type>& items)
 //----------------------------------------------------------------------------
 // 2D Grids
 
-namespace grid {
+namespace grid::planar {
 
 enum class direction {
     up,
@@ -75,25 +75,25 @@ enum class direction {
     down,
 };
 
-struct point : public std::array<int64_t, 2> { };
-struct vector : public std::array<int64_t, 2> { };
+struct offset : public std::array<int64_t, 2> { };
+struct position : public std::array<int64_t, 2> { };
 
-int64_t taxicab_norm(vector u);
+int64_t taxicab_norm(offset u);
 direction to_direction(char c);
-point to_point(vector u);
-vector to_vector(direction dir);
-vector to_vector(point p);
+position to_position(offset u);
+offset to_offset(direction dir);
+offset to_offset(position p);
 
-vector operator*(int64_t n, vector u);
-point operator+(point p, vector u);
-vector operator+(vector u, vector v);
-vector operator-(point p, point q);
-point operator-(point p, vector u);
-vector operator-(vector u);
+offset operator*(int64_t n, offset u);
+position operator+(position p, offset u);
+offset operator+(offset u, offset v);
+offset operator-(position p, position q);
+position operator-(position p, offset u);
+offset operator-(offset u);
 
 std::istream& operator>>(std::istream& in, direction& dir);
 
-} // namespace grid
+} // namespace grid::planar
 
 template <>
 struct std::hash<grid::point> {

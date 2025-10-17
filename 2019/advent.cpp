@@ -53,19 +53,40 @@ offset to_offset(position p)
     return { p[0], p[1] };
 }
 
+offset& operator*=(offset& u, int64_t n)
+{
+    u[0] *= n;
+    u[1] *= n;
+    return u;
+}
+
 offset operator*(int64_t n, offset u)
 {
-    return { n * u[0], n * u[1] };
+    return u *= n;
+}
+
+position& operator+=(position& p, offset u)
+{
+    p[0] += u[0];
+    p[1] += u[1];
+    return p;
 }
 
 position operator+(position p, offset u)
 {
-    return { p[0] + u[0], p[1] + u[1] };
+    return p += u;
+}
+
+offset& operator+=(offset& u, offset v)
+{
+    u[0] += v[0];
+    u[1] += v[1];
+    return u;
 }
 
 offset operator+(offset u, offset v)
 {
-    return { u[0] + v[0], u[1] + v[1] };
+    return u += v;
 }
 
 offset operator-(position p, position q)
@@ -73,9 +94,16 @@ offset operator-(position p, position q)
     return { p[0] - q[0], p[1] - q[1] };
 }
 
+position& operator-=(position& p, offset u)
+{
+    p[0] -= u[0];
+    p[1] -= u[1];
+    return p;
+}
+
 position operator-(position p, offset u)
 {
-    return p + (-u);
+    return p -= u;
 }
 
 offset operator-(offset v)

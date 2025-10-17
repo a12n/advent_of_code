@@ -84,10 +84,14 @@ position to_position(offset u);
 offset to_offset(direction dir);
 offset to_offset(position p);
 
+offset& operator*=(offset& u, int64_t n);
 offset operator*(int64_t n, offset u);
+position& operator+=(position& p, offset u);
 position operator+(position p, offset u);
+offset& operator+=(offset& u, offset v);
 offset operator+(offset u, offset v);
 offset operator-(position p, position q);
+position& operator-=(position& p, offset u);
 position operator-(position p, offset u);
 offset operator-(offset u);
 

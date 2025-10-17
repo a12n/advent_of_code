@@ -1,36 +1,14 @@
 #include "advent.hpp"
 
-using namespace grid;
+using namespace grid::planar;
 
 namespace {
 
-struct segment {
-    direction dir;
-    int64_t n;
-};
+using position_set = std::set<position>;
 
-using segment_list = std::vector<segment>;
-
-std::istream& operator>>(std::istream& in, segment& s)
+position_set intersection(const position_set& s, const position_set& t)
 {
-    direction d;
-    int n;
-    if (in >> d >> n) {
-        s = { d, n };
-    }
-    return in;
-}
-
-std::istream& operator>>(std::istream& in, segment_list& l)
-{
-    return ::operator>><segment, ','>(in, l);
-}
-
-using point_set = std::set<point>;
-
-point_set intersection(const point_set& s, const point_set& t)
-{
-    point_set r;
+    position_set r;
     std::set_intersection(s.begin(), s.end(), t.begin(), t.end(), std::inserter(r, r.begin()));
     return r;
 }
@@ -40,7 +18,7 @@ point_set intersection(const point_set& s, const point_set& t)
 int main()
 {
     // TODO
-    point_set wire[2];
+    position_set wire[2];
 
     for (size_t i = 0; i < 2; ++i) {
         std::string line;
@@ -52,15 +30,14 @@ int main()
         std::replace(line.begin(), line.end(), ',', ' ');
         std::istringstream in(line);
 
-        point p = { 0, 0 };
-        segment s;
+        position p = { 0, 0 };
+        direction dir;
+        int64_t n;
 
-        while (in >> s) {
-            const auto u = to_vector(s.dir);
-
-            while (s.n--) {
+        while (in >> dir >> n) {
+            const auto u = to_offset(dir);
+            for (; n > 0; --n, p += u) {
                 wire[i].insert(p);
-                p = p + u;
             }
         }
 
@@ -71,7 +48,7 @@ int main()
 
     std::optional<int64_t> optimal_norm {};
     for (const auto& p : intersection(wire[0], wire[1])) {
-        const auto n = taxicab_norm(to_vector(p));
+        const auto n = taxicab_norm(to_offset(p));
         if (n == 0) {
             continue;
         }

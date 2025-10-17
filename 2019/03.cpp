@@ -65,9 +65,14 @@ int main()
     std::optional<int64_t> optimal {};
 
     for (const auto& [p, t] : intersection(wire[0], wire[1])) {
+        std::cerr << "p " << p << " t " << t << '\n';
 #if PART == 1
         if (const auto n = taxicab_norm(to_offset(p)); n != 0 && (!optimal || n < *optimal)) {
             optimal = n;
+        }
+#elif PART == 2
+        if (p != position { 0, 0 } && (!optimal || t < *optimal)) {
+            optimal = t;
         }
 #endif // PART
     }

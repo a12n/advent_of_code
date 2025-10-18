@@ -138,6 +138,11 @@ enum class opcode {
     halt = 99,
 };
 
+enum class mode {
+    position = 0,
+    immediate = 1,
+};
+
 using memory = std::vector<value>;
 
 address run(memory& m, address ip);

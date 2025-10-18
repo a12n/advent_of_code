@@ -2,6 +2,22 @@
 
 namespace grid::planar {
 
+direction opposite(direction dir)
+{
+    switch (dir) {
+    case direction::up:
+        return direction::down;
+    case direction::left:
+        return direction::right;
+    case direction::right:
+        return direction::left;
+    case direction::down:
+        return direction::up;
+    default:
+        throw std::invalid_argument(__func__);
+    }
+}
+
 int64_t taxicab_norm(offset u)
 {
     return std::abs(u[0]) + std::abs(u[1]);

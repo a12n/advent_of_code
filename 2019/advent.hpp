@@ -81,6 +81,7 @@ enum class direction {
 struct offset : public std::array<int64_t, 2> { };
 struct position : public std::array<int64_t, 2> { };
 
+direction opposite(direction dir);
 int64_t taxicab_norm(offset u);
 direction to_direction(char c);
 position to_position(offset u);

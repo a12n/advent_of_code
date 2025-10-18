@@ -133,6 +133,8 @@ using value = int64_t;
 enum class opcode {
     add = 1,
     mul = 2,
+    input = 3,
+    output = 4,
     halt = 99,
 };
 

@@ -154,10 +154,21 @@ std::ostream& operator<<(std::ostream& out, position p)
 
 namespace intcode {
 
+std::tuple<opcode, mode, mode, mode> decode(value v)
+{
+    return {
+        opcode(v % 100),
+        mode((v / 100) % 10),
+        mode((v / 1000) % 10),
+        mode((v / 10000) % 10)
+    };
+}
+
 address run(memory& m, address ip)
 {
     while (true) {
-        switch (opcode(m[ip])) {
+        const auto [op, mode1, mode2, mode3] = decode(m[ip]);
+        switch (op) {
         case opcode::add:
             m[m[ip + 3]] = m[m[ip + 1]] + m[m[ip + 2]];
             ip += 4;

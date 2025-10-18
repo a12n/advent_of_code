@@ -6,19 +6,17 @@ using password = std::array<char, 6>;
 
 bool adjacent_digits(password p)
 {
-    for (size_t i = 1; i < p.size(); ++i) {
 #if PART == 1
+    for (size_t i = 1; i < p.size(); ++i) {
         if (p[i] == p[i - 1]) {
             return true;
         }
-#elif PART == 2
-        // TODO
-        if (p[i] == p[i - 1]) {
-            return true;
-        }
-#endif // PART
     }
     return false;
+#elif PART == 2
+    // TODO
+    return true;
+#endif // PART
 }
 
 bool never_decrease(password p)

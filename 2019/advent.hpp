@@ -128,6 +128,7 @@ struct std::hash<grid::planar::offset> {
 namespace intcode {
 
 using address = size_t;
+using value = int64_t;
 
 enum class opcode {
     add = 1,
@@ -135,7 +136,7 @@ enum class opcode {
     halt = 99,
 };
 
-using memory = std::vector<int64_t>;
+using memory = std::vector<value>;
 
 address run(memory& m, address ip);
 

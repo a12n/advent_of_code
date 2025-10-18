@@ -14,18 +14,17 @@ bool adjacent_digits(password p)
     }
     return false;
 #elif PART == 2
-    std::array<bool, 6> eq {};
+    size_t n = 1;
     for (size_t i = 1; i < p.size(); ++i) {
         if (p[i] == p[i - 1]) {
-            eq[i] = true;
-        }
-    }
-    for (size_t i = 0; i < p.size();++i) {
-        if ((i == 0 || !eq[i - 1]) && eq[i] && (i == p.size() - 1 || !eq[i + 1])) {
+            ++n;
+        } else if (n == 2) {
             return true;
+        } else {
+            n = 1;
         }
     }
-    return false;
+    return n == 2;
 #endif // PART
 }
 

@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <charconv>
 #include <cstdint>
 #include <cstdlib>
@@ -22,6 +23,8 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+
+#include <sysexits.h>
 
 //----------------------------------------------------------------------------
 // I/O Utilities

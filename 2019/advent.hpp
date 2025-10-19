@@ -137,6 +137,8 @@ enum class opcode {
     output = 4,
     jump_if_true = 5,
     jump_if_false = 6,
+    less_than = 7,
+    equals = 8,
     halt = 99,
 };
 

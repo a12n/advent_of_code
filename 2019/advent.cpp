@@ -194,7 +194,9 @@ address run(memory& m, address ip, environ& env)
         const auto [op, mode1, mode2, mode3] = decode(m[ip]);
         switch (op) {
         case opcode::add:
-        case opcode::mul: {
+        case opcode::mul:
+        case opcode::less_than:
+        case opcode::equals: {
             const auto addr1 = (mode1 == mode::immediate ? ip + 1 : mode1 == mode::position ? m[ip + 1]
                                                                                             : throw err);
             const auto addr2 = (mode2 == mode::immediate ? ip + 2 : mode2 == mode::position ? m[ip + 2]
@@ -202,8 +204,12 @@ address run(memory& m, address ip, environ& env)
             const auto addr3 = (mode3 == mode::position ? m[ip + 3] : throw err);
             if (op == opcode::add) {
                 m[addr3] = m[addr1] + m[addr2];
-            } else {
+            } else if (op == opcode::mul) {
                 m[addr3] = m[addr1] * m[addr2];
+            } else if (op == opcode::less_than) {
+                m[addr3] = (m[addr1] < m[addr2]);
+            } else if (op == opcode::equals) {
+                m[addr3] = (m[addr1] == m[addr2]);
             }
             ip += 4;
         } break;

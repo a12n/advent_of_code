@@ -39,7 +39,7 @@ for IN_FILE in $PROG_ID/*.in; do
         HEADER="==== $TEST_ID "
         if [ -r $ENV_FILE ]; then
             HEADER="$HEADER @ $ENV_FILE "
-            export $(xargs < $ENV_FILE)
+            export $(xargs < $ENV_FILE) > /dev/null
         fi
         HEADER="$HEADER ===="
 

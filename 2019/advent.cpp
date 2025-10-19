@@ -246,7 +246,7 @@ address run(memory& img, address ip, environ& env)
         case opcode::jump_if_false: {
             const auto addr1 = (mode1 == mode::immediate ? ip + 1 : mode1 == mode::position ? img[ip + 1]
                                                                                             : throw err);
-            const auto addr2 = (mode1 == mode::immediate ? ip + 2 : mode2 == mode::position ? img[ip + 2]
+            const auto addr2 = (mode2 == mode::immediate ? ip + 2 : mode2 == mode::position ? img[ip + 2]
                                                                                             : throw err);
             if ((op == opcode::jump_if_true && img[addr1] != 0) || (op == opcode::jump_if_false && img[addr1] == 0)) {
                 ip = img[addr2];

@@ -145,7 +145,16 @@ enum class mode {
 
 using memory = std::vector<value>;
 
-address run(memory& m, address ip);
+namespace env {
+
+value input();
+void output(value v);
+
+} // namespace env
+
+address run(memory& m, address ip,
+    value (*input)() = env::input,
+    void (*output)(value) = env::output);
 
 std::istream& operator>>(std::istream& in, memory& m);
 

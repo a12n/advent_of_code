@@ -164,7 +164,27 @@ std::tuple<opcode, mode, mode, mode> decode(value v)
     };
 }
 
-address run(memory& m, address ip)
+namespace env {
+
+value input()
+{
+    std::string s;
+    std::cerr << '>' << '\n';
+    if (!std::getline(std::cin, s)) {
+        throw std::runtime_error(__func__);
+    }
+    return std::stoll(s);
+}
+
+void output(value v)
+{
+    std::cerr << '<';
+    std::cout << v << '\n';
+}
+
+} // namespace env
+
+address run(memory& m, address ip, value (*input)(), void (*output)(value))
 {
     const auto err = std::invalid_argument(__func__);
 
@@ -184,6 +204,20 @@ address run(memory& m, address ip)
                 m[addr3] = m[addr1] * m[addr2];
             }
             ip += 4;
+        } break;
+
+        case opcode::input: {
+            const auto addr1 = (mode1 == mode::position ? m[ip + 1] : throw err);
+            m[addr1] = input();
+            ip += 2;
+        } break;
+
+        case opcode::output: {
+            const auto addr1 = (mode1 == mode::immediate ? ip + 1 : mode1 == mode::position ? m[ip + 1]
+                                                                                            : throw err);
+            output(m[addr1]);
+            ip += 2;
+        } break;
 
         case opcode::halt:
             return ip;

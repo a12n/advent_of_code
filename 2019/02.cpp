@@ -29,7 +29,7 @@ int main()
     intcode::memory img;
 
     if (!(std::cin >> img)) {
-        return 1;
+        return EX_DATAERR;
     }
 
 #if PART == 1
@@ -40,7 +40,7 @@ int main()
 #elif PART == 2
     const auto params = gravity_assist(img, 19690720);
     if (!params) {
-        return 1;
+        return EX_UNAVAILABLE;
     }
     std::cerr << params->first << ' ' << params->second << '\n';
     std::cout << 100 * params->first + params->second << '\n';

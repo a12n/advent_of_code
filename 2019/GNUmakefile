@@ -1,4 +1,4 @@
-CXXFLAGS=	-O2 -Wall -Wextra -Wno-unused-function -Wpedantic -g -std=c++17
+CXXFLAGS=	-O0 -Wall -Wextra -Wno-unused-function -Wpedantic -g -std=c++17
 
 .PHONY: all clean
 

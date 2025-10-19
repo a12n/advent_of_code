@@ -221,6 +221,19 @@ address run(memory& m, address ip, environ& env)
             ip += 2;
         } break;
 
+        case opcode::jump_if_true:
+        case opcode::jump_if_false: {
+            const auto addr1 = (mode1 == mode::immediate ? ip + 1 : mode1 == mode::position ? m[ip + 1]
+                                                                                            : throw err);
+            const auto addr2 = (mode1 == mode::immediate ? ip + 2 : mode2 == mode::position ? m[ip + 2]
+                                                                                            : throw err);
+            if ((op == opcode::jump_if_true && m[addr1] != 0) || (op == opcode::jump_if_false && m[addr1] == 0)) {
+                ip = m[addr2];
+            } else {
+                ip += 3;
+            }
+        } break;
+
         case opcode::halt:
             return ip;
 

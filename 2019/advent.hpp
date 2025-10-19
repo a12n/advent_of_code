@@ -135,6 +135,8 @@ enum class opcode {
     mul = 2,
     input = 3,
     output = 4,
+    jump_if_true = 5,
+    jump_if_false = 6,
     halt = 99,
 };
 

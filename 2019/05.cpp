@@ -4,15 +4,12 @@ using intcode::operator>>;
 
 int main()
 {
-    intcode::memory p;
+    intcode::memory img;
 
-    if (!(std::cin >> p)) {
+    if (!(std::cin >> img)) {
         return 1;
     }
-
-#if PART == 1
-    intcode::run(p, 0);
-#endif // PART
+    intcode::run(img, 0);
 
     return 0;
 }

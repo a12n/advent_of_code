@@ -7,6 +7,7 @@
 #include <charconv>
 #include <cstdint>
 #include <cstdlib>
+#include <forward_list>
 #include <functional>
 #include <iomanip>
 #include <iostream>
@@ -152,6 +153,14 @@ using memory = std::vector<value>;
 struct environ {
     virtual value input();
     virtual void output(value v);
+};
+
+struct test_environ : environ {
+    value input() override;
+    void output(value v) override;
+
+    std::forward_list<value> fake_in;
+    std::forward_list<value> expected_out;
 };
 
 address run(memory& m, address ip);

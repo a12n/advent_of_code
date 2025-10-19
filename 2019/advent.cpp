@@ -180,6 +180,20 @@ void environ::output(value v)
     std::cout << v << '\n';
 }
 
+value test_environ::input()
+{
+    assert(!fake_in.empty());
+    value v = fake_in.front();
+    fake_in.pop_front();
+    return v;
+}
+
+void test_environ::output(value v)
+{
+    assert(v == expected_out.front());
+    expected_out.pop_front();
+}
+
 address run(memory& m, address ip)
 {
     environ empty;

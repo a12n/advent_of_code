@@ -5,15 +5,15 @@ using intcode::operator>>;
 #if PART == 2
 namespace {
 
-std::optional<std::pair<int, int>> gravity_assist(const intcode::memory& p, int k)
+std::optional<std::pair<int, int>> gravity_assist(const intcode::memory& prog, int k)
 {
     for (int noun = 0; noun < 100; ++noun) {
         for (int verb = 0; verb < 100; ++verb) {
-            intcode::memory t = p;
-            t[1] = noun;
-            t[2] = verb;
-            intcode::run(t, 0);
-            if (t[0] == k) {
+            intcode::memory img = prog;
+            img[1] = noun;
+            img[2] = verb;
+            intcode::run(img, 0);
+            if (img[0] == k) {
                 return { { noun, verb } };
             }
         }
@@ -26,19 +26,19 @@ std::optional<std::pair<int, int>> gravity_assist(const intcode::memory& p, int 
 
 int main()
 {
-    intcode::memory p;
+    intcode::memory img;
 
-    if (!(std::cin >> p)) {
+    if (!(std::cin >> img)) {
         return 1;
     }
 
 #if PART == 1
-    p[1] = 12;
-    p[2] = 2;
-    intcode::run(p, 0);
-    std::cout << p[0] << '\n';
+    img[1] = 12;
+    img[2] = 2;
+    intcode::run(img, 0);
+    std::cout << img[0] << '\n';
 #elif PART == 2
-    const auto params = gravity_assist(p, 19690720);
+    const auto params = gravity_assist(img, 19690720);
     if (!params) {
         return 1;
     }

@@ -34,9 +34,15 @@ for IN_FILE in $PROG_ID/*.in; do
         continue
     fi
 
+    INJ_FILE=$TEST_ID.inj
     ENV_FILE=$TEST_ID.env
     (
         HEADER="==== $TEST_ID "
+        if [ -r $INJ_FILE ]; then
+            HEADER="$HEADER < $INJ_FILE "
+        else
+            INJ_FILE=/dev/null
+        fi
         if [ -r $ENV_FILE ]; then
             HEADER="$HEADER @ $ENV_FILE "
             export $(xargs < $ENV_FILE) > /dev/null
@@ -44,7 +50,7 @@ for IN_FILE in $PROG_ID/*.in; do
         HEADER="$HEADER ===="
 
         echo $HEADER
-        PROG_OUT=$(cat $IN_FILE | $PROG 2> /dev/null | $OUT_CMD)
+        PROG_OUT=$(cat $IN_FILE $INJ_FILE | $PROG 2> /dev/null | $OUT_CMD)
         EXPECT_OUT=$($OUT_CMD $OUT_FILE)
         if [ "$PROG_OUT" != "$EXPECT_OUT" ]; then
             echo ---- Program Output ----

@@ -194,61 +194,61 @@ void test_environ::output(value v)
     expected_out.pop_front();
 }
 
-address run(memory& m, address ip)
+address run(memory& img, address ip)
 {
     environ empty;
-    return run(m, ip, empty);
+    return run(img, ip, empty);
 }
 
-address run(memory& m, address ip, environ& env)
+address run(memory& img, address ip, environ& env)
 {
     const auto err = std::invalid_argument(__func__);
 
     while (true) {
-        const auto [op, mode1, mode2, mode3] = decode(m[ip]);
+        const auto [op, mode1, mode2, mode3] = decode(img[ip]);
         switch (op) {
         case opcode::add:
         case opcode::mul:
         case opcode::less_than:
         case opcode::equals: {
-            const auto addr1 = (mode1 == mode::immediate ? ip + 1 : mode1 == mode::position ? m[ip + 1]
+            const auto addr1 = (mode1 == mode::immediate ? ip + 1 : mode1 == mode::position ? img[ip + 1]
                                                                                             : throw err);
-            const auto addr2 = (mode2 == mode::immediate ? ip + 2 : mode2 == mode::position ? m[ip + 2]
+            const auto addr2 = (mode2 == mode::immediate ? ip + 2 : mode2 == mode::position ? img[ip + 2]
                                                                                             : throw err);
-            const auto addr3 = (mode3 == mode::position ? m[ip + 3] : throw err);
+            const auto addr3 = (mode3 == mode::position ? img[ip + 3] : throw err);
             if (op == opcode::add) {
-                m[addr3] = m[addr1] + m[addr2];
+                img[addr3] = img[addr1] + img[addr2];
             } else if (op == opcode::mul) {
-                m[addr3] = m[addr1] * m[addr2];
+                img[addr3] = img[addr1] * img[addr2];
             } else if (op == opcode::less_than) {
-                m[addr3] = (m[addr1] < m[addr2]);
+                img[addr3] = (img[addr1] < img[addr2]);
             } else if (op == opcode::equals) {
-                m[addr3] = (m[addr1] == m[addr2]);
+                img[addr3] = (img[addr1] == img[addr2]);
             }
             ip += 4;
         } break;
 
         case opcode::input: {
-            const auto addr1 = (mode1 == mode::position ? m[ip + 1] : throw err);
-            m[addr1] = env.input();
+            const auto addr1 = (mode1 == mode::position ? img[ip + 1] : throw err);
+            img[addr1] = env.input();
             ip += 2;
         } break;
 
         case opcode::output: {
-            const auto addr1 = (mode1 == mode::immediate ? ip + 1 : mode1 == mode::position ? m[ip + 1]
+            const auto addr1 = (mode1 == mode::immediate ? ip + 1 : mode1 == mode::position ? img[ip + 1]
                                                                                             : throw err);
-            env.output(m[addr1]);
+            env.output(img[addr1]);
             ip += 2;
         } break;
 
         case opcode::jump_if_true:
         case opcode::jump_if_false: {
-            const auto addr1 = (mode1 == mode::immediate ? ip + 1 : mode1 == mode::position ? m[ip + 1]
+            const auto addr1 = (mode1 == mode::immediate ? ip + 1 : mode1 == mode::position ? img[ip + 1]
                                                                                             : throw err);
-            const auto addr2 = (mode1 == mode::immediate ? ip + 2 : mode2 == mode::position ? m[ip + 2]
+            const auto addr2 = (mode1 == mode::immediate ? ip + 2 : mode2 == mode::position ? img[ip + 2]
                                                                                             : throw err);
-            if ((op == opcode::jump_if_true && m[addr1] != 0) || (op == opcode::jump_if_false && m[addr1] == 0)) {
-                ip = m[addr2];
+            if ((op == opcode::jump_if_true && img[addr1] != 0) || (op == opcode::jump_if_false && img[addr1] == 0)) {
+                ip = img[addr2];
             } else {
                 ip += 3;
             }
@@ -263,9 +263,9 @@ address run(memory& m, address ip, environ& env)
     }
 }
 
-std::istream& operator>>(std::istream& in, memory& m)
+std::istream& operator>>(std::istream& in, memory& img)
 {
-    return ::operator>><int64_t, ','>(in, m);
+    return ::operator>><int64_t, ','>(in, img);
 }
 
 } // namespace intcode

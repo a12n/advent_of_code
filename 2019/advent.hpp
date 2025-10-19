@@ -163,10 +163,10 @@ struct test_environ : environ {
     std::forward_list<value> expected_out;
 };
 
-address run(memory& m, address ip);
-address run(memory& m, address ip, environ& env);
+address run(memory& img , address ip);
+address run(memory& img, address ip, environ& env);
 
-std::istream& operator>>(std::istream& in, memory& m);
+std::istream& operator>>(std::istream& in, memory& img);
 
 } // namespace intcode
 

@@ -166,21 +166,30 @@ std::tuple<opcode, mode, mode, mode> decode(value v)
 
 address run(memory& m, address ip)
 {
+    const auto err = std::invalid_argument(__func__);
+
     while (true) {
         const auto [op, mode1, mode2, mode3] = decode(m[ip]);
         switch (op) {
         case opcode::add:
-            m[m[ip + 3]] = m[m[ip + 1]] + m[m[ip + 2]];
+        case opcode::mul: {
+            const auto addr1 = (mode1 == mode::immediate ? ip + 1 : mode1 == mode::position ? m[ip + 1]
+                                                                                            : throw err);
+            const auto addr2 = (mode2 == mode::immediate ? ip + 2 : mode2 == mode::position ? m[ip + 2]
+                                                                                            : throw err);
+            const auto addr3 = (mode3 == mode::position ? m[ip + 3] : throw err);
+            if (op == opcode::add) {
+                m[addr3] = m[addr1] + m[addr2];
+            } else {
+                m[addr3] = m[addr1] * m[addr2];
+            }
             ip += 4;
-            break;
-        case opcode::mul:
-            m[m[ip + 3]] = m[m[ip + 1]] * m[m[ip + 2]];
-            ip += 4;
-            break;
+
         case opcode::halt:
             return ip;
+
         default:
-            throw std::invalid_argument(__func__);
+            throw err;
         }
     }
 }

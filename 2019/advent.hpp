@@ -168,6 +168,11 @@ address run(memory& img, address ip, environ& env);
 
 std::istream& operator>>(std::istream& in, memory& img);
 
+void test(
+    const memory& prog,
+    address start, address stop,
+    const std::forward_list<value>& in, const std::forward_list<value>& out);
+
 } // namespace intcode
 
 #endif // ADVENT_HPP

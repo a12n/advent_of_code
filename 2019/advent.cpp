@@ -205,7 +205,8 @@ address run(memory& img, address ip, environ& env)
     const auto err = std::invalid_argument(__func__);
 
     while (true) {
-        const auto [op, mode1, mode2, mode3] = decode(img[ip]);
+        const auto instr = img[ip];
+        const auto [op, mode1, mode2, mode3] = decode(instr);
         switch (op) {
         case opcode::add:
         case opcode::mul:

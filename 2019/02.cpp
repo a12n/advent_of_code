@@ -48,3 +48,13 @@ int main()
 
     return 0;
 }
+
+__attribute__((constructor)) void test()
+{
+#if PART == 1
+    intcode::memory img { 1, 9, 10, 3, 2, 3, 11, 0, 99, 30, 40, 50 };
+    intcode::test_environ env;
+    assert(intcode::run(img, 0, env) == 8);
+    assert(img[0] == 3500);
+#endif // PART
+}

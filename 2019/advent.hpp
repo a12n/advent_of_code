@@ -171,7 +171,11 @@ struct pipe_environ : environ {
     std::deque<value> buf;
 };
 
-address run(memory& img , address ip);
+// Run interrupted until I/O or halt.
+std::tuple<opcode, address, address> run_intrpt(memory& img, address ip);
+
+// Run uninterrupted until halt, use environment for I/O.
+address run(memory& img, address ip);
 address run(memory& img, address ip, environ& env);
 
 std::istream& operator>>(std::istream& in, memory& img);

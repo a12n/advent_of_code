@@ -206,7 +206,7 @@ void pipe_environ::output(value v)
     buf.push_back(v);
 }
 
-address run(memory& img, address ip, environ& env)
+std::tuple<opcode, address, address> run_intrpt(memory& img, address ip)
 {
     const auto err = std::invalid_argument(__func__);
 
@@ -237,16 +237,16 @@ address run(memory& img, address ip, environ& env)
 
         case opcode::input: {
             const auto addr1 = (mode1 == mode::position ? img[ip + 1] : throw err);
-            img[addr1] = env.input();
             ip += 2;
-        } break;
+            return { op, ip, addr1 };
+        }
 
         case opcode::output: {
             const auto addr1 = (mode1 == mode::immediate ? ip + 1 : mode1 == mode::position ? img[ip + 1]
                                                                                             : throw err);
-            env.output(img[addr1]);
             ip += 2;
-        } break;
+            return { op, ip, addr1 };
+        }
 
         case opcode::jump_if_true:
         case opcode::jump_if_false: {
@@ -262,10 +262,31 @@ address run(memory& img, address ip, environ& env)
         } break;
 
         case opcode::halt:
-            return ip;
+            return { op, ip, 0 };
 
         default:
             throw err;
+        }
+    }
+}
+
+address run(memory& img, address ip, environ& env)
+{
+    while (true) {
+        const auto [op, ip2, addr] = run_intrpt(img, ip);
+        switch (op) {
+        case opcode::input:
+            img[addr] = env.input();
+            ip = ip2;
+            break;
+        case opcode::output:
+            env.output(img[addr]);
+            ip = ip2;
+            break;
+        case opcode::halt:
+            return ip2;
+        default:
+            throw std::invalid_argument(__func__);
         }
     }
 }

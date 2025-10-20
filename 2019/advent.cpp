@@ -206,6 +206,13 @@ void pipe_environ::output(value v)
     buf.push_back(v);
 }
 
+void expand(memory& img, address addr)
+{
+    if (addr >= img.size()) {
+        img.resize(addr + 1, 0);
+    }
+}
+
 std::tuple<opcode, address, address> run_intrpt(memory& img, address ip)
 {
     const auto err = std::invalid_argument(__func__);
@@ -223,6 +230,7 @@ std::tuple<opcode, address, address> run_intrpt(memory& img, address ip)
             const auto addr2 = (mode2 == mode::immediate ? ip + 2 : mode2 == mode::position ? img[ip + 2]
                                                                                             : throw err);
             const auto addr3 = (mode3 == mode::position ? img[ip + 3] : throw err);
+            expand(img, std::max({ addr1, addr2, addr3 }));
             if (op == opcode::add) {
                 img[addr3] = img[addr1] + img[addr2];
             } else if (op == opcode::mul) {
@@ -237,6 +245,7 @@ std::tuple<opcode, address, address> run_intrpt(memory& img, address ip)
 
         case opcode::input: {
             const auto addr1 = (mode1 == mode::position ? img[ip + 1] : throw err);
+            expand(img, addr1);
             ip += 2;
             return { op, ip, addr1 };
         }
@@ -244,6 +253,7 @@ std::tuple<opcode, address, address> run_intrpt(memory& img, address ip)
         case opcode::output: {
             const auto addr1 = (mode1 == mode::immediate ? ip + 1 : mode1 == mode::position ? img[ip + 1]
                                                                                             : throw err);
+            expand(img, addr1);
             ip += 2;
             return { op, ip, addr1 };
         }
@@ -254,6 +264,7 @@ std::tuple<opcode, address, address> run_intrpt(memory& img, address ip)
                                                                                             : throw err);
             const auto addr2 = (mode2 == mode::immediate ? ip + 2 : mode2 == mode::position ? img[ip + 2]
                                                                                             : throw err);
+            expand(img, std::max(addr1, addr2));
             if ((op == opcode::jump_if_true && img[addr1] != 0) || (op == opcode::jump_if_false && img[addr1] == 0)) {
                 ip = img[addr2];
             } else {

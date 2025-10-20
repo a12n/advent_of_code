@@ -76,21 +76,23 @@ int main()
 
     intcode::value max_signal = 0;
 
+    constexpr const int min_phase = 0, max_phase = 4;
+
     // FIXME
-    for (int a = 0; a < 5; ++a) {
-        for (int b = 0; b < 5; ++b) {
+    for (int a = min_phase; a <= max_phase; ++a) {
+        for (int b = min_phase; b <= max_phase; ++b) {
             if (b == a) {
                 continue;
             }
-            for (int c = 0; c < 5; ++c) {
+            for (int c = min_phase; c <= max_phase; ++c) {
                 if (c == a || c == b) {
                     continue;
                 }
-                for (int d = 0; d < 5; ++d) {
+                for (int d = min_phase; d <= max_phase; ++d) {
                     if (d == a || d == b || d == c) {
                         continue;
                     }
-                    for (int e = 0; e < 5; ++e) {
+                    for (int e = min_phase; e <= max_phase; ++e) {
                         if (e == a || e == b || e == c || e == d) {
                             continue;
                         }

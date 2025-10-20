@@ -76,7 +76,11 @@ int main()
 
     intcode::value max_signal = 0;
 
+#if PART == 1
     constexpr const int min_phase = 0, max_phase = 4;
+#elif PART == 2
+    constexpr const int min_phase = 5, max_phase = 9;
+#endif // PART
 
     // FIXME
     for (int a = min_phase; a <= max_phase; ++a) {

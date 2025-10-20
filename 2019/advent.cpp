@@ -235,7 +235,7 @@ void expand(memory& img, address addr)
     }
 }
 
-std::tuple<opcode, address, address> run_intrpt(memory& img, address ip)
+std::tuple<opcode, address, address> run_intrpt(state& st, memory& img, address ip)
 {
     const auto err = std::invalid_argument(__func__);
 
@@ -298,10 +298,17 @@ std::tuple<opcode, address, address> run_intrpt(memory& img, address ip)
     }
 }
 
+std::tuple<opcode, address, address> run_intrpt(memory& img, address ip)
+{
+    state st;
+    return run_intrpt(st, img, ip);
+}
+
 address run(memory& img, address ip, environ& env)
 {
+    state st;
     while (true) {
-        const auto [op, ip2, addr] = run_intrpt(img, ip);
+        const auto [op, ip2, addr] = run_intrpt(st, img, ip);
         switch (op) {
         case opcode::input:
             img[addr] = env.input();

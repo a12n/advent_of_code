@@ -150,6 +150,10 @@ enum class mode {
     immediate = 1,
 };
 
+struct state {
+    value rel_base {};
+};
+
 using memory = std::vector<value>;
 
 struct environ {
@@ -173,6 +177,10 @@ struct pipe_environ : environ {
 };
 
 // Run interrupted until I/O or halt.
+std::tuple<opcode, address, address> run_intrpt(state& st, memory& img, address ip);
+
+// Like run_intrpt above, but doesn't preserve state (e.g., relative
+// base) between runs.
 std::tuple<opcode, address, address> run_intrpt(memory& img, address ip);
 
 // Run uninterrupted until halt, use environment for I/O.

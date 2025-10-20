@@ -2,8 +2,11 @@
 
 namespace {
 
+// The number of amplifiers.
+constexpr const size_t n = 5;
+
 intcode::value amplifier_controller(
-    const intcode::memory& prog, const std::array<intcode::value, 5>& phase)
+    const intcode::memory& prog, std::array<intcode::value, n> phase)
 {
     intcode::pipe_environ env;
     intcode::value signal = 0;

@@ -149,6 +149,7 @@ enum class opcode {
 enum class mode {
     position = 0,
     immediate = 1,
+    relative = 2,
 };
 
 struct state {

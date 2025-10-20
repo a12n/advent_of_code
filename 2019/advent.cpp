@@ -206,12 +206,6 @@ void pipe_environ::output(value v)
     buf.push_back(v);
 }
 
-address run(memory& img, address ip)
-{
-    environ empty;
-    return run(img, ip, empty);
-}
-
 address run(memory& img, address ip, environ& env)
 {
     const auto err = std::invalid_argument(__func__);
@@ -274,6 +268,12 @@ address run(memory& img, address ip, environ& env)
             throw err;
         }
     }
+}
+
+address run(memory& img, address ip)
+{
+    environ empty;
+    return run(img, ip, empty);
 }
 
 std::istream& operator>>(std::istream& in, memory& img)

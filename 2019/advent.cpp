@@ -69,6 +69,11 @@ offset to_offset(position p)
     return { p[0], p[1] };
 }
 
+offset normalize(offset u)
+{
+    return u /= std::gcd(u[0], u[1]);
+}
+
 offset& operator*=(offset& u, int64_t n)
 {
     u[0] *= n;
@@ -79,6 +84,18 @@ offset& operator*=(offset& u, int64_t n)
 offset operator*(int64_t n, offset u)
 {
     return u *= n;
+}
+
+offset& operator/=(offset& u, int64_t n)
+{
+    u[0] /= n;
+    u[1] /= n;
+    return u;
+}
+
+offset operator/(offset u, int64_t n)
+{
+    return u /= n;
 }
 
 position& operator+=(position& p, offset u)

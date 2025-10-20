@@ -15,6 +15,7 @@
 #include <iostream>
 #include <istream>
 #include <map>
+#include <numeric>
 #include <optional>
 #include <ostream>
 #include <set>
@@ -90,9 +91,12 @@ direction to_direction(char c);
 position to_position(offset u);
 offset to_offset(direction dir);
 offset to_offset(position p);
+offset normalize(offset u);
 
 offset& operator*=(offset& u, int64_t n);
 offset operator*(int64_t n, offset u);
+offset& operator/=(offset& u, int64_t n);
+offset operator/(offset u, int64_t n);
 position& operator+=(position& p, offset u);
 position operator+(position p, offset u);
 offset& operator+=(offset& u, offset v);

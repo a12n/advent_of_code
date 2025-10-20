@@ -321,8 +321,8 @@ address run(memory& img, address ip, environ& env)
 
 address run(memory& img, address ip)
 {
-    environ empty;
-    return run(img, ip, empty);
+    environ def;
+    return run(img, ip, def);
 }
 
 std::istream& operator>>(std::istream& in, memory& img)

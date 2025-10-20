@@ -14,7 +14,7 @@ int main()
     return 0;
 }
 
-__attribute__((constructor)) void test()
+int test()
 {
 #if PART == 2
     {
@@ -53,4 +53,5 @@ __attribute__((constructor)) void test()
         intcode::test(prog, 0, 46, { 88 }, { 1001 }); // 88 > 8
     };
 #endif // PART
+    return 0;
 }

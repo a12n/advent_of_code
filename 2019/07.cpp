@@ -112,7 +112,7 @@ int main()
     return 0;
 }
 
-__attribute__((constructor)) void test()
+int test()
 {
 #if PART == 1
     assert(amplifier_controller(
@@ -142,4 +142,5 @@ __attribute__((constructor)) void test()
                { 9, 7, 8, 5, 6 })
         == 18216);
 #endif // PART
+    return 0;
 }

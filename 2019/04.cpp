@@ -103,7 +103,7 @@ int main()
     return 0;
 }
 
-__attribute__((constructor)) void test()
+int test()
 {
 #if PART == 1
     assert(valid(password { '1', '1', '1', '1', '1', '1' }));
@@ -114,4 +114,5 @@ __attribute__((constructor)) void test()
     assert(!adjacent_digits(password { '1', '2', '3', '4', '4', '4' }));
     assert(valid(password { '1', '1', '1', '1', '2', '2' }));
 #endif // PART
+    return 0;
 }

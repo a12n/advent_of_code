@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <deque>
 #include <forward_list>
+#include <fstream>
 #include <functional>
 #include <iomanip>
 #include <iostream>
@@ -175,8 +176,8 @@ struct pipe_environ : environ {
 std::tuple<opcode, address, address> run_intrpt(memory& img, address ip);
 
 // Run uninterrupted until halt, use environment for I/O.
-address run(memory& img, address ip);
 address run(memory& img, address ip, environ& env);
+address run(memory& img, address ip = 0);
 
 std::istream& operator>>(std::istream& in, memory& img);
 
@@ -184,6 +185,10 @@ void test(
     const memory& prog,
     address start, address stop,
     const std::forward_list<value>& in, const std::forward_list<value>& out);
+
+// Run interpreter with program from command line parameter or from
+// stdin, and I/O attached to stdin and stdout.
+int main(int argc, char *argv[]);
 
 } // namespace intcode
 

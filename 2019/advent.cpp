@@ -316,4 +316,24 @@ void test(
     assert(env.expected_out.empty());
 }
 
+int main(int argc, char* argv[])
+{
+    memory img;
+
+    if (argc > 1) {
+        std::ifstream f(argv[1]);
+        if (!(f >> img)) {
+            return EX_DATAERR;
+        }
+    } else {
+        if (!(std::cin >> img)) {
+            return EX_DATAERR;
+        }
+    }
+
+    run(img);
+
+    return 0;
+}
+
 } // namespace intcode

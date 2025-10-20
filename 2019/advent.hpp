@@ -7,6 +7,7 @@
 #include <charconv>
 #include <cstdint>
 #include <cstdlib>
+#include <deque>
 #include <forward_list>
 #include <functional>
 #include <iomanip>
@@ -161,6 +162,13 @@ struct test_environ : environ {
 
     std::forward_list<value> fake_in;
     std::forward_list<value> expected_out;
+};
+
+struct pipe_environ : environ {
+    value input() override;
+    void output(value v) override;
+
+    std::deque<value> buf;
 };
 
 address run(memory& img , address ip);

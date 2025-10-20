@@ -142,6 +142,7 @@ enum class opcode {
     jump_if_false = 6,
     less_than = 7,
     equals = 8,
+    adjust_rel_base = 9,
     halt = 99,
 };
 

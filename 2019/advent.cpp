@@ -289,6 +289,13 @@ std::tuple<opcode, address, address> run_intrpt(state& st, memory& img, address 
             }
         } break;
 
+        case opcode::adjust_rel_base: {
+            const auto addr1 = src_param_addr(img, mode1, ip + 1);
+            expand(img, addr1);
+            st.rel_base += img[addr1];
+            ip += 2;
+        } break;
+
         case opcode::halt:
             return { op, ip, 0 };
 

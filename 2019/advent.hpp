@@ -82,6 +82,11 @@ enum class direction {
     down,
 };
 
+enum class rotation {
+    cw,
+    ccw,
+};
+
 struct offset : public std::array<int64_t, 2> { };
 struct position : public std::array<int64_t, 2> { };
 
@@ -92,6 +97,7 @@ position to_position(offset u);
 offset to_offset(direction dir);
 offset to_offset(position p);
 offset normalize(offset u);
+direction rotate(rotation rdir, direction dir);
 
 offset& operator*=(offset& u, int64_t n);
 offset operator*(int64_t n, offset u);

@@ -74,6 +74,37 @@ offset normalize(offset u)
     return u /= std::gcd(u[0], u[1]);
 }
 
+direction rotate(rotation rdir, direction dir)
+{
+    switch (rdir) {
+    case rotation::cw:
+        switch (dir) {
+        case direction::up:
+            return direction::right;
+        case direction::left:
+            return direction::up;
+        case direction::right:
+            return direction::down;
+        case direction::down:
+            return direction::left;
+        };
+        break;
+    case rotation::ccw:
+        switch (dir) {
+        case direction::up:
+            return direction::left;
+        case direction::left:
+            return direction::down;
+        case direction::right:
+            return direction::up;
+        case direction::down:
+            return direction::right;
+        };
+        break;
+    }
+    throw std::invalid_argument(__func__);
+}
+
 offset& operator*=(offset& u, int64_t n)
 {
     u[0] *= n;

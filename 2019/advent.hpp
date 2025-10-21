@@ -175,13 +175,6 @@ struct test_environ : environ {
     std::forward_list<value> expected_out;
 };
 
-struct pipe_environ : environ {
-    value input() override;
-    void output(value v) override;
-
-    std::deque<value> buf;
-};
-
 // Run interrupted until I/O or halt.
 std::tuple<opcode, address, address> run_intrpt(state& st, memory& img, address ip);
 

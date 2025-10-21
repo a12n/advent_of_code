@@ -211,18 +211,6 @@ void test_environ::output(value v)
     expected_out.pop_front();
 }
 
-value pipe_environ::input()
-{
-    const auto v = buf.front();
-    buf.pop_front();
-    return v;
-}
-
-void pipe_environ::output(value v)
-{
-    buf.push_back(v);
-}
-
 address src_param_addr(const state& st, const memory& img, mode m, value v)
 {
     switch (m) {

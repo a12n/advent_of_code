@@ -25,7 +25,7 @@ std::ostream& operator<<(std::ostream& out, tile t)
     case tile::block:
         return out << 'H';
     case tile::paddle:
-        return out << '|';
+        return out << '-';
     case tile::ball:
         return out << '.';
     }

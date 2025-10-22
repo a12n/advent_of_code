@@ -1,3 +1,12 @@
+#include <algorithm>
+#include <iostream>
+#include <tuple>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+
+#include <sysexits.h>
+
 #include "advent.hpp"
 
 namespace {

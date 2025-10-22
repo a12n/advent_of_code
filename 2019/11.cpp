@@ -1,3 +1,8 @@
+#include <iostream>
+#include <map>
+
+#include <sysexits.h>
+
 #include "advent.hpp"
 
 namespace {

@@ -1,3 +1,12 @@
+#include <algorithm>
+#include <array>
+#include <iostream>
+#include <numeric>
+#include <optional>
+#include <sstream>
+
+#include <sysexits.h>
+
 #include "advent.hpp"
 
 namespace {

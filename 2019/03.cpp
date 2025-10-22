@@ -1,3 +1,10 @@
+#include <algorithm>
+#include <cstdint>
+#include <iostream>
+#include <map>
+#include <optional>
+#include <sstream>
+
 #include "advent.hpp"
 
 using namespace grid::planar;

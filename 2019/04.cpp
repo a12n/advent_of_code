@@ -1,4 +1,8 @@
-#include "advent.hpp"
+#include <array>
+#include <cassert>
+#include <iostream>
+
+#include <sysexits.h>
 
 namespace {
 

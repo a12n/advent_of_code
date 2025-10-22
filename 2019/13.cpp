@@ -68,7 +68,7 @@ void arcade_cabinet(const intcode::memory& prog)
             }
         } break;
         case intcode::opcode::halt:
-            return canv;
+            return;
         default:
             throw std::runtime_error(__func__);
         }
@@ -89,7 +89,7 @@ int main()
         return EX_DATAERR;
     }
 
-    void arcade_cabinet(img);
+    arcade_cabinet(img);
 
     return 0;
 }

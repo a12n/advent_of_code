@@ -1,4 +1,56 @@
-#include "advent.hpp"
+#include <algorithm>
+#include <cassert>
+#include <fstream>
+#include <iostream>
+#include <stdexcept>
+
+#include <sysexits.h>
+
+#include "intcode.hpp"
+
+namespace {
+
+//----------------------------------------------------------------------------
+// I/O Utilities
+
+template <typename item_type, char sep = ','>
+std::istream& operator>>(std::istream& in, std::vector<item_type>& items)
+{
+    items.clear();
+
+    item_type v;
+
+    if (!(in >> v)) {
+        return in;
+    }
+    items.push_back(std::move(v));
+
+    while (true) {
+        char c;
+
+        if (!(in >> c)) {
+            if (in.eof()) {
+                in.clear(in.rdstate() & ~std::ios::failbit);
+            }
+            break;
+        }
+
+        if (c != sep) {
+            in.unget();
+            break;
+        }
+
+        if (!(in >> v)) {
+            in.setstate(std::ios::failbit);
+            break;
+        }
+        items.push_back(std::move(v));
+    }
+
+    return in;
+}
+
+} // namespace
 
 namespace intcode {
 

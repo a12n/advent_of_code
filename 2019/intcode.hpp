@@ -1,74 +1,11 @@
-#ifndef ADVENT_HPP
-#define ADVENT_HPP
+#ifndef INTCODE_HPP
+#define INTCODE_HPP
 
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <charconv>
 #include <cstdint>
-#include <cstdlib>
-#include <deque>
 #include <forward_list>
-#include <fstream>
-#include <functional>
-#include <iomanip>
-#include <iostream>
 #include <istream>
-#include <map>
-#include <numeric>
-#include <optional>
-#include <ostream>
-#include <set>
-#include <sstream>
-#include <stdexcept>
-#include <string>
-#include <string_view>
-#include <unordered_map>
-#include <unordered_set>
-#include <utility>
+#include <tuple>
 #include <vector>
-
-#include <sysexits.h>
-
-//----------------------------------------------------------------------------
-// I/O Utilities
-
-template <typename item_type, char sep = ','>
-std::istream& operator>>(std::istream& in, std::vector<item_type>& items)
-{
-    items.clear();
-
-    item_type v;
-
-    if (!(in >> v)) {
-        return in;
-    }
-    items.push_back(std::move(v));
-
-    while (true) {
-        char c;
-
-        if (!(in >> c)) {
-            if (in.eof()) {
-                in.clear(in.rdstate() & ~std::ios::failbit);
-            }
-            break;
-        }
-
-        if (c != sep) {
-            in.unget();
-            break;
-        }
-
-        if (!(in >> v)) {
-            in.setstate(std::ios::failbit);
-            break;
-        }
-        items.push_back(std::move(v));
-    }
-
-    return in;
-}
 
 //----------------------------------------------------------------------------
 // IntCode Computer
@@ -140,4 +77,4 @@ int main(int argc, char *argv[]);
 
 } // namespace intcode
 
-#endif // ADVENT_HPP
+#endif  // INTCODE_HPP

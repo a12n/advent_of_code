@@ -1,10 +1,11 @@
 #include <iostream>
 #include <map>
+#include <optional>
 
 #include <sysexits.h>
 
-#include "advent.hpp"
 #include "grid.hpp"
+#include "intcode.hpp"
 
 namespace {
 
@@ -114,6 +115,8 @@ canvas hull_painting_robot(const intcode::memory& prog, std::optional<color> sta
 
 int main()
 {
+    using intcode::operator>>;
+
     intcode::memory img;
 
     if (!(std::cin >> img)) {

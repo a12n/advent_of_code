@@ -1,4 +1,10 @@
-#include "advent.hpp"
+#include <array>
+#include <cassert>
+#include <iostream>
+
+#include <sysexits.h>
+
+#include "intcode.hpp"
 
 namespace {
 
@@ -68,6 +74,8 @@ intcode::value amplifier_controller(
 
 int main()
 {
+    using intcode::operator>>;
+
     intcode::memory img;
 
     if (!(std::cin >> img)) {

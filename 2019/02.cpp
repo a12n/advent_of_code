@@ -1,4 +1,11 @@
-#include "advent.hpp"
+#include <cassert>
+#include <iostream>
+#include <optional>
+#include <utility>
+
+#include <sysexits.h>
+
+#include "intcode.hpp"
 
 #if PART == 2
 namespace {
@@ -24,6 +31,8 @@ std::optional<std::pair<int, int>> gravity_assist(const intcode::memory& prog, i
 
 int main()
 {
+    using intcode::operator>>;
+
     intcode::memory img;
 
     if (!(std::cin >> img)) {

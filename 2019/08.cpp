@@ -1,4 +1,7 @@
-#include "advent.hpp"
+#include <array>
+#include <cstdint>
+#include <iostream>
+#include <optional>
 
 namespace {
 

@@ -99,14 +99,30 @@ int main()
     size_t steps = -1;
     const auto p0 = p;
     const auto v0 = v;
+    std::optional<size_t> pn {}, vn {};
 #endif // PART
 
     for (size_t i = 0; i < steps; ++i) {
         simulate(p, v);
+#if PART == 2
+        if (p == p0 && !pn) {
+            pn = i;
+            std::cerr << "pn " << *pn << '\n';
+        }
+        if (v == v0 && !vn) {
+            vn = i;
+            std::cerr << "vn " << *vn << '\n';
+        }
+        if (pn && vn) {
+            break;
+        }
+#endif // PART
     }
 
 #if PART == 1
     std::cout << total_energy(p, v) << '\n';
+#elif PART == 2
+    std::cout << std::lcm(*pn, *vn) << '\n';
 #endif // PART
 
     return 0;

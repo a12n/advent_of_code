@@ -1,23 +1,24 @@
-#include "advent.hpp"
+#include <cstdint>
+#include <iostream>
 
 namespace {
 
-using mass_t = int64_t;
+using mass = int64_t;
 
-mass_t fuel_required(mass_t mass)
+mass fuel_required(mass m)
 {
-    return mass / 3 - 2;
+    return m / 3 - 2;
 }
 
-mass_t total_fuel_required(mass_t mass)
+mass total_fuel_required(mass m)
 {
-    mass_t total_fuel = 0;
+    mass total_fuel = 0;
 
     while (true) {
-        if ((mass = fuel_required(mass)) <= 0) {
+        if ((m = fuel_required(m)) <= 0) {
             break;
         }
-        total_fuel += mass;
+        total_fuel += m;
     }
 
     return total_fuel;
@@ -27,14 +28,14 @@ mass_t total_fuel_required(mass_t mass)
 
 int main()
 {
-    mass_t mass, total_fuel = 0;
+    mass m, total_fuel = 0;
 
-    while (std::cin >> mass) {
+    while (std::cin >> m) {
         total_fuel +=
 #if PART == 1
-            fuel_required(mass)
+            fuel_required(m)
 #elif PART == 2
-            total_fuel_required(mass)
+            total_fuel_required(m)
 #endif // PART
             ;
     }

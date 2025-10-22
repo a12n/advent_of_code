@@ -78,8 +78,11 @@ int main()
 {
     constexpr const size_t n = 4;
 
-    std::array<position, n> p {};
-    std::array<offset, n> v {};
+    using position_array = std::array<position, n>;
+    using velocity_array = std::array<offset, n>;
+
+    position_array p {};
+    velocity_array v {};
 
     for (auto& pi : p) {
         if (!(std::cin >> pi)) {

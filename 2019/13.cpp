@@ -2,7 +2,6 @@
 
 #include <sysexits.h>
 
-#include "ansi.hpp"
 #include "intcode.hpp"
 
 namespace {
@@ -15,68 +14,49 @@ enum class tile {
     ball = 4,
 };
 
-std::ostream& operator<<(std::ostream& out, tile t)
-{
-    switch (t) {
-    case tile::empty:
-        return out << ' ';
-    case tile::wall:
-        return out << '#';
-    case tile::block:
-        return out << 'H';
-    case tile::paddle:
-        return out << '-';
-    case tile::ball:
-        return out << '.';
-    }
-    return out << '?';
-}
+enum class expect {
+    x,
+    y,
+    tile,
+};
 
-void arcade_cabinet(const intcode::memory& prog)
+#if PART == 1
+size_t arcade_cabinet(const intcode::memory& prog)
 {
-    enum {
-        x_position,
-        y_position,
-        tile_id,
-    } expect
-        = x_position;
-
-    ansi::cursor_position cursor_pos {};
+    expect expect = expect::x;
+    size_t n_block = 0;
 
     intcode::address ip = 0;
     intcode::memory img = prog;
     intcode::state st;
 
-    std::cout << ansi::erase {} << ansi::hide_cursor {};
     while (true) {
         const auto [op, ip2, addr] = intcode::run_intrpt(st, img, ip);
         switch (op) {
         case intcode::opcode::output: {
             switch (expect) {
-            case x_position:
-                cursor_pos.col = img[addr];
-                expect = y_position;
+            case expect::x:
+                expect = expect::y;
                 break;
-            case y_position:
-                cursor_pos.row = img[addr];
-                std::cout << cursor_pos;
-                expect = tile_id;
+            case expect::y:
+                expect = expect::tile;
                 break;
-            case tile_id:
-                std::cout << tile(img[addr]);
-                expect = x_position;
+            case expect::tile:
+                n_block += (tile(img[addr]) == tile::block);
+                expect = expect::x;
                 break;
             }
         } break;
         case intcode::opcode::halt:
-            std::cout << ansi::hide_cursor { false };
-            return;
+            return n;
         default:
             throw std::runtime_error(__func__);
         }
         ip = ip2;
     }
 }
+#elif PART == 2
+#endif // PART
 
 } // namespace
 
@@ -90,7 +70,9 @@ int main()
         return EX_DATAERR;
     }
 
-    arcade_cabinet(img);
+#if PART == 1
+    std::cout << arcade_cabinet(img) << '\n';
+#endif // PART
 
     return 0;
 }

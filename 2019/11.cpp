@@ -21,8 +21,8 @@ using canvas = std::map<position, color>;
 
 std::ostream& operator<<(std::ostream& out, color c)
 {
-    return out << (c == white ? '#' : c == black ? '.'
-                                                 : '_');
+    return out << (c == white ? "█" : c == black ? "░"
+                                                 : "?");
 }
 
 std::ostream& operator<<(std::ostream& out, const canvas& canv)

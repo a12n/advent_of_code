@@ -7,7 +7,7 @@
 
 #include <sysexits.h>
 
-#include "advent.hpp"
+#include "grid.hpp"
 
 namespace {
 

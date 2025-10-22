@@ -6,7 +6,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(aoc advent.cpp)
+add_library(aoc
+  advent.cpp
+  grid.cpp
+  )
 
 file(GLOB SRCS [0-2][0-9].cpp)
 foreach(src ${SRCS})

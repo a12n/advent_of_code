@@ -4,6 +4,12 @@ namespace {
 
 using namespace grid::spatial;
 
+template <size_t n>
+using position_array = std::array<position, n>;
+
+template <size_t n>
+using velocity_array = std::array<offset, n>;
+
 int64_t potential_energy(const position& p)
 {
     return taxicab_norm(to_offset(p));
@@ -20,7 +26,7 @@ int64_t total_energy(const position& p, const offset& v)
 }
 
 template <size_t n>
-int64_t total_energy(const std::array<position, n>& p, const std::array<offset, n>& v)
+int64_t total_energy(const position_array<n>& p, const velocity_array<n>& v)
 {
     int64_t ans = 0;
     for (size_t i = 0; i < n; ++i) {
@@ -49,7 +55,7 @@ std::istream& operator>>(std::istream& in, position& p)
 }
 
 template <size_t n>
-void simulate(std::array<position, n>& p, std::array<offset, n>& v)
+void simulate(position_array<n>& p, velocity_array<n>& v)
 {
     // Gravity
     for (size_t i = 0; i < n - 1; ++i) {
@@ -78,11 +84,8 @@ int main()
 {
     constexpr const size_t n = 4;
 
-    using position_array = std::array<position, n>;
-    using velocity_array = std::array<offset, n>;
-
-    position_array p {};
-    velocity_array v {};
+    position_array<n> p {};
+    velocity_array<n> v {};
 
     for (auto& pi : p) {
         if (!(std::cin >> pi)) {

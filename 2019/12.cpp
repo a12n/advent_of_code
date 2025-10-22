@@ -90,17 +90,24 @@ int main()
         }
     }
 
+#if PART == 1
     size_t steps = 1000;
-
-    if (const char* steps_env = getenv("STEPS"); steps_env) {
+    if (const auto steps_env = getenv("STEPS"); steps_env) {
         steps = std::stol(steps_env);
     }
+#elif PART == 2
+    size_t steps = -1;
+    const auto p0 = p;
+    const auto v0 = v;
+#endif // PART
 
     for (size_t i = 0; i < steps; ++i) {
         simulate(p, v);
     }
 
+#if PART == 1
     std::cout << total_energy(p, v) << '\n';
+#endif // PART
 
     return 0;
 }

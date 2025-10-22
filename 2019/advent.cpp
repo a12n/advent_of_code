@@ -200,6 +200,108 @@ std::ostream& operator<<(std::ostream& out, position p)
 
 } // namespace grid::planar
 
+namespace grid::spatial {
+
+int64_t taxicab_norm(offset u)
+{
+    return std::abs(u[0]) + std::abs(u[1]) + std::abs(u[2]);
+}
+
+offset to_offset(position p)
+{
+    return { p[0], p[1], p[2] };
+}
+
+position to_position(offset u)
+{
+    return { u[0], u[1], u[2] };
+}
+
+offset& operator*=(offset& u, int64_t n)
+{
+    u[0] *= n;
+    u[1] *= n;
+    u[2] *= n;
+    return u;
+}
+
+offset operator*(int64_t n, offset u)
+{
+    return u *= n;
+}
+
+offset& operator/=(offset& u, int64_t n)
+{
+    u[0] /= n;
+    u[1] /= n;
+    u[2] /= n;
+    return u;
+}
+
+offset operator/(offset u, int64_t n)
+{
+    return u /= n;
+}
+
+position& operator+=(position& p, offset u)
+{
+    p[0] += u[0];
+    p[1] += u[1];
+    p[2] += u[2];
+    return p;
+}
+
+position operator+(position p, offset u)
+{
+    return p += u;
+}
+
+offset& operator+=(offset& u, offset v)
+{
+    u[0] += v[0];
+    u[1] += v[1];
+    u[2] += v[2];
+    return u;
+}
+
+offset operator+(offset u, offset v)
+{
+    return u += v;
+}
+
+offset operator-(position p, position q)
+{
+    return { p[0] - q[0], p[1] - q[1], p[2] - q[2] };
+}
+
+position& operator-=(position& p, offset u)
+{
+    p[0] -= u[0];
+    p[1] -= u[1];
+    p[2] -= u[2];
+    return p;
+}
+position operator-(position p, offset u)
+{
+    return p -= u;
+}
+offset operator-(offset u)
+{
+    return { -u[0], -u[1], -u[2] };
+}
+
+std::ostream& operator<<(std::ostream& out, offset u)
+{
+    return out << '[' << u[0] << ',' << u[1] << ',' << u[2] << ']';
+}
+
+std::ostream& operator<<(std::ostream& out, position p)
+{
+    return out << to_offset(p);
+}
+
+} // namespace grid::spatial
+
 namespace intcode {
 
 std::tuple<opcode, mode, mode, mode> decode(value v)

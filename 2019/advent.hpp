@@ -136,6 +136,36 @@ struct std::hash<grid::planar::offset> {
 };
 
 //----------------------------------------------------------------------------
+// 3D Grids
+
+namespace grid::spatial {
+
+struct offset : public std::array<int64_t, 3> { };
+struct position : public std::array<int64_t, 3> { };
+
+int64_t taxicab_norm(offset u);
+offset to_offset(position p);
+position to_position(offset u);
+
+offset& operator*=(offset& u, int64_t n);
+offset operator*(int64_t n, offset u);
+offset& operator/=(offset& u, int64_t n);
+offset operator/(offset u, int64_t n);
+position& operator+=(position& p, offset u);
+position operator+(position p, offset u);
+offset& operator+=(offset& u, offset v);
+offset operator+(offset u, offset v);
+offset operator-(position p, position q);
+position& operator-=(position& p, offset u);
+position operator-(position p, offset u);
+offset operator-(offset u);
+
+std::ostream& operator<<(std::ostream& out, offset u);
+std::ostream& operator<<(std::ostream& out, position p);
+
+} // namespace grid::spatial
+
+//----------------------------------------------------------------------------
 // IntCode Computer
 
 namespace intcode {

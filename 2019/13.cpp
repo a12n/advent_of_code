@@ -1,4 +1,6 @@
+#include <chrono>
 #include <iostream>
+#include <thread>
 
 #include <sysexits.h>
 
@@ -73,7 +75,7 @@ void arcade_cabinet(const intcode::memory& prog)
             throw std::runtime_error(__func__);
         }
         ip = ip2;
-        std::cin.get();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 

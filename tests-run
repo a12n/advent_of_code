@@ -29,26 +29,37 @@ esac
 
 for IN_FILE in $PROG_ID/*.in; do
     TEST_ID=${IN_FILE%.*}
-    ENV_FILE=$TEST_ID.env
     OUT_FILE=$TEST_ID.out
     if [ ! -f $OUT_FILE -o ! -r $IN_FILE ]; then
         continue
     fi
-    if [ -r $ENV_FILE ]; then
-        echo "==== $TEST_ID < $ENV_FILE ===="
-        PROG_OUT=$(export $(xargs < $ENV_FILE) && $PROG < $IN_FILE 2> /dev/null | $OUT_CMD)
-    else
-        echo "==== $TEST_ID ===="
-        PROG_OUT=$($PROG < $IN_FILE 2> /dev/null | $OUT_CMD)
-    fi
-    EXPECT_OUT=$($OUT_CMD $OUT_FILE)
-    if [ "$PROG_OUT" != "$EXPECT_OUT" ]; then
-        echo ---- Program Output ----
-        echo $PROG_OUT
-        echo ------------------------
-        echo ---- Expected Output ---
-        echo $EXPECT_OUT
-        echo ------------------------
-        exit 1
-    fi
+
+    INJ_FILE=$TEST_ID.inj
+    ENV_FILE=$TEST_ID.env
+    (
+        HEADER="==== $TEST_ID "
+        if [ -r $INJ_FILE ]; then
+            HEADER="$HEADER < $INJ_FILE "
+        else
+            INJ_FILE=/dev/null
+        fi
+        if [ -r $ENV_FILE ]; then
+            HEADER="$HEADER @ $ENV_FILE "
+            export $(xargs < $ENV_FILE) > /dev/null
+        fi
+        HEADER="$HEADER ===="
+
+        echo $HEADER
+        PROG_OUT=$(cat $IN_FILE $INJ_FILE | $PROG 2> /dev/null | $OUT_CMD)
+        EXPECT_OUT=$($OUT_CMD $OUT_FILE)
+        if [ "$PROG_OUT" != "$EXPECT_OUT" ]; then
+            echo ---- Program Output ----
+            echo $PROG_OUT
+            echo ------------------------
+            echo ---- Expected Output ---
+            echo $EXPECT_OUT
+            echo ------------------------
+            exit 1
+        fi
+    )
 done

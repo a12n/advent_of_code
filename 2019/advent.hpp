@@ -1,27 +1,172 @@
 #ifndef ADVENT_HPP
 #define ADVENT_HPP
 
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <charconv>
 #include <cstdint>
+#include <cstdlib>
+#include <deque>
+#include <forward_list>
+#include <fstream>
 #include <functional>
+#include <iomanip>
 #include <iostream>
+#include <istream>
+#include <map>
+#include <numeric>
 #include <optional>
+#include <ostream>
+#include <set>
+#include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
 #include <vector>
 
-using std::cerr;
-using std::cin;
-using std::cout;
-using std::endl;
-using std::function;
-using std::invalid_argument;
-using std::max;
-using std::min;
-using std::nullopt;
-using std::optional;
-using std::runtime_error;
-using std::string;
-using std::vector;
+#include <sysexits.h>
+
+//----------------------------------------------------------------------------
+// I/O Utilities
+
+template <typename item_type, char sep = ','>
+std::istream& operator>>(std::istream& in, std::vector<item_type>& items)
+{
+    items.clear();
+
+    item_type v;
+
+    if (!(in >> v)) {
+        return in;
+    }
+    items.push_back(std::move(v));
+
+    while (true) {
+        char c;
+
+        if (!(in >> c)) {
+            if (in.eof()) {
+                in.clear(in.rdstate() & ~std::ios::failbit);
+            }
+            break;
+        }
+
+        if (c != sep) {
+            in.unget();
+            break;
+        }
+
+        if (!(in >> v)) {
+            in.setstate(std::ios::failbit);
+            break;
+        }
+        items.push_back(std::move(v));
+    }
+
+    return in;
+}
+
+//----------------------------------------------------------------------------
+// 2D Grids
+
+namespace grid::planar {
+
+enum class direction {
+    up,
+    left,
+    right,
+    down,
+};
+
+enum class rotation {
+    cw,
+    ccw,
+};
+
+struct offset : public std::array<int64_t, 2> { };
+struct position : public std::array<int64_t, 2> { };
+
+direction opposite(direction dir);
+int64_t taxicab_norm(offset u);
+direction to_direction(char c);
+position to_position(offset u);
+offset to_offset(direction dir);
+offset to_offset(position p);
+offset normalize(offset u);
+direction rotate(rotation rdir, direction dir);
+
+offset& operator*=(offset& u, int64_t n);
+offset operator*(int64_t n, offset u);
+offset& operator/=(offset& u, int64_t n);
+offset operator/(offset u, int64_t n);
+position& operator+=(position& p, offset u);
+position operator+(position p, offset u);
+offset& operator+=(offset& u, offset v);
+offset operator+(offset u, offset v);
+offset operator-(position p, position q);
+position& operator-=(position& p, offset u);
+position operator-(position p, offset u);
+offset operator-(offset u);
+
+std::istream& operator>>(std::istream& in, direction& dir);
+
+std::ostream& operator<<(std::ostream& out, offset u);
+std::ostream& operator<<(std::ostream& out, position p);
+
+} // namespace grid::planar
+
+template <>
+struct std::hash<grid::planar::position> {
+    size_t operator()(grid::planar::position p) const noexcept
+    {
+        return std::hash<int64_t> {}(p[0]) ^ (std::hash<int64_t> {}(p[1]) << 1);
+    }
+};
+
+template <>
+struct std::hash<grid::planar::offset> {
+    size_t operator()(grid::planar::offset u) const noexcept
+    {
+        return std::hash<grid::planar::position> {}(to_position(u));
+    }
+};
+
+//----------------------------------------------------------------------------
+// 3D Grids
+
+namespace grid::spatial {
+
+struct offset : public std::array<int64_t, 3> { };
+struct position : public std::array<int64_t, 3> { };
+
+int64_t taxicab_norm(offset u);
+offset to_offset(position p);
+position to_position(offset u);
+
+offset& operator*=(offset& u, int64_t n);
+offset operator*(int64_t n, offset u);
+offset& operator/=(offset& u, int64_t n);
+offset operator/(offset u, int64_t n);
+position& operator+=(position& p, offset u);
+position operator+(position p, offset u);
+offset& operator+=(offset& u, offset v);
+offset operator+(offset u, offset v);
+offset operator-(position p, position q);
+position& operator-=(position& p, offset u);
+position operator-(position p, offset u);
+offset operator-(offset u);
+
+std::ostream& operator<<(std::ostream& out, offset u);
+std::ostream& operator<<(std::ostream& out, position p);
+
+} // namespace grid::spatial
+
+//----------------------------------------------------------------------------
+// IntCode Computer
 
 namespace intcode {
 
@@ -31,14 +176,62 @@ using value = int64_t;
 enum class opcode {
     add = 1,
     mul = 2,
+    input = 3,
+    output = 4,
+    jump_if_true = 5,
+    jump_if_false = 6,
+    less_than = 7,
+    equals = 8,
+    adjust_rel_base = 9,
     halt = 99,
 };
 
-using memory = vector<value>;
+enum class mode {
+    position = 0,
+    immediate = 1,
+    relative = 2,
+};
 
-void read(istream& in, memory& p);
+struct state {
+    value rel_base {};
+};
 
-address run(memory& p, address ip);
+using memory = std::vector<value>;
+
+struct environ {
+    virtual value input();
+    virtual void output(value v);
+};
+
+struct test_environ : environ {
+    value input() override;
+    void output(value v) override;
+
+    std::forward_list<value> fake_in;
+    std::forward_list<value> expected_out;
+};
+
+// Run interrupted until I/O or halt.
+std::tuple<opcode, address, address> run_intrpt(state& st, memory& img, address ip);
+
+// Like run_intrpt above, but doesn't preserve state (e.g., relative
+// base) between runs.
+std::tuple<opcode, address, address> run_intrpt(memory& img, address ip);
+
+// Run uninterrupted until halt, use environment for I/O.
+address run(memory& img, address ip, environ& env);
+address run(memory& img, address ip = 0);
+
+std::istream& operator>>(std::istream& in, memory& img);
+
+void test(
+    const memory& prog,
+    address start, address stop,
+    const std::forward_list<value>& in, const std::forward_list<value>& out);
+
+// Run interpreter with program from command line parameter or from
+// stdin, and I/O attached to stdin and stdout.
+int main(int argc, char *argv[]);
 
 } // namespace intcode
 

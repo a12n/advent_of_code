@@ -1,4 +1,4 @@
-CXXFLAGS=	-O2 -Wall -Wextra -Wno-unused-function -Wpedantic -g -std=c++17
+CXXFLAGS=	-O0 -Wall -Wextra -Wno-unused-function -Wpedantic -g -std=c++17
 
 .PHONY: all clean
 
@@ -13,4 +13,4 @@ clean:
 %-2: %.cpp advent.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -DPART=2 $^ -o $@
 
-advent.o: advent.cpp
+advent.o: advent.hpp advent.cpp

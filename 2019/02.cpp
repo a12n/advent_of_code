@@ -1,7 +1,5 @@
 #include "advent.hpp"
 
-using intcode::operator>>;
-
 #if PART == 2
 namespace {
 

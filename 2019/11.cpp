@@ -131,15 +131,13 @@ int main()
         return EX_DATAERR;
     }
 
-    const auto canv =
+    std::cout
 #if PART == 1
-        hull_painting_robot(img)
+        << hull_painting_robot(img).size() << '\n'
 #elif PART == 2
-        hull_painting_robot(img, white)
+        << hull_painting_robot(img, white)
 #endif // PART
         ;
-    std::cerr << canv;
-    std::cout << canv.size() << '\n';
 
     return 0;
 }

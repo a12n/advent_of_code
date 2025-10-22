@@ -49,6 +49,7 @@ void arcade_cabinet(const intcode::memory& prog)
     intcode::memory img = prog;
     intcode::state st;
 
+    std::cout << ansi::erase {} << ansi::hide_cursor {};
     while (true) {
         const auto [op, ip2, addr] = intcode::run_intrpt(st, img, ip);
         switch (op) {
@@ -70,6 +71,7 @@ void arcade_cabinet(const intcode::memory& prog)
             }
         } break;
         case intcode::opcode::halt:
+            std::cout << ansi::hide_cursor { false };
             return;
         default:
             throw std::runtime_error(__func__);

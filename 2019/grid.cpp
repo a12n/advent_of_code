@@ -56,13 +56,13 @@ offset to_offset(direction d)
 {
     switch (d) {
     case direction::up:
-        return { 0, 1 };
+        return { 0, -1 };
     case direction::left:
         return { -1, 0 };
     case direction::right:
         return { 1, 0 };
     case direction::down:
-        return { 0, -1 };
+        return { 0, 1 };
     default:
         throw std::invalid_argument(__func__);
     }

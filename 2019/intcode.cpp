@@ -4,8 +4,6 @@
 #include <iostream>
 #include <stdexcept>
 
-#include <sysexits.h>
-
 #include "intcode.hpp"
 
 namespace {
@@ -250,24 +248,20 @@ void test(
     assert(env.expected_out.empty());
 }
 
-int main(int argc, char* argv[])
+memory load(int argc, char* argv[])
 {
     memory img;
-
     if (argc > 1) {
         std::ifstream f(argv[1]);
         if (!(f >> img)) {
-            return EX_DATAERR;
+            throw std::invalid_argument(__func__);
         }
     } else {
         if (!(std::cin >> img)) {
-            return EX_DATAERR;
+            throw std::invalid_argument(__func__);
         }
     }
-
-    run(img);
-
-    return 0;
+    return img;
 }
 
 } // namespace intcode

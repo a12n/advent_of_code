@@ -71,9 +71,8 @@ void test(
     address start, address stop,
     const std::forward_list<value>& in, const std::forward_list<value>& out);
 
-// Run interpreter with program from command line parameter or from
-// stdin, and I/O attached to stdin and stdout.
-int main(int argc, char *argv[]);
+// Load memory image from file or from standard input.
+memory load(int argc, char *argv[]);
 
 } // namespace intcode
 

@@ -2,5 +2,7 @@
 
 int main(int argc, char* argv[])
 {
-    return intcode::main(argc, argv);
+    auto img = intcode::load(argc, argv);
+    intcode::run(img);
+    return 0;
 }

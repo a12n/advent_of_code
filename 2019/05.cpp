@@ -2,7 +2,9 @@
 
 int main()
 {
-    return intcode::main(0, nullptr);
+    auto img = intcode::load(0, nullptr);
+    intcode::run(img);
+    return 0;
 }
 
 int test()

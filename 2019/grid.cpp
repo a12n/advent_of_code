@@ -1,3 +1,4 @@
+#include <cmath>
 #include <numeric>
 #include <stdexcept>
 
@@ -106,6 +107,12 @@ direction rotate(rotation rdir, direction dir)
         break;
     }
     throw std::invalid_argument(__func__);
+}
+
+double angle(offset u)
+{
+    const auto theta = std::atan2(u[1], u[0]);
+    return theta < 0 ? (theta + 2 * M_PI) : theta;
 }
 
 offset& operator*=(offset& u, int64_t n)

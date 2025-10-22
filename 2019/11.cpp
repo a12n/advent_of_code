@@ -67,7 +67,7 @@ canvas hull_painting_robot(const intcode::memory& prog, std::optional<color> sta
     intcode::state st;
 
     if (start) {
-        canv[{ 0, 0 }] = *start;
+        canv[p] = *start;
     }
 
     while (true) {

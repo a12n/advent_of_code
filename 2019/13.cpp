@@ -14,6 +14,23 @@ enum class tile {
     ball = 4,
 };
 
+std::ostream& operator<<(std::ostream& out, tile t)
+{
+    switch (t) {
+    case tile::empty:
+        return out << " ";
+    case tile::wall:
+        return out << "█";
+    case tile::block:
+        return out << "░";
+    case tile::paddle:
+        return out << "▔";
+    case tile::ball:
+        return out << "o";
+    };
+    return out << "?";
+}
+
 enum class expect {
     x,
     y,

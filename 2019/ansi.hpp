@@ -19,7 +19,7 @@ struct hide_cursor {
 };
 
 struct cursor_position {
-    size_t row, col;
+    size_t row = 0, col = 0;
 };
 
 std::ostream& operator<<(std::ostream& out, erase cmd);

@@ -60,15 +60,9 @@ size_t arcade_cabinet(const intcode::memory& prog)
 
 } // namespace
 
-int main()
+int main(int argc, char* argv[])
 {
-    using intcode::operator>>;
-
-    intcode::memory img;
-
-    if (!(std::cin >> img)) {
-        return EX_DATAERR;
-    }
+    const auto img = intcode::load(argc, argv);
 
 #if PART == 1
     std::cout << arcade_cabinet(img) << '\n';

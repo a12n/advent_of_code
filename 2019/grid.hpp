@@ -6,6 +6,7 @@
 #include <istream>
 #include <map>
 #include <ostream>
+#include <tuple>
 
 //----------------------------------------------------------------------------
 // 2D Grids
@@ -109,6 +110,30 @@ std::istream& operator>>(std::istream& in, direction& dir);
 
 std::ostream& operator<<(std::ostream& out, offset u);
 std::ostream& operator<<(std::ostream& out, position p);
+
+template <typename mapped_type>
+std::ostream& operator<<(std::ostream& out, const std::tuple<const std::map<position, mapped_type>&, const extent&>& grid_extent)
+{
+    const auto [grid, extent] = grid_extent;
+    const mapped_type empty {};
+    for (position p = extent.min(); p[1] <= extent.max()[1]; ++p[1]) {
+        for (p[0] = extent.min()[0]; p[0] <= extent.max()[0]; ++p[0]) {
+            if (const auto it = grid.find(p); it != grid.end()) {
+                out << it->second;
+            } else {
+                out << empty;
+            }
+        }
+        out.put('\n');
+    }
+    return out;
+}
+
+template <typename mapped_type>
+std::ostream& operator<<(std::ostream& out, const std::map<position, mapped_type>& grid)
+{
+    return out << std::tuple<const std::map<position, mapped_type>&, const extent&> { grid, extent(grid) };
+}
 
 } // namespace grid::planar
 

@@ -31,16 +31,20 @@ direction to_direction(char c)
 {
     switch (c) {
     case 'U':
+    case '^':
     case 'u':
         return direction::up;
+    case '<':
     case 'L':
     case 'l':
         return direction::left;
+    case '>':
     case 'R':
     case 'r':
         return direction::right;
     case 'D':
     case 'd':
+    case 'v':
         return direction::down;
     default:
         throw std::invalid_argument(__func__);

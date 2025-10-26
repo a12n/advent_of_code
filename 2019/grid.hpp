@@ -16,6 +16,11 @@ enum class direction {
     left,
     right,
     down,
+
+    north = up,
+    west = left,
+    east = right,
+    south = down,
 };
 
 enum class rotation {

@@ -25,34 +25,6 @@ std::ostream& operator<<(std::ostream& out, color c)
                                                  : "?");
 }
 
-std::ostream& operator<<(std::ostream& out, const canvas& canv)
-{
-    if (canv.empty()) {
-        return out;
-    }
-
-    extent ext;
-
-    for (const auto [p, _] : canv) {
-        ext.insert(p);
-    }
-    std::cerr << __func__ << " min " << ext.min() << " max " << ext.max() << '\n';
-
-    // TODO: Iterate over canvas points.
-    for (position p = ext.min(); p[1] <= ext.max()[1]; ++p[1]) {
-        for (p[0] = ext.min()[0]; p[0] <= ext.max()[0]; ++p[0]) {
-            color c = black;
-            if (const auto it = canv.find(p); it != canv.end()) {
-                c = it->second;
-            }
-            out << c;
-        }
-        out.put('\n');
-    }
-
-    return out;
-}
-
 canvas hull_painting_robot(const intcode::memory& prog, std::optional<color> start = std::nullopt)
 {
     canvas canv;

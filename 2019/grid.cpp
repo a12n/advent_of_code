@@ -6,22 +6,6 @@
 
 namespace grid::planar {
 
-bool extent::insert(position p)
-{
-    bool inserted = false;
-    for (size_t i = 0; i < 2; ++i) {
-        if (p[i] < min_[i]) {
-            min_[i] = p[i];
-            inserted = true;
-        }
-        if (p[i] > max_[i]) {
-            max_[i] = p[i];
-            inserted = true;
-        }
-    }
-    return inserted;
-}
-
 direction opposite(direction dir)
 {
     switch (dir) {
@@ -203,6 +187,22 @@ position operator-(position p, offset u)
 offset operator-(offset v)
 {
     return { -v[0], -v[1] };
+}
+
+bool extent::insert(position p)
+{
+    bool inserted = false;
+    for (size_t i = 0; i < 2; ++i) {
+        if (p[i] < min_[i]) {
+            min_[i] = p[i];
+            inserted = true;
+        }
+        if (p[i] > max_[i]) {
+            max_[i] = p[i];
+            inserted = true;
+        }
+    }
+    return inserted;
 }
 
 std::istream& operator>>(std::istream& in, direction& dir)

@@ -31,6 +31,29 @@ enum class rotation {
 struct offset : public std::array<int64_t, 2> { };
 struct position : public std::array<int64_t, 2> { };
 
+direction opposite(direction dir);
+int64_t taxicab_norm(offset u);
+direction to_direction(char c);
+position to_position(offset u);
+offset to_offset(direction dir);
+offset to_offset(position p);
+offset normalize(offset u);
+direction rotate(rotation rdir, direction dir);
+double angle(offset u);
+
+offset& operator*=(offset& u, int64_t n);
+offset operator*(int64_t n, offset u);
+offset& operator/=(offset& u, int64_t n);
+offset operator/(offset u, int64_t n);
+position& operator+=(position& p, offset u);
+position operator+(position p, offset u);
+offset& operator+=(offset& u, offset v);
+offset operator+(offset u, offset v);
+offset operator-(position p, position q);
+position& operator-=(position& p, offset u);
+position operator-(position p, offset u);
+offset operator-(offset u);
+
 struct extent {
     extent() = default;
 
@@ -67,29 +90,6 @@ private:
     position min_ { 0, 0 };
     position max_ { -1, -1 };
 };
-
-direction opposite(direction dir);
-int64_t taxicab_norm(offset u);
-direction to_direction(char c);
-position to_position(offset u);
-offset to_offset(direction dir);
-offset to_offset(position p);
-offset normalize(offset u);
-direction rotate(rotation rdir, direction dir);
-double angle(offset u);
-
-offset& operator*=(offset& u, int64_t n);
-offset operator*(int64_t n, offset u);
-offset& operator/=(offset& u, int64_t n);
-offset operator/(offset u, int64_t n);
-position& operator+=(position& p, offset u);
-position operator+(position p, offset u);
-offset& operator+=(offset& u, offset v);
-offset operator+(offset u, offset v);
-offset operator-(position p, position q);
-position& operator-=(position& p, offset u);
-position operator-(position p, offset u);
-offset operator-(offset u);
 
 std::istream& operator>>(std::istream& in, direction& dir);
 

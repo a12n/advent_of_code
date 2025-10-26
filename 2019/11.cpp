@@ -31,22 +31,16 @@ std::ostream& operator<<(std::ostream& out, const canvas& canv)
         return out;
     }
 
-    position p_min = { INT64_MAX, INT64_MAX };
-    position p_max = { INT64_MIN, INT64_MIN };
+    extent ext;
 
-    // TODO: Add grid::planar::extent.
     for (const auto [p, _] : canv) {
-        p_min[0] = std::min(p_min[0], p[0]);
-        p_min[1] = std::min(p_min[1], p[1]);
-        p_max[0] = std::max(p_max[0], p[0]);
-        p_max[1] = std::max(p_max[1], p[1]);
+        ext.insert(p);
     }
-
-    std::cerr << __func__ << " min " << p_min << " max " << p_max << '\n';
+    std::cerr << __func__ << " min " << ext.min() << " max " << ext.max() << '\n';
 
     // TODO: Iterate over canvas points.
-    for (position p = p_min; p[1] <= p_max[1]; ++p[1]) {
-        for (p[0] = p_min[0]; p[0] <= p_max[0]; ++p[0]) {
+    for (position p = ext.min(); p[1] <= ext.max()[1]; ++p[1]) {
+        for (p[0] = ext.min()[0]; p[0] <= ext.max()[0]; ++p[0]) {
             color c = black;
             if (const auto it = canv.find(p); it != canv.end()) {
                 c = it->second;

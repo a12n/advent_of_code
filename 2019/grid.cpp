@@ -6,6 +6,22 @@
 
 namespace grid::planar {
 
+bool extent::insert(position p)
+{
+    bool inserted = false;
+    for (size_t i = 0; i < 2; ++i) {
+        if (p[i] < min_[i]) {
+            min_[i] = p[i];
+            inserted = true;
+        }
+        if (p[i] > max_[i]) {
+            max_[i] = p[i];
+            inserted = true;
+        }
+    }
+    return inserted;
+}
+
 direction opposite(direction dir)
 {
     switch (dir) {

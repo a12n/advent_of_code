@@ -31,6 +31,43 @@ enum class rotation {
 struct offset : public std::array<int64_t, 2> { };
 struct position : public std::array<int64_t, 2> { };
 
+struct extent {
+    extent() = default;
+
+    explicit extent(position p)
+        : min_(p)
+        , max_(p)
+    {
+    }
+
+    explicit extent(position p, position q)
+        : extent(p)
+    {
+        insert(q);
+    }
+
+    bool empty() const
+    {
+        return min_[0] > max_[0] || min_[1] > max_[1];
+    }
+
+    bool insert(position p);
+
+    const position& min() const
+    {
+        return min_;
+    }
+
+    const position& max() const
+    {
+        return max_;
+    }
+
+private:
+    position min_ { 0, 0 };
+    position max_ { -1, -1 };
+};
+
 direction opposite(direction dir);
 int64_t taxicab_norm(offset u);
 direction to_direction(char c);

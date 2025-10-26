@@ -4,6 +4,7 @@
 #include <array>
 #include <cstdint>
 #include <istream>
+#include <map>
 #include <ostream>
 
 //----------------------------------------------------------------------------
@@ -72,6 +73,14 @@ struct extent {
     explicit extent(position p, offset u)
         : extent(p, p + u)
     {
+    }
+
+    template <typename mapped_type>
+    explicit extent(const std::map<position, mapped_type>& grid)
+    {
+        for (const auto& [p, _] : grid) {
+            insert(p);
+        }
     }
 
     bool empty() const

@@ -69,6 +69,11 @@ struct extent {
         insert(q);
     }
 
+    explicit extent(position p, offset u)
+        : extent(p, p + u)
+    {
+    }
+
     bool empty() const
     {
         return min_[0] > max_[0] || min_[1] > max_[1];

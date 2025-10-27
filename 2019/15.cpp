@@ -1,14 +1,22 @@
 #include <iostream>
+#include <map>
+#include <optional>
 
+#include "grid.hpp"
 #include "intcode.hpp"
 
 namespace {
+
+using namespace grid::planar;
 
 size_t repair_droid(const intcode::memory& prog)
 {
     intcode::address ip = 0;
     intcode::memory img = prog;
     intcode::state st;
+
+    position p = { 0, 0 };
+    std::map<position, std::optional<size_t>> steps;
 
     while (true) {
         const auto [op, ip2, addr] = intcode::run_intrpt(st, img, ip);
@@ -24,6 +32,8 @@ size_t repair_droid(const intcode::memory& prog)
         }
         ip = ip2;
     }
+
+    return 0;
 }
 
 } // namespace

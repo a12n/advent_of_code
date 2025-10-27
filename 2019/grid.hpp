@@ -84,6 +84,14 @@ struct extent {
         }
     }
 
+    template <typename iterator>
+    explicit extent(iterator begin, iterator end)
+    {
+        for (; begin != end; ++begin) {
+            insert(*begin);
+        }
+    }
+
     bool empty() const
     {
         return min_[0] > max_[0] || min_[1] > max_[1];

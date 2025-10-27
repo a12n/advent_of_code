@@ -123,15 +123,15 @@ std::ostream& operator<<(std::ostream& out, position p);
 template <typename mapped_type>
 struct output_grid {
     const std::map<position, mapped_type>& grid;
-    const extent& extent;
+    const extent& ext;
     const mapped_type& empty {};
 };
 
 template <typename mapped_type>
 std::ostream& operator<<(std::ostream& out, output_grid<mapped_type> value)
 {
-    for (position p = value.extent.min(); p[1] <= value.extent.max()[1]; ++p[1]) {
-        for (p[0] = value.extent.min()[0]; p[0] <= value.extent.max()[0]; ++p[0]) {
+    for (position p = value.ext.min(); p[1] <= value.ext.max()[1]; ++p[1]) {
+        for (p[0] = value.ext.min()[0]; p[0] <= value.ext.max()[0]; ++p[0]) {
             if (const auto it = value.grid.find(p); it != value.grid.end()) {
                 out << it->second;
             } else {

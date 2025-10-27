@@ -22,6 +22,7 @@ struct cursor_position {
     size_t row = 0, col = 0;
 };
 
+// FIXME: to string?
 std::ostream& operator<<(std::ostream& out, erase cmd);
 std::ostream& operator<<(std::ostream& out, hide_cursor cmd);
 std::ostream& operator<<(std::ostream& out, cursor_position cmd);

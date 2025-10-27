@@ -111,6 +111,7 @@ std::istream& operator>>(std::istream& in, direction& dir);
 std::ostream& operator<<(std::ostream& out, offset u);
 std::ostream& operator<<(std::ostream& out, position p);
 
+// FIXME: read/write functions (with additional parameters) instead of these operators?
 template <typename mapped_type>
 std::ostream& operator<<(std::ostream& out, const std::tuple<const std::map<position, mapped_type>&, const extent&>& grid_extent)
 {

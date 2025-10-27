@@ -121,27 +121,26 @@ std::ostream& operator<<(std::ostream& out, position p);
 
 // FIXME: input()/output() functions (with additional parameters) instead of these operators?
 template <typename mapped_type>
-std::ostream& operator<<(std::ostream& out, const std::tuple<const std::map<position, mapped_type>&, const extent&>& grid_extent)
+struct output_grid {
+    const std::map<position, mapped_type>& grid;
+    const extent& extent;
+    const mapped_type& empty {};
+};
+
+template <typename mapped_type>
+std::ostream& operator<<(std::ostream& out, output_grid<mapped_type> value)
 {
-    const auto [grid, extent] = grid_extent;
-    const mapped_type empty {};
-    for (position p = extent.min(); p[1] <= extent.max()[1]; ++p[1]) {
-        for (p[0] = extent.min()[0]; p[0] <= extent.max()[0]; ++p[0]) {
-            if (const auto it = grid.find(p); it != grid.end()) {
+    for (position p = value.extent.min(); p[1] <= value.extent.max()[1]; ++p[1]) {
+        for (p[0] = value.extent.min()[0]; p[0] <= value.extent.max()[0]; ++p[0]) {
+            if (const auto it = value.grid.find(p); it != value.grid.end()) {
                 out << it->second;
             } else {
-                out << empty;
+                out << value.empty;
             }
         }
         out.put('\n');
     }
     return out;
-}
-
-template <typename mapped_type>
-std::ostream& operator<<(std::ostream& out, const std::map<position, mapped_type>& grid)
-{
-    return out << std::tuple<const std::map<position, mapped_type>&, const extent&> { grid, extent(grid) };
 }
 
 } // namespace grid::planar

@@ -115,6 +115,7 @@ direction rotate(rotation rdir, direction dir)
 
 offset rotate(rotation rdir, offset u)
 {
+    // Implicit ±π/2 rotation matrix by vector multiplication.
     switch (rdir) {
     case rotation::cw:
         return { -u[1], u[0] };

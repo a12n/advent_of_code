@@ -125,7 +125,7 @@ template <typename mapped_type>
 struct output_grid {
     const std::map<position, mapped_type>& grid;
     const extent& ext;
-    const mapped_type& empty {};
+    const mapped_type& empty;
 };
 
 template <typename mapped_type>

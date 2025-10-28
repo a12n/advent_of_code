@@ -144,6 +144,7 @@ int main()
             // TODO
         }
     }
+    std::cout << vaporized[0] * 100 + vaporized[1] << '\n';
     // TODO: Take 200 points from this distrib. Iterate over different
     // vectors (polar angles) and from each distrib bin take one
     // position (starting from the closest to the optimal_i, as they

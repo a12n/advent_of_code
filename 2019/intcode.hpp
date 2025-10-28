@@ -40,6 +40,9 @@ struct state {
 
 using memory = std::vector<value>;
 
+// Run interrupted until I/O or halt.
+std::tuple<opcode, address> run_intrpt(memory& img, address& ip, value& rel_base);
+
 struct environ {
     virtual value input();
     virtual void output(value v);
@@ -52,9 +55,6 @@ struct test_environ : environ {
     std::forward_list<value> fake_in;
     std::forward_list<value> expected_out;
 };
-
-// Run interrupted until I/O or halt.
-std::tuple<opcode, address, address> run_intrpt(state& st, memory& img, address ip);
 
 // Like run_intrpt above, but doesn't preserve state (e.g., relative
 // base) between runs.

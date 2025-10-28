@@ -125,10 +125,8 @@ void expand(memory& img, address addr)
     }
 }
 
-std::tuple<opcode, address, address> run_intrpt(state& st, memory& img, address ip)
+std::tuple<opcode, address> run_intrpt(memory& img, address& ip, value& rel_base)
 {
-    const auto err = std::invalid_argument(__func__);
-
     while (true) {
         const auto instr = img[ip];
         const auto [op, mode1, mode2, mode3] = decode(instr);
@@ -137,9 +135,9 @@ std::tuple<opcode, address, address> run_intrpt(state& st, memory& img, address 
         case opcode::mul:
         case opcode::less_than:
         case opcode::equals: {
-            const auto addr1 = src_param_addr(img, st.rel_base, mode1, ip + 1);
-            const auto addr2 = src_param_addr(img, st.rel_base, mode2, ip + 2);
-            const auto addr3 = dest_param_addr(img, st.rel_base, mode3, ip + 3);
+            const auto addr1 = src_param_addr(img, rel_base, mode1, ip + 1);
+            const auto addr2 = src_param_addr(img, rel_base, mode2, ip + 2);
+            const auto addr3 = dest_param_addr(img, rel_base, mode3, ip + 3);
             expand(img, std::max({ addr1, addr2, addr3 }));
             if (op == opcode::add) {
                 img[addr3] = img[addr1] + img[addr2];
@@ -154,23 +152,23 @@ std::tuple<opcode, address, address> run_intrpt(state& st, memory& img, address 
         } break;
 
         case opcode::input: {
-            const auto addr1 = dest_param_addr(img, st.rel_base, mode1, ip + 1);
+            const auto addr1 = dest_param_addr(img, rel_base, mode1, ip + 1);
             expand(img, addr1);
             ip += 2;
-            return { op, ip, addr1 };
+            return { op, addr1 };
         }
 
         case opcode::output: {
-            const auto addr1 = src_param_addr(img, st.rel_base, mode1, ip + 1);
+            const auto addr1 = src_param_addr(img, rel_base, mode1, ip + 1);
             expand(img, addr1);
             ip += 2;
-            return { op, ip, addr1 };
+            return { op, addr1 };
         }
 
         case opcode::jump_if_true:
         case opcode::jump_if_false: {
-            const auto addr1 = src_param_addr(img, st.rel_base, mode1, ip + 1);
-            const auto addr2 = src_param_addr(img, st.rel_base, mode2, ip + 2);
+            const auto addr1 = src_param_addr(img, rel_base, mode1, ip + 1);
+            const auto addr2 = src_param_addr(img, rel_base, mode2, ip + 2);
             expand(img, std::max(addr1, addr2));
             if ((op == opcode::jump_if_true && img[addr1] != 0) || (op == opcode::jump_if_false && img[addr1] == 0)) {
                 ip = img[addr2];
@@ -180,17 +178,17 @@ std::tuple<opcode, address, address> run_intrpt(state& st, memory& img, address 
         } break;
 
         case opcode::adjust_rel_base: {
-            const auto addr1 = src_param_addr(img, st.rel_base, mode1, ip + 1);
+            const auto addr1 = src_param_addr(img, rel_base, mode1, ip + 1);
             expand(img, addr1);
-            st.rel_base += img[addr1];
+            rel_base += img[addr1];
             ip += 2;
         } break;
 
         case opcode::halt:
-            return { op, ip, 0 };
+            return { op, 0 };
 
         default:
-            throw err;
+            throw std::invalid_argument(__func__);
         }
     }
 }

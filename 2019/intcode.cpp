@@ -92,7 +92,7 @@ void test_environ::output(value v)
     expected_out.pop_front();
 }
 
-address src_param_addr(const state& st, const memory& img, mode m, value v)
+address src_param_addr(const memory& img, value rel_base, mode m, value v)
 {
     switch (m) {
     case mode::immediate:
@@ -100,19 +100,19 @@ address src_param_addr(const state& st, const memory& img, mode m, value v)
     case mode::position:
         return img[v];
     case mode::relative:
-        return st.rel_base + img[v];
+        return rel_base + img[v];
     default:
         throw std::invalid_argument(__func__);
     }
 }
 
-address dest_param_addr(const state& st, const memory& img, mode m, value v)
+address dest_param_addr(const memory& img, value rel_base, mode m, value v)
 {
     switch (m) {
     case mode::position:
         return img[v];
     case mode::relative:
-        return st.rel_base + img[v];
+        return rel_base + img[v];
     default:
         throw std::invalid_argument(__func__);
     }
@@ -137,9 +137,9 @@ std::tuple<opcode, address, address> run_intrpt(state& st, memory& img, address 
         case opcode::mul:
         case opcode::less_than:
         case opcode::equals: {
-            const auto addr1 = src_param_addr(st, img, mode1, ip + 1);
-            const auto addr2 = src_param_addr(st, img, mode2, ip + 2);
-            const auto addr3 = dest_param_addr(st, img, mode3, ip + 3);
+            const auto addr1 = src_param_addr(img, st.rel_base, mode1, ip + 1);
+            const auto addr2 = src_param_addr(img, st.rel_base, mode2, ip + 2);
+            const auto addr3 = dest_param_addr(img, st.rel_base, mode3, ip + 3);
             expand(img, std::max({ addr1, addr2, addr3 }));
             if (op == opcode::add) {
                 img[addr3] = img[addr1] + img[addr2];
@@ -154,14 +154,14 @@ std::tuple<opcode, address, address> run_intrpt(state& st, memory& img, address 
         } break;
 
         case opcode::input: {
-            const auto addr1 = dest_param_addr(st, img, mode1, ip + 1);
+            const auto addr1 = dest_param_addr(img, st.rel_base, mode1, ip + 1);
             expand(img, addr1);
             ip += 2;
             return { op, ip, addr1 };
         }
 
         case opcode::output: {
-            const auto addr1 = src_param_addr(st, img, mode1, ip + 1);
+            const auto addr1 = src_param_addr(img, st.rel_base, mode1, ip + 1);
             expand(img, addr1);
             ip += 2;
             return { op, ip, addr1 };
@@ -169,8 +169,8 @@ std::tuple<opcode, address, address> run_intrpt(state& st, memory& img, address 
 
         case opcode::jump_if_true:
         case opcode::jump_if_false: {
-            const auto addr1 = src_param_addr(st, img, mode1, ip + 1);
-            const auto addr2 = src_param_addr(st, img, mode2, ip + 2);
+            const auto addr1 = src_param_addr(img, st.rel_base, mode1, ip + 1);
+            const auto addr2 = src_param_addr(img, st.rel_base, mode2, ip + 2);
             expand(img, std::max(addr1, addr2));
             if ((op == opcode::jump_if_true && img[addr1] != 0) || (op == opcode::jump_if_false && img[addr1] == 0)) {
                 ip = img[addr2];
@@ -180,7 +180,7 @@ std::tuple<opcode, address, address> run_intrpt(state& st, memory& img, address 
         } break;
 
         case opcode::adjust_rel_base: {
-            const auto addr1 = src_param_addr(st, img, mode1, ip + 1);
+            const auto addr1 = src_param_addr(img, st.rel_base, mode1, ip + 1);
             expand(img, addr1);
             st.rel_base += img[addr1];
             ip += 2;

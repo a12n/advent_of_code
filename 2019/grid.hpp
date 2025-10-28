@@ -41,6 +41,7 @@ offset to_offset(direction dir);
 offset to_offset(position p);
 offset normalize(offset u);
 direction rotate(rotation rdir, direction dir);
+offset rotate(rotation rdir, offset u);
 double angle(offset u);
 
 offset& operator*=(offset& u, int64_t n);

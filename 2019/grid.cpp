@@ -113,6 +113,17 @@ direction rotate(rotation rdir, direction dir)
     throw std::invalid_argument(__func__);
 }
 
+offset rotate(rotation rdir, offset u)
+{
+    switch (rdir) {
+    case rotation::cw:
+        return { -u[1], u[0] };
+    case rotation::ccw:
+        return { u[1], -u[0] };
+    }
+    throw std::invalid_argument(__func__);
+}
+
 double angle(offset u)
 {
     const auto theta = std::atan2(u[1], u[0]);

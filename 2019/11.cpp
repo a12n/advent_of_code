@@ -36,16 +36,16 @@ canvas hull_painting_robot(const intcode::memory& prog, std::optional<color> sta
     } expect
         = paint;
 
-    intcode::address ip = 0;
     intcode::memory img = prog;
-    intcode::state st;
+    intcode::address ip = 0;
+    intcode::value rel_base = 0;
 
     if (start) {
         canv[p] = *start;
     }
 
     while (true) {
-        const auto [op, ip2, addr] = intcode::run_intrpt(st, img, ip);
+        const auto [op, addr] = intcode::run_intrpt(img, ip, rel_base);
         switch (op) {
         case intcode::opcode::input:
             if (const auto it = canv.find(p); it != canv.end()) {
@@ -81,7 +81,6 @@ canvas hull_painting_robot(const intcode::memory& prog, std::optional<color> sta
         default:
             throw std::runtime_error(__func__);
         }
-        ip = ip2;
     }
 }
 

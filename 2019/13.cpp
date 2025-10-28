@@ -47,9 +47,9 @@ std::pair<size_t, size_t> arcade_cabinet(
     intcode::value x = 0, y = 0;
     intcode::value x_ball = 0, x_paddle = 0;
 
-    intcode::address ip = 0;
     intcode::memory img = prog;
-    intcode::state st;
+    intcode::address ip = 0;
+    intcode::value rel_base = 0;
 
     size_t n_block = 0, score = 0;
 
@@ -59,7 +59,7 @@ std::pair<size_t, size_t> arcade_cabinet(
 
     screen << ansi::erase {} << ansi::hide_cursor {};
     while (true) {
-        const auto [op, ip2, addr] = intcode::run_intrpt(st, img, ip);
+        const auto [op, addr] = intcode::run_intrpt(img, ip, rel_base);
         switch (op) {
         case intcode::opcode::input: {
             const auto x_diff = x_ball - x_paddle;
@@ -106,7 +106,6 @@ std::pair<size_t, size_t> arcade_cabinet(
         default:
             throw std::runtime_error(__func__);
         }
-        ip = ip2;
     }
 }
 

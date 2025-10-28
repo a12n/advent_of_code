@@ -115,7 +115,7 @@ int main()
     static_cast<void>(optimal_num);
     auto distrib = asteroid_offset_distrib(offsets[optimal_i]);
     std::sort(distrib.begin(), distrib.end(), [](const auto& bi, const auto& bj) {
-        return angle(bi.u) < angle(bj.u);
+        return angle(rotate(rotation::cw, bi.u)) < angle(rotate(rotation::cw, bj.u));
     });
     for (auto& [_, indices] : distrib) {
         std::sort(indices.begin(), indices.end(), [&asteroids, optimal_i](size_t i, size_t j) {

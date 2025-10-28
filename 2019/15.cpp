@@ -9,6 +9,21 @@ namespace {
 
 using namespace grid::planar;
 
+intcode::value movement_command(direction dir)
+{
+    switch (dir) {
+    case direction::north:
+        return 1;
+    case direction::west:
+        return 3;
+    case direction::east:
+        return 4;
+    case direction::south:
+        return 2;
+    }
+    throw std::invalid_argument(__func__);
+}
+
 size_t repair_droid(const intcode::memory& prog)
 {
     intcode::address ip = 0;

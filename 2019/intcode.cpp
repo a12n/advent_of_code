@@ -193,12 +193,6 @@ std::tuple<opcode, address> run_intrpt(memory& img, address& ip, value& rel_base
     }
 }
 
-std::tuple<opcode, address, address> run_intrpt(memory& img, address ip)
-{
-    state st;
-    return run_intrpt(st, img, ip);
-}
-
 address run(memory& img, address ip, environ& env)
 {
     state st;

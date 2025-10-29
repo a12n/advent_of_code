@@ -56,10 +56,6 @@ struct test_environ : environ {
     std::forward_list<value> expected_out;
 };
 
-// Like run_intrpt above, but doesn't preserve state (e.g., relative
-// base) between runs.
-std::tuple<opcode, address, address> run_intrpt(memory& img, address ip);
-
 // Run uninterrupted until halt, use environment for I/O.
 address run(memory& img, address ip, environ& env);
 address run(memory& img, address ip = 0);

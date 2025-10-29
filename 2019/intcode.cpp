@@ -62,36 +62,6 @@ std::tuple<opcode, mode, mode, mode> decode(value v)
     };
 }
 
-value environ::input()
-{
-    std::string s;
-    std::cerr << '>' << '\n';
-    if (!std::getline(std::cin, s)) {
-        throw std::runtime_error(__func__);
-    }
-    return std::stoll(s);
-}
-
-void environ::output(value v)
-{
-    std::cerr << '<';
-    std::cout << v << '\n';
-}
-
-value test_environ::input()
-{
-    assert(!fake_in.empty());
-    value v = fake_in.front();
-    fake_in.pop_front();
-    return v;
-}
-
-void test_environ::output(value v)
-{
-    assert(v == expected_out.front());
-    expected_out.pop_front();
-}
-
 address src_param_addr(const memory& img, value rel_base, mode m, value v)
 {
     switch (m) {
@@ -191,6 +161,36 @@ std::tuple<opcode, address> run_intrpt(memory& img, address& ip, value& rel_base
             throw std::invalid_argument(__func__);
         }
     }
+}
+
+value environ::input()
+{
+    std::string s;
+    std::cerr << '>' << '\n';
+    if (!std::getline(std::cin, s)) {
+        throw std::runtime_error(__func__);
+    }
+    return std::stoll(s);
+}
+
+void environ::output(value v)
+{
+    std::cerr << '<';
+    std::cout << v << '\n';
+}
+
+value test_environ::input()
+{
+    assert(!fake_in.empty());
+    value v = fake_in.front();
+    fake_in.pop_front();
+    return v;
+}
+
+void test_environ::output(value v)
+{
+    assert(v == expected_out.front());
+    expected_out.pop_front();
 }
 
 address run(memory& img, environ& env)

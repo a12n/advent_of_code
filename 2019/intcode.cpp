@@ -193,22 +193,21 @@ std::tuple<opcode, address> run_intrpt(memory& img, address& ip, value& rel_base
     }
 }
 
-address run(memory& img, address ip, environ& env)
+address run(memory& img, environ& env)
 {
-    state st;
+    address ip = 0;
+    value rel_base = 0;
     while (true) {
-        const auto [op, ip2, addr] = run_intrpt(st, img, ip);
+        const auto [op, addr] = run_intrpt(img, ip, rel_base);
         switch (op) {
         case opcode::input:
             img[addr] = env.input();
-            ip = ip2;
             break;
         case opcode::output:
             env.output(img[addr]);
-            ip = ip2;
             break;
         case opcode::halt:
-            return ip2;
+            return ip;
         default:
             throw std::invalid_argument(__func__);
         }

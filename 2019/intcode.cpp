@@ -225,16 +225,14 @@ std::istream& operator>>(std::istream& in, memory& img)
     return ::operator>><int64_t, ','>(in, img);
 }
 
-void test(
-    const memory& prog,
-    address start, address stop,
+void test(const memory& prog, address stop,
     const std::forward_list<value>& in, const std::forward_list<value>& out)
 {
     memory img = prog;
     test_environ env;
     env.fake_in = in;
     env.expected_out = out;
-    assert(run(img, start, env) == stop);
+    assert(run(img, env) == stop);
     assert(env.fake_in.empty());
     assert(env.expected_out.empty());
 }

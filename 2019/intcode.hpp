@@ -62,9 +62,7 @@ address run(memory& img, address ip = 0);
 
 std::istream& operator>>(std::istream& in, memory& img);
 
-void test(
-    const memory& prog,
-    address start, address stop,
+void test(const memory& prog, address stop,
     const std::forward_list<value>& in, const std::forward_list<value>& out);
 
 // Load memory image from file or from standard input.

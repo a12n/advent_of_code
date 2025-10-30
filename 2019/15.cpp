@@ -10,22 +10,22 @@ namespace {
 
 using namespace grid::planar;
 
-enum class tile {
+enum class tile_type {
     wall = 0,
     empty = 1,
     oxygen = 2,
 };
 
-std::ostream& operator<<(std::ostream& out, tile t)
+std::ostream& operator<<(std::ostream& out, tile_type tile)
 {
-    switch (t) {
-    case tile::wall:
+    switch (tile) {
+    case tile_type::wall:
         return out << "█";
-    case tile::empty:
+    case tile_type::empty:
         return out << "░";
-    case tile::oxygen:
+    case tile_type::oxygen:
         return out << "X";
-    case tile(3):
+    case tile_type(3):
         return out << "@";
     }
     return out << " ";
@@ -52,7 +52,7 @@ struct repair_droid {
     intcode::value rel_base = 0;
 };
 
-tile move(repair_droid& droid, direction dir)
+tile_type move(repair_droid& droid, direction dir)
 {
     // Input movement command
     {
@@ -66,11 +66,11 @@ tile move(repair_droid& droid, direction dir)
         const auto [op, addr] = intcode::run_intrpt(droid.img, droid.ip, droid.rel_base);
         assert(op == intcode::opcode::output);
         assert(droid.img[addr] >= 0 && droid.img[addr] <= 2);
-        return tile(droid.img[addr]);
+        return tile_type(droid.img[addr]);
     }
 }
 
-void explore(repair_droid& droid, std::map<position, tile>& grid, position p, size_t steps)
+void explore(repair_droid& droid, std::map<position, tile_type>& grid, position p, size_t steps)
 {
     for (const direction dir : { direction::north, direction::west, direction::east, direction::south }) {
         const auto q = p + to_offset(dir);
@@ -79,30 +79,30 @@ void explore(repair_droid& droid, std::map<position, tile>& grid, position p, si
             continue;
         }
 
-        const auto til = move(droid, dir);
-        grid.insert({ q, til });
-        std::cerr << __func__ << " " << p << " -> " << q << " = " << til << '\n';
+        const auto tile = move(droid, dir);
+        grid.insert({ q, tile });
+        std::cerr << __func__ << " " << p << " -> " << q << " = " << tile << '\n';
 
-        switch (til) {
-        case tile::wall:
+        switch (tile) {
+        case tile_type::wall:
             break;
-        case tile::empty:
+        case tile_type::empty:
             explore(droid, grid, q, steps + 1);
             move(droid, opposite(dir));
             break;
-        case tile::oxygen:
+        case tile_type::oxygen:
             std::cerr << __func__ << " oxygen " << q << " " << steps + 1 << '\n';
             break;
         }
     };
 }
 
-std::map<position, tile> explore(const intcode::memory& prog)
+std::map<position, tile_type> explore(const intcode::memory& prog)
 {
     repair_droid droid = { prog };
-    std::map<position, tile> grid;
+    std::map<position, tile_type> grid;
 
-    grid[{ 0, 0 }] = tile(3);
+    grid[{ 0, 0 }] = tile_type(3);
     explore(droid, grid, { 0, 0 }, 0);
 
     return grid;
@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 
     const auto grid = explore(img);
 
-    std::cerr << output_grid<tile> { grid, extent(grid), tile(-1) };
+    std::cerr << output_grid<tile_type> { grid, extent(grid), tile_type(-1) };
 
     return 0;
 }

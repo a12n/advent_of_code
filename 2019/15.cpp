@@ -83,7 +83,7 @@ void repair_droid(intcode::memory& img, intcode::address& ip, intcode::value& re
             move(img, ip, rel_base, opposite(dir));
             break;
         case tile::oxygen:
-            return;
+            break;
         }
     };
 }

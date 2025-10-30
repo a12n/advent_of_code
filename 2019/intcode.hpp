@@ -57,8 +57,8 @@ struct test_environ : environ {
 };
 
 // Run uninterrupted until halt, use environment for I/O.
+address run(memory& img);
 address run(memory& img, environ& env);
-address run(memory& img, address ip = 0);
 
 std::istream& operator>>(std::istream& in, memory& img);
 

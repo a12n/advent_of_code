@@ -193,6 +193,12 @@ void test_environ::output(value v)
     expected_out.pop_front();
 }
 
+address run(memory& img)
+{
+    environ env;
+    return run(img, env);
+}
+
 address run(memory& img, environ& env)
 {
     address ip = 0;
@@ -212,12 +218,6 @@ address run(memory& img, environ& env)
             throw std::invalid_argument(__func__);
         }
     }
-}
-
-address run(memory& img, address ip)
-{
-    environ def;
-    return run(img, ip, def);
 }
 
 std::istream& operator>>(std::istream& in, memory& img)

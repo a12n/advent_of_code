@@ -17,7 +17,7 @@ std::optional<std::pair<int, int>> gravity_assist(const intcode::memory& prog, i
             intcode::memory img = prog;
             img[1] = noun;
             img[2] = verb;
-            intcode::run(img, 0);
+            intcode::run(img);
             if (img[0] == k) {
                 return { { noun, verb } };
             }
@@ -42,7 +42,7 @@ int main()
 #if PART == 1
     img[1] = 12;
     img[2] = 2;
-    intcode::run(img, 0);
+    intcode::run(img);
     std::cout << img[0] << '\n';
 #elif PART == 2
     const auto params = gravity_assist(img, 19690720);
@@ -61,7 +61,7 @@ int test()
 #if PART == 1
     intcode::memory img { 1, 9, 10, 3, 2, 3, 11, 0, 99, 30, 40, 50 };
     intcode::test_environ env;
-    assert(intcode::run(img, 0, env) == 8);
+    assert(intcode::run(img, env) == 8);
     assert(img[0] == 3500);
 #endif // PART
     return 0;

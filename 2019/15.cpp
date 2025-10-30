@@ -26,15 +26,15 @@ intcode::value movement_command(direction dir)
 
 size_t repair_droid(const intcode::memory& prog)
 {
-    intcode::address ip = 0;
     intcode::memory img = prog;
-    intcode::state st;
+    intcode::address ip = 0;
+    intcode::value rel_base = 0;
 
     position p = { 0, 0 };
     std::map<position, std::optional<size_t>> steps;
 
     while (true) {
-        const auto [op, ip2, addr] = intcode::run_intrpt(st, img, ip);
+        const auto [op, addr] = intcode::run_intrpt(img, ip, rel_base);
         switch (op) {
         case intcode::opcode::input: {
             // TODO
@@ -45,7 +45,6 @@ size_t repair_droid(const intcode::memory& prog)
         default:
             throw std::runtime_error(__func__);
         }
-        ip = ip2;
     }
 
     return 0;

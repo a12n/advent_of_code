@@ -16,6 +16,8 @@ enum class tile_type {
     oxygen = 2,
 };
 
+using tile_grid = std::map<position, tile_type>;
+
 std::ostream& operator<<(std::ostream& out, tile_type tile)
 {
     switch (tile) {
@@ -70,7 +72,7 @@ tile_type move(repair_droid& droid, direction dir)
     }
 }
 
-void explore(repair_droid& droid, std::map<position, tile_type>& grid, position p, size_t steps)
+void explore(repair_droid& droid, tile_grid& grid, position p, size_t steps)
 {
     for (const direction dir : { direction::north, direction::west, direction::east, direction::south }) {
         const auto q = p + to_offset(dir);
@@ -97,10 +99,10 @@ void explore(repair_droid& droid, std::map<position, tile_type>& grid, position 
     };
 }
 
-std::map<position, tile_type> explore(const intcode::memory& prog)
+tile_grid explore(const intcode::memory& prog)
 {
     repair_droid droid = { prog };
-    std::map<position, tile_type> grid;
+    tile_grid grid;
 
     grid[{ 0, 0 }] = tile_type(3);
     explore(droid, grid, { 0, 0 }, 0);
@@ -113,7 +115,6 @@ std::map<position, tile_type> explore(const intcode::memory& prog)
 int main(int argc, char* argv[])
 {
     const auto img = intcode::load(argc, argv);
-
     const auto grid = explore(img);
 
     std::cerr << output_grid<tile_type> { grid, extent(grid), tile_type(-1) };

@@ -19,13 +19,13 @@ std::ostream& operator<<(std::ostream& out, tile t)
 {
     switch (t) {
     case tile::wall:
-        return out << '#';
+        return out << "█";
     case tile::empty:
-        return out << '.';
+        return out << "░";
     case tile::oxygen:
-        return out << 'O';
+        return out << "X";
     }
-    return out << '?';
+    return out << "@";
 }
 
 intcode::value movement_command(direction dir)

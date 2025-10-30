@@ -72,24 +72,24 @@ tile_type move(repair_droid& droid, direction dir)
     }
 }
 
-void explore(repair_droid& droid, tile_grid& grid, position p, size_t steps)
+void explore(repair_droid& droid, tile_grid& tiles, position p, size_t steps)
 {
     for (const direction dir : { direction::north, direction::west, direction::east, direction::south }) {
         const auto q = p + to_offset(dir);
 
-        if (const auto it = grid.find(q); it != grid.end()) {
+        if (const auto it = tiles.find(q); it != tiles.end()) {
             continue;
         }
 
         const auto tile = move(droid, dir);
-        grid.insert({ q, tile });
+        tiles.insert({ q, tile });
         std::cerr << __func__ << " " << p << " -> " << q << " = " << tile << '\n';
 
         switch (tile) {
         case tile_type::wall:
             break;
         case tile_type::empty:
-            explore(droid, grid, q, steps + 1);
+            explore(droid, tiles, q, steps + 1);
             move(droid, opposite(dir));
             break;
         case tile_type::oxygen:
@@ -102,10 +102,10 @@ void explore(repair_droid& droid, tile_grid& grid, position p, size_t steps)
 tile_grid explore(const intcode::memory& prog)
 {
     repair_droid droid = { prog };
-    tile_grid grid;
+    tile_grid tiles;
 
-    grid[{ 0, 0 }] = tile_type(3);
-    explore(droid, grid, { 0, 0 }, 0);
+    tiles[{ 0, 0 }] = tile_type(3);
+    explore(droid, tiles, { 0, 0 }, 0);
 
     return grid;
 }
@@ -115,9 +115,9 @@ tile_grid explore(const intcode::memory& prog)
 int main(int argc, char* argv[])
 {
     const auto img = intcode::load(argc, argv);
-    const auto grid = explore(img);
+    const auto tiles = explore(img);
 
-    std::cerr << output_grid<tile_type> { grid, extent(grid), tile_type(-1) };
+    std::cerr << output_grid<tile_type> { tiles, extent(tiles), tile_type(-1) };
 
     return 0;
 }

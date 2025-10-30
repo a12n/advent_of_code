@@ -9,6 +9,25 @@ namespace {
 
 using namespace grid::planar;
 
+enum class tile {
+    wall = 0,
+    empty = 1,
+    oxygen = 2,
+};
+
+std::ostream& operator<<(std::ostream& out, tile t)
+{
+    switch (t) {
+    case tile::wall:
+        return out << '#';
+    case tile::empty:
+        return out << '.';
+    case tile::oxygen:
+        return out << 'O';
+    }
+    return out << '?';
+}
+
 intcode::value movement_command(direction dir)
 {
     switch (dir) {

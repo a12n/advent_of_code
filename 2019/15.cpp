@@ -64,7 +64,7 @@ tile move(intcode::memory& img, intcode::address& ip, intcode::value& rel_base, 
     }
 }
 
-void repair_droid(intcode::memory& img, intcode::address& ip, intcode::value& rel_base, std::map<position, tile>& grid, position p, size_t steps)
+void explore(intcode::memory& img, intcode::address& ip, intcode::value& rel_base, std::map<position, tile>& grid, position p, size_t steps)
 {
     for (const direction dir : { direction::north, direction::west, direction::east, direction::south }) {
         const auto q = p + to_offset(dir);
@@ -81,7 +81,7 @@ void repair_droid(intcode::memory& img, intcode::address& ip, intcode::value& re
         case tile::wall:
             break;
         case tile::empty:
-            repair_droid(img, ip, rel_base, grid, q, steps + 1);
+            explore(img, ip, rel_base, grid, q, steps + 1);
             move(img, ip, rel_base, opposite(dir));
             break;
         case tile::oxygen:
@@ -91,7 +91,7 @@ void repair_droid(intcode::memory& img, intcode::address& ip, intcode::value& re
     };
 }
 
-std::map<position, tile> repair_droid(const intcode::memory& prog)
+std::map<position, tile> explore(const intcode::memory& prog)
 {
     std::map<position, tile> grid;
 
@@ -100,7 +100,7 @@ std::map<position, tile> repair_droid(const intcode::memory& prog)
     intcode::value rel_base = 0;
 
     grid[{ 0, 0 }] = tile(3);
-    repair_droid(img, ip, rel_base, grid, { 0, 0 }, 0);
+    explore(img, ip, rel_base, grid, { 0, 0 }, 0);
 
     return grid;
 }
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 {
     const auto img = intcode::load(argc, argv);
 
-    const auto grid = repair_droid(img);
+    const auto grid = explore(img);
 
     std::cerr << output_grid<tile> { grid, extent(grid), tile(-1) };
 

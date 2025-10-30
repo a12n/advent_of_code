@@ -46,25 +46,31 @@ intcode::value movement_command(direction dir)
     throw std::invalid_argument(__func__);
 }
 
-tile move(intcode::memory& img, intcode::address& ip, intcode::value& rel_base, direction dir)
+struct repair_droid {
+    intcode::memory img;
+    intcode::address ip = 0;
+    intcode::value rel_base = 0;
+};
+
+tile move(repair_droid& droid, direction dir)
 {
     // Input movement command
     {
-        const auto [op, addr] = intcode::run_intrpt(img, ip, rel_base);
+        const auto [op, addr] = intcode::run_intrpt(droid.img, droid.ip, droid.rel_base);
         assert(op == intcode::opcode::input);
-        img[addr] = movement_command(dir);
+        droid.img[addr] = movement_command(dir);
     }
 
     // Output status
     {
-        const auto [op, addr] = intcode::run_intrpt(img, ip, rel_base);
+        const auto [op, addr] = intcode::run_intrpt(droid.img, droid.ip, droid.rel_base);
         assert(op == intcode::opcode::output);
-        assert(img[addr] >= 0 && img[addr] <= 2);
-        return tile(img[addr]);
+        assert(droid.img[addr] >= 0 && droid.img[addr] <= 2);
+        return tile(droid.img[addr]);
     }
 }
 
-void explore(intcode::memory& img, intcode::address& ip, intcode::value& rel_base, std::map<position, tile>& grid, position p, size_t steps)
+void explore(repair_droid& droid, std::map<position, tile>& grid, position p, size_t steps)
 {
     for (const direction dir : { direction::north, direction::west, direction::east, direction::south }) {
         const auto q = p + to_offset(dir);
@@ -73,7 +79,7 @@ void explore(intcode::memory& img, intcode::address& ip, intcode::value& rel_bas
             continue;
         }
 
-        const auto til = move(img, ip, rel_base, dir);
+        const auto til = move(droid, dir);
         grid.insert({ q, til });
         std::cerr << __func__ << " " << p << " -> " << q << " = " << til << '\n';
 
@@ -81,8 +87,8 @@ void explore(intcode::memory& img, intcode::address& ip, intcode::value& rel_bas
         case tile::wall:
             break;
         case tile::empty:
-            explore(img, ip, rel_base, grid, q, steps + 1);
-            move(img, ip, rel_base, opposite(dir));
+            explore(droid, grid, q, steps + 1);
+            move(droid, opposite(dir));
             break;
         case tile::oxygen:
             std::cerr << __func__ << " oxygen " << q << " " << steps + 1 << '\n';
@@ -93,14 +99,11 @@ void explore(intcode::memory& img, intcode::address& ip, intcode::value& rel_bas
 
 std::map<position, tile> explore(const intcode::memory& prog)
 {
+    repair_droid droid = { prog };
     std::map<position, tile> grid;
 
-    intcode::memory img = prog;
-    intcode::address ip = 0;
-    intcode::value rel_base = 0;
-
     grid[{ 0, 0 }] = tile(3);
-    explore(img, ip, rel_base, grid, { 0, 0 }, 0);
+    explore(droid, grid, { 0, 0 }, 0);
 
     return grid;
 }

@@ -17,6 +17,7 @@ intcode::value amplifier_controller(
     // Memory and instruction pointers for all N amplfiers.
     std::array<intcode::memory, n> img;
     std::array<intcode::address, n> ip;
+    std::array<intcode::value, n> rel_base;
 
     // Index of the currently running amplifier and bit-field to track
     // running state of all amplifiers.
@@ -27,6 +28,7 @@ intcode::value amplifier_controller(
     for (size_t i = 0; i < n; ++i) {
         img[i] = prog;
         ip[i] = 0;
+        rel_base[i] = 0;
         running |= (1 << i);
     }
 
@@ -34,7 +36,7 @@ intcode::value amplifier_controller(
 
     // While not all amplifiers halt.
     while (running != 0) {
-        const auto [op, ip2, addr] = intcode::run_intrpt(img[amp], ip[amp]);
+        const auto [op, addr] = intcode::run_intrpt(img[amp], ip[amp], rel_base[amp]);
         switch (op) {
         case intcode::opcode::input:
             if (phase[amp] == -1) {
@@ -47,19 +49,16 @@ intcode::value amplifier_controller(
                 img[amp][addr] = phase[amp];
                 phase[amp] = -1;
             }
-            ip[amp] = ip2;
             break;
         case intcode::opcode::output:
             // Amplifier iteration finished. Save the returned signal
             // for the next stage.
             signal = img[amp][addr];
-            ip[amp] = ip2;
             // Start running the next amplification stage.
             amp = (amp + 1) % n;
             break;
         case intcode::opcode::halt:
             running &= ~(1 << amp);
-            ip[amp] = ip2;
             amp = (amp + 1) % n;
             break;
         default:

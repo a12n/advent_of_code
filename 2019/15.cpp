@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
 
     const auto grid = repair_droid(img);
 
-    std::cerr << output_grid<tile> { grid, extent(grid), tile::empty };
+    std::cerr << output_grid<tile> { grid, extent(grid), tile(-1) };
 
     return 0;
 }

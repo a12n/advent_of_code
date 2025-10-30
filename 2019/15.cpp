@@ -85,6 +85,7 @@ void repair_droid(intcode::memory& img, intcode::address& ip, intcode::value& re
             move(img, ip, rel_base, opposite(dir));
             break;
         case tile::oxygen:
+            std::cerr << __func__ << " oxygen " << q << " " << steps + 1 << '\n';
             break;
         }
     };

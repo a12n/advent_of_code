@@ -25,8 +25,10 @@ std::ostream& operator<<(std::ostream& out, tile t)
         return out << "░";
     case tile::oxygen:
         return out << "X";
+    case tile(3):
+        return out << "@";
     }
-    return out << "@";
+    return out << " ";
 }
 
 intcode::value movement_command(direction dir)
@@ -96,7 +98,7 @@ std::map<position, tile> repair_droid(const intcode::memory& prog)
     intcode::address ip = 0;
     intcode::value rel_base = 0;
 
-    grid[{ 0, 0 }] = tile(-1);
+    grid[{ 0, 0 }] = tile(3);
     repair_droid(img, ip, rel_base, grid, { 0, 0 }, 0);
 
     return grid;

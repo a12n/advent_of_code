@@ -104,7 +104,7 @@ tile_grid explore(const intcode::memory& prog)
     repair_droid droid = { prog };
     tile_grid tiles;
 
-    tiles[{ 0, 0 }] = tile_type(3);
+    tiles.insert({ { 0, 0 }, tile_type(3) });
     explore(droid, tiles, { 0, 0 }, 0);
 
     return grid;

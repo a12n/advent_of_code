@@ -1,3 +1,4 @@
+#include <cassert>
 #include <iostream>
 #include <map>
 #include <optional>
@@ -43,30 +44,62 @@ intcode::value movement_command(direction dir)
     throw std::invalid_argument(__func__);
 }
 
-size_t repair_droid(const intcode::memory& prog)
+tile move(intcode::memory& img, intcode::address& ip, intcode::value& rel_base, direction dir)
 {
+    // Input movement command
+    {
+        const auto [op, addr] = intcode::run_intrpt(img, ip, rel_base);
+        assert(op == intcode::opcode::input);
+        img[addr] = movement_command(dir);
+    }
+
+    // Output status
+    {
+        const auto [op, addr] = intcode::run_intrpt(img, ip, rel_base);
+        assert(op == intcode::opcode::output);
+        assert(img[addr] >= 0 && img[addr] <= 2);
+        return tile(img[addr]);
+    }
+}
+
+void repair_droid(intcode::memory& img, intcode::address& ip, intcode::value& rel_base, std::map<position, tile>& grid, position p, size_t steps)
+{
+    for (const direction dir : { direction::north, direction::west, direction::east, direction::south }) {
+        const auto q = p + to_offset(dir);
+
+        if (const auto it = grid.find(q); it != grid.end()) {
+            continue;
+        }
+
+        const auto til = move(img, ip, rel_base, dir);
+        grid.insert({ q, til });
+        std::cerr << __func__ << " " << p << " -> " << q << " = " << til << '\n';
+
+        switch (til) {
+        case tile::wall:
+            break;
+        case tile::empty:
+            repair_droid(img, ip, rel_base, grid, q, steps + 1);
+            move(img, ip, rel_base, opposite(dir));
+            break;
+        case tile::oxygen:
+            return;
+        }
+    };
+}
+
+std::map<position, tile> repair_droid(const intcode::memory& prog)
+{
+    std::map<position, tile> grid;
+
     intcode::memory img = prog;
     intcode::address ip = 0;
     intcode::value rel_base = 0;
 
-    position p = { 0, 0 };
-    std::map<position, std::optional<size_t>> steps;
+    grid[{ 0, 0 }] = tile(-1);
+    repair_droid(img, ip, rel_base, grid, { 0, 0 }, 0);
 
-    while (true) {
-        const auto [op, addr] = intcode::run_intrpt(img, ip, rel_base);
-        switch (op) {
-        case intcode::opcode::input: {
-            // TODO
-        } break;
-        case intcode::opcode::output: {
-            // TODO
-        } break;
-        default:
-            throw std::runtime_error(__func__);
-        }
-    }
-
-    return 0;
+    return grid;
 }
 
 } // namespace
@@ -75,7 +108,9 @@ int main(int argc, char* argv[])
 {
     const auto img = intcode::load(argc, argv);
 
-    std::cout << repair_droid(img) << '\n';
+    const auto grid = repair_droid(img);
+
+    std::cerr << output_grid<tile> { grid, extent(grid), tile::empty };
 
     return 0;
 }

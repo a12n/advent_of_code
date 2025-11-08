@@ -39,25 +39,22 @@ using chemicals = std::map<std::string, int64_t>;
 // appear with negative quantities in the equation).
 using reactions = std::map<std::string, chemicals>;
 
-chemicals& operator*=(chemicals& a, int64_t m)
-{
-    for (auto& [_, n] : a) {
-        n *= m;
-    }
-    return a;
-}
-
-chemicals operator*(const chemicals& a, int64_t m)
+chemicals mul(const chemicals& a, int64_t m)
 {
     chemicals c = a;
-    return c *= m;
+    for (auto& [_, n] : c) {
+        n *= m;
+    }
+    return c;
 }
 
-chemicals operator+(const chemicals& a, const chemicals& b)
+chemicals add(const chemicals& a, const chemicals& b)
 {
     chemicals c;
+
     auto ai = a.begin();
     auto bi = b.begin();
+
     while (ai != a.end() && bi != b.end()) {
         if (ai->first < bi->first) {
             c.insert(*ai);
@@ -67,7 +64,7 @@ chemicals operator+(const chemicals& a, const chemicals& b)
             ++bi;
         } else {
             if (const auto n = ai->second + bi->second; n != 0) {
-                c.insert({ ai->first, ai->second + bi->second });
+                c.insert({ ai->first, n });
             }
             ++ai;
             ++bi;
@@ -156,7 +153,7 @@ int main()
         const auto& [chem, n] = *consume;
         const auto& chems = reacts.at(chem);
         const auto m = div_ceil(-n, chems.at(chem));
-        soup = soup + (chems * m);
+        soup = add(soup, mul(chems, m));
     }
 
     std::cout << -soup.at("ORE") << '\n';

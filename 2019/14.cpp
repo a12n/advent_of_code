@@ -137,6 +137,11 @@ std::istream& operator>>(std::istream& in, reactions& reacts)
     return in;
 }
 
+int64_t max_fuel(const chemicals& cargo)
+{
+    return 0;
+}
+
 } // namespace
 
 int main()
@@ -173,6 +178,8 @@ int main()
     }
 
     std::cout << -soup.at("ORE") << '\n';
+#elif PART==2
+    std::cout << max_fuel({ { "ORE", 1000000000000 } }) << '\n';
 #endif // PART
 
     return 0;

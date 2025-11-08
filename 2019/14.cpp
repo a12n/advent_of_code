@@ -57,10 +57,14 @@ chemicals add(const chemicals& a, const chemicals& b)
 
     while (ai != a.end() && bi != b.end()) {
         if (ai->first < bi->first) {
-            c.insert(*ai);
+            if (ai->second != 0) {
+                c.insert(*ai);
+            }
             ++ai;
         } else if (bi->first < ai->first) {
-            c.insert(*bi);
+            if (bi->second != 0) {
+                c.insert(*bi);
+            }
             ++bi;
         } else {
             if (const auto n = ai->second + bi->second; n != 0) {
@@ -70,8 +74,19 @@ chemicals add(const chemicals& a, const chemicals& b)
             ++bi;
         }
     }
-    c.insert(ai, a.end());
-    c.insert(bi, b.end());
+
+    for (; ai != a.end(); ++ai) {
+        if (ai->second != 0) {
+            c.insert(*ai);
+        }
+    }
+
+    for (; bi != b.end(); ++bi) {
+        if (bi->second != 0) {
+            c.insert(*bi);
+        }
+    }
+
     return c;
 }
 

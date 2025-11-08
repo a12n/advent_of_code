@@ -147,6 +147,7 @@ int main()
         return EX_DATAERR;
     }
 
+#if PART==1
     chemicals soup = { { "FUEL", -1 } };
 
     while (true) {
@@ -172,6 +173,7 @@ int main()
     }
 
     std::cout << -soup.at("ORE") << '\n';
+#endif // PART
 
     return 0;
 }

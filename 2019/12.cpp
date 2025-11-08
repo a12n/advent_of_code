@@ -19,6 +19,19 @@ using position_array = std::array<position, n>;
 template <size_t n>
 using velocity_array = std::array<offset, n>;
 
+template <typename t, size_t n>
+std::ostream& operator<<(std::ostream& out, const std::array<t, n>& p)
+{
+    out << '[';
+    for (size_t i = 0; i < n; ++i) {
+        if (i != 0) {
+            out << ' ';
+        }
+        out << p[i];
+    }
+    return out << ']';
+}
+
 int64_t potential_energy(const position& p)
 {
     return taxicab_norm(to_offset(p));

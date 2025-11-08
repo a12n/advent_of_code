@@ -39,13 +39,18 @@ using chemicals = std::map<std::string, int64_t>;
 // appear with negative quantities in the equation).
 using reactions = std::map<std::string, chemicals>;
 
+chemicals& operator*=(chemicals& a, int64_t m)
+{
+    for (auto& [_, n] : a) {
+        n *= m;
+    }
+    return a;
+}
+
 chemicals operator*(const chemicals& a, int64_t m)
 {
-    chemicals c;
-    for (const auto& [chem, n] : a) {
-        c.insert({ chem, n * m });
-    }
-    return c;
+    chemicals c = a;
+    return c *= m;
 }
 
 chemicals operator+(const chemicals& a, const chemicals& b)

@@ -130,16 +130,18 @@ int main()
     for (size_t i = 0; i < steps; ++i) {
         simulate(p, v);
 #if PART == 2
-        if (p == p0 && !pn) {
-            pn = i;
-            std::cerr << "pn " << *pn << '\n';
+        std::cerr << i + 1 << " p " << p << " v " << v << '\n';
+
+        for (size_t j = 0; j < n; ++j) {
+            if (p[j] == p0[j]) {
+                std::cerr << i + 1 << " ==p[" << j << "] " << p[j] << '\n';
+            }
         }
-        if (v == v0 && !vn) {
-            vn = i;
-            std::cerr << "vn " << *vn << '\n';
-        }
-        if (pn && vn) {
-            break;
+
+        for (size_t j = 0; j < n; ++j) {
+            if (v[j] == v0[j]) {
+                std::cerr << i + 1 << " ==v[" << j << "] " << v[j] << '\n';
+            }
         }
 #endif // PART
     }

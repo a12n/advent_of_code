@@ -122,34 +122,32 @@ int main()
     }
 #elif PART == 2
     size_t steps = -1;
-    const auto p0 = p;
-    const auto v0 = v;
-    std::optional<size_t> pn {}, vn {};
+    std::map<position_array<n>, size_t> pn;
+    std::map<velocity_array<n>, size_t> vn;
 #endif // PART
 
     for (size_t i = 0; i < steps; ++i) {
-        simulate(p, v);
 #if PART == 2
-        std::cerr << i + 1 << " p " << p << " v " << v << '\n';
+        std::cerr << i << " p " << p << " v " << v << '\n';
 
-        for (size_t j = 0; j < n; ++j) {
-            if (p[j] == p0[j]) {
-                std::cerr << i + 1 << " ==p[" << j << "] " << p[j] << '\n';
-            }
+        if (const auto it = pn.find(p); it != pn.end()) {
+            std::cerr << i << " == p @ " << it->second << '\n';
         }
 
-        for (size_t j = 0; j < n; ++j) {
-            if (v[j] == v0[j]) {
-                std::cerr << i + 1 << " ==v[" << j << "] " << v[j] << '\n';
-            }
+        if (const auto it = vn.find(v); it != vn.end()) {
+            std::cerr << i << " == v @ " << it->second << '\n';
         }
+
+        pn.insert({ p, i });
+        vn.insert({ v, i });
 #endif // PART
+        simulate(p, v);
     }
 
 #if PART == 1
     std::cout << total_energy(p, v) << '\n';
 #elif PART == 2
-    std::cout << std::lcm(*pn, *vn) << '\n';
+    // std::cout << std::lcm(*pn, *vn) << '\n';
 #endif // PART
 
     return 0;

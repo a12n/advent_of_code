@@ -19,19 +19,6 @@ using position_array = std::array<position, n>;
 template <size_t n>
 using velocity_array = std::array<offset, n>;
 
-template <typename t, size_t n>
-std::ostream& operator<<(std::ostream& out, const std::array<t, n>& p)
-{
-    out << '[';
-    for (size_t i = 0; i < n; ++i) {
-        if (i != 0) {
-            out << ' ';
-        }
-        out << p[i];
-    }
-    return out << ']';
-}
-
 int64_t potential_energy(const position& p)
 {
     return taxicab_norm(to_offset(p));
@@ -120,46 +107,33 @@ int main()
     if (const auto steps_env = getenv("STEPS"); steps_env) {
         steps = std::stol(steps_env);
     }
-#elif PART == 2
-    size_t steps = -1;
-    std::map<std::array<int64_t, 2 * n>, size_t> xn;
-    std::map<std::array<int64_t, 2 * n>, size_t> yn;
-    std::map<std::array<int64_t, 2 * n>, size_t> zn;
-#endif // PART
 
     for (size_t i = 0; i < steps; ++i) {
-#if PART == 2
-        std::cerr << i << " p " << p << " v " << v << '\n';
-
-        const std::array<int64_t, 2 * n> xk = { p[0][0], p[1][0], p[2][0], p[3][0], v[0][0], v[1][0], v[2][0], v[3][0] },
-                                         yk = { p[0][1], p[1][1], p[2][1], p[3][1], v[0][1], v[1][1], v[2][1], v[3][1] },
-                                         zk = { p[0][2], p[1][2], p[2][2], p[3][2], v[0][2], v[1][2], v[2][2], v[3][2] };
-
-        const auto xi = xn.find(xk);
-        const auto yi = yn.find(yk);
-        const auto zi = zn.find(zk);
-
-        if (xi != xn.end()) {
-            std::cerr << i << " ==x " << xi->second << '\n';
-        }
-        if (yi != yn.end()) {
-            std::cerr << i << " ==y " << yi->second << '\n';
-        }
-        if (zi != zn.end()) {
-            std::cerr << i << " ==z " << zi->second << '\n';
-        }
-
-        xn.insert({ xk, i });
-        yn.insert({ yk, i });
-        zn.insert({ zk, i });
-#endif // PART
         simulate(p, v);
     }
 
-#if PART == 1
     std::cout << total_energy(p, v) << '\n';
 #elif PART == 2
-    // std::cout << std::lcm(*pn, *vn) << '\n';
+    std::map<std::array<int64_t, 2 * n>, size_t> seen[3];
+    std::optional<size_t> cycle[3];
+
+    for (size_t i = 0; !(cycle[0] && cycle[1] && cycle[2]); ++i) {
+        for (size_t k = 0; k < 3; ++k) {
+            const std::array<int64_t, 2 * n> key = {
+                p[0][k], p[1][k], p[2][k], p[3][k], v[0][k], v[1][k], v[2][k], v[3][k]
+            };
+
+            if (!cycle[k] && seen[k].find(key) != seen[k].end()) {
+                cycle[k] = i;
+            }
+
+            seen[k].insert({ key, i });
+        }
+
+        simulate(p, v);
+    }
+
+    std::cout << std::lcm(std::lcm(*cycle[0], *cycle[1]), *cycle[2]) << '\n';
 #endif // PART
 
     return 0;

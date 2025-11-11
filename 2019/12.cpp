@@ -114,23 +114,17 @@ int main()
 
     std::cout << total_energy(p, v) << '\n';
 #elif PART == 2
-    std::map<std::array<int64_t, 2 * n>, size_t> seen[3];
+    const auto p0 = p;
     std::optional<size_t> cycle[3];
 
     for (size_t i = 0; !(cycle[0] && cycle[1] && cycle[2]); ++i) {
-        for (size_t k = 0; k < 3; ++k) {
-            const std::array<int64_t, 2 * n> key = {
-                p[0][k], p[1][k], p[2][k], p[3][k], v[0][k], v[1][k], v[2][k], v[3][k]
-            };
-
-            if (!cycle[k] && seen[k].find(key) != seen[k].end()) {
-                cycle[k] = i;
-            }
-
-            seen[k].insert({ key, i });
-        }
-
         simulate(p, v);
+
+        for (size_t k = 0; k < 3; ++k) {
+            if (!cycle[k] && (p[0][k] == p0[0][k] && p[1][k] == p0[1][k] && p[2][k] == p0[2][k] && p[3][k] == p0[3][k] && v[0][k] == 0 && v[1][k] == 0 && v[2][k] == 0 && v[3][k] == 0)) {
+                cycle[k] = i + 1;
+            }
+        }
     }
 
     std::cout << std::lcm(std::lcm(*cycle[0], *cycle[1]), *cycle[2]) << '\n';

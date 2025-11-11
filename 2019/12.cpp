@@ -122,24 +122,36 @@ int main()
     }
 #elif PART == 2
     size_t steps = -1;
-    std::map<position_array<n>, size_t> pn;
-    std::map<velocity_array<n>, size_t> vn;
+    std::map<std::array<int64_t, 2 * n>, size_t> xn;
+    std::map<std::array<int64_t, 2 * n>, size_t> yn;
+    std::map<std::array<int64_t, 2 * n>, size_t> zn;
 #endif // PART
 
     for (size_t i = 0; i < steps; ++i) {
 #if PART == 2
         std::cerr << i << " p " << p << " v " << v << '\n';
 
-        if (const auto it = pn.find(p); it != pn.end()) {
-            std::cerr << i << " == p @ " << it->second << '\n';
+        const std::array<int64_t, 2 * n> xk = { p[0][0], p[1][0], p[2][0], p[3][0], v[0][0], v[1][0], v[2][0], v[3][0] },
+                                         yk = { p[0][1], p[1][1], p[2][1], p[3][1], v[0][1], v[1][1], v[2][1], v[3][1] },
+                                         zk = { p[0][2], p[1][2], p[2][2], p[3][2], v[0][2], v[1][2], v[2][2], v[3][2] };
+
+        const auto xi = xn.find(xk);
+        const auto yi = yn.find(yk);
+        const auto zi = zn.find(zk);
+
+        if (xi != xn.end()) {
+            std::cerr << i << " ==x " << xi->second << '\n';
+        }
+        if (yi != yn.end()) {
+            std::cerr << i << " ==y " << yi->second << '\n';
+        }
+        if (zi != zn.end()) {
+            std::cerr << i << " ==z " << zi->second << '\n';
         }
 
-        if (const auto it = vn.find(v); it != vn.end()) {
-            std::cerr << i << " == v @ " << it->second << '\n';
-        }
-
-        pn.insert({ p, i });
-        vn.insert({ v, i });
+        xn.insert({ xk, i });
+        yn.insert({ yk, i });
+        zn.insert({ zk, i });
 #endif // PART
         simulate(p, v);
     }

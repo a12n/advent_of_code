@@ -192,7 +192,7 @@ std::istream& operator>>(std::istream& in, reactions& reacts)
     return in;
 }
 
-int64_t max_fuel(const chemicals& cargo)
+int64_t max_fuel(const reactions& reacts, const chemicals& cargo)
 {
     return 0;
 }
@@ -236,7 +236,7 @@ int main()
 
     std::cout << init_ore - cargo.at("ORE") << '\n';
 #elif PART==2
-    std::cout << max_fuel({ { "ORE", 1000000000000 } }) << '\n';
+    std::cout << max_fuel(reacts, { { "ORE", 1000000000000 } }) << '\n';
 #endif // PART
 
     return 0;

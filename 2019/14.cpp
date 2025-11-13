@@ -208,12 +208,12 @@ int main()
     }
 
 #if PART==1
-    chemicals soup = { { "FUEL", -1 } };
+    chemicals cargo = { { "FUEL", -1 } };
 
     while (true) {
         std::optional<std::tuple<std::string, int64_t>> consume;
 
-        for (const auto& [chem, n] : soup) {
+        for (const auto& [chem, n] : cargo) {
             if (n > 0 || chem == "ORE") {
                 continue;
             }
@@ -229,10 +229,10 @@ int main()
         const auto& [chem, n] = *consume;
         const auto& chems = reacts.at(chem);
         const auto m = div_ceil(-n, chems.at(chem));
-        soup = add(soup, mul(chems, m));
+        cargo = add(cargo, mul(chems, m));
     }
 
-    std::cout << -soup.at("ORE") << '\n';
+    std::cout << -cargo.at("ORE") << '\n';
 #elif PART==2
     std::cout << max_fuel({ { "ORE", 1000000000000 } }) << '\n';
 #endif // PART

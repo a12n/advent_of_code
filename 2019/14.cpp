@@ -227,9 +227,9 @@ int main()
         }
 
         const auto& [chem, n] = *consume;
-        const auto& chems = reacts.at(chem);
-        const auto m = div_ceil(-n, chems.at(chem));
-        cargo = add(cargo, mul(chems, m));
+        const auto& products = reacts.at(chem);
+        const auto m = div_ceil(-n, products.at(chem));
+        cargo = add(cargo, mul(products, m));
     }
 
     std::cout << -cargo.at("ORE") << '\n';

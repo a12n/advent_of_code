@@ -242,8 +242,17 @@ int main()
 
 #if PART==1
     std::cout << ore_consumed << '\n';
-#elif PART==2
-    std::cout << max_fuel(reacts, { { "ORE", 1000000000000 } }) << '\n';
+#elif PART == 2
+    while (true) {
+        const size_t m = cargo.at("ORE") / ore_consumed;
+        if (m == 0) {
+            break;
+        }
+        cargo = add(cargo, mul(reacts.at("FUEL"), m));
+        balance(reacts, cargo);
+    }
+
+    std::cout << cargo.at("FUEL") << '\n';
 #endif // PART
 
     return 0;

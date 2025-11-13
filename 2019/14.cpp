@@ -207,14 +207,16 @@ int main()
         return EX_DATAERR;
     }
 
-#if PART==1
-    chemicals cargo = { { "FUEL", -1 } };
+    const size_t init_ore = 1000000000000;
+    chemicals cargo = { { "ORE", init_ore } };
 
+#if PART==1
+    cargo = add(cargo, reacts.at("FUEL"));
     while (true) {
         std::optional<std::tuple<std::string, int64_t>> consume;
 
         for (const auto& [chem, n] : cargo) {
-            if (n > 0 || chem == "ORE") {
+            if (n > 0) {
                 continue;
             }
             if (!consume || n > std::get<1>(*consume)) {
@@ -232,7 +234,7 @@ int main()
         cargo = add(cargo, mul(products, m));
     }
 
-    std::cout << -cargo.at("ORE") << '\n';
+    std::cout << init_ore - cargo.at("ORE") << '\n';
 #elif PART==2
     std::cout << max_fuel({ { "ORE", 1000000000000 } }) << '\n';
 #endif // PART

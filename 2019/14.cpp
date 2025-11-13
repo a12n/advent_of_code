@@ -197,6 +197,31 @@ int64_t max_fuel(const reactions& reacts, const chemicals& cargo)
     return 0;
 }
 
+void balance(const reactions& reacts, chemicals& chems)
+{
+    while (true) {
+        std::optional<std::tuple<std::string, int64_t>> consume;
+
+        for (const auto& [chem, n] : chems) {
+            if (n > 0) {
+                continue;
+            }
+            if (!consume || n > std::get<1>(*consume)) {
+                consume = { chem, n };
+            }
+        };
+
+        if (!consume) {
+            return;
+        }
+
+        const auto& [chem, n] = *consume;
+        const auto& products = reacts.at(chem);
+        const auto m = div_ceil(-n, products.at(chem));
+        chems = add(chems, mul(products, m));
+    }
+}
+
 } // namespace
 
 int main()
@@ -207,34 +232,16 @@ int main()
         return EX_DATAERR;
     }
 
-    const size_t init_ore = 1000000000000;
-    chemicals cargo = { { "ORE", init_ore } };
+    const size_t ore_init = 1000000000000;
+    chemicals cargo = { { "ORE", ore_init } };
+
+    cargo = add(cargo, reacts.at("FUEL"));
+    balance(reacts, cargo);
+
+    const size_t ore_consumed = ore_init-cargo.at("ORE");
 
 #if PART==1
-    cargo = add(cargo, reacts.at("FUEL"));
-    while (true) {
-        std::optional<std::tuple<std::string, int64_t>> consume;
-
-        for (const auto& [chem, n] : cargo) {
-            if (n > 0) {
-                continue;
-            }
-            if (!consume || n > std::get<1>(*consume)) {
-                consume = { chem, n };
-            }
-        };
-
-        if (!consume) {
-            break;
-        }
-
-        const auto& [chem, n] = *consume;
-        const auto& products = reacts.at(chem);
-        const auto m = div_ceil(-n, products.at(chem));
-        cargo = add(cargo, mul(products, m));
-    }
-
-    std::cout << init_ore - cargo.at("ORE") << '\n';
+    std::cout << ore_consumed << '\n';
 #elif PART==2
     std::cout << max_fuel(reacts, { { "ORE", 1000000000000 } }) << '\n';
 #endif // PART

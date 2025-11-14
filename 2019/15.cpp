@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <cassert>
+#include <deque>
 #include <iostream>
 #include <map>
 #include <optional>
@@ -17,6 +19,7 @@ enum class tile_type {
 };
 
 using tile_grid = std::map<position, tile_type>;
+using distance_grid = std::map<position, size_t>;
 
 std::ostream& operator<<(std::ostream& out, tile_type tile)
 {
@@ -111,6 +114,39 @@ void explore(repair_droid& droid, tile_grid& tiles, std::optional<position>& oxy
     explore(droid, tiles, oxygen, { 0, 0 });
 }
 
+distance_grid distances(const tile_grid& tiles, position src)
+{
+    distance_grid dists;
+
+    dists.insert({ src, 0 });
+
+    std::deque<position> states;
+
+    states.push_back(src);
+    while (!states.empty()) {
+        const auto p = states.front();
+        states.pop_front();
+
+        const auto dist = dists.find(p)->second;
+
+        for (const direction dir : { direction::north, direction::west, direction::east, direction::south }) {
+            const auto q = p + to_offset(dir);
+
+            if (const auto it = tiles.find(q); it == tiles.end() || it->second == tile_type::wall) {
+                continue;
+            }
+
+            if (const auto it = dists.find(q); it != dists.end()) {
+                continue;
+            }
+
+            dists.insert({ q, dist + 1 });
+            states.push_back(q);
+        }
+    }
+
+    return dists;
+}
 
 } // namespace
 

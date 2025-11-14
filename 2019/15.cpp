@@ -96,6 +96,8 @@ void explore(repair_droid& droid, tile_grid& tiles, std::optional<position>& oxy
             if (!oxygen) {
                 oxygen = q;
             }
+            explore(droid, tiles, oxygen, q);
+            move(droid, opposite(dir));
             break;
         }
     };

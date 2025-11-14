@@ -1,5 +1,5 @@
 #include <iostream>
-#include <map>
+#include <vector>
 
 #include "grid.hpp"
 #include "intcode.hpp"
@@ -8,7 +8,7 @@ namespace {
 
 using namespace grid::planar;
 
-using scaffold_view = std::map<position, char>;
+using scaffold_view = std::vector<std::vector<char>>;
 
 struct ascii_prog {
     intcode::memory img;
@@ -18,14 +18,16 @@ struct ascii_prog {
 
 void render(ascii_prog& ascii, scaffold_view& view, position p)
 {
+    view.push_back({});
     while (true) {
         const auto [op, addr] = intcode::run_intrpt(ascii.img, ascii.ip, ascii.rel_base);
         switch (op) {
         case intcode::opcode::output:
             if (ascii.img[addr] == '\n') {
+                view.push_back({});
                 p = { 0, p[1] + 1 };
             } else {
-                view.insert({ p, ascii.img[addr] });
+                view.back().push_back(ascii.img[addr]);
                 ++p[0];
             }
             break;

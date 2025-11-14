@@ -72,10 +72,8 @@ tile_type move(repair_droid& droid, direction dir)
     }
 }
 
-std::optional<position> explore(repair_droid& droid, tile_grid& tiles, position p, size_t steps)
+void explore(repair_droid& droid, tile_grid& tiles, std::optional<position>& oxygen, position p)
 {
-    std::optional<position> oxygen = {};
-
     for (const direction dir : { direction::north, direction::west, direction::east, direction::south }) {
         const auto q = p + to_offset(dir);
 
@@ -91,27 +89,24 @@ std::optional<position> explore(repair_droid& droid, tile_grid& tiles, position 
         case tile_type::wall:
             break;
         case tile_type::empty:
-            if (const auto r = explore(droid, tiles, q, steps + 1); r) {
-                assert(!oxygen);
-                oxygen = r;
-            }
+            explore(droid, tiles, oxygen, q);
             move(droid, opposite(dir));
             break;
         case tile_type::oxygen:
-            assert(!oxygen);
-            oxygen = q;
+            if (!oxygen) {
+                oxygen = q;
+            }
             break;
         }
     };
-
-    return oxygen;
 }
 
-std::optional<position> explore(repair_droid& droid, tile_grid& tiles)
+void explore(repair_droid& droid, tile_grid& tiles, std::optional<position>& oxygen)
 {
     tiles.clear();
+    oxygen.reset();
     tiles.insert({ { 0, 0 }, tile_type(3) });
-    return explore(droid, tiles, { 0, 0 }, 0);
+    explore(droid, tiles, oxygen, { 0, 0 });
 }
 
 
@@ -120,9 +115,11 @@ std::optional<position> explore(repair_droid& droid, tile_grid& tiles)
 int main(int argc, char* argv[])
 {
     repair_droid droid = { intcode::load(argc, argv) };
-    tile_grid tiles;
 
-    const auto oxygen = explore(droid, tiles);
+    tile_grid tiles;
+    std::optional<position> oxygen;
+
+    explore(droid, tiles, oxygen);
 
     std::cerr << "oxygen " << *oxygen << '\n';
 

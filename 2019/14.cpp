@@ -240,16 +240,14 @@ int main()
 #elif PART == 2
     while (true) {
         const size_t m = cargo.at("ORE") / ore_consumed;
-        if (m == 0) {
+        auto next_cargo = add(cargo, mul(reacts.at("FUEL"), m ? m : 1));
+        balance(reacts, next_cargo);
+        if (next_cargo.at("ORE") < 0) {
+            // Can't produce more fuel.
             break;
         }
-        cargo = add(cargo, mul(reacts.at("FUEL"), m));
-        balance(reacts, cargo);
+        cargo = next_cargo;
     }
-
-    // One more fuel
-    cargo = add(cargo, reacts.at("FUEL"));
-    balance(reacts, cargo);
 
     std::cout << cargo.at("FUEL") << '\n';
 #endif // PART

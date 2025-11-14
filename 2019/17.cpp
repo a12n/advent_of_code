@@ -39,6 +39,25 @@ void render(ascii_prog& ascii, scaffold_view& view, position p)
     }
 }
 
+size_t calibrate_cameras(const scaffold_view& view)
+{
+    size_t sum = 0;
+    for (size_t i = 0; i < view.size(); ++i) {
+        if (i == 0 || i == (view.size() - 1)) {
+            continue;
+        }
+        for (size_t j = 0; j < view[i].size(); ++j) {
+            if (j == 0 || j == (view[i].size() - 1)) {
+                continue;
+            }
+            if (view[i][j] != '.' && (view[i - 1][j] != '.' && view[i][j - 1] != '.' && view[i][j + 1] != '.' && view[i + 1][j] != '.')) {
+                sum += i * j;
+            }
+        }
+    }
+    return sum;
+}
+
 } // namespace
 
 int main(int argc, char* argv[])

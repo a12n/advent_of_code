@@ -86,7 +86,6 @@ void explore(repair_droid& droid, tile_grid& tiles, std::optional<position>& oxy
 
         const auto tile = move(droid, dir);
         tiles.insert({ q, tile });
-        std::cerr << __func__ << " " << p << " -> " << q << " = " << tile << '\n';
 
         switch (tile) {
         case tile_type::wall:
@@ -159,9 +158,6 @@ int main(int argc, char* argv[])
         repair_droid droid = { intcode::load(argc, argv) };
         explore(droid, tiles, oxygen);
     }
-
-    std::cerr << "oxygen " << *oxygen << '\n';
-    std::cerr << output_grid<tile_type> { tiles, extent(tiles), tile_type(-1) };
 
     const auto dists = distances(tiles, *oxygen);
 

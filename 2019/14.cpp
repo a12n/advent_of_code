@@ -233,9 +233,9 @@ int main()
     cargo = add(cargo, reacts.at("FUEL"));
     balance(reacts, cargo);
 
-    const size_t ore_consumed = ore_init-cargo.at("ORE");
+    const size_t ore_consumed = ore_init - cargo.at("ORE");
 
-#if PART==1
+#if PART == 1
     std::cout << ore_consumed << '\n';
 #elif PART == 2
     while (true) {

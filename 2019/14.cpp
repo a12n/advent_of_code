@@ -91,60 +91,6 @@ chemicals add(const chemicals& a, const chemicals& b)
     return c;
 }
 
-// Like add() but raises std::underflow_error if there's a negative
-// result.
-chemicals add_underflow(const chemicals& a, const chemicals& b)
-{
-    chemicals c;
-
-    auto ai = a.begin();
-    auto bi = b.begin();
-
-    while (ai != a.end() && bi != b.end()) {
-        if (ai->first < bi->first) {
-            if (ai->second > 0) {
-                c.insert(*ai);
-            } else if (ai->second < 0) {
-                throw std::underflow_error(__func__);
-            }
-            ++ai;
-        } else if (bi->first < ai->first) {
-            if (bi->second > 0) {
-                c.insert(*bi);
-            } else if (bi->second < 0) {
-                throw std::underflow_error(__func__);
-            }
-            ++bi;
-        } else {
-            if (const auto n = ai->second + bi->second; n > 0) {
-                c.insert({ ai->first, n });
-            } else if (n < 0) {
-                throw std::underflow_error(__func__);
-            }
-            ++ai;
-            ++bi;
-        }
-    }
-
-    for (; ai != a.end(); ++ai) {
-        if (ai->second > 0) {
-            c.insert(*ai);
-        } else if (ai->second < 0) {
-            throw std::underflow_error(__func__);
-        }
-    }
-
-    for (; bi != b.end(); ++bi) {
-        if (bi->second > 0) {
-            c.insert(*bi);
-        } else if (bi->second < 0) {
-            throw std::underflow_error(__func__);
-        }
-    }
-
-    return c;
-}
-
 std::istream& operator>>(std::istream& in, reactions& reacts)
 {
     std::string line;

@@ -116,12 +116,13 @@ void explore(repair_droid& droid, tile_grid& tiles, std::optional<position>& oxy
 
 int main(int argc, char* argv[])
 {
-    repair_droid droid = { intcode::load(argc, argv) };
-
     tile_grid tiles;
     std::optional<position> oxygen;
 
-    explore(droid, tiles, oxygen);
+    {
+        repair_droid droid = { intcode::load(argc, argv) };
+        explore(droid, tiles, oxygen);
+    }
 
     std::cerr << "oxygen " << *oxygen << '\n';
 

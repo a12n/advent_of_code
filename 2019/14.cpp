@@ -252,6 +252,10 @@ int main()
         balance(reacts, cargo);
     }
 
+    // One more fuel
+    cargo = add(cargo, reacts.at("FUEL"));
+    balance(reacts, cargo);
+
     std::cout << cargo.at("FUEL") << '\n';
 #endif // PART
 

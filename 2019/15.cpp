@@ -164,9 +164,12 @@ int main(int argc, char* argv[])
 #if PART == 1
     std::cout << dists.at({ 0, 0 }) << '\n';
 #elif PART == 2
-    std::cout << std::max_element(dists.begin(), dists.end(), [](const auto& a, const auto& b) {
-        return a.second < b.second;
-    })->second << '\n';
+    std::cout << std::max_element(
+        dists.begin(), dists.end(),
+        [](const auto& a, const auto& b) {
+            return a.second < b.second;
+        })->second
+              << '\n';
 #endif // PART
 
     return 0;

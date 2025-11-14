@@ -192,11 +192,6 @@ std::istream& operator>>(std::istream& in, reactions& reacts)
     return in;
 }
 
-int64_t max_fuel(const reactions& reacts, const chemicals& cargo)
-{
-    return 0;
-}
-
 void balance(const reactions& reacts, chemicals& chems)
 {
     while (true) {

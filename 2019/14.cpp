@@ -198,7 +198,7 @@ void balance(const reactions& reacts, chemicals& chems)
         std::optional<std::tuple<std::string, int64_t>> consume;
 
         for (const auto& [chem, n] : chems) {
-            if (n > 0) {
+            if (n > 0 || chem == "ORE") {
                 continue;
             }
             if (!consume || n > std::get<1>(*consume)) {

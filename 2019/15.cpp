@@ -22,15 +22,15 @@ std::ostream& operator<<(std::ostream& out, tile_type tile)
 {
     switch (tile) {
     case tile_type::wall:
-        return out << "█";
+        return out << "██";
     case tile_type::empty:
-        return out << "░";
+        return out << "░░";
     case tile_type::oxygen:
-        return out << "X";
+        return out << "OO";
     case tile_type(3):
-        return out << "@";
+        return out << "@@";
     }
-    return out << " ";
+    return out << "▓▓";
 }
 
 intcode::value movement_command(direction dir)

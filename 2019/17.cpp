@@ -70,7 +70,9 @@ int main(int argc, char* argv[])
         render(ascii, view, { 0, 0 });
     }
 
-    std::cerr << output_grid<char> { view, extent(view), ' ' };
+#if PART == 1
+    std::cout << calibrate_cameras(view) << '\n';
+#endif // PART
 
     return 0;
 }

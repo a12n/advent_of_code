@@ -8,6 +8,7 @@
 #include <ostream>
 #include <string_view>
 #include <tuple>
+#include <vector>
 
 //----------------------------------------------------------------------------
 // 2D Grids
@@ -64,6 +65,12 @@ position& operator-=(position& p, offset u);
 position operator-(position p, offset u);
 offset operator-(offset u);
 
+template <typename mapped_type>
+using dense_grid = std::vector<std::vector<mapped_type>>;
+
+template <typename mapped_type>
+using sparse_grid = std::map<position, mapped_type>;
+
 struct extent {
     extent() = default;
 
@@ -85,7 +92,7 @@ struct extent {
     }
 
     template <typename mapped_type>
-    explicit extent(const std::map<position, mapped_type>& grid)
+    explicit extent(const sparse_grid<mapped_type>& grid)
     {
         for (const auto& [p, _] : grid) {
             insert(p);
@@ -130,7 +137,7 @@ std::ostream& operator<<(std::ostream& out, position p);
 // FIXME: input()/output() functions (with additional parameters) instead of these operators?
 template <typename mapped_type>
 struct output_grid {
-    const std::map<position, mapped_type>& grid;
+    const sparse_grid<mapped_type>& grid;
     const extent& ext;
     const mapped_type& empty;
 };

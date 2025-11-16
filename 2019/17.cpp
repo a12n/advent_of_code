@@ -208,12 +208,11 @@ int main(int argc, char* argv[])
     ascii_prog ascii = { intcode::load(argc, argv) };
 
     std::cout << run(ascii,
-        R"(B,A,B,A,B,C,A,C,B,C
-L,8,R,12,R,10,R,4
-R,4,L,10,L,10
-L,8,L,8,R,10,R,4
-n
-)") << '\n';
+        "B,A,B,A,B,C,A,C,B,C\n"
+        "L,8,R,12,R,10,R,4\n"
+        "R,4,L,10,L,10\n"
+        "L,8,L,8,R,10,R,4\n"
+        "n\n") << '\n';
 #endif // PART
 
     return 0;

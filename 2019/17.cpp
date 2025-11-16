@@ -95,18 +95,19 @@ size_t calibrate_cameras(const scaffold_view& view)
     return sum;
 }
 
-using command = std::variant<rotation, size_t>;
+using move_forward = size_t;
+using action = std::variant<rotation, move_forward>;
 
-std::optional<command> next_command(const scaffold_view& view, vacuum_robot& robot)
+std::optional<action> plan_action(const scaffold_view& view, position& robot_pos, direction& robot_dir)
 {
     {
-        const auto u = to_offset(robot.dir);
-        auto q = robot.p + u;
+        const auto u = to_offset(robot_dir);
+        auto q = robot_pos + u;
         if (at(view, q) == '#') {
             size_t units = 0;
             do {
                 ++units;
-                robot.p = q;
+                robot_pos = q;
                 q += u;
             } while (at(view, q) == '#');
             return { { units } };
@@ -114,34 +115,24 @@ std::optional<command> next_command(const scaffold_view& view, vacuum_robot& rob
     }
 
     {
-        const auto dir = rotate(rotation::left, robot.dir);
+        const auto dir = rotate(rotation::left, robot_dir);
         const auto u = to_offset(dir);
-        if (at(view, robot.p + u) == '#') {
-            robot.dir = dir;
+        if (at(view, robot_pos + u) == '#') {
+            robot_dir = dir;
             return { { rotation::left } };
         }
     }
 
     {
-        const auto dir = rotate(rotation::right, robot.dir);
+        const auto dir = rotate(rotation::right, robot_dir);
         const auto u = to_offset(dir);
-        if (at(view, robot.p + u) == '#') {
-            robot.dir = dir;
+        if (at(view, robot_pos + u) == '#') {
+            robot_dir = dir;
             return { { rotation::right } };
         }
     }
 
     return {};
-}
-
-std::vector<command> commands(const scaffold_view& view, vacuum_robot& robot)
-{
-    std::optional<command> move;
-    std::vector<command> moves;
-    while ((move = next_command(view, robot))) {
-        moves.push_back(*move);
-    }
-    return moves;
 }
 
 } // namespace
@@ -161,11 +152,8 @@ int main(int argc, char* argv[])
 
     auto [robot_pos, robot_dir] = vacuum_robot(view);
     std::cerr << "robot_pos " << robot_pos << " robot_dir " << direction_symbol(robot_dir) << '\n';
-    const auto cmds = commands(view, robot);
-    for (size_t i = 0; i < cmds.size(); ++i) {
-        if (i != 0) {
-            std::cerr << ',';
-        }
+    for (std::optional<action> act; (act = plan_action(view, robot_pos, robot_dir));) {
+        std::cerr << ',';
         if (std::holds_alternative<rotation>(*act)) {
             std::cerr << rotation_symbol(std::get<rotation>(*act), false);
         } else {

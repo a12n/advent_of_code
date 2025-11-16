@@ -142,9 +142,9 @@ void output(std::ostream& s, const sparse_grid<mapped_type>& grid, const extent&
     for (position p = ext.min(); p[1] <= ext.max()[1]; ++p[1]) {
         for (p[0] = ext.min()[0]; p[0] <= ext.max()[0]; ++p[0]) {
             if (const auto it = grid.find(p); it != grid.end()) {
-                ::output<mapped_type>(s, it->second);
+                s << it->second;
             } else {
-                ::output<mapped_type>(s, empty);
+                s << empty;
             }
         }
         s.put('\n');

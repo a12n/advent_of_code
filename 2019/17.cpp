@@ -198,19 +198,19 @@ int main(int argc, char* argv[])
     // {R,4,L,10,L,10},{L,8,R,12,R,10,R,4},{R,4,L,10,L,10},{L,8,R,12,R,10,R,4},{R,4,L,10,L,10},{L,8,L,8,R,10,R,4},{L,8,R,12,R,10,R,4},{L,8,L,8,R,10,R,4},{R,4,L,10,L,10},{L,8,L,8,R,10,R,4}
     //
     // Movement functions:
-    // A = L,8,R,12,R,10,R,4
-    // B = R,4,L,10,L,10
+    // A = R,4,L,10,L,10
+    // B = L,8,R,12,R,10,R,4
     // C = L,8,L,8,R,10,R,4
     //
     // Main movement routine:
-    // B,A,B,A,B,C,A,C,B,C
+    // A,B,A,B,A,C,B,C,A,C
 
     ascii_prog ascii = { intcode::load(argc, argv) };
 
     std::cout << run(ascii,
-        "B,A,B,A,B,C,A,C,B,C\n"
-        "L,8,R,12,R,10,R,4\n"
+        "A,B,A,B,A,C,B,C,A,C\n"
         "R,4,L,10,L,10\n"
+        "L,8,R,12,R,10,R,4\n"
         "L,8,L,8,R,10,R,4\n"
         "n\n") << '\n';
 #endif // PART

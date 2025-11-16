@@ -11,6 +11,12 @@ namespace {
 using distance_map = std::map<char, std::map<char, size_t>>;
 using vault_map = std::vector<std::string>;
 
+distance_map distances(const vault_map& vault)
+{
+    // TODO
+    return {};
+}
+
 } // namespace
 
 template <>
@@ -32,7 +38,7 @@ vault_map input<vault_map>(std::istream& s)
 
 int main()
 {
-    const auto vault = input<vault_map>(std::cin);
+    const auto dists = distances(input<vault_map>(std::cin));
 
     // TODO
 

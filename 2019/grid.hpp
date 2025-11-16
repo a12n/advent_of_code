@@ -114,12 +114,12 @@ struct extent {
 
     bool insert(position p);
 
-    const position& min() const
+    position min() const
     {
         return min_;
     }
 
-    const position& max() const
+    position max() const
     {
         return max_;
     }

@@ -11,12 +11,6 @@ namespace {
 
 using namespace grid::planar;
 
-std::ostream& operator<<(std::ostream& out, rotation rdir)
-{
-    return out << (rdir == rotation::left ? 'L' : rdir == rotation::right ? 'R'
-                                                                          : '?');
-}
-
 using scaffold_view = std::vector<std::vector<char>>;
 
 bool check_bounds(const scaffold_view& view, position p)

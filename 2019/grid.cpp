@@ -22,6 +22,18 @@ std::string_view direction_symbol(direction dir, bool unicode)
     }
 }
 
+std::string_view rotation_symbol(rotation rdir, bool unicode)
+{
+    switch (rdir) {
+    case rotation::cw:
+        return unicode ? "↷" : "R";
+    case rotation::ccw:
+        return unicode ? "↶" : "L";
+    default:
+        throw std::invalid_argument(__func__);
+    }
+}
+
 direction opposite(direction dir)
 {
     switch (dir) {

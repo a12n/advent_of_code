@@ -134,28 +134,19 @@ std::istream& operator>>(std::istream& in, direction& dir);
 std::ostream& operator<<(std::ostream& out, offset u);
 std::ostream& operator<<(std::ostream& out, position p);
 
-// FIXME: input()/output() functions (with additional parameters) instead of these operators?
 template <typename mapped_type>
-struct output_grid {
-    const sparse_grid<mapped_type>& grid;
-    const extent& ext;
-    const mapped_type& empty;
-};
-
-template <typename mapped_type>
-std::ostream& operator<<(std::ostream& out, output_grid<mapped_type> value)
+void output(std::ostream& s, const sparse_grid<mapped_type>& grid, const extent& ext, const mapped_type& empty)
 {
-    for (position p = value.ext.min(); p[1] <= value.ext.max()[1]; ++p[1]) {
-        for (p[0] = value.ext.min()[0]; p[0] <= value.ext.max()[0]; ++p[0]) {
-            if (const auto it = value.grid.find(p); it != value.grid.end()) {
-                out << it->second;
+    for (position p = ext.min(); p[1] <= ext.max()[1]; ++p[1]) {
+        for (p[0] = ext.min()[0]; p[0] <= ext.max()[0]; ++p[0]) {
+            if (const auto it = grid.find(p); it != grid.end()) {
+                output<mapped_type>(s, it->second);
             } else {
-                out << value.empty;
+                output<mapped_type>(s, empty);
             }
         }
-        out.put('\n');
+        s.put('\n');
     }
-    return out;
 }
 
 } // namespace grid::planar

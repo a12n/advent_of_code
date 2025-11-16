@@ -2,17 +2,20 @@
 #define INPUT_HPP
 
 #include <istream>
+#include <optional>
 #include <ostream>
 #include <stdexcept>
 #include <type_traits>
 
 template <typename value_type>
-value_type input(std::istream& s)
+std::optional<value_type> input(std::istream& s)
 {
     value_type v;
-    if (!(s >> v))
-        throw std::invalid_argument(__func__);
-    return v;
+    if (s >> v)
+        return v;
+    if (s.eof())
+        return {};
+    throw std::invalid_argument(__func__);
 }
 
 template <typename value_type>

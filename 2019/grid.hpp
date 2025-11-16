@@ -28,6 +28,9 @@ enum class direction {
 enum class rotation {
     cw,
     ccw,
+
+    right = cw,
+    left = ccw,
 };
 
 struct offset : public std::array<int64_t, 2> { };

@@ -6,6 +6,22 @@
 
 namespace grid::planar {
 
+std::string_view direction_symbol(direction dir, bool unicode)
+{
+    switch (dir) {
+    case direction::up:
+        return unicode ? "↑" : "^";
+    case direction::left:
+        return unicode ? "←" : "<";
+    case direction::right:
+        return unicode ? "→" : ">";
+    case direction::down:
+        return unicode ? "↓" : "v";
+    default:
+        throw std::invalid_argument(__func__);
+    }
+}
+
 direction opposite(direction dir)
 {
     switch (dir) {

@@ -6,6 +6,7 @@
 #include <istream>
 #include <map>
 #include <ostream>
+#include <string_view>
 #include <tuple>
 
 //----------------------------------------------------------------------------
@@ -35,6 +36,8 @@ enum class rotation {
 
 struct offset : public std::array<int64_t, 2> { };
 struct position : public std::array<int64_t, 2> { };
+
+std::string_view direction_symbol(direction dir, bool unicode = true);
 
 direction opposite(direction dir);
 int64_t taxicab_norm(offset u);

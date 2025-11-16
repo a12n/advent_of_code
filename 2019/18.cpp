@@ -4,36 +4,37 @@
 #include <string>
 #include <vector>
 
-#include <sysexits.h>
+#include "input.hpp"
 
 namespace {
 
 using distance_map = std::map<char, std::map<char, size_t>>;
 using vault_map = std::vector<std::string>;
 
-std::istream& operator>>(std::istream& in, vault_map& vault)
+} // namespace
+
+template <>
+vault_map input<vault_map>(std::istream& s)
 {
-    vault.clear();
+    vault_map vault;
     while (true) {
         vault.emplace_back();
-        if (!std::getline(in, vault.back())) {
+        if (!std::getline(s, vault.back())) {
+            if (!s.eof()) {
+                throw std::invalid_argument(__func__);
+            }
             vault.pop_back();
-            break;
+            return vault;
         }
         assert(vault.back().size() == vault.front().size());
     }
-    return in;
 }
-
-} // namespace
 
 int main()
 {
-    vault_map vault;
+    const auto vault = input<vault_map>(std::cin);
 
-    if (!(std::cin >> vault).eof()) {
-        return EX_DATAERR;
-    }
+    // TODO
 
     return 0;
 }

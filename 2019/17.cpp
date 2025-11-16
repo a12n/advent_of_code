@@ -1,4 +1,5 @@
 #include <cassert>
+#include <cctype>
 #include <iostream>
 #include <optional>
 #include <variant>
@@ -135,6 +136,32 @@ std::optional<action> plan_action(const scaffold_view& view, position& robot_pos
     return {};
 }
 
+intcode::value run(ascii_prog& ascii, std::string_view input)
+{
+    intcode::value last_output = 0;
+    ascii.img[0] = 2;
+    while (true) {
+        const auto [op, addr] = intcode::run_intrpt(ascii.img, ascii.ip, ascii.rel_base);
+        switch (op) {
+        case intcode::opcode::output:
+            last_output = ascii.img[addr];
+            if (std::isprint(last_output) || last_output == '\n') {
+                std::cerr.put(last_output);
+            }
+            break;
+        case intcode::opcode::input:
+            assert(!input.empty());
+            ascii.img[addr] = input[0];
+            input.remove_prefix(1);
+            break;
+        case intcode::opcode::halt:
+            return last_output;
+        default:
+            throw std::runtime_error(__func__);
+        }
+    }
+}
+
 } // namespace
 
 int main(int argc, char* argv[])
@@ -178,7 +205,15 @@ int main(int argc, char* argv[])
     // Main movement routine:
     // B,A,B,A,B,C,A,C,B,C
 
-    // TODO
+    ascii_prog ascii = { intcode::load(argc, argv) };
+
+    std::cout << run(ascii,
+        R"(B,A,B,A,B,C,A,C,B,C
+L,8,R,12,R,10,R,4
+R,4,L,10,L,10
+L,8,L,8,R,10,R,4
+n
+)") << '\n';
 #endif // PART
 
     return 0;

@@ -38,38 +38,48 @@ struct ascii_prog {
     intcode::value rel_base = 0;
 };
 
-struct vacuum_robot {
-    position p;
-    direction dir;
-};
-
-void render(ascii_prog& ascii, scaffold_view& view, vacuum_robot& robot, position p)
+scaffold_view render(ascii_prog& ascii)
 {
+    scaffold_view view;
     view.push_back({});
-    while (true) {
+    for (position p = { 0, 0 };;) {
         const auto [op, addr] = intcode::run_intrpt(ascii.img, ascii.ip, ascii.rel_base);
         switch (op) {
         case intcode::opcode::output:
             if (ascii.img[addr] == '\n') {
                 view.push_back({});
-                p = { 0, p[1] + 1 };
+                p[0] = 0;
+                p[1]++;
             } else {
                 view.back().push_back(ascii.img[addr]);
-                try {
-                    robot.dir = to_direction(ascii.img[addr]);
-                    robot.p = p;
-                } catch (const std::invalid_argument&) {
-                    // Not position of the robot.
-                }
-                ++p[0];
+                p[0]++;
             }
             break;
         case intcode::opcode::halt:
-            return;
+            return view;
         default:
             throw std::invalid_argument(__func__);
         }
     }
+}
+
+std::tuple<position, direction> vacuum_robot(const scaffold_view& view)
+{
+    for (position p = { 0, 0 }; static_cast<size_t>(p[1]) < view.size(); ++p[1]) {
+        for (p[0] = 0; static_cast<size_t>(p[0]) < view[p[1]].size(); ++p[0]) {
+            switch (view[p[1]][p[0]]) {
+            case '^':
+                return { p, direction::up };
+            case '<':
+                return { p, direction::left };
+            case '>':
+                return { p, direction::right };
+            case 'v':
+                return { p, direction::down };
+            }
+        }
+    }
+    throw std::invalid_argument(__func__);
 }
 
 size_t calibrate_cameras(const scaffold_view& view)
@@ -144,37 +154,32 @@ std::vector<command> commands(const scaffold_view& view, vacuum_robot& robot)
 
 int main(int argc, char* argv[])
 {
+#if PART == 1
     ascii_prog ascii = { intcode::load(argc, argv) };
-    scaffold_view view;
-    vacuum_robot robot;
 
-    {
-        auto tmp_ascii = ascii;
-        render(tmp_ascii, view, robot, { 0, 0 });
-
-        for (const auto& r : view) {
-            for (const auto c : r) {
-                std::cerr << c;
-            }
-            std::cerr << '\n';
+    const auto view = render(ascii);
+    for (const auto& row : view) {
+        for (const auto c : row) {
+            std::cerr << c;
         }
-
-        std::cerr << "robot { p " << robot.p << " dir " << robot.dir << " }\n";
-        const auto cmds = commands(view, robot);
-        for (size_t i = 0; i < cmds.size(); ++i) {
-            if (i != 0) {
-                std::cerr << ',';
-            }
-            if (std::holds_alternative<rotation>(cmds[i])) {
-                std::cerr << std::get<rotation>(cmds[i]);
-            } else {
-                std::cerr << std::get<size_t>(cmds[i]);
-            }
-        };
         std::cerr << '\n';
     }
 
-#if PART == 1
+    auto [robot_pos, robot_dir] = vacuum_robot(view);
+    std::cerr << "robot_pos " << robot_pos << " robot_dir " << direction_symbol(robot_dir) << '\n';
+    const auto cmds = commands(view, robot);
+    for (size_t i = 0; i < cmds.size(); ++i) {
+        if (i != 0) {
+            std::cerr << ',';
+        }
+        if (std::holds_alternative<rotation>(*act)) {
+            std::cerr << rotation_symbol(std::get<rotation>(*act), false);
+        } else {
+            std::cerr << std::get<size_t>(*act);
+        }
+    }
+    std::cerr << '\n';
+
     std::cout << calibrate_cameras(view) << '\n';
 #elif PART == 2
     assert(ascii.img[0] == 1);

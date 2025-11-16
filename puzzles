@@ -11,11 +11,11 @@ encrypt() {
 }
 
 case "$1" in
-    encrypt)
+    encrypt|enc|e)
         shift
         encrypt "$@"
         ;;
-    decrypt)
+    decrypt|dec|d)
         shift
         decrypt "$@"
         ;;

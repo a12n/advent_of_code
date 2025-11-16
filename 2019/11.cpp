@@ -99,7 +99,7 @@ int main()
 #if PART == 1
     std::cout << hull_painting_robot(img).size() << '\n';
 #elif PART == 2
-    const auto canv = hull_painting_robot(img,white);
+    const auto canv = hull_painting_robot(img, white);
     std::cout << output_grid<color> { canv, extent(canv), black };
 #endif // PART
 

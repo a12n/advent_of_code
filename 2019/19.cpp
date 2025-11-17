@@ -5,14 +5,15 @@
 #include "grid.hpp"
 #include "intcode.hpp"
 
+namespace {
+
 using namespace grid::planar;
 
-int main(int argc, char* argv[])
+std::optional<position> drone_system(const intcode::memory&prog, sparse_set_grid& beam, size_t limit = static_cast<size_t>(-1))
 {
-    const intcode::memory prog = intcode::load(argc, argv);
+    beam.clear();
 
     std::deque<position> queue;
-    sparse_set_grid beam;
 
     // Primer positions.
     for (int64_t y = 0; y < 10; ++y) {
@@ -25,12 +26,7 @@ int main(int argc, char* argv[])
         const auto p = queue.front();
         queue.pop_front();
 
-#if PART == 1
-        if (p[0] >= 50 || p[1] >= 50) {
-            continue;
-        }
-#endif // PART == 1
-        if (beam.find(p) != beam.end()) {
+        if (p[0] >= limit || p[1] >= limit || beam.find(p) != beam.end()) {
             continue;
         }
 
@@ -59,15 +55,13 @@ int main(int argc, char* argv[])
                 queue.push_back(p + offset { 0, 1 });
                 queue.push_back(p + offset { 1, 1 });
                 beam.insert(p);
-#if PART == 2
+
                 const auto top_right = p - offset { 0, 100 - 1 };
                 const auto bottom_left = p - offset { 100 - 1, 0 };
                 const auto top_left = p - offset { 100 - 1, 100 - 1 };
                 if (beam.find(top_right) != beam.end() && beam.find(bottom_left) != beam.end() && beam.find(top_left) != beam.end()) {
-                    std::cout << 10000 * top_left[0] + top_left[1] << '\n';
-                    return 0;
+                    return top_left;
                 }
-#endif // PART == 2
             }
         }
 
@@ -77,10 +71,22 @@ int main(int argc, char* argv[])
         }
     }
 
+    return {};
+}
+
+} // namespace
+
+int main(int argc, char* argv[])
+{
+    sparse_set_grid beam;
+
 #if PART == 1
-    output(std::cerr, beam, extent(beam.begin(), beam.end()), ' ', '#');
+    drone_system(intcode::load(argc, argv), beam, 50);
     std::cout << beam.size() << '\n';
-#endif // PART == 1
+#elif PART == 2
+    const auto top_left = drone_system(intcode::load(argc, argv), beam).value();
+    std::cout << 10000 * top_left[0] + top_left[1] << '\n';
+#endif // PART
 
     return 0;
 }

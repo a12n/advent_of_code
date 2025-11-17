@@ -11,7 +11,6 @@ int main(int argc, char* argv[])
 {
     const intcode::memory prog = intcode::load(argc, argv);
 
-#if PART == 1
     std::deque<position> queue;
     sparse_set_grid beam;
 
@@ -26,7 +25,12 @@ int main(int argc, char* argv[])
         const auto p = queue.front();
         queue.pop_front();
 
-        if (p[0] >= 50 || p[1] >= 50 || beam.find(p) != beam.end()) {
+#if PART == 1
+        if (p[0] >= 50 || p[1] >= 50) {
+            continue;
+        }
+#endif // PART == 1
+        if (beam.find(p) != beam.end()) {
             continue;
         }
 
@@ -64,9 +68,10 @@ int main(int argc, char* argv[])
         }
     }
 
+#if PART == 1
     output(std::cerr, beam, extent(beam.begin(), beam.end()), ' ', '#');
     std::cout << beam.size() << '\n';
-#endif // PART
+#endif // PART == 1
 
     return 0;
 }

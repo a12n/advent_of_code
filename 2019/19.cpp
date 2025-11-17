@@ -13,9 +13,8 @@ int main(int argc, char* argv[])
     const intcode::memory prog = intcode::load(argc, argv);
 
 #if PART == 1
-    size_t pulled = 0;
     std::deque<position> queue;
-    std::map<position, char> beam;
+    sparse_set_grid beam;
 
     // Primer positions.
     for (int64_t y = 0; y < 10; ++y) {
@@ -53,13 +52,10 @@ int main(int argc, char* argv[])
             assert(op == intcode::opcode::output);
             assert(img[addr] == 0 || img[addr] == 1);
             if (img[addr]) {
-                ++pulled;
                 queue.push_back(p + offset { 0, 1 });
                 queue.push_back(p + offset { 1, 0 });
                 queue.push_back(p + offset { 1, 1 });
-                beam.insert({ p, '#' });
-            } else {
-                beam.insert({ p, '.' });
+                beam.insert(p);
             }
         }
 
@@ -69,8 +65,8 @@ int main(int argc, char* argv[])
         }
     }
 
-    output(std::cerr, beam, extent(beam), ' ');
-    std::cout << pulled << '\n';
+    output(std::cerr, beam, extent(beam.begin(), beam.end()), ' ', '#');
+    std::cout << beam.size() << '\n';
 #endif // PART
 
     return 0;

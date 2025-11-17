@@ -20,17 +20,22 @@ distance_map distances(const vault_map& vault)
 } // namespace
 
 template <>
-vault_map input<vault_map>(std::istream& s)
+std::optional<vault_map> input<vault_map>(std::istream& s)
 {
     vault_map vault;
     while (true) {
         vault.emplace_back();
         if (!std::getline(s, vault.back())) {
-            if (!s.eof()) {
+            if (s.eof()) {
+                vault.pop_back();
+                if (vault.empty()) {
+                    return {};
+                } else {
+                    return vault;
+                }
+            } else {
                 throw std::invalid_argument(__func__);
             }
-            vault.pop_back();
-            return vault;
         }
         assert(vault.back().size() == vault.front().size());
     }
@@ -38,7 +43,7 @@ vault_map input<vault_map>(std::istream& s)
 
 int main()
 {
-    const auto dists = distances(input<vault_map>(std::cin));
+    const auto dists = distances(input<vault_map>(std::cin).value());
 
     // TODO
 

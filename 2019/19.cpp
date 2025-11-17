@@ -59,6 +59,15 @@ int main(int argc, char* argv[])
                 queue.push_back(p + offset { 0, 1 });
                 queue.push_back(p + offset { 1, 1 });
                 beam.insert(p);
+#if PART == 2
+                const auto top_right = p - offset { 0, 100 - 1 };
+                const auto bottom_left = p - offset { 100 - 1, 0 };
+                const auto top_left = p - offset { 100 - 1, 100 - 1 };
+                if (beam.find(top_right) != beam.end() && beam.find(bottom_left) != beam.end() && beam.find(top_left) != beam.end()) {
+                    std::cout << 10000 * top_left[0] + top_left[1] << '\n';
+                    return 0;
+                }
+#endif // PART == 2
             }
         }
 

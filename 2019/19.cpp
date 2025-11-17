@@ -1,4 +1,3 @@
-#define PART 1
 #include <cassert>
 #include <deque>
 #include <iostream>

@@ -9,7 +9,7 @@ namespace {
 
 using namespace grid::planar;
 
-std::optional<position> drone_system(const intcode::memory&prog, sparse_set_grid& beam, size_t limit = static_cast<size_t>(-1))
+std::optional<position> drone_system(const intcode::memory& prog, sparse_set_grid& beam, size_t limit = static_cast<size_t>(-1))
 {
     beam.clear();
 

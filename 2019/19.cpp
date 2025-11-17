@@ -5,15 +5,17 @@
 
 int main(int argc, char* argv[])
 {
-    intcode::memory img = intcode::load(argc, argv);
-    intcode::address ip = 0;
-    intcode::value rel_base = 0;
+    const intcode::memory prog = intcode::load(argc, argv);
 
 #if PART == 1
     size_t pulled = 0;
 
     for (size_t y = 0; y < 50; ++y) {
         for (size_t x = 0; x < 50; ++x) {
+            intcode::memory img = prog;
+            intcode::address ip = 0;
+            intcode::value rel_base = 0;
+
             {
                 const auto [op, addr] = intcode::run_intrpt(img, ip, rel_base);
                 assert(op == intcode::opcode::input);
@@ -36,6 +38,11 @@ int main(int argc, char* argv[])
                 } else {
                     std::cerr.put('.');
                 }
+            }
+
+            {
+                const auto [op, addr] = intcode::run_intrpt(img, ip, rel_base);
+                assert(op == intcode::opcode::halt);
             }
         }
         std::cerr.put('\n');

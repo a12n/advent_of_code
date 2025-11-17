@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 #if PART == 1
     size_t pulled = 0;
     std::deque<position> queue;
-    std::map<position, char> grid;
+    std::map<position, char> beam;
 
     // Primer positions.
     for (int64_t y = 0; y < 10; ++y) {
@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
         const auto p = queue.front();
         queue.pop_front();
 
-        if (p[0] >= 50 || p[1] >= 50 || grid.find(p) != grid.end()) {
+        if (p[0] >= 50 || p[1] >= 50 || beam.find(p) != beam.end()) {
             continue;
         }
 
@@ -57,9 +57,9 @@ int main(int argc, char* argv[])
                 queue.push_back(p + offset { 0, 1 });
                 queue.push_back(p + offset { 1, 0 });
                 queue.push_back(p + offset { 1, 1 });
-                grid.insert({ p, '#' });
+                beam.insert({ p, '#' });
             } else {
-                grid.insert({ p, '.' });
+                beam.insert({ p, '.' });
             }
         }
 
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    output(std::cerr, grid, extent(grid), ' ');
+    output(std::cerr, beam, extent(beam), ' ');
     std::cout << pulled << '\n';
 #endif // PART
 

@@ -6,6 +6,7 @@
 #include <istream>
 #include <map>
 #include <ostream>
+#include <set>
 #include <string_view>
 #include <tuple>
 #include <vector>
@@ -72,6 +73,7 @@ using dense_grid = std::vector<std::vector<mapped_type>>;
 
 template <typename mapped_type>
 using sparse_grid = std::map<position, mapped_type>;
+using sparse_set_grid = std::set<position>;
 
 struct extent {
     extent() = default;
@@ -143,6 +145,21 @@ void output(std::ostream& s, const sparse_grid<mapped_type>& grid, const extent&
         for (p[0] = ext.min()[0]; p[0] <= ext.max()[0]; ++p[0]) {
             if (const auto it = grid.find(p); it != grid.end()) {
                 s << it->second;
+            } else {
+                s << empty;
+            }
+        }
+        s.put('\n');
+    }
+}
+
+template <typename mapped_type>
+void output(std::ostream& s, const sparse_set_grid& grid, const extent& ext, const mapped_type& empty, const mapped_type& non_empty)
+{
+    for (position p = ext.min(); p[1] <= ext.max()[1]; ++p[1]) {
+        for (p[0] = ext.min()[0]; p[0] <= ext.max()[0]; ++p[0]) {
+            if (const auto it = grid.find(p); it != grid.end()) {
+                s << non_empty;
             } else {
                 s << empty;
             }

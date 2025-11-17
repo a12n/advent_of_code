@@ -55,8 +55,8 @@ int main(int argc, char* argv[])
             assert(op == intcode::opcode::output);
             assert(img[addr] == 0 || img[addr] == 1);
             if (img[addr]) {
-                queue.push_back(p + offset { 0, 1 });
                 queue.push_back(p + offset { 1, 0 });
+                queue.push_back(p + offset { 0, 1 });
                 queue.push_back(p + offset { 1, 1 });
                 beam.insert(p);
             }

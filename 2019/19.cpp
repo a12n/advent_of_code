@@ -1,6 +1,7 @@
 #include <cassert>
 #include <deque>
 #include <iostream>
+#include <optional>
 
 #include "grid.hpp"
 #include "intcode.hpp"

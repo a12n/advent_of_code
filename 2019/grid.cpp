@@ -252,6 +252,7 @@ std::istream& operator>>(std::istream& in, direction& dir)
         try {
             dir = to_direction(c);
         } catch (std::invalid_argument&) {
+            in.unget();
             in.setstate(std::ios::failbit);
         }
     }

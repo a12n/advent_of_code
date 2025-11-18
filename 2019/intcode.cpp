@@ -222,7 +222,7 @@ address run(memory& img, environ& env)
 
 std::istream& operator>>(std::istream& in, memory& img)
 {
-    return ::operator>><int64_t, ','>(in, img);
+    return ::operator>> <value, ','>(in, img);
 }
 
 void test(const memory& prog, address stop,

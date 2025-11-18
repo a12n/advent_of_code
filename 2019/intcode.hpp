@@ -34,10 +34,6 @@ enum class mode {
     relative = 2,
 };
 
-struct state {
-    value rel_base {};
-};
-
 using memory = std::vector<value>;
 
 // Run interrupted until I/O or halt.

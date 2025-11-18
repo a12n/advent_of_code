@@ -8,10 +8,7 @@
 #include <ostream>
 #include <set>
 #include <string_view>
-#include <tuple>
 #include <vector>
-
-#include "input.hpp"
 
 //----------------------------------------------------------------------------
 // 2D Grids

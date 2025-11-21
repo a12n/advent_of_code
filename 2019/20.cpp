@@ -64,15 +64,15 @@ int main(void)
 
     std::map<label_type, std::vector<portal_exit>> portal_exits;
     for_each(grid, [&grid, &portal_exits](position lp1, char l1) {
-        if (l1 < 'A' || l1> 'Z') {
+        if (l1 < 'A' || l1 > 'Z') {
             return;
         }
 
-        for (const auto dir : {direction::right,direction::down}){
+        for (const auto dir : { direction::right, direction::down }) {
             const auto lp2 = lp1 + to_offset(dir);
-            const auto l2 = at(grid,lp2,' ');
+            const auto l2 = at(grid, lp2, ' ');
 
-            if (l2 < 'A' || l2 >'Z'){
+            if (l2 < 'A' || l2 > 'Z') {
                 continue;
             }
 

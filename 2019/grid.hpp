@@ -53,6 +53,7 @@ offset normalize(offset u);
 direction rotate(rotation rdir, direction dir);
 offset rotate(rotation rdir, offset u);
 double angle(offset u);
+position midpoint(position p, position q);
 
 offset& operator*=(offset& u, int64_t n);
 offset operator*(int64_t n, offset u);

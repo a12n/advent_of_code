@@ -159,6 +159,11 @@ double angle(offset u)
     return theta < 0 ? (theta + 2 * M_PI) : theta;
 }
 
+position midpoint(position p, position q)
+{
+    return p + (q - p) / 2;
+}
+
 offset& operator*=(offset& u, int64_t n)
 {
     u[0] *= n;

@@ -7,6 +7,7 @@
 #include <map>
 #include <ostream>
 #include <set>
+#include <stdexcept>
 #include <string_view>
 #include <vector>
 

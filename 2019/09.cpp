@@ -2,7 +2,8 @@
 
 int main(int argc, char* argv[])
 {
-    auto img = intcode::load(argc, argv);
-    intcode::run(img);
+    using namespace intcode;
+    auto img = load(argc, argv);
+    run(img, input_stream_line(std::cin), output_stream_line(std::cout));
     return 0;
 }

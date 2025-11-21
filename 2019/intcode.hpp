@@ -76,6 +76,103 @@ std::istream& operator>>(std::istream& in, memory& img);
 // Load memory image from file or from standard input.
 memory load(int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
+// Input and output functions
+
+// Throw exception on input attempts.
+inline auto input_error(const std::exception& err = std::runtime_error("unexpected input"))
+{
+    return [&err]() -> value {
+        throw err;
+    };
+}
+
+// Input characters from the istream in ASCII mode.
+inline auto input_stream_ascii(std::istream& s)
+{
+    return [&s]() {
+        return s.get();
+    };
+}
+
+// Parse values for input from the istream, one value per line.
+inline auto input_stream_line(std::istream& s)
+{
+    return [&s]() {
+        std::string line;
+        if (!std::getline(s, line)) {
+            throw std::runtime_error(__func__);
+        }
+        return std::stoll(line);
+    };
+}
+
+// Input characters from a string in ASCII mode.
+inline auto input_string_ascii(std::string_view& s)
+{
+    return [&s]() {
+        const auto v = s.front();
+        s.remove_prefix(1);
+        return v;
+    };
+}
+
+// Always input the same constant value.
+inline auto input_value(value v)
+{
+    return [v]() {
+        return v;
+    };
+}
+
+// Assert next output value equals to n.
+inline auto output_assert(value n)
+{
+    return [n](value v) {
+        assert(v == n);
+    };
+}
+
+// Throws error on output attempts.
+inline auto output_error(const std::exception& err = std::runtime_error("unexpected output"))
+{
+    return [&err](value) {
+        throw err;
+    };
+}
+
+// Output characters to the ostream in ASCII mode.
+inline auto output_stream_ascii(std::ostream& s)
+{
+    return [&s](value v) {
+        s.put(v);
+    };
+}
+
+// Format output values to the ostream, one value per line.
+inline auto output_stream_line(std::ostream& s)
+{
+    return [&s](value v) {
+        s << v << '\n';
+    };
+}
+
+// Append output characters to the provided string in ASCII mode.
+inline auto output_string_ascii(std::string& str)
+{
+    return [&str](value v) {
+        str.push_back(v);
+    };
+}
+
+// Assign output values to the provided reference.
+inline auto output_value(value& n)
+{
+    return [&n](value v) {
+        n = v;
+    };
+}
+
 } // namespace intcode
 
 #endif  // INTCODE_HPP

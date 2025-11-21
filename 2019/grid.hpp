@@ -1,6 +1,7 @@
 #ifndef GRID_HPP
 #define GRID_HPP
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <istream>
@@ -98,6 +99,19 @@ struct extent {
     {
         for (const auto& [p, _] : grid) {
             insert(p);
+        }
+    }
+
+    template <typename mapped_type>
+    explicit extent(const dense_grid<mapped_type>& grid)
+    {
+        for (const auto& row : grid) {
+            if (!row.empty()) {
+                max_[0] = std::max(max_[0], static_cast<int64_t>(row.size() - 1));
+            };
+        }
+        if (max_[0] != -1) {
+            max_[1] = grid.size() - 1;
         }
     }
 

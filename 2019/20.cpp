@@ -13,8 +13,6 @@ using label_type = std::array<char, 2>;
 
 size_t shortest_path(const dense_grid<char>& grid, const sparse_grid<position>& portals, position start, position finish)
 {
-    const size_t invalid_dist = -1;
-
     std::deque<std::tuple<position, size_t, size_t>> queue;
     std::set<std::tuple<position, size_t>> seen;
 

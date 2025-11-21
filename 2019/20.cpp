@@ -1,11 +1,54 @@
 #include <array>
+#include <deque>
 #include <iostream>
 
 #include "grid.hpp"
 
+namespace {
+
 using namespace grid::planar;
 
 using label_type = std::array<char, 2>;
+
+sparse_grid<size_t> distances(const dense_grid<char>& grid, const sparse_grid<position>& portals, position start)
+{
+    const size_t invalid_dist = -1;
+
+    sparse_grid<size_t> dists;
+    std::deque<position> queue;
+
+    dists.insert({ start, 0 });
+    queue.push_back(start);
+
+    while (!queue.empty()) {
+        const auto p = queue.front();
+        queue.pop_front();
+
+        for (const auto dir : { direction::up, direction::left, direction::right, direction::down }) {
+            auto q = p + to_offset(dir);
+
+            // Teleport if it's a portal.
+            q = at(portals, q, q);
+
+            // Don't step into walls.
+            if (at(grid, q) != '.') {
+                continue;
+            }
+
+            // Ignore positions for which distance is already known.
+            if (at(dists, q, invalid_dist) != invalid_dist) {
+                continue;
+            }
+
+            dists.emplace(q, dists.at(p) + 1);
+            queue.push_back(q);
+        }
+    }
+
+    return dists;
+}
+
+} // namespace
 
 int main(void)
 {
@@ -74,6 +117,8 @@ int main(void)
     for (const auto& [from, to] : portals) {
         std::cerr << from << " -> " << to << '\n';
     }
+
+    std::cout << distances(grid, portals, start).at(finish) << '\n';
 
     return 0;
 }

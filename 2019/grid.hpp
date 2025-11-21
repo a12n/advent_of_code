@@ -155,6 +155,48 @@ const mapped_type& at(const dense_grid<mapped_type>& grid, position p, const map
     return empty;
 }
 
+// Call func for each character in a grid read from the input stream.
+template <typename func_type>
+void for_each(std::istream& s, func_type func)
+{
+    for (position p = { 0, 0 }; s.good(); ++p[1]) {
+        for (p[0] = 0;; ++p[0]) {
+            if (const auto c = s.get(); c != '\n' && c != -1) {
+                func(p, c);
+            } else {
+                break;
+            }
+        }
+    }
+    if (!s.eof()) {
+        throw std::invalid_argument(__func__);
+    }
+}
+
+// Input sparse grid from istream, mapping characters to the
+// mapped_type values with a func.
+template <typename mapped_type, typename func_type>
+void input(std::istream& s, sparse_grid<mapped_type>& grid, func_type func)
+{
+    grid.clear();
+    for_each(s, [&grid, func](position p, char c) {
+        grid.insert({ p, func(p, c) });
+    });
+}
+
+// Same as input for sparse_grid above, but for dense_grid.
+template <typename mapped_type, typename func_type>
+void input(std::istream& s, dense_grid<mapped_type>& grid, func_type func)
+{
+    grid.clear();
+    for_each(s, [&grid, func](position p, char c) {
+        if (p[1] == grid.size()) {
+            grid.emplace_back();
+        }
+        grid.back().push_back(func(p, c));
+    });
+}
+
 template <typename mapped_type>
 void output(std::ostream& s, const sparse_grid<mapped_type>& grid, const extent& ext, const mapped_type& empty)
 {

@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <cassert>
 #include <fstream>
-#include <stdexcept>
 
 #include "intcode.hpp"
 
@@ -162,78 +161,9 @@ std::tuple<opcode, address> run_intrpt(memory& img, address& ip, value& rel_base
     }
 }
 
-value environ::input()
-{
-    std::string s;
-    std::cerr << '>' << '\n';
-    if (!std::getline(std::cin, s)) {
-        throw std::runtime_error(__func__);
-    }
-    return std::stoll(s);
-}
-
-void environ::output(value v)
-{
-    std::cerr << '<';
-    std::cout << v << '\n';
-}
-
-value test_environ::input()
-{
-    assert(!fake_in.empty());
-    value v = fake_in.front();
-    fake_in.pop_front();
-    return v;
-}
-
-void test_environ::output(value v)
-{
-    assert(v == expected_out.front());
-    expected_out.pop_front();
-}
-
-address run(memory& img)
-{
-    environ env;
-    return run(img, env);
-}
-
-address run(memory& img, environ& env)
-{
-    address ip = 0;
-    value rel_base = 0;
-    while (true) {
-        const auto [op, addr] = run_intrpt(img, ip, rel_base);
-        switch (op) {
-        case opcode::input:
-            img[addr] = env.input();
-            break;
-        case opcode::output:
-            env.output(img[addr]);
-            break;
-        case opcode::halt:
-            return ip;
-        default:
-            throw std::invalid_argument(__func__);
-        }
-    }
-}
-
 std::istream& operator>>(std::istream& in, memory& img)
 {
     return ::operator>> <value, ','>(in, img);
-}
-
-void test(const memory& prog, address stop,
-    const std::forward_list<value>& in, const std::forward_list<value>& out)
-{
-    memory img = prog;
-    test_environ env;
-    env.fake_in = in;
-    env.expected_out = out;
-    assert(run(img, env) == stop);
-    assert(env.fake_in.empty());
-    assert(env.expected_out.empty());
 }
 
 memory load(int argc, char* argv[])

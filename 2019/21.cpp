@@ -36,17 +36,22 @@ AND D J	; J = D && J
 int main(int argc, char* argv[])
 {
     auto img = intcode::load(argc, argv);
+    std::string_view script =
 #if PART == 1
-    std::string_view script = "NOT A T\n"
-                              "NOT T T\n"
-                              "AND B T\n"
-                              "AND C T\n"
-                              "NOT T J\n"
-                              "AND D J\n"
-                              "WALK\n";
+        "NOT A T\n"
+        "NOT T T\n"
+        "AND B T\n"
+        "AND C T\n"
+        "NOT T J\n"
+        "AND D J\n"
+        "WALK\n"
+#elif PART == 2
+        // TODO
+        "RUN\n"
+#endif // PART
+        ;
     intcode::value damage = 0;
     intcode::run(img, intcode::input_string_ascii(script), intcode::output_value(damage));
     std::cout << damage << '\n';
-#endif // PART
     return 0;
 }

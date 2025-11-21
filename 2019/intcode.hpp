@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <forward_list>
+#include <iostream>
 #include <istream>
 #include <tuple>
 #include <vector>
@@ -50,6 +51,27 @@ struct test_environ : environ {
 
     std::forward_list<value> fake_in;
     std::forward_list<value> expected_out;
+};
+
+struct ascii_environ : environ {
+    ascii_environ(std::istream& in = std::cin, std::ostream& out = std::cerr)
+        : in(in)
+        , out(out)
+    {
+    }
+
+    value input() override
+    {
+        return in.get();
+    }
+
+    void output(value v) override
+    {
+        out.put(v);
+    }
+
+    std::istream& in;
+    std::ostream& out;
 };
 
 // Run uninterrupted until halt, use environment for I/O.

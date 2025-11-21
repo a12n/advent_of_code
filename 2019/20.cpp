@@ -1,6 +1,7 @@
 #include <array>
 #include <deque>
 #include <iostream>
+#include <tuple>
 
 #include "grid.hpp"
 

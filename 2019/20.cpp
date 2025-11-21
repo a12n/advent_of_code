@@ -15,31 +15,36 @@ size_t shortest_path(const dense_grid<char>& grid, const sparse_grid<position>& 
 {
     const size_t invalid_dist = -1;
 
-    std::deque<std::tuple<position, size_t>> queue;
-    sparse_set_grid seen;
+    std::deque<std::tuple<position, size_t, size_t>> queue;
+    std::set<std::tuple<position, size_t>> seen;
 
-    queue.emplace_back(start, 0);
-    seen.insert(start);
+    queue.emplace_back(start, 0, 0);
+    seen.emplace(start, 0);
 
     while (!queue.empty()) {
-        const auto [p, dist] = queue.front();
+        const auto [p, p_level, p_dist] = queue.front();
         queue.pop_front();
 
-        if (p == finish) {
-            return dist;
+        if (p == finish && p_level == 0) {
+            return p_dist;
         }
 
         for (const auto dir : { direction::up, direction::left, direction::right, direction::down }) {
             auto q = p + to_offset(dir);
+            auto q_level = p_level;
 
-            q = at(portals, q, q);
+            if (const auto it = portals.find(q); it != portals.end()) {
+#if PART == 1
+                q = it->second;
+#endif // PART
+            }
 
-            if (at(grid, q) != '.' || contains(seen, q)) {
+            if (at(grid, q) != '.' || seen.find({ q, q_level }) != seen.end()) {
                 continue;
             }
 
-            seen.insert(q);
-            queue.emplace_back(q, dist + 1);
+            queue.emplace_back(q, q_level, p_dist + 1);
+            seen.emplace(q, q_level);
         }
     }
 

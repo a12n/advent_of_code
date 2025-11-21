@@ -136,6 +136,26 @@ std::ostream& operator<<(std::ostream& out, offset u);
 std::ostream& operator<<(std::ostream& out, position p);
 
 template <typename mapped_type>
+const mapped_type& at(const sparse_grid<mapped_type>& grid, position p, const mapped_type& empty = mapped_type())
+{
+    if (const auto it = grid.find(p); it != grid.end()) {
+        return it->second;
+    }
+    return empty;
+}
+
+template <typename mapped_type>
+const mapped_type& at(const dense_grid<mapped_type>& grid, position p, const mapped_type& empty = mapped_type())
+{
+    if (p[1] >= 0 && p[1] < grid.size()) {
+        if (const auto& row = grid[p[1]]; p[0] >= 0 && p[0] < row.size()) {
+            return row[p[0]];
+        }
+    }
+    return empty;
+}
+
+template <typename mapped_type>
 void output(std::ostream& s, const sparse_grid<mapped_type>& grid, const extent& ext, const mapped_type& empty)
 {
     for (position p = ext.min(); p[1] <= ext.max()[1]; ++p[1]) {

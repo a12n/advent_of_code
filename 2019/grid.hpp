@@ -145,6 +145,11 @@ const mapped_type& at(const sparse_grid<mapped_type>& grid, position p, const ma
     return empty;
 }
 
+inline bool contains(const sparse_set_grid& grid, position p)
+{
+    return grid.find(p) != grid.end();
+}
+
 template <typename mapped_type>
 const mapped_type& at(const dense_grid<mapped_type>& grid, position p, const mapped_type& empty = mapped_type())
 {

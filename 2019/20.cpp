@@ -11,42 +11,39 @@ using namespace grid::planar;
 
 using label_type = std::array<char, 2>;
 
-sparse_grid<size_t> distances(const dense_grid<char>& grid, const sparse_grid<position>& portals, position start)
+size_t shortest_path(const dense_grid<char>& grid, const sparse_grid<position>& portals, position start, position finish)
 {
     const size_t invalid_dist = -1;
 
-    sparse_grid<size_t> dists;
-    std::deque<position> queue;
+    std::deque<std::tuple<position, size_t>> queue;
+    sparse_set_grid seen;
 
-    dists.insert({ start, 0 });
-    queue.push_back(start);
+    queue.emplace_back(start, 0);
+    seen.insert(start);
 
     while (!queue.empty()) {
-        const auto p = queue.front();
+        const auto [p, dist] = queue.front();
         queue.pop_front();
+
+        if (p == finish) {
+            return dist;
+        }
 
         for (const auto dir : { direction::up, direction::left, direction::right, direction::down }) {
             auto q = p + to_offset(dir);
 
-            // Teleport if it's a portal.
             q = at(portals, q, q);
 
-            // Don't step into walls.
-            if (at(grid, q) != '.') {
+            if (at(grid, q) != '.' || contains(seen, q)) {
                 continue;
             }
 
-            // Ignore positions for which distance is already known.
-            if (at(dists, q, invalid_dist) != invalid_dist) {
-                continue;
-            }
-
-            dists.emplace(q, dists.at(p) + 1);
-            queue.push_back(q);
+            seen.insert(q);
+            queue.emplace_back(q, dist + 1);
         }
     }
 
-    return dists;
+    return -1;
 }
 
 } // namespace
@@ -119,7 +116,7 @@ int main(void)
         std::cerr << from << " -> " << to << '\n';
     }
 
-    std::cout << distances(grid, portals, start).at(finish) << '\n';
+    std::cout << shortest_path(grid, portals, start, finish) << '\n';
 
     return 0;
 }

@@ -13,6 +13,9 @@ using label_type = std::array<char, 2>;
 
 size_t shortest_path(const dense_grid<char>& grid, const sparse_grid<position>& portals, position start, position finish)
 {
+    const auto ext = extent(grid);
+    const auto mid = midpoint(ext.min(), ext.max());
+
     std::deque<std::tuple<position, size_t, size_t>> queue;
     std::set<std::tuple<position, size_t>> seen;
 
@@ -34,6 +37,24 @@ size_t shortest_path(const dense_grid<char>& grid, const sparse_grid<position>& 
             if (const auto it = portals.find(q); it != portals.end()) {
 #if PART == 1
                 q = it->second;
+#elif PART == 2
+                const bool lower_level = (dir == direction::up && q[1] > mid[1])
+                    || (dir == direction::left && q[0] > mid[0])
+                    || (dir == direction::right && q[0] < mid[0])
+                    || (dir == direction::down && q[1] < mid[1]);
+
+                const bool upper_level = (dir == direction::up && q[1] < mid[1])
+                    || (dir == direction::left && q[0] < mid[0])
+                    || (dir == direction::right && q[0] > mid[0])
+                    || (dir == direction::down && q[1] > mid[1]);
+
+                if (lower_level) {
+                    q = it->second;
+                    q_level++;
+                } else if (upper_level && q_level > 0) {
+                    q = it->second;
+                    q_level--;
+                }
 #endif // PART
             }
 

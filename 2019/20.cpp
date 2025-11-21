@@ -19,38 +19,48 @@ int main(void)
     });
     output(std::cerr, grid);
 
-    std::map<label_type, std::vector<position>> portal_labels;
-    for_each(grid, [&grid, &portal_labels](position p, char label1) {
-        if (label1 >= 'A' && label1 <= 'Z') {
-            if (const auto label2 = at(grid, p + offset { 1, 0 }, ' '); label2 >= 'A' && label2 <= 'Z') {
-                const auto label = label_type { label1, label2 };
-                if (const auto q = p - offset { 1, 0 }; at(grid, q, ' ') == '.') {
-                    portal_labels[label].push_back(q);
-                } else if (const auto q = p + offset { 2, 0 }; at(grid, q, ' ') == '.') {
-                    portal_labels[label].push_back(q);
+    using portal_exit = std::tuple<position, direction>;
+
+    std::map<label_type, std::vector<portal_exit>> portal_exits;
+    for_each(grid, [&grid, &portal_exits](position lp1, char l1) {
+        if (l1 < 'A' || l1> 'Z') {
+            return;
+        }
+
+        for (const auto dir : {direction::right,direction::down}){
+            const auto lp2 = lp1 + to_offset(dir);
+            const auto l2 = at(grid,lp2,' ');
+
+            if (l2 < 'A' || l2 >'Z'){
+                continue;
+            }
+
+            for (const auto& [p, dir2] : { portal_exit { lp1, opposite(dir) }, portal_exit { lp2, dir } }) {
+                if (at(grid, p + to_offset(dir2), ' ') != '.') {
+                    continue;
                 }
-            } else if (const auto label2 = at(grid, p + offset { 0, 1 }, ' '); label2 >= 'A' && label2 <= 'Z') {
-                const auto label = label_type { label1, label2 };
-                if (const auto q = p - offset { 0, 1 }; at(grid, q, ' ') == '.') {
-                    portal_labels[label].push_back(q);
-                } else if (const auto q = p + offset { 0, 2 }; at(grid, q, ' ') == '.') {
-                    portal_labels[label].push_back(q);
-                }
+
+                portal_exits[{ l1, l2 }].emplace_back(p, dir2);
             }
         }
     });
 
     position start, finish;
     std::map<position, position> portals;
-    for (const auto& [label, positions] : portal_labels) {
-        if (positions.size() == 2) {
-            portals.insert({ positions[0], positions[1] });
-            portals.insert({ positions[1], positions[0] });
-        } else if (positions.size() == 1) {
+    for (const auto& [label, exits] : portal_exits) {
+        if (exits.size() == 2) {
+            const auto& [p1, dir1] = exits[0];
+            const auto& [p2, dir2] = exits[1];
+
+            portals.insert({ p1, p2 + to_offset(dir2) });
+            portals.insert({ p2, p1 + to_offset(dir1) });
+        } else if (exits.size() == 1) {
+            const auto& [p, dir] = exits[0];
+
             if (label == label_type { 'A', 'A' }) {
-                start = positions[0];
+                start = p + to_offset(dir);
             } else if (label == label_type { 'Z', 'Z' }) {
-                finish = positions[0];
+                finish = p + to_offset(dir);
             } else {
                 std::invalid_argument(__func__);
             }

@@ -42,7 +42,8 @@ int main(int argc, char* argv[])
                               "AND B T\n"
                               "AND C T\n"
                               "NOT T J\n"
-                              "AND D J\n";
+                              "AND D J\n"
+                              "WALK\n";
     intcode::value damage = 0;
     intcode::run(img, intcode::input_string_ascii(script), intcode::output_value(damage));
     std::cout << damage << '\n';

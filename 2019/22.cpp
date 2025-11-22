@@ -55,3 +55,52 @@ int main()
 
     return 0;
 }
+
+int test()
+{
+    const size_t n = 10;
+
+    {
+        const auto shuffle = deal_with_increment<n>(7) | deal_into_new_stack<n>() | deal_into_new_stack<n>();
+        assert(shuffle(0) == 0);
+        assert(shuffle(1) == 7);
+        assert(shuffle(2) == 4);
+        assert(shuffle(3) == 1);
+        assert(shuffle(4) == 8);
+        assert(shuffle(5) == 5);
+        assert(shuffle(6) == 2);
+        assert(shuffle(7) == 9);
+        assert(shuffle(8) == 6);
+        assert(shuffle(9) == 3);
+    }
+
+    {
+        const auto shuffle = cut_cards<n>(6) | deal_with_increment<n>(7) | deal_into_new_stack<n>();
+        assert(shuffle(0) == 1);
+        assert(shuffle(1) == 4);
+        assert(shuffle(2) == 7);
+        assert(shuffle(3) == 0);
+        assert(shuffle(4) == 3);
+        assert(shuffle(5) == 6);
+        assert(shuffle(6) == 9);
+        assert(shuffle(7) == 2);
+        assert(shuffle(8) == 5);
+        assert(shuffle(9) == 8);
+    }
+
+    {
+        const auto shuffle = deal_with_increment<n>(7) | deal_with_increment<n>(9) | cut_cards<n>(-2);
+        assert(shuffle(0) == 2);
+        assert(shuffle(1) == 5);
+        assert(shuffle(2) == 8);
+        assert(shuffle(3) == 1);
+        assert(shuffle(4) == 4);
+        assert(shuffle(5) == 7);
+        assert(shuffle(6) == 0);
+        assert(shuffle(7) == 3);
+        assert(shuffle(8) == 6);
+        assert(shuffle(9) == 9);
+    }
+
+    return 0;
+}

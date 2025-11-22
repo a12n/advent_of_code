@@ -38,7 +38,28 @@ int main(int argc, char* argv[])
         "AND D J\n"
         "WALK\n"
 #elif PART == 2
-        // TODO
+        /*
+        Jump, if can do two consequitive jumps and still be on the
+        ground:
+
+        !(A && B && C) && D
+        && (H || (E && I) || (E && F))
+
+        !(A && B && C) && D
+        && (H || (E && (I || F)))
+        */
+        "NOT A T\n"
+        "NOT T T\n" // T=A
+        "AND B T\n" // T=A & B
+        "AND C T\n" // T=A & B & C
+        "NOT T J\n" // J=!(A & B & C)
+        "AND D J\n" // J=!(A & B & C) & D
+        "NOT F T\n"
+        "NOT T T\n" // T=F
+        "OR I T\n" // T=I | F
+        "AND E T\n" // T=E & (I | F)
+        "OR H T\n" // T=H | (E & (I | F))
+        "AND T J\n" // J=!(A & B & C) & D & (H | (E & (I | F)))
         "RUN\n"
 #endif // PART
         ;

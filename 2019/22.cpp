@@ -92,8 +92,7 @@ technique input(std::istream& s, technique f = [](size_t i) { return i; })
 
 int main()
 {
-    // TODO
-
+    std::cout << (input<10007>(std::cin))(2019) << '\n';
     return 0;
 }
 

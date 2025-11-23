@@ -61,7 +61,9 @@ int test()
     const size_t n = 10;
 
     {
-        const auto shuffle = deal_with_increment<n>(7) | deal_into_new_stack<n>() | deal_into_new_stack<n>();
+        const auto shuffle = deal_with_increment<n>(7)
+            | deal_into_new_stack<n>()
+            | deal_into_new_stack<n>();
         assert(shuffle(0) == 0);
         assert(shuffle(1) == 7);
         assert(shuffle(2) == 4);
@@ -75,7 +77,9 @@ int test()
     }
 
     {
-        const auto shuffle = cut_cards<n>(6) | deal_with_increment<n>(7) | deal_into_new_stack<n>();
+        const auto shuffle = cut_cards<n>(6)
+            | deal_with_increment<n>(7)
+            | deal_into_new_stack<n>();
         assert(shuffle(0) == 1);
         assert(shuffle(1) == 4);
         assert(shuffle(2) == 7);
@@ -89,7 +93,9 @@ int test()
     }
 
     {
-        const auto shuffle = deal_with_increment<n>(7) | deal_with_increment<n>(9) | cut_cards<n>(-2);
+        const auto shuffle = deal_with_increment<n>(7)
+            | deal_with_increment<n>(9)
+            | cut_cards<n>(-2);
         assert(shuffle(0) == 2);
         assert(shuffle(1) == 5);
         assert(shuffle(2) == 8);

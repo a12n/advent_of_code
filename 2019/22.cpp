@@ -47,6 +47,47 @@ technique operator|(technique f, technique g)
     };
 }
 
+template <size_t n>
+technique input(std::istream& s, technique f = [](size_t i) { return i; })
+{
+    std::string tok;
+
+    // FIXME
+    if (s >> tok) {
+        if (tok == "deal") {
+            if (!(s >> tok)) {
+                throw std::invalid_argument(__func__);
+            }
+            if (tok == "into") {
+                if (!(s >> tok) || tok != "new" || !(s >> tok) || tok != "stack") {
+                    throw std::invalid_argument(__func__);
+                }
+                return input<n>(s, f | deal_into_new_stack<n>());
+            } else if (tok == "with") {
+                size_t k;
+                if (!(s >> tok) || tok != "increment" || !(s >> k)) {
+                    throw std::invalid_argument(__func__);
+                }
+                return input<n>(s, f | deal_with_increment<n>(k));
+            }
+        } else if (tok == "cut") {
+            int k;
+            if (!(s >> k)) {
+                throw std::invalid_argument(__func__);
+            }
+            return input<n>(s, f | cut_cards<n>(k));
+        } else {
+            throw std::invalid_argument(__func__);
+        }
+    }
+
+    if (s.eof()) {
+        return f;
+    }
+
+    throw std::invalid_argument(__func__);
+}
+
 } // namespace
 
 int main()

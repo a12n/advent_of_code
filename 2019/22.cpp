@@ -108,5 +108,28 @@ int test()
         assert(shuffle(9) == 9);
     }
 
+    {
+        const auto shuffle = deal_into_new_stack<n>()
+            | cut_cards<n>(-2)
+            | deal_with_increment<n>(7)
+            | cut_cards<n>(8)
+            | cut_cards<n>(-4)
+            | deal_with_increment<n>(7)
+            | cut_cards<n>(3)
+            | deal_with_increment<n>(9)
+            | deal_with_increment<n>(3)
+            | cut_cards<n>(-1);
+        assert(shuffle(0) == 7);
+        assert(shuffle(1) == 4);
+        assert(shuffle(2) == 1);
+        assert(shuffle(3) == 8);
+        assert(shuffle(4) == 5);
+        assert(shuffle(5) == 2);
+        assert(shuffle(6) == 9);
+        assert(shuffle(7) == 6);
+        assert(shuffle(8) == 3);
+        assert(shuffle(9) == 0);
+    }
+
     return 0;
 }

@@ -1,15 +1,16 @@
 #include <cassert>
 #include <cstdlib>
+#include <functional>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 
 namespace {
 
-const size_t n_cards = 10007;
+using technique = std::function<size_t(size_t)>;
 
 template <size_t n>
-auto deal_into_new_stack()
+technique deal_into_new_stack()
 {
     return [](size_t i) {
         assert(i < n);
@@ -18,7 +19,7 @@ auto deal_into_new_stack()
 }
 
 template <size_t n>
-auto cut_cards(int k)
+technique cut_cards(int k)
 {
     if (k < 0) {
         k += n;
@@ -31,7 +32,7 @@ auto cut_cards(int k)
 }
 
 template <size_t n>
-auto deal_with_increment(size_t k)
+technique deal_with_increment(size_t k)
 {
     return [k](size_t i) {
         assert(i < n);
@@ -39,8 +40,7 @@ auto deal_with_increment(size_t k)
     };
 }
 
-template <typename f_type, typename g_type>
-auto operator|(f_type f, g_type g)
+technique operator|(technique f, technique g)
 {
     return [f, g](size_t i) {
         return g(f(i));

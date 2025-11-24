@@ -68,6 +68,9 @@ position& operator-=(position& p, offset u);
 position operator-(position p, offset u);
 offset operator-(offset u);
 
+template <typename mapped_type, size_t n, size_t m>
+using fixed_grid = std::array<std::array<mapped_type, m>, n>;
+
 template <typename mapped_type>
 using dense_grid = std::vector<std::vector<mapped_type>>;
 
@@ -176,6 +179,15 @@ const mapped_type& at(const dense_grid<mapped_type>& grid, position p, const map
     return empty;
 }
 
+template <typename mapped_type, size_t n, size_t m>
+const mapped_type& at(const fixed_grid<mapped_type, n, m>& grid, position p, const mapped_type& empty = mapped_type())
+{
+    if (p[1] >= 0 && p[1] < n && p[0] >= 0 && p[0] < m) {
+        return grid[p[1]][p[0]];
+    }
+    return empty;
+}
+
 // Call func for each character in a grid read from the input stream.
 template <typename func_type>
 void for_each(std::istream& s, func_type func)
@@ -215,6 +227,18 @@ void input(std::istream& s, dense_grid<mapped_type>& grid, func_type func)
             grid.emplace_back();
         }
         grid.back().push_back(func(p, c));
+    });
+}
+
+// Same as input for dense_grid, but for fixed_grid.
+template <typename mapped_type, size_t n, size_t m, typename func_type>
+void input(std::istream& s, fixed_grid<mapped_type, n, m>& grid, func_type func)
+{
+    for_each(s, [&grid, func](position p, char c) {
+        if (p[1] >= n || p[0] >= m) {
+            throw std::invalid_argument(__func__);
+        }
+        grid[p[1]][p[0]] = func(p, c);
     });
 }
 

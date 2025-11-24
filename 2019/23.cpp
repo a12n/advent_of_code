@@ -2,6 +2,7 @@
 #include <cassert>
 #include <deque>
 #include <iostream>
+#include <optional>
 #include <tuple>
 
 #include "intcode.hpp"
@@ -18,6 +19,9 @@ intcode::value network(const intcode::memory& nic)
     std::array<intcode::address, n> ip {};
     std::array<intcode::value, n> rel_base {};
     std::array<std::deque<packet>, n> queue;
+
+    // NAT.
+    std::optional<packet> nat, nat_sent;
 
     // Load program.
     for (size_t i = 0; i < n; ++i) {
@@ -36,10 +40,13 @@ intcode::value network(const intcode::memory& nic)
 
     // Run computers.
     while (true) {
+        bool idle = true;
+
         for (size_t i = 0; i < n; ++i) {
             std::tie(op, addr) = intcode::run_intrpt(img[i], ip[i], rel_base[i]);
             assert(op == intcode::opcode::input || op == intcode::opcode::output);
             if (op == intcode::opcode::output) {
+                idle = false;
                 // Send packet.
                 const auto dest = img[i][addr];
                 std::tie(op, addr) = intcode::run_intrpt(img[i], ip[i], rel_base[i]);
@@ -49,7 +56,11 @@ intcode::value network(const intcode::memory& nic)
                 assert(op == intcode::opcode::output);
                 const auto y = img[i][addr];
                 if (dest == 255) {
+#if PART == 1
                     return y;
+#elif PART == 2
+                    nat = { x, y };
+#endif // PART
                 } else {
                     queue[dest].push_back({ x, y });
                 }
@@ -58,6 +69,7 @@ intcode::value network(const intcode::memory& nic)
                 if (queue[i].empty()) {
                     img[i][addr] = -1;
                 } else {
+                    idle = false;
                     const auto [x, y] = queue[i].front();
                     img[i][addr] = x;
                     std::tie(op, addr) = intcode::run_intrpt(img[i], ip[i], rel_base[i]);
@@ -66,6 +78,18 @@ intcode::value network(const intcode::memory& nic)
                     queue[i].pop_front();
                 }
             }
+        }
+
+        if (idle && nat.has_value()) {
+            const auto [_, y0] = *nat;
+            if (nat_sent) {
+                const auto [_, y1] = *nat_sent;
+                if (y0 == y1) {
+                    return y0;
+                }
+            }
+            queue[0].push_back(*nat);
+            nat_sent = *nat;
         }
     }
 }

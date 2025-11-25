@@ -256,8 +256,22 @@ int main()
 
 int test()
 {
-    const int16_t l=0;
-#if PART == 2
+#if PART == 1
+    const bugs_grid bugs = bug(4, 0)
+        | bug(0, 1) | bug(3, 1)
+        | bug(0, 2) | bug(3, 2) | bug(4, 2)
+        | bug(2, 3)
+        | bug(0, 4);
+
+    assert(neighbors(bugs, 0, 0) == bug(0, 1));
+    assert(neighbors(bugs, 3, 2) == (bug(3, 1) | bug(4, 2)));
+
+    assert(count(bugs) == 8);
+
+    assert(biodiversity(bug(0, 3) | bug(1, 4)) == 2129920);
+    assert(biodiversity(bugs) == 1205552);
+#elif PART == 2
+    const int16_t l = 0;
     {
         // Tile 19 has four adjacent tiles: 14, 18, 20, and 24.
         const bug_set adj = {

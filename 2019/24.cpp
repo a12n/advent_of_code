@@ -11,10 +11,22 @@ const size_t n = 5;
 // 25 bits to represent presence of bugs on the 5×5 grid.
 using set = uint32_t;
 
-// The bit for a bug at the specified position.
+// Single bit for a bug at the specified position.
 constexpr set bug(unsigned x, unsigned y)
 {
     return 1 << (n * y + x);
+}
+
+// Bugs at all the positions of the speicified row number.
+constexpr set row(unsigned y)
+{
+    return bug(0, y) | bug(1, y) | bug(2, y) | bug(3, y) | bug(4, y);
+}
+
+// Bugs at all the positions of the speicified column number.
+constexpr set column(unsigned x)
+{
+    return bug(x, 0) | bug(x, 1) | bug(x, 2) | bug(x, 3) | bug(x, 4);
 }
 
 // Get bug at the specified position on the grid.

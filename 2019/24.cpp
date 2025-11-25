@@ -171,6 +171,16 @@ constexpr unsigned count(set b)
     return n;
 }
 
+// Count bugs on all non-empty levels of the multi-level grid.
+unsigned count(const multiset& b)
+{
+    unsigned n = 0;
+    for (const auto bi : b) {
+        n += count(bi);
+    }
+    return n;
+}
+
 } // namespace bugs
 
 namespace {

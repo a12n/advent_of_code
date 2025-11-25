@@ -105,51 +105,59 @@ void insert(multiset& b, unsigned x, unsigned y, int level)
     b[i] = insert(b[i], x, y);
 }
 
-// Neighbors in the recursively-folded space. Neighbors at the same
-// level will be stored in the `immed` set, neighbors from the middle
-// tile will be in the `inner` set, and neighbors from the outer grid
-// will be in `outer` set.
-constexpr void neighbors(set b, unsigned x, unsigned y, set& immed, set& inner, set& outer)
+
+// Neighbors at the same level will be stored in the `immed` set (at
+// index 0), neighbors from the middle tile will be in the `inner` set
+// (at index 1), and neighbors from the outer grid will be in `outer`
+// set (index 2).
+constexpr std::array<set, 3> neighbors(std::array<set, 3> b, unsigned x, unsigned y)
 {
     const unsigned mid = n / 2;
 
-    immed = inner = outer = 0;
+    std::array<set, 3> ans {};
+    enum {
+        immed,
+        inner,
+        outer,
+    };
 
     // Up
     if (y == 0) {
-        outer |= bug(mid, mid - 1);
+        ans[outer] |= at(b[outer], mid, mid - 1);
     } else if (x == mid && y == (mid + 1)) {
-        inner |= row(n - 1);
+        ans[inner] |= row_at(b[inner], n - 1);
     } else {
-        immed |= bug(x, y - 1);
+        ans[immed] |= at(b[immed], x, y - 1);
     }
 
     // Left
     if (x == 0) {
-        outer |= bug(mid - 1, mid);
+        ans[outer] |= at(b[outer], mid - 1, mid);
     } else if (x == (mid + 1) && y == mid) {
-        inner |= column(n - 1);
+        ans[inner] |= column_at(b[inner], n - 1);
     } else {
-        immed |= bug(x - 1, y);
+        ans[immed] |= at(b[immed], x - 1, y);
     }
 
     // Right
     if (x == n - 1) {
-        outer |= bug(mid + 1, mid);
+        ans[outer] |= at(b[outer], mid + 1, mid);
     } else if (x == (mid - 1) && y == mid) {
-        inner |= column(0);
+        ans[inner] |= column_at(b[inner], 0);
     } else {
-        immed |= bug(x + 1, y);
+        ans[immed] |= at(b[immed], x + 1, y);
     }
 
     // Down
     if (y == n - 1) {
-        outer |= bug(mid, mid + 1);
+        ans[outer] |= at(b[outer], mid, mid + 1);
     } else if (x == mid && y == (mid - 1)) {
-        inner |= row(0);
+        ans[inner] |= row_at(b[inner], 0);
     } else {
-        immed |= bug(x, y + 1);
+        ans[immed] |= at(b[immed], x, y + 1);
     }
+
+    return ans;
 }
 
 // Count bugs on the grid.

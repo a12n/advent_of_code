@@ -87,7 +87,7 @@ constexpr unsigned index(int level)
                                                   : 0;
 }
 
-set at(const multiset& b, unsigned x, unsigned y, int level)
+set at(const multiset& b, int level, unsigned x, unsigned y)
 {
     const auto i = index(level);
     if (i < b.size()) {
@@ -96,7 +96,7 @@ set at(const multiset& b, unsigned x, unsigned y, int level)
     return 0;
 }
 
-void insert(multiset& b, unsigned x, unsigned y, int level)
+void insert(multiset& b, int level, unsigned x, unsigned y)
 {
     const auto i = index(level);
     if (i >= b.size()) {

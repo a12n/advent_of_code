@@ -50,6 +50,53 @@ constexpr set neighbors(set b, unsigned x, unsigned y)
         | (y < n - 1 ? at(b, x, y + 1) : 0);
 }
 
+// Neighbors in the recursively-folded space. Neighbors at the same
+// level will be stored in the `immed` set, neighbors from the middle
+// tile will be in the `inner` set, and neighbors from the outer grid
+// will be in `outer` set.
+constexpr void neighbors(set b, unsigned x, unsigned y, set& immed, set& inner, set& outer)
+{
+    const unsigned mid = n / 2;
+
+    immed = inner = outer = 0;
+
+    // Up
+    if (y == 0) {
+        outer |= bug(mid, mid - 1);
+    } else if (x == mid && y == (mid + 1)) {
+        inner |= row(n - 1);
+    } else {
+        immed |= bug(x, y - 1);
+    }
+
+    // Left
+    if (x == 0) {
+        outer |= bug(mid - 1, mid);
+    } else if (x == (mid + 1) && y == mid) {
+        inner |= column(n - 1);
+    } else {
+        immed |= bug(x - 1, y);
+    }
+
+    // Right
+    if (x == n - 1) {
+        outer |= bug(mid + 1, mid);
+    } else if (x == (mid - 1) && y == mid) {
+        inner |= column(0);
+    } else {
+        immed |= bug(x + 1, y);
+    }
+
+    // Down
+    if (y == n - 1) {
+        outer |= bug(mid, mid + 1);
+    } else if (x == mid && y == (mid - 1)) {
+        inner |= row(0);
+    } else {
+        immed |= bug(x, y + 1);
+    }
+}
+
 // Count bugs on the grid.
 constexpr unsigned count(set b)
 {

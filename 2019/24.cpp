@@ -8,6 +8,9 @@ namespace bugs {
 // The size of the Eris bugs grid is n×n.
 const size_t n = 5;
 
+//----------------------------------------------------------------------------
+// Single-level bugs grid
+
 // 25 bits to represent presence of bugs on the 5×5 grid.
 using set = uint32_t;
 
@@ -48,6 +51,46 @@ constexpr set neighbors(set b, unsigned x, unsigned y)
         | (x > 0 ? at(b, x - 1, y) : 0)
         | (x < n - 1 ? at(b, x + 1, y) : 0)
         | (y < n - 1 ? at(b, x, y + 1) : 0);
+}
+
+//----------------------------------------------------------------------------
+// Grid of bugs in the recursively-folded space
+
+// Bugs grid on multiple levels.
+using multiset = std::vector<set>;
+
+// Mapping of levels (negative and non-negative) to indices into the
+// `multiset` array of separate grids.
+constexpr unsigned index(int level)
+{
+    //  0 -> 0
+    //  1 -> 1
+    // -1 -> 2
+    //  2 -> 3
+    // -2 -> 4
+    //  3 -> 5
+    // -3 -> 6
+    // …
+    return (level < 0) ? 2 * -level : (level > 0) ? 2 * level - 1
+                                                  : 0;
+}
+
+set at(const multiset& b, unsigned x, unsigned y, int level)
+{
+    const auto i = index(level);
+    if (i < b.size()) {
+        return b[i];
+    }
+    return 0;
+}
+
+void insert(multiset& b, unsigned x, unsigned y, int level)
+{
+    const auto i = index(level);
+    if (i >= b.size()) {
+        b.resize(i + 1, 0);
+    }
+    b[i] = insert(b[i], x, y);
 }
 
 // Neighbors in the recursively-folded space. Neighbors at the same

@@ -6,9 +6,7 @@
 namespace {
 
 const size_t n = 5;
-using namespace grid::planar;
 
-#if PART == 1
 using bugs_grid = uint32_t;
 
 constexpr bugs_grid bug(unsigned x, unsigned y)
@@ -69,7 +67,9 @@ constexpr size_t biodiversity(bugs_grid bugs)
     return bugs;
 }
 
-#elif PART == 2
+#if PART == 2
+using grid::planar::direction;
+
 // Level and grid position.
 using bug_position = std::tuple<int16_t, int8_t, int8_t>;
 using bug_set = std::set<bug_position>;
@@ -101,16 +101,16 @@ void for_each_adjacent_dir(const bug_position& bug, direction dir, func_type fun
             for_each_adjacent_edge(dir, level + 1, func);
         } else {
             // func(bug_position(p_level, p + to_offset(dir)));
-            func(bug_position ( level, x, y - 1 ));
+            func(bug_position(level, x, y - 1));
         }
     } else if (dir == direction::left) {
         if (x == 0) {
-            func(bug_position(level-1,(n/2)-1,n/2));
+            func(bug_position(level - 1, (n / 2) - 1, n / 2));
         } else if (x == (n / 2) + 1 && y == (n / 2)) {
             for_each_adjacent_edge(dir, level + 1, func);
         } else {
             // func(bug_position(p_level, p + to_offset(dir)));
-            func(bug_position ( level,x - 1, y ));
+            func(bug_position(level, x - 1, y));
         }
     } else if (dir == direction::right) {
         if (x == n - 1) {
@@ -119,7 +119,7 @@ void for_each_adjacent_dir(const bug_position& bug, direction dir, func_type fun
             for_each_adjacent_edge(dir, level + 1, func);
         } else {
             // func(bug_position(p_level, p + to_offset(dir)));
-            func(bug_position ( level, x + 1, y ));
+            func(bug_position(level, x + 1, y));
         }
     } else if (dir == direction::down) {
         if (y == n - 1) {
@@ -128,7 +128,7 @@ void for_each_adjacent_dir(const bug_position& bug, direction dir, func_type fun
             for_each_adjacent_edge(dir, level + 1, func);
         } else {
             // func(bug_position(p_level, p + to_offset(dir)));
-            func(bug_position ( level, x, y + 1 ));
+            func(bug_position(level, x, y + 1));
         }
     }
 }
@@ -224,7 +224,7 @@ int main()
     // return test();
     bug_set grid;
 
-    for_each(std::cin, [&grid](position p, char c) {
+    grid::planar::for_each(std::cin, [&grid](auto p, auto c) {
         if (p[0] >= n || p[1] >= n || (c != '.' && c != '#')) {
             throw std::invalid_argument(__func__);
         }
@@ -243,10 +243,6 @@ int main()
     while (minutes-- > 0) {
         grid = simulate(grid);
     }
-
-    // for (const auto& [p_level, p] : grid) {
-    //     std::cerr << p_level << ' ' << p << '\n';
-    // }
 
     std::cout << grid.size() << '\n';
 #endif // PART

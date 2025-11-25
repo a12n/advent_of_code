@@ -9,37 +9,64 @@ const size_t n = 5;
 using namespace grid::planar;
 
 #if PART == 1
-using bugs_grid = fixed_grid<bool, n, n>;
+using bugs_grid = uint32_t;
 
-bugs_grid simulate(const bugs_grid& grid)
+constexpr bugs_grid bug(unsigned x, unsigned y)
 {
-    bugs_grid next;
-    for (position p = { 0, 0 }; p[1] < 5; ++p[1]) {
-        for (p[0] = 0; p[0] < 5; ++p[0]) {
-            const size_t k = at(grid, p + to_offset(direction::up)) + at(grid, p + to_offset(direction::left)) + at(grid, p + to_offset(direction::right)) + at(grid, p + to_offset(direction::down));
-            if (at(grid, p)) {
-                next[p[1]][p[0]] = (k == 1);
+    return 1 << (n * y + x);
+}
+
+constexpr bugs_grid at(bugs_grid bugs, unsigned x, unsigned y)
+{
+    return bugs & (1 << (n * y + x));
+}
+
+constexpr bugs_grid insert(bugs_grid bugs, unsigned x, unsigned y)
+{
+    return bugs | (1 << (n * y + x));
+}
+
+constexpr bugs_grid neighbors(bugs_grid bugs, unsigned x, unsigned y)
+{
+    return (y > 0 ? at(bugs, x, y - 1) : 0)
+        | (x > 0 ? at(bugs, x - 1, y) : 0)
+        | (x < n - 1 ? at(bugs, x + 1, y) : 0)
+        | (y < n - 1 ? at(bugs, x, y + 1) : 0);
+}
+
+constexpr unsigned count(bugs_grid bugs)
+{
+    unsigned n = 0;
+    while (bugs) {
+        bugs &= (bugs - 1);
+        ++n;
+    }
+    return n;
+}
+
+bugs_grid simulate(bugs_grid bugs)
+{
+    bugs_grid next = 0;
+    for (unsigned y = 0; y < n; ++y) {
+        for (unsigned x = 0; x < n; ++x) {
+            const auto k = count(neighbors(bugs, x, y));
+            if (at(bugs, x, y)) {
+                if (k == 1) {
+                    next = insert(next, x, y);
+                }
             } else {
-                next[p[1]][p[0]] = (k == 1 || k == 2);
+                if (k == 1 || k == 2) {
+                    next = insert(next, x, y);
+                }
             }
         }
     }
     return next;
 }
 
-size_t biodiversity(const bugs_grid& grid)
+constexpr size_t biodiversity(bugs_grid bugs)
 {
-    size_t mult = 1;
-    size_t sum = 0;
-    for (const auto& row : grid) {
-        for (const auto bug : row) {
-            if (bug) {
-                sum += mult;
-            }
-            mult *= 2;
-        }
-    }
-    return sum;
+    return bugs;
 }
 
 #elif PART == 2
@@ -174,17 +201,24 @@ bug_set simulate(const bug_set& grid)
 int main()
 {
 #if PART == 1
-    bugs_grid grid;
+    bugs_grid bugs = 0;
 
-    input(std::cin, grid, [](position, char c) { return c == '#'; });
+    grid::planar::for_each(std::cin, [&bugs](auto p, auto c) {
+        if (p[0] >= n || p[1] >= n || (c != '.' && c != '#')) {
+            throw std::invalid_argument(__func__);
+        }
+        if (c == '#') {
+            bugs = insert(bugs, p[0], p[1]);
+        }
+    });
 
     std::set<bugs_grid> seen;
-    while (seen.find(grid) == seen.end()) {
-        seen.insert(grid);
-        grid = simulate(grid);
+    while (seen.find(bugs) == seen.end()) {
+        seen.insert(bugs);
+        bugs = simulate(bugs);
     }
 
-    std::cout << biodiversity(grid) << '\n';
+    std::cout << biodiversity(bugs) << '\n';
 #elif PART == 2
     // int test(void);
     // return test();

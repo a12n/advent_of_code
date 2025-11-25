@@ -38,6 +38,18 @@ constexpr set at(set b, unsigned x, unsigned y)
     return b & bug(x, y);
 }
 
+// Get bugs of the speicified row in the grid.
+constexpr set row_at(set b, unsigned y)
+{
+    return at(b, 0, y) | at(b, 1, y) | at(b, 2, y) | at(b, 3, y) | at(b, 4, y);
+}
+
+// Get bugs of the speicified column.
+constexpr set column_at(set b, unsigned x)
+{
+    return at(b, x, 0) | at(b, x, 1) | at(b, x, 2) | at(b, x, 3) | at(b, x, 4);
+}
+
 // Set bug at the specified position.
 constexpr set insert(set b, unsigned x, unsigned y)
 {

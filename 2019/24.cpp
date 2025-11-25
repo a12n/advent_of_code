@@ -44,7 +44,7 @@ constexpr unsigned count(bugs_grid bugs)
     return n;
 }
 
-bugs_grid simulate(bugs_grid bugs)
+constexpr bugs_grid simulate(bugs_grid bugs)
 {
     bugs_grid next = 0;
     for (unsigned y = 0; y < n; ++y) {

@@ -3,58 +3,69 @@
 
 #include "grid.hpp"
 
-namespace {
+namespace bugs {
 
+// The size of the Eris bugs grid is n×n.
 const size_t n = 5;
 
-using bugs_grid = uint32_t;
+// 25 bits to represent presence of bugs on the 5×5 grid.
+using set = uint32_t;
 
-constexpr bugs_grid bug(unsigned x, unsigned y)
+// The bit for a bug at the specified position.
+constexpr set bug(unsigned x, unsigned y)
 {
     return 1 << (n * y + x);
 }
 
-constexpr bugs_grid at(bugs_grid bugs, unsigned x, unsigned y)
+// Get bug at the specified position on the grid.
+constexpr set at(set b, unsigned x, unsigned y)
 {
-    return bugs & (1 << (n * y + x));
+    return b & bug(x, y);
 }
 
-constexpr bugs_grid insert(bugs_grid bugs, unsigned x, unsigned y)
+// Set bug at the specified position.
+constexpr set insert(set b, unsigned x, unsigned y)
 {
-    return bugs | (1 << (n * y + x));
+    return b | bug(x, y);
 }
 
-constexpr bugs_grid neighbors(bugs_grid bugs, unsigned x, unsigned y)
+// Usual 4-neighborhood of a bug at specified position.
+constexpr set neighbors(set b, unsigned x, unsigned y)
 {
-    return (y > 0 ? at(bugs, x, y - 1) : 0)
-        | (x > 0 ? at(bugs, x - 1, y) : 0)
-        | (x < n - 1 ? at(bugs, x + 1, y) : 0)
-        | (y < n - 1 ? at(bugs, x, y + 1) : 0);
+    return (y > 0 ? at(b, x, y - 1) : 0)
+        | (x > 0 ? at(b, x - 1, y) : 0)
+        | (x < n - 1 ? at(b, x + 1, y) : 0)
+        | (y < n - 1 ? at(b, x, y + 1) : 0);
 }
 
-constexpr unsigned count(bugs_grid bugs)
+// Count bugs on the grid.
+constexpr unsigned count(set b)
 {
     unsigned n = 0;
-    while (bugs) {
-        bugs &= (bugs - 1);
+    while (b) {
+        b &= (b - 1);
         ++n;
     }
     return n;
 }
 
-constexpr bugs_grid simulate(bugs_grid bugs)
+} // namespace bugs
+
+namespace {
+
+constexpr bugs::set simulate(bugs::set b)
 {
-    bugs_grid next = 0;
-    for (unsigned y = 0; y < n; ++y) {
-        for (unsigned x = 0; x < n; ++x) {
-            const auto k = count(neighbors(bugs, x, y));
-            if (at(bugs, x, y)) {
+    bugs::set next = 0;
+    for (unsigned y = 0; y < bugs::n; ++y) {
+        for (unsigned x = 0; x < bugs::n; ++x) {
+            const auto k = bugs::count(bugs::neighbors(b, x, y));
+            if (bugs::at(b, x, y)) {
                 if (k == 1) {
-                    next = insert(next, x, y);
+                    next = bugs::insert(next, x, y);
                 }
             } else {
                 if (k == 1 || k == 2) {
-                    next = insert(next, x, y);
+                    next = bugs::insert(next, x, y);
                 }
             }
         }
@@ -62,9 +73,9 @@ constexpr bugs_grid simulate(bugs_grid bugs)
     return next;
 }
 
-constexpr size_t biodiversity(bugs_grid bugs)
+constexpr size_t biodiversity(bugs::set b)
 {
-    return bugs;
+    return b;
 }
 
 #if PART == 2
@@ -201,24 +212,24 @@ bug_set simulate(const bug_set& grid)
 int main()
 {
 #if PART == 1
-    bugs_grid bugs = 0;
+    bugs::set b = 0;
 
-    grid::planar::for_each(std::cin, [&bugs](auto p, auto c) {
-        if (p[0] >= n || p[1] >= n || (c != '.' && c != '#')) {
+    grid::planar::for_each(std::cin, [&b](auto p, auto c) {
+        if (p[0] >= bugs::n || p[1] >= bugs::n || (c != '.' && c != '#')) {
             throw std::invalid_argument(__func__);
         }
         if (c == '#') {
-            bugs = insert(bugs, p[0], p[1]);
+            b = bugs::insert(b, p[0], p[1]);
         }
     });
 
-    std::set<bugs_grid> seen;
-    while (seen.find(bugs) == seen.end()) {
-        seen.insert(bugs);
-        bugs = simulate(bugs);
+    std::set<bugs::set> seen;
+    while (seen.find(b) == seen.end()) {
+        seen.insert(b);
+        b = simulate(b);
     }
 
-    std::cout << biodiversity(bugs) << '\n';
+    std::cout << biodiversity(b) << '\n';
 #elif PART == 2
     // int test(void);
     // return test();
@@ -253,19 +264,21 @@ int main()
 int test()
 {
 #if PART == 1
-    const bugs_grid bugs = bug(4, 0)
+    using namespace bugs;
+
+    const set b = bug(4, 0)
         | bug(0, 1) | bug(3, 1)
         | bug(0, 2) | bug(3, 2) | bug(4, 2)
         | bug(2, 3)
         | bug(0, 4);
 
-    assert(neighbors(bugs, 0, 0) == bug(0, 1));
-    assert(neighbors(bugs, 3, 2) == (bug(3, 1) | bug(4, 2)));
+    assert(neighbors(b, 0, 0) == bug(0, 1));
+    assert(neighbors(b, 3, 2) == (bug(3, 1) | bug(4, 2)));
 
-    assert(count(bugs) == 8);
+    assert(count(b) == 8);
 
     assert(biodiversity(bug(0, 3) | bug(1, 4)) == 2129920);
-    assert(biodiversity(bugs) == 1205552);
+    assert(biodiversity(b) == 1205552);
 #elif PART == 2
     const int16_t l = 0;
     {

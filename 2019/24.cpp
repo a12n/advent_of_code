@@ -154,58 +154,56 @@ constexpr void for_each_bug(const multiset& b, func_type f)
     }
 }
 
-// Neighbors at the same level will be stored in the `immed` set (at
-// index 0), neighbors from the middle tile will be in the `inner` set
-// (at index 1), and neighbors from the outer grid will be in `outer`
-// set (index 2).
-constexpr std::array<set, 3> neighbors(std::array<set, 3> b, unsigned x, unsigned y)
+// Calls the function for each neighbor position of the speicified
+// position.
+template <typename func_type>
+constexpr void for_each_neighbor(int lvl, unsigned x, unsigned y, func_type f)
 {
     const unsigned mid = n / 2;
 
-    std::array<set, 3> ans {};
-    enum {
-        immed,
-        inner,
-        outer,
-    };
-
     // Up
     if (y == 0) {
-        ans[outer] |= at(b[outer], mid, mid - 1);
+        f(lvl - 1, mid, mid - 1);
     } else if (x == mid && y == (mid + 1)) {
-        ans[inner] |= row_at(b[inner], n - 1);
+        for (unsigned xi = 0; xi < n; ++xi) {
+            f(lvl + 1, xi, n - 1);
+        }
     } else {
-        ans[immed] |= at(b[immed], x, y - 1);
+        f(lvl, x, y - 1);
     }
 
     // Left
     if (x == 0) {
-        ans[outer] |= at(b[outer], mid - 1, mid);
+        f(lvl - 1, mid - 1, mid);
     } else if (x == (mid + 1) && y == mid) {
-        ans[inner] |= column_at(b[inner], n - 1);
+        for (unsigned yi = 0; yi < n; ++yi) {
+            f(lvl + 1, n - 1, yi);
+        }
     } else {
-        ans[immed] |= at(b[immed], x - 1, y);
+        f(lvl, x - 1, y);
     }
 
     // Right
     if (x == n - 1) {
-        ans[outer] |= at(b[outer], mid + 1, mid);
+        f(lvl - 1, mid + 1, mid);
     } else if (x == (mid - 1) && y == mid) {
-        ans[inner] |= column_at(b[inner], 0);
+        for (unsigned yi = 0; yi < n; ++yi) {
+            f(lvl + 1, 0, yi);
+        }
     } else {
-        ans[immed] |= at(b[immed], x + 1, y);
+        f(lvl, x + 1, y);
     }
 
     // Down
     if (y == n - 1) {
-        ans[outer] |= at(b[outer], mid, mid + 1);
+        f(lvl - 1, mid, mid + 1);
     } else if (x == mid && y == (mid - 1)) {
-        ans[inner] |= row_at(b[inner], 0);
+        for (unsigned xi = 0; xi < n; ++xi) {
+            f(lvl + 1, xi, 0);
+        }
     } else {
-        ans[immed] |= at(b[immed], x, y + 1);
+        f(lvl, x, y + 1);
     }
-
-    return ans;
 }
 
 // Count bugs on the grid.
@@ -514,6 +512,53 @@ int test()
         assert(check_inner == inner);
         assert(check_outer == outer);
         assert(check_other == 0);
+    }
+
+    using position=std::tuple<int,unsigned,unsigned>;
+    using position_set=std::set<position>;
+
+    { // Tile 19 has four adjacent tiles: 14, 18, 20, and 24.
+        const position_set expect = {
+            { 0, 3, 2 },
+            { 0, 2, 3 },
+            { 0, 4, 3 },
+            { 0, 3, 4 },
+        };
+        position_set check;
+        for_each_neighbor(0, 3, 3, [&check](int lvl, unsigned x, unsigned y) {
+            check.emplace(lvl, x, y);
+        });
+        assert(check == expect);
+    }
+
+    {
+        // Tile G has four adjacent tiles: B, F, H, and L.
+        const position_set expect = {
+            { 1, 1, 0 },
+            { 1, 0, 1 },
+            { 1, 2, 1 },
+            { 1, 1, 2 },
+        };
+        position_set check;
+        for_each_neighbor(1, 1, 1, [&check](int lvl, unsigned x, unsigned y) {
+            check.emplace(lvl, x, y);
+        });
+        assert(check == expect);
+    }
+
+    {
+        // Tile D has four adjacent tiles: 8, C, E, and I.
+        const position_set expect = {
+            { 0, 2, 1 },
+            { 1, 2, 0 },
+            { 1, 4, 0 },
+            { 1, 3, 1 },
+        };
+        position_set check;
+        for_each_neighbor(1, 3, 0, [&check](int lvl, unsigned x, unsigned y) {
+            check.emplace(lvl, x, y);
+        });
+        assert(check == expect);
     }
 
     return 0;

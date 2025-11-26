@@ -507,7 +507,7 @@ int test()
             } else if (lvl == 1) {
                 check_inner = insert(check_inner, x, y);
             } else {
-                check_outer = insert(check_outer, x, y);
+                check_other = insert(check_other, x, y);
             }
         });
         assert(check_immed == immed);

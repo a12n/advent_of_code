@@ -92,6 +92,18 @@ constexpr unsigned index(int level)
     }
 }
 
+// Inverse of index.
+constexpr int unindex(unsigned i)
+{
+    if (i & 1) {
+        return (i + 1) / 2;
+    } else if (i) {
+        return -(i / 2);
+    } else {
+        return 0;
+    }
+}
+
 set at(const multiset& b, int level, unsigned x, unsigned y)
 {
     const auto i = index(level);

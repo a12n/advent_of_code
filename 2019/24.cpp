@@ -65,6 +65,22 @@ constexpr set neighbors(set b, unsigned x, unsigned y)
         | (y < n - 1 ? at(b, x, y + 1) : 0);
 }
 
+// For each present bug in the set, call the provided function.
+template <typename func_type>
+constexpr void for_each_bug(set b, func_type f)
+{
+    for (unsigned y = 0; y < n; ++y) {
+        for (unsigned x = 0; x < n; ++x) {
+            if (b & 1) {
+                f(x, y);
+            }
+            if (!(b >>= 1)) {
+                return;
+            }
+        }
+    }
+}
+
 //----------------------------------------------------------------------------
 // Grid of bugs in the recursively-folded space
 
@@ -427,6 +443,14 @@ int test()
 
     assert(biodiversity(bug(0, 3) | bug(1, 4)) == 2129920);
     assert(biodiversity(sample) == 1205552);
+
+    {
+        set check = 0;
+        for_each_bug(sample, [&check](unsigned x, unsigned y) {
+            check = insert(check, x, y);
+        });
+        assert(check == sample);
+    }
 
     {
         assert(index(0) == 0);

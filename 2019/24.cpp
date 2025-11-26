@@ -143,6 +143,16 @@ constexpr void insert(multiset& b, int level, unsigned x, unsigned y)
     b[i] = insert(b[i], x, y);
 }
 
+template <typename func_type>
+constexpr void for_each_bug(const multiset& b, func_type f)
+{
+    for (unsigned i = 0; i < b.size(); ++i) {
+        const auto lvl = unindex(i);
+        for_each_bug(b[i], [f, lvl](unsigned x, unsigned y) {
+            f(lvl, x, y);
+        });
+    }
+}
 
 // Neighbors at the same level will be stored in the `immed` set (at
 // index 0), neighbors from the middle tile will be in the `inner` set
@@ -468,6 +478,43 @@ int test()
         }
     }
 
+    {
+        const set immed = bug(1, 0)
+            | bug(1, 1) | bug(3, 1) | bug(4, 1)
+            | bug(1, 2);
+        const set inner = bug(1, 0) | bug(2, 0)
+            | bug(0, 1) | bug(3, 1) | bug(4, 1)
+            | bug(4, 2)
+            | bug(0, 3) | bug(1, 3) | bug(3, 3) | bug(4, 3)
+            | bug(0, 4) | bug(1, 4) | bug(2, 4) | bug(3, 4) | bug(4, 4);
+        const set outer = bug(0, 0) | bug(3, 0) | bug(4, 0)
+            | bug(3, 1) | bug(4, 1)
+            | bug(3, 3)
+            | bug(1, 4) | bug(2, 4) | bug(3, 4) | bug(4, 4);
+
+        multiset m;
+        m.resize(3);
+        m[index(0)] = immed;
+        m[index(1)] = inner;
+        m[index(-1)] = outer;
+
+        set check_immed = 0, check_inner = 0, check_outer = 0, check_other = 0;
+        for_each_bug(m, [&check_immed, &check_inner, &check_outer, &check_other](int lvl, unsigned x, unsigned y) {
+            if (lvl == -1) {
+                check_outer = insert(check_outer, x, y);
+            } else if (lvl == 0) {
+                check_immed = insert(check_immed, x, y);
+            } else if (lvl == 1) {
+                check_inner = insert(check_inner, x, y);
+            } else {
+                check_outer = insert(check_outer, x, y);
+            }
+        });
+        assert(check_immed == immed);
+        assert(check_inner == inner);
+        assert(check_outer == outer);
+        assert(check_other == 0);
+    }
 
     return 0;
 }

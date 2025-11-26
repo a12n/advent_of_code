@@ -83,8 +83,13 @@ constexpr unsigned index(int level)
     //  3 -> 5
     // -3 -> 6
     // …
-    return (level < 0) ? 2 * -level : (level > 0) ? 2 * level - 1
-                                                  : 0;
+    if (level < 0) {
+        return 2 * -level;
+    } else if (level > 0) {
+        return 2 * level - 1;
+    } else {
+        return 0;
+    }
 }
 
 set at(const multiset& b, int level, unsigned x, unsigned y)

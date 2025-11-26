@@ -24,10 +24,10 @@ technique cut_cards(int k)
     if (k < 0) {
         k += n;
     }
-    assert(k <= n);
+    assert(static_cast<size_t>(k) <= n);
     return [k](size_t i) {
         assert(i < n);
-        return (i < k) ? (n - k + i) : (i - k);
+        return (i < static_cast<size_t>(k)) ? (n - k + i) : (i - k);
     };
 }
 

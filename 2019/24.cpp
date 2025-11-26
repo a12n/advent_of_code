@@ -89,7 +89,7 @@ using multiset = std::vector<set>;
 
 // Mapping of levels (negative and non-negative) to indices into the
 // `multiset` array of separate grids.
-constexpr unsigned index(int level)
+constexpr unsigned index(int lvl)
 {
     //  0 -> 0
     //  1 -> 1
@@ -99,10 +99,10 @@ constexpr unsigned index(int level)
     //  3 -> 5
     // -3 -> 6
     // …
-    if (level < 0) {
-        return 2 * -level;
-    } else if (level > 0) {
-        return 2 * level - 1;
+    if (lvl < 0) {
+        return 2 * -lvl;
+    } else if (lvl > 0) {
+        return 2 * lvl - 1;
     } else {
         return 0;
     }
@@ -120,23 +120,23 @@ constexpr int unindex(unsigned i)
     }
 }
 
-constexpr set at(const multiset& b, int level)
+constexpr set at(const multiset& b, int lvl)
 {
-    const auto i = index(level);
+    const auto i = index(lvl);
     if (i < b.size()) {
         return b[i];
     }
     return 0;
 }
 
-constexpr set at(const multiset& b, int level, unsigned x, unsigned y)
+constexpr set at(const multiset& b, int lvl, unsigned x, unsigned y)
 {
-    return at(at(b, level), x, y);
+    return at(at(b, lvl), x, y);
 }
 
-constexpr void insert(multiset& b, int level, unsigned x, unsigned y)
+constexpr void insert(multiset& b, int lvl, unsigned x, unsigned y)
 {
-    const auto i = index(level);
+    const auto i = index(lvl);
     if (i >= b.size()) {
         b.resize(i + 1, 0);
     }

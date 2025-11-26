@@ -514,8 +514,15 @@ int test()
         assert(check_other == 0);
     }
 
-    using position=std::tuple<int,unsigned,unsigned>;
-    using position_set=std::set<position>;
+    using position = std::tuple<int, unsigned, unsigned>;
+    using position_set = std::set<position>;
+    const auto neighbors = [](int lvl, unsigned x, unsigned y) {
+        position_set nb;
+        for_each_neighbor(lvl, x, y, [&nb](int nlvl, unsigned nx, unsigned ny) {
+            nb.emplace(nlvl, nx, ny);
+        });
+        return nb;
+    };
 
     { // Tile 19 has four adjacent tiles: 14, 18, 20, and 24.
         const position_set expect = {
@@ -524,41 +531,65 @@ int test()
             { 0, 4, 3 },
             { 0, 3, 4 },
         };
-        position_set check;
-        for_each_neighbor(0, 3, 3, [&check](int lvl, unsigned x, unsigned y) {
-            check.emplace(lvl, x, y);
-        });
-        assert(check == expect);
+        assert(neighbors(0, 3, 3) == expect);
     }
 
-    {
-        // Tile G has four adjacent tiles: B, F, H, and L.
+    { // Tile G has four adjacent tiles: B, F, H, and L.
         const position_set expect = {
             { 1, 1, 0 },
             { 1, 0, 1 },
             { 1, 2, 1 },
             { 1, 1, 2 },
         };
-        position_set check;
-        for_each_neighbor(1, 1, 1, [&check](int lvl, unsigned x, unsigned y) {
-            check.emplace(lvl, x, y);
-        });
-        assert(check == expect);
+        assert(neighbors(1, 1, 1) == expect);
     }
 
-    {
-        // Tile D has four adjacent tiles: 8, C, E, and I.
+    { // Tile D has four adjacent tiles: 8, C, E, and I.
         const position_set expect = {
             { 0, 2, 1 },
             { 1, 2, 0 },
             { 1, 4, 0 },
             { 1, 3, 1 },
         };
-        position_set check;
-        for_each_neighbor(1, 3, 0, [&check](int lvl, unsigned x, unsigned y) {
-            check.emplace(lvl, x, y);
-        });
-        assert(check == expect);
+        assert(neighbors(1, 3, 0) == expect);
+    }
+
+    { // Tile E has four adjacent tiles: 8, D, 14, and J.
+        const position_set expect = {
+            { 0, 2, 1 },
+            { 1, 3, 0 },
+            { 0, 3, 2 },
+            { 1, 4, 1 },
+        };
+        assert(neighbors(1, 4, 0) == expect);
+    }
+
+    { // Tile 14 has eight adjacent tiles: 9, E, J, O, T, Y, 15, and 19.
+        const position_set expect = {
+            { 0, 3, 1 },
+            { 1, 4, 0 },
+            { 1, 4, 1 },
+            { 1, 4, 2 },
+            { 1, 4, 3 },
+            { 1, 4, 4 },
+            { 0, 4, 2 },
+            { 0, 3, 3 },
+        };
+        assert(neighbors(0, 3, 2) == expect);
+    }
+
+    { // Tile N has eight adjacent tiles: I, O, S, and five tiles within the sub-grid marked ?.
+        const position_set expect = {
+            { 1, 3, 1 },
+            { 2, 4, 0 },
+            { 2, 4, 1 },
+            { 2, 4, 2 },
+            { 2, 4, 3 },
+            { 2, 4, 4 },
+            { 1, 4, 2 },
+            { 1, 3, 3 },
+        };
+        assert(neighbors(1, 3, 2) == expect);
     }
 
     return 0;

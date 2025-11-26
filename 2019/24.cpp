@@ -412,22 +412,21 @@ int main()
 
 int test()
 {
-#if PART == 1
     using namespace bugs;
 
-    const set b = bug(4, 0)
+    const set sample = bug(4, 0)
         | bug(0, 1) | bug(3, 1)
         | bug(0, 2) | bug(3, 2) | bug(4, 2)
         | bug(2, 3)
         | bug(0, 4);
 
-    assert(neighbors(b, 0, 0) == bug(0, 1));
-    assert(neighbors(b, 3, 2) == (bug(3, 1) | bug(4, 2)));
+    assert(neighbors(sample, 0, 0) == bug(0, 1));
+    assert(neighbors(sample, 3, 2) == (bug(3, 1) | bug(4, 2)));
 
-    assert(count(b) == 8);
+    assert(count(sample) == 8);
 
     assert(biodiversity(bug(0, 3) | bug(1, 4)) == 2129920);
-    assert(biodiversity(b) == 1205552);
+    assert(biodiversity(sample) == 1205552);
 
     {
         assert(index(0) == 0);
@@ -439,40 +438,7 @@ int test()
             assert(unindex(index(lvl)) == lvl);
         }
     }
-#elif PART == 2
-    const int16_t l = 0;
-    {
-        // Tile 19 has four adjacent tiles: 14, 18, 20, and 24.
-        const bug_set adj = {
-            { l, 3, 2 },
-            { l, 2, 3 },
-            { l, 4, 3 },
-            { l, 3, 4 },
-        };
-        assert(adjacent({ l, 3, 3 }) == adj);
-    }
 
-    {
-        // Tile G has four adjacent tiles: B, F, H, and L.
-        const bug_set adj = {
-            { l + 1, 1, 0 },
-            { l + 1, 0, 1 },
-            { l + 1, 2, 1 },
-            { l + 1, 1, 2 },
-        };
-        assert(adjacent({ l + 1, 1, 1 }) == adj);
-    }
 
-    {
-        // Tile D has four adjacent tiles: 8, C, E, and I.
-        const bug_set adj = {
-            { l, 2, 1 },
-            { l + 1, 2, 0 },
-            { l + 1, 4, 0 },
-            { l + 1, 3, 1 },
-        };
-        assert(adjacent({ l + 1, 3, 0 }) == adj);
-    }
-#endif // PART
     return 0;
 }

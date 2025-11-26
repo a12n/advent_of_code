@@ -428,6 +428,17 @@ int test()
 
     assert(biodiversity(bug(0, 3) | bug(1, 4)) == 2129920);
     assert(biodiversity(b) == 1205552);
+
+    {
+        assert(index(0) == 0);
+        assert(index(1) == 1);
+        assert(index(-1) == 2);
+        assert(index(2) == 3);
+        assert(index(-2) == 4);
+        for (int lvl = -100; lvl <= 100; ++lvl) {
+            assert(unindex(index(lvl)) == lvl);
+        }
+    }
 #elif PART == 2
     const int16_t l = 0;
     {

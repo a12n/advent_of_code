@@ -96,16 +96,24 @@ inline auto input_stream_ascii(std::istream& s)
 }
 
 // Parse values for input from the istream, one value per line.
-inline auto input_stream_line(std::istream& s)
-{
-    return [&s]() {
-        std::string line;
+struct input_stream_line {
+    input_stream_line(std::istream& s)
+        : s(s)
+    {
+    }
+
+    intcode::value operator()()
+    {
         if (!std::getline(s, line)) {
             throw std::runtime_error(__func__);
         }
         return std::stoll(line);
     };
-}
+
+private:
+    std::istream& s;
+    std::string line;
+};
 
 // Input characters from a string in ASCII mode.
 struct input_string_ascii {

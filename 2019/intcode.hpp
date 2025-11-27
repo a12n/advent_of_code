@@ -108,14 +108,25 @@ inline auto input_stream_line(std::istream& s)
 }
 
 // Input characters from a string in ASCII mode.
-inline auto input_string_ascii(std::string_view& s)
-{
-    return [&s]() {
+struct input_string_ascii {
+    input_string_ascii(std::string_view s)
+        : s(s)
+    {
+    }
+
+    intcode::value operator()()
+    {
+        if (s.empty()) {
+            throw std::length_error(__func__);
+        }
         const auto v = s.front();
         s.remove_prefix(1);
         return v;
-    };
-}
+    }
+
+private:
+    std::string_view s;
+};
 
 // Always input the same constant value.
 inline auto input_value(value v)

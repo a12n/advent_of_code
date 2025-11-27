@@ -99,8 +99,8 @@ inline auto input_stream_ascii(std::istream& s)
 }
 
 // Parse values for input from the istream, one value per line.
-struct input_stream_line {
-    input_stream_line(std::istream& s)
+struct input_stream_parse {
+    input_stream_parse(std::istream& s)
         : s(s)
     {
     }
@@ -176,7 +176,7 @@ inline auto output_stream_ascii(std::ostream& s)
 }
 
 // Format output values to the ostream, one value per line.
-inline auto output_stream_line(std::ostream& s)
+inline auto output_stream_format(std::ostream& s)
 {
     return [&s](value v) {
         s << v << '\n';
@@ -201,4 +201,4 @@ inline auto output_value(value& n)
 
 } // namespace intcode
 
-#endif  // INTCODE_HPP
+#endif // INTCODE_HPP

@@ -1,3 +1,5 @@
+#include <array>
+
 #include "intcode.hpp"
 
 // Must not take:
@@ -15,6 +17,109 @@
 // "polygon"
 // "tambourine"
 // "wreath"
+
+namespace {
+
+template <typename callback_type>
+struct event_parser {
+    event_parser(callback_type cb)
+        : cb(cb)
+    {
+    }
+
+    void operator()(std::string_view line)
+    {
+        if (line.empty()) {
+            return;
+        }
+        std::cerr << "line \"" << line << "\"\n";
+        (*this.*state)(line);
+    }
+
+private:
+    void parse_room_name(std::string_view line)
+    {
+        const auto n = line.size();
+        if (n == 0) {
+            return;
+        }
+        if (n < 7 || line.substr(0, 3) != "== " || line.substr(n - 3, 3) != " ==") {
+            throw std::invalid_argument(__func__);
+        }
+        room_name = line.substr(3, n - 3);
+        state = &event_parser::parse_doors_header;
+    }
+
+    void parse_doors_header(std::string_view line)
+    {
+        if (line != "Doors here lead:") {
+            return;
+        }
+        state = &event_parser::parse_doors;
+    }
+
+    void parse_doors(std::string_view line)
+    {
+        if (line == "Command?") {
+            cb(room_name, doors, items);
+            room_name.clear();
+            doors = {};
+            items.clear();
+            state = &event_parser::parse_room_name;
+            return;
+        }
+
+        if (line == "Items here:") {
+            state = &event_parser::parse_items;
+            return;
+        };
+
+        if (line.size() < 3 || line.substr(0, 2) != "- ") {
+            throw std::invalid_argument(__func__);
+        }
+
+        if (const auto door = line.substr(2); door == "north") {
+            doors[0] = true;
+        } else if (door == "west") {
+            doors[1] = true;
+        } else if (door == "east") {
+            doors[2] = true;
+        } else if (door == "south") {
+            doors[3] = true;
+        } else {
+            throw std::invalid_argument(__func__);
+        }
+
+    }
+
+    void parse_items(std::string_view line)
+    {
+        if(line=="Command?"){
+            cb(room_name,doors,items);
+            room_name.clear();
+            doors={};
+            items.clear();
+            state=&event_parser::parse_room_name;
+            return;
+        }
+
+        if (line.size() < 3 || line.substr(0, 2) != "- ") {
+            throw std::invalid_argument(__func__);
+        }
+
+        items.emplace_back(line.substr(2));
+    }
+
+    void (event_parser::*state)(std::string_view) = &event_parser::parse_room_name;
+
+    std::string room_name {};
+    std::array<bool, 4> doors {};
+    std::vector<std::string> items {};
+
+    callback_type cb;
+};
+
+} // namespace
 
 int main(int argc, char* argv[])
 {

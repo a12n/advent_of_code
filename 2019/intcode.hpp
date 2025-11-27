@@ -90,7 +90,10 @@ inline auto input_error(const std::exception& err = std::runtime_error("unexpect
 // Input characters from the istream in ASCII mode.
 inline auto input_stream_ascii(std::istream& s)
 {
-    return [&s]() {
+    return [&s]() -> value {
+        if (s.eof()) {
+            throw std::length_error(__func__);
+        }
         return s.get();
     };
 }
@@ -105,7 +108,11 @@ struct input_stream_line {
     intcode::value operator()()
     {
         if (!std::getline(s, line)) {
-            throw std::runtime_error(__func__);
+            if (s.eof()) {
+                throw std::length_error(__func__);
+            } else {
+                throw std::runtime_error(__func__);
+            }
         }
         return std::stoll(line);
     };
@@ -139,7 +146,7 @@ private:
 // Always input the same constant value.
 inline auto input_value(value v)
 {
-    return [v]() {
+    return [v]() -> value {
         return v;
     };
 }

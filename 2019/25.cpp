@@ -1,45 +1,46 @@
 #include "intcode.hpp"
 
-// "molten lava" — "The molten lava is way too hot! You melt!"
+// Must not take:
 // "escape pod" — "You're launched into space! Bye!"
 // "giant electromagnet" — "The giant electromagnet is stuck to you.  You can't move!!"
+// "molten lava" — "The molten lava is way too hot! You melt!"
 // "photons" — "It is suddenly completely dark! You are eaten by a Grue!"
-// "tambourine" — ?
-// "polygon" — ?
-// "boulder" — ?
-// "fuel cell" — ?
-// "fixed point" — ?
-// "wreath" — ?
-// "manifold" — ?
+
+// May take:
+// "boulder"
+// "fixed point"
+// "fuel cell"
+// "hologram"
+// "manifold"
+// "polygon"
+// "tambourine"
+// "wreath"
 
 int main(int argc, char* argv[])
 {
     auto img = intcode::load(argc, argv);
     intcode::run(img,
         intcode::input_string_ascii(
+            // Bring all items to the "Security Checkpoint"
             "south\n"
             "south\n"
             "take tambourine\n"
             "north\n"
             "north\n"
-            // Hull Breach
             "west\n"
             "south\n"
             "take polygon\n"
             "north\n"
             "east\n"
-            // Hull Breach
             "north\n"
             "west\n"
             "take boulder\n"
             "east\n"
-            // Navigation
             "north\n"
             "take manifold\n"
             "north\n"
             "take hologram\n"
             "south\n"
-            // Observatory
             "west\n"
             "take fuel cell\n"
             "south\n"
@@ -49,7 +50,6 @@ int main(int argc, char* argv[])
             "north\n"
             "west\n"
             "north\n"
-            // Holodeck
             "north\n"
             "take wreath\n"
             "east\n"
@@ -62,9 +62,7 @@ int main(int argc, char* argv[])
             "drop manifold\n"
             "drop polygon\n"
             "drop tambourine\n"
-            "drop wreath\n"
-            // Security Checkpoint
-            ),
+            "drop wreath\n"),
         intcode::output_stream_ascii(std::cout));
     return 0;
 }

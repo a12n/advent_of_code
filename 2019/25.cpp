@@ -196,6 +196,17 @@ int main(int argc, char* argv[])
 
                 return str;
             }) }),
-        intcode::output_stream_ascii(std::cout));
+        intcode::output_ascii_line_buffered([](std::string_view line) {
+            constexpr std::string_view begin_pattern = "You should be able to get in by typing ";
+            constexpr std::string_view end_pattern = " on the keypad";
+            auto begin = line.find(begin_pattern);
+            if (begin == line.npos) {
+                return;
+            }
+            begin += begin_pattern.size();
+            auto end = line.find(end_pattern, begin);
+            assert(end != line.npos);
+            std::cout << line.substr(begin, end - begin) << '\n';
+        }));
     return 0;
 }

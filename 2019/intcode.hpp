@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <functional>
 #include <iostream>
 #include <stdexcept>
 #include <tuple>
@@ -150,6 +151,30 @@ inline auto input_value(value v)
         return v;
     };
 }
+
+struct input_compose {
+    input_compose(std::initializer_list<std::function<value()>> funcs)
+        : funcs(funcs)
+        , func(funcs.begin())
+    {
+    }
+
+    value operator()()
+    {
+        while (func != funcs.end()) {
+            try {
+                return (*func)();
+            } catch (const std::length_error&) {
+                ++func;
+            }
+        }
+        throw std::length_error(__func__);
+    }
+
+private:
+    std::initializer_list<std::function<value()>> funcs;
+    const std::function<value()>* func = nullptr;
+};
 
 // Assert next output value equals to n.
 inline auto output_assert(value n)

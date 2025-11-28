@@ -82,7 +82,7 @@ memory load(int argc, char *argv[]);
 // Throw exception on input attempts.
 inline auto input_error(const std::exception& err = std::runtime_error("unexpected input"))
 {
-    return [&err]() -> value {
+    return [err]() -> value {
         throw err;
     };
 }
@@ -162,7 +162,7 @@ inline auto output_assert(value n)
 // Throws error on output attempts.
 inline auto output_error(const std::exception& err = std::runtime_error("unexpected output"))
 {
-    return [&err](value) {
+    return [err](value) {
         throw err;
     };
 }

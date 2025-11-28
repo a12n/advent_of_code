@@ -144,6 +144,33 @@ private:
     std::string_view s;
 };
 
+template <typename func_type>
+struct input_ascii_buffered {
+    input_ascii_buffered(func_type func)
+        : func(func)
+    {
+    }
+
+    intcode::value operator()()
+    {
+        if (view.empty()) {
+            buffer = func();
+            view = buffer;
+            if (view.empty()) {
+                throw std::length_error(__func__);
+            }
+        }
+        const auto v = view.front();
+        view.remove_prefix(1);
+        return v;
+    }
+
+private:
+    std::string buffer;
+    std::string_view view;
+    func_type func;
+};
+
 // Always input the same constant value.
 inline auto input_value(value v)
 {

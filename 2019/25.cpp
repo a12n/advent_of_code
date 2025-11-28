@@ -9,14 +9,16 @@
 // "photons" — "It is suddenly completely dark! You are eaten by a Grue!"
 
 // May take:
-// "boulder"
-// "fixed point"
-// "fuel cell"
-// "hologram"
-// "manifold"
-// "polygon"
-// "tambourine"
-// "wreath"
+constexpr std::array<std::string_view, 8> items = {
+    "boulder",
+    "fixed point",
+    "fuel cell",
+    "hologram",
+    "manifold",
+    "polygon",
+    "tambourine",
+    "wreath",
+};
 
 namespace {
 
@@ -124,50 +126,76 @@ private:
 int main(int argc, char* argv[])
 {
     auto img = intcode::load(argc, argv);
+    unsigned sack = 0;
     intcode::run(img,
-        intcode::input_string_ascii(
-            // Bring all items to the "Security Checkpoint"
-            "south\n"
-            "south\n"
-            "take tambourine\n"
-            "north\n"
-            "north\n"
-            "west\n"
-            "south\n"
-            "take polygon\n"
-            "north\n"
-            "east\n"
-            "north\n"
-            "west\n"
-            "take boulder\n"
-            "east\n"
-            "north\n"
-            "take manifold\n"
-            "north\n"
-            "take hologram\n"
-            "south\n"
-            "west\n"
-            "take fuel cell\n"
-            "south\n"
-            "east\n"
-            "south\n"
-            "take fixed point\n"
-            "north\n"
-            "west\n"
-            "north\n"
-            "north\n"
-            "take wreath\n"
-            "east\n"
-            "east\n"
-            "inv\n"
-            "drop boulder\n"
-            "drop fixed point\n"
-            "drop fuel cell\n"
-            "drop hologram\n"
-            "drop manifold\n"
-            "drop polygon\n"
-            "drop tambourine\n"
-            "drop wreath\n"),
+        intcode::input_compose({ intcode::input_string_ascii(
+                                     // Bring all items to the "Security Checkpoint"
+                                     "south\n"
+                                     "south\n"
+                                     "take tambourine\n"
+                                     "north\n"
+                                     "north\n"
+                                     "west\n"
+                                     "south\n"
+                                     "take polygon\n"
+                                     "north\n"
+                                     "east\n"
+                                     "north\n"
+                                     "west\n"
+                                     "take boulder\n"
+                                     "east\n"
+                                     "north\n"
+                                     "take manifold\n"
+                                     "north\n"
+                                     "take hologram\n"
+                                     "south\n"
+                                     "west\n"
+                                     "take fuel cell\n"
+                                     "south\n"
+                                     "east\n"
+                                     "south\n"
+                                     "take fixed point\n"
+                                     "north\n"
+                                     "west\n"
+                                     "north\n"
+                                     "north\n"
+                                     "take wreath\n"
+                                     "east\n"
+                                     "east\n"
+                                     "inv\n"
+                                     "drop boulder\n"
+                                     "drop fixed point\n"
+                                     "drop fuel cell\n"
+                                     "drop hologram\n"
+                                     "drop manifold\n"
+                                     "drop polygon\n"
+                                     "drop tambourine\n"
+                                     "drop wreath\n"),
+            intcode::input_ascii_buffered([&sack]() {
+                ++sack;
+
+                std::string str;
+
+                for (unsigned i = 0; i < items.size(); ++i) {
+                    if (sack & (1 << i)) {
+                        str += "take ";
+                        str += items[i];
+                        str += '\n';
+                    }
+                }
+
+                str += "north\n";
+
+                for (unsigned i = 0; i < items.size(); ++i) {
+                    if (sack & (1 << i)) {
+                        str += "drop ";
+                        str += items[i];
+                        str += '\n';
+                    }
+                }
+
+                return str;
+            }) }),
         intcode::output_stream_ascii(std::cout));
     return 0;
 }

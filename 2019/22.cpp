@@ -40,9 +40,27 @@ technique deal_with_increment(size_t k, bool inv = false)
     // Function:
     // y = (x * k) % n
     //
+    // k = 3
+    // 0 1 2 3 4 5 6 7 8 9 ->
+    // 0 7 4 1 8 5 2 9 6 3
+    // *   . *     *     * ; cycles
+    //
+    // k = 7
+    // 0 1 2 3 4 5 6 7 8 9 ->
+    // 0 3 6 9 2 5 8 1 4 7
+    // * :     .     *     ; cycles
+    //
+    //         1+^-^   ^-^
+    // Shift left from k by amount ((n - 1) % k) + 1?
+    //
     // Inverse:
-    // c = k - (y % k) ; number of (mod n) cycles
+    // d = y // k
+    // r = y % k
+    //
+    // c = k - (y % k)                 ; number of (mod n) cycles
+    // c = k - (y % k) - ((n - 1) % k) ; number of (mod n) cycles
     // x = (y + n * c) / k
+    //
     if (inv) {
         return [k](size_t i) {
             if (const auto m = i % k; m != 0) {

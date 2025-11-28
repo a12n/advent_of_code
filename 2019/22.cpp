@@ -19,8 +19,11 @@ technique deal_into_new_stack()
 }
 
 template <size_t n>
-technique cut_cards(int k)
+technique cut_cards(int k, bool inv = false)
 {
+    if (inv) {
+        k = -k;
+    }
     if (k < 0) {
         k += n;
     }
@@ -32,12 +35,28 @@ technique cut_cards(int k)
 }
 
 template <size_t n>
-technique deal_with_increment(size_t k)
+technique deal_with_increment(size_t k, bool inv = false)
 {
-    return [k](size_t i) {
-        assert(i < n);
-        return (i * k) % n;
-    };
+    // Function:
+    // y = (x * k) % n
+    //
+    // Inverse:
+    // c = k - (y % k) ; number of (mod n) cycles
+    // x = (y + n * c) / k
+    if (inv) {
+        return [k](size_t i) {
+            if (const auto m = i % k; m != 0) {
+                return (i + n * (k - m)) / k;
+            } else {
+                return i / k;
+            }
+        };
+    } else {
+        return [k](size_t i) {
+            assert(i < n);
+            return (i * k) % n;
+        };
+    }
 }
 
 technique operator|(technique f, technique g)
@@ -92,6 +111,8 @@ technique input(std::istream& s, technique f = [](size_t i) { return i; })
 
 int main()
 {
+    int test(void);
+    return test();
     std::cout << (input<10007>(std::cin))(2019) << '\n';
     return 0;
 }
@@ -100,6 +121,7 @@ int test()
 {
     const size_t n = 10;
 
+#if PART == 1
     {
         const auto shuffle = deal_with_increment<n>(7)
             | deal_into_new_stack<n>()
@@ -170,6 +192,24 @@ int test()
         assert(shuffle(8) == 3);
         assert(shuffle(9) == 0);
     }
+#elif PART == 2
+    {
+        const auto unshuffle = deal_into_new_stack<n>()
+            | deal_into_new_stack<n>()
+            | deal_with_increment<n>(7, true);
+
+        assert(unshuffle(0) == 0);
+        assert(unshuffle(1) == 3);
+        assert(unshuffle(2) == 6);
+        assert(unshuffle(3) == 9);
+        assert(unshuffle(4) == 2);
+        assert(unshuffle(5) == 5);
+        assert(unshuffle(6) == 8);
+        assert(unshuffle(7) == 1);
+        assert(unshuffle(8) == 4);
+        assert(unshuffle(9) == 7);
+    }
+#endif // PART
 
     return 0;
 }

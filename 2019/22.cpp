@@ -120,6 +120,10 @@ int main()
 #if PART == 1
     const auto shuffle = input<10007>(std::cin);
     std::cout << shuffle(2019) << '\n';
+#elif PART == 2
+    const auto shuffle_inv = input<119315717514047>(std::cin, true);
+    // TODO
+    std::cout << shuffle_inv(2020) << '\n';
 #endif // PART
     return 0;
 }

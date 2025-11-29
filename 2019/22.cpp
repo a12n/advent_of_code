@@ -84,20 +84,23 @@ technique input(std::istream& s, technique f = [](size_t i) { return i; })
                 if (!(s >> tok) || tok != "new" || !(s >> tok) || tok != "stack") {
                     throw std::invalid_argument(__func__);
                 }
-                return input<n>(s, f | deal_into_new_stack<n>());
+                const auto g = deal_into_new_stack<n>();
+                return input<n>(s, f | g);
             } else if (tok == "with") {
                 size_t k;
                 if (!(s >> tok) || tok != "increment" || !(s >> k)) {
                     throw std::invalid_argument(__func__);
                 }
-                return input<n>(s, f | deal_with_increment<n>(k));
+                const auto g = deal_with_increment<n>(k);
+                return input<n>(s, f | g);
             }
         } else if (tok == "cut") {
             int k;
             if (!(s >> k)) {
                 throw std::invalid_argument(__func__);
             }
-            return input<n>(s, f | cut_cards<n>(k));
+            const auto g = cut_cards<n>(k);
+            return input<n>(s, f | g);
         } else {
             throw std::invalid_argument(__func__);
         }

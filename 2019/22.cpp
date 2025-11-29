@@ -117,7 +117,10 @@ technique input(std::istream& s, bool inv = false, technique f = [](size_t i) { 
 
 int main()
 {
-    std::cout << (input<10007>(std::cin))(2019) << '\n';
+#if PART == 1
+    const auto shuffle = input<10007>(std::cin);
+    std::cout << shuffle(2019) << '\n';
+#endif // PART
     return 0;
 }
 

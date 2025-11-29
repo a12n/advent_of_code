@@ -227,6 +227,23 @@ int test()
         assert(unshuffle(8) == 4);
         assert(unshuffle(9) == 7);
     }
+
+    {
+        const auto unshuffle = deal_into_new_stack<n>()
+            | deal_with_increment<n>(7, true)
+            | cut_cards<n>(6, true);
+
+        assert(unshuffle(0) == 3);
+        assert(unshuffle(1) == 0);
+        assert(unshuffle(2) == 7);
+        assert(unshuffle(3) == 4);
+        assert(unshuffle(4) == 1);
+        assert(unshuffle(5) == 8);
+        assert(unshuffle(6) == 5);
+        assert(unshuffle(7) == 2);
+        assert(unshuffle(8) == 9);
+        assert(unshuffle(9) == 6);
+    }
 #endif // PART
 
     return 0;

@@ -48,16 +48,11 @@ technique deal_with_increment(size_t k, bool inv = false)
     // *       .     *
     if (inv) {
         return [k](size_t i) {
-            // TODO
-            size_t m = 0;
+            // TODO: No loop?
             while (i % k != 0) {
-                if (i < k) {
-                    i += n;
-                }
-                i -= k;
-                m += 1;
+                i += n;
             }
-            return m + (i / k);
+            return i / k;
         };
     } else {
         return [k](size_t i) {

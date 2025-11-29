@@ -63,11 +63,15 @@ technique deal_with_increment(size_t k, bool inv = false)
     //
     if (inv) {
         return [k](size_t i) {
-            if (const auto m = i % k; m != 0) {
-                return (i + n * (k - m)) / k;
-            } else {
-                return i / k;
+            size_t m = 0;
+            while (i % k != 0) {
+                if (i < k) {
+                    i += n;
+                }
+                i -= k;
+                m += 1;
             }
+            return m + (i / k);
         };
     } else {
         return [k](size_t i) {

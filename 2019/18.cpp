@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
+#include <stdexcept>
 
 #include "grid.hpp"
 
@@ -21,6 +22,17 @@ bool is_key(char k)
 bool is_door(char d)
 {
     return d >= 'A' && d <= 'Z';
+}
+
+constexpr size_t to_index(char c)
+{
+    if (c >= '@' && c <= 'Z') {
+        return (c - '@');
+    } else if (c >= 'a' && c <= 'z') {
+        return ('Z' - '@') + 1 + (c - 'a');
+    } else {
+        throw std::invalid_argument(__func__);
+    }
 }
 
 key_set from_key(char k)

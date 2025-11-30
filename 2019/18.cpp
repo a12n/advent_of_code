@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <stdexcept>
+#include <unordered_map>
 
 #include "grid.hpp"
 
@@ -51,7 +52,48 @@ key_set from_door(char d)
 
 const size_t n = 1 + ('z' - 'a') + ('Z' - 'A');
 
-using adjacency = std::array<std::array<size_t, n>, n>;
+using graph = std::unordered_map<char, std::unordered_map<char, size_t>>;
+
+void to_graph(graph& g, const dense_grid<char>& grid, position p, sparse_set_grid& visited, size_t n, std::string path)
+{
+    visited.insert(p);
+
+    for (const auto dir : { direction::up, direction::left, direction::right, direction::down }) {
+        const auto q = p + to_offset(dir);
+
+        if (contains(visited, q)) {
+            continue;
+        }
+
+        const auto c = at(grid, q, '#');
+
+        if (c == '#') {
+            continue;
+        }
+
+        if (c == '.') {
+            to_graph(g, grid, q, visited, n + 1, path);
+        } else {
+            std::cerr << "	\"" << path.back() << "\" -- \"" << c << "\" [label=\"" << n + 1 << "\"];\n";
+            const auto u = std::min(c, path.back());
+            const auto v = std::max(c, path.back());
+            g[u][v] = n + 1;
+            to_graph(g, grid, q, visited, 0, path + c);
+        }
+    }
+
+    visited.erase(p);
+}
+
+void to_graph(graph& g, const dense_grid<char>& grid, position start)
+{
+    assert(at(grid, start) == '@');
+    g.clear();
+    sparse_set_grid visited;
+    std::cerr << "strict graph {\n";
+    to_graph(g, grid, start, visited, 0, "@");
+    std::cerr << "}\n";
+}
 
 using distance_map = std::map<char, std::map<char, size_t>>;
 
@@ -123,19 +165,22 @@ size_t dfs(const vault_map& vault, position p, key_set keys)
 
 int main()
 {
-    vault_map vault;
+    graph graph;
+    position start;
 
-    input(std::cin, vault);
-    output(std::cerr, vault);
+    {
+        dense_grid<char> grid;
 
-    key_set all_keys = 0;
-    for_each<char>(vault, [&all_keys](position p, char c) {
-        if (c >= 'a' && c <= 'z') {
-            all_keys |= from_key(c);
-        }
-    });
+        input(std::cin, grid, [](position, char c) {
+            if (c == '@' || c == '.' || c == '#' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+                return c;
+            }
+            throw std::invalid_argument(__func__);
+        });
 
-    std::cout << dfs(vault, find<char>(vault, '@').value(), all_keys) << '\n';
+        start = find<char>(grid, '@').value();
+        to_graph(graph, grid, start);
+    }
 
     return 0;
 }

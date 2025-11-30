@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <istream>
 #include <map>
+#include <optional>
 #include <ostream>
 #include <set>
 #include <stdexcept>
@@ -270,6 +271,34 @@ void output(std::ostream& s, const sparse_set_grid& grid, const extent& ext, con
         }
         s.put('\n');
     }
+}
+
+template <typename mapped_type, typename pred_type>
+std::optional<position> find_if(const dense_grid<mapped_type>& grid, pred_type pred)
+{
+    for (position p = { 0, 0 }; static_cast<size_t>(p[1]) < grid.size(); ++p[1]) {
+        for (p[0] = 0; static_cast<size_t>(p[0]) < grid[p[1]].size(); ++p[0]) {
+            if (pred(p, grid[p[1]][p[0]])) {
+                return p;
+            }
+        }
+    }
+    return {};
+}
+
+template <typename mapped_type>
+std::optional<position> find(const dense_grid<mapped_type>& grid, const mapped_type& v)
+{
+    return find_if<mapped_type>(grid, [&v](position p, const mapped_type& u) { return u == v; });
+}
+
+template <typename mapped_type, typename func_type>
+void for_each(const dense_grid<mapped_type>& grid, func_type func)
+{
+    find_if<mapped_type>(grid, [func](position p, const auto& v) {
+        func(p, v);
+        return false;
+    });
 }
 
 } // namespace grid::planar

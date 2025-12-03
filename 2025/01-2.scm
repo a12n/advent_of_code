@@ -4,7 +4,7 @@
 (include "01.scm")
 
 ;; Password method 0x434C49434B.
-(define (rotate-clicb dial rotation)
+(define (rotate-click dial rotation)
   (receive (delta-rotation rotation)
       (truncate/ rotation 100)
     (let* ((dial-unlim (+ dial rotation))
@@ -16,14 +16,14 @@
            (dial (modulo dial-unlim 100)))
       (values dial (+ (abs delta-rotation) (abs delta-dial))))))
 
-(display (entrance-password rotate-clicb 50 0))
+(display (entrance-password rotate-click 50 0))
 (newline)
 
-;; Test cases for rotate-clicb
+;; Test cases for rotate-click
 (let ((rotate-test
        (lambda (dial rotation)
          (receive (dial-rotated delta)
-             (rotate-clicb dial rotation)
+             (rotate-click dial rotation)
            (cons dial-rotated delta)))))
   (assert (equal? (rotate-test 50 -68) '(82 . 1)))
   (assert (equal? (rotate-test 82 -30) '(52 . 0)))

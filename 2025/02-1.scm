@@ -4,18 +4,6 @@
 
 (include "02.scm")
 
-;; The number of digits in integer n written in base.
-(define (ndigits n #!optional (base 10))
-  (let ((m (quotient n base)))
-    (if (zero? m) 1 (+ 1 (ndigits m)))))
-
-(assert (= (ndigits 0) 1))
-(assert (= (ndigits 1) 1))
-(assert (= (ndigits 9) 1))
-(assert (= (ndigits 10) 2))
-(assert (= (ndigits 123) 3))
-(assert (= (ndigits 131072) 6))
-
 ;; Minimum invalid identifier not less than the provided identifier k.
 ;;
 ;; Invalid identifiers represented as half of the digits of the actual

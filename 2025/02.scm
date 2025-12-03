@@ -4,6 +4,18 @@
 
 (include "aoc.scm")
 
+;; The number of digits in integer n written in base.
+(define (ndigits n #!optional (base 10))
+  (let ((m (quotient n base)))
+    (if (zero? m) 1 (+ 1 (ndigits m)))))
+
+(assert (= (ndigits 0) 1))
+(assert (= (ndigits 1) 1))
+(assert (= (ndigits 9) 1))
+(assert (= (ndigits 10) 2))
+(assert (= (ndigits 123) 3))
+(assert (= (ndigits 131072) 6))
+
 ;; Parse identifier range. Parsed ranges are represented as cons
 ;; cell. E.g., "11-22" will be parsed as (11 . 22).
 (define (string->id-range s)

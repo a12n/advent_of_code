@@ -1,4 +1,8 @@
-;; TODO: define-syntax
-(define (assert equal? actual expected)
-  (if (not (equal? actual expected))
-      (error "assert" actual expected)))
+(define-syntax assert
+  (syntax-rules ()
+    ((assert exp)
+     (if exp #t
+         (error "assert" (quote exp))))))
+
+(define (compose f g)
+  (lambda (x) (f (g x))))

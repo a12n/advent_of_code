@@ -15,16 +15,15 @@
 (define (largest-joltage n bank)
   (define (loop m prev-row bank-left)
     (if (= m n) (last prev-row)
-        (let ((next
-               (reverse
-                (fold
-                 (lambda (prev-x left-x ans)
-                   (let ((next-x (+ (* prev-x 10) left-x)))
-                     (if (or (null? ans) (> next-x (car ans)))
-                         (cons next-x ans)
-                         (cons (car ans) ans))))
-                 '() prev-row bank-left))))
-          (loop (+ m 1) next (cdr bank-left)))))
+        (let ((next-rev
+               (fold
+                (lambda (prev-x left-x ans)
+                  (let ((next-x (+ (* prev-x 10) left-x)))
+                    (if (or (null? ans) (> next-x (car ans)))
+                        (cons next-x ans)
+                        (cons (car ans) ans))))
+                '() prev-row bank-left)))
+          (loop (+ m 1) (reverse next-rev) (cdr bank-left)))))
   (loop 0 (circular-list 0) bank))
 
 (define (total-output-joltage n #!optional (sum 0))

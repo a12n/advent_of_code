@@ -13,8 +13,8 @@
 ;; 8 '(                                   23423423 34234234 42342342 43423423 44234234 44342342 44423427 44434278)
 
 (define (largest-joltage n bank)
-  (define (loop m prev bank-left)
-    (if (= m n) (last prev)
+  (define (loop m prev-row bank-left)
+    (if (= m n) (last prev-row)
         (let ((next
                (reverse
                 (fold
@@ -23,7 +23,7 @@
                      (if (or (null? ans) (> next-x (car ans)))
                          (cons next-x ans)
                          (cons (car ans) ans))))
-                 '() prev bank-left))))
+                 '() prev-row bank-left))))
           (loop (+ m 1) next (cdr bank-left)))))
   (loop 0 (circular-list 0) bank))
 

@@ -2,5 +2,5 @@
 
 (include "03.scm")
 
-(display (total-output-joltage 2 0))
+(display (total-output-joltage 2))
 (newline)

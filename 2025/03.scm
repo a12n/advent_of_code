@@ -27,7 +27,7 @@
           (loop next (cdr left) (+ m 1)))))
   (loop (circular-list 0) banks 0))
 
-(define (total-output-joltage n sum)
+(define (total-output-joltage n #!optional (sum 0))
   (let ((line (read-line)))
     (if (eof-object? line) sum
         (total-output-joltage

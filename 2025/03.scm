@@ -12,8 +12,8 @@
 ;; 7 '(                           2342342  3423423  4234234  4342342  4423423  4434234  4442342  4443427  4444278)
 ;; 8 '(                                   23423423 34234234 42342342 43423423 44234234 44342342 44423427 44434278)
 
-(define (largest-joltage n banks)
-  (define (loop prev left m)
+(define (largest-joltage n bank)
+  (define (loop m prev left)
     (if (= m n) (last prev)
         (let ((next
                (reverse
@@ -24,8 +24,8 @@
                          (cons next-x ans)
                          (cons (car ans) ans))))
                  '() prev left))))
-          (loop next (cdr left) (+ m 1)))))
-  (loop (circular-list 0) banks 0))
+          (loop (+ m 1) next (cdr left)))))
+  (loop 0 (circular-list 0) bank))
 
 (define (total-output-joltage n #!optional (sum 0))
   (let ((line (read-line)))

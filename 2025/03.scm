@@ -26,3 +26,9 @@
                  '() prev left))))
           (loop next (cdr left) (+ m 1)))))
   (loop (circular-list 0) banks 0))
+
+(define (total-output-joltage n sum)
+  (let ((line (read-line)))
+    (if (eof-object? line) sum
+        (total-output-joltage
+         n (+ sum (largest-joltage n (string->battery-bank line)))))))

@@ -1,5 +1,5 @@
 (define (string->battery-bank s)
-  (list->vector (map digit-value (string->list s))))
+  (map digit-value (string->list s)))
 
 ;;   '(2  3   4    2     3      4       2        3        4        2        3        4        2        7        8)
 ;;    ------------------------------------------------------------------------------------------------------------

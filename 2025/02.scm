@@ -4,9 +4,9 @@
 
 (include "aoc.scm")
 
-;; The number of digits in integer n written in base.
-(define (ndigits n #!optional (base 10))
-  (let ((m (quotient n base)))
+;; The number of digits in integer n written in base 10.
+(define (ndigits n)
+  (let ((m (quotient n 10)))
     (if (zero? m) 1 (+ 1 (ndigits m)))))
 
 (assert (= (ndigits 0) 1))

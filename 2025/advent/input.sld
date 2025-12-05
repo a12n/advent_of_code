@@ -1,5 +1,5 @@
 (define-library (advent input)
-  (export fold-lines read-lines string->number-range)
+  (export fold-lines read-lines)
   (import (scheme base)
           (scheme case-lambda)
           (srfi 13)
@@ -20,12 +20,5 @@
       (case-lambda
        (() (read-lines (current-input-port)))
        ((input) (reverse (fold-lines cons '() input)))))
-
-    (define (string->number-range s)
-      (let ((fields (string-tokenize s (char-set-complement (char-set #\-)))))
-        (if (= (length fields) 2)
-            (cons (string->number (car fields))
-                  (string->number (cadr fields)))
-            (error "invalid string" s))))
 
     ))

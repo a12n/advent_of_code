@@ -26,4 +26,9 @@
       (display (length fresh-ingredients))
       (newline))))
 
-(main part-1)
+(define (part-2)
+  (let-values (((database _) (read-input)))
+    (display (segment-set-size database))
+    (newline)))
+
+(main part-1 part-2)

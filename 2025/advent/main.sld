@@ -1,6 +1,7 @@
 (define-library (advent main)
   (export main)
   (import (scheme base)
+          (scheme cxr)
           (scheme process-context)
           (srfi 13))
   (begin

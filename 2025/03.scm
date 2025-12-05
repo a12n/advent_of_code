@@ -1,3 +1,12 @@
+#!/usr/bin/env gosh
+
+(import
+ (scheme base)
+ (scheme char)
+ (scheme write)
+ (srfi 1)
+ (advent main))
+
 (define (string->battery-bank s)
   (map digit-value (string->list s)))
 
@@ -26,8 +35,18 @@
           (loop (+ m 1) (reverse next-rev) (cdr bank-left)))))
   (loop 0 (circular-list 0) bank))
 
-(define (total-output-joltage n #!optional (sum 0))
+(define (total-output-joltage n sum)
   (let ((line (read-line)))
     (if (eof-object? line) sum
         (total-output-joltage
          n (+ sum (largest-joltage n (string->battery-bank line)))))))
+
+(define (part-1)
+  (display (total-output-joltage 2 0))
+  (newline))
+
+(define (part-2)
+  (display (total-output-joltage 12 0))
+  (newline))
+
+(main part-1 part-2)

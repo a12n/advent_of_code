@@ -42,7 +42,7 @@
 ;; ---------------------------------------------------------------------------
 ;; Part 2
 
-;; FIXME
+;; XXX: Simpler loop?
 (define (part-2)
   (let* ((worksheet (lines->grid (read-lines)))
          (n (grid-rows worksheet))
@@ -56,14 +56,14 @@
        (cond
         ;; Exit condition
         ((< col 0) total)
-        ;; Done one column
+        ;; Done a column, move to the next one
         ((= row n)
          (loop total
                numbers
                0
                (- col 1)
                0))
-        ;; Found digit
+        ;; Found digit, update current number
         ((char-numeric? (grid-ref worksheet row col))
          (loop total
                numbers
@@ -90,8 +90,9 @@
                '()
                0
                col
-               (+ row 1))))
-       ))
+               (+ row 1)))
+        ;; Unexpected char
+        (else (error "invalid input")))))
     (newline)))
 
 ;; ---------------------------------------------------------------------------

@@ -51,7 +51,7 @@
 
 (define (part-1)
   (let ((grid (lines->grid (read-lines))))
-    (display (beam-splitting! grid n0 m0))
+    (display (beam-splitting! grid))
     (newline)))
 
 ;; ---------------------------------------------------------------------------

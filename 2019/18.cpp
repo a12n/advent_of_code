@@ -198,21 +198,27 @@ size_t search(const graph& graph, const key_set all_keys, char u = '@')
 int main()
 {
     graph graph;
-    position start;
+    key_set all_keys = 0;
 
     {
         dense_grid<char> grid;
 
-        input(std::cin, grid, [](position, char c) {
-            if (c == '@' || c == '.' || c == '#' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
-                return c;
+        input(std::cin, grid, [&all_keys](position, char c) {
+            if (c != '@' && c != '.' && c != '#' && (c < 'a' || c > 'z') && (c < 'A' && c > 'Z')) {
+                throw std::invalid_argument(__func__);
             }
-            throw std::invalid_argument(__func__);
+            if (is_key(c)) {
+                all_keys |= from_key(c);
+            }
+            return c;
         });
 
-        start = find<char>(grid, '@').value();
-        to_graph(graph, grid, start);
+        std::cerr << __func__ << ": all_keys " << all_keys << '\n';
+
+        to_graph(graph, grid, find<char>(grid, '@').value());
     }
+
+    std::cout << search(graph, all_keys, '@') << '\n';
 
     return 0;
 }

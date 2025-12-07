@@ -15,12 +15,12 @@ using namespace grid::planar;
 // 1 << (c - 'a') for keys [a-z]
 using key_set = uint32_t;
 
-bool is_key(char k)
+constexpr bool is_key(char k)
 {
     return k >= 'a' && k <= 'z';
 }
 
-bool is_door(char d)
+constexpr bool is_door(char d)
 {
     return d >= 'A' && d <= 'Z';
 }
@@ -36,12 +36,12 @@ constexpr size_t to_index(char c)
     }
 }
 
-key_set from_key(char k)
+constexpr key_set from_key(char k)
 {
     return 1 << (k - 'a');
 }
 
-key_set from_door(char d)
+constexpr key_set from_door(char d)
 {
     return 1 << (d - 'A');
 }

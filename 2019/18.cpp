@@ -75,9 +75,8 @@ void to_graph(graph& g, const dense_grid<char>& grid, position p, sparse_set_gri
             to_graph(g, grid, q, visited, n + 1, path);
         } else {
             std::cerr << "	\"" << path.back() << "\" -- \"" << c << "\" [label=\"" << n + 1 << "\"];\n";
-            const auto u = std::min(c, path.back());
-            const auto v = std::max(c, path.back());
-            g[u][v] = n + 1;
+            g[c][path.back()] = n + 1;
+            g[path.back()][c] = n + 1;
             to_graph(g, grid, q, visited, 0, path + c);
         }
     }

@@ -160,6 +160,39 @@ size_t dfs(const vault_map& vault, position p, key_set keys)
     return min_steps;
 }
 
+size_t search(const graph& graph, const key_set all_keys, char u = '@')
+{
+    std::set<std::tuple<size_t, char, key_set>> states;
+    size_t min_steps = -1;
+
+    states.insert({ 0, u, 0 });
+
+    while (!states.empty()) {
+        const auto [total_steps, u, keys] = *states.begin();
+        states.erase(states.begin());
+
+        std::cerr << __func__ << ": total_steps " << total_steps << " u " << u << " keys " << keys << " states " << states.size() << '\n';
+
+        if (total_steps > min_steps) {
+            continue;
+        }
+
+        if ((keys & all_keys) == all_keys && total_steps < min_steps) {
+            min_steps = total_steps;
+        }
+
+        for (const auto& [v, steps] : graph.at(u)) {
+            if (v == '@' || (is_door(v) && (keys & from_door(v)))) {
+                states.insert({ total_steps + steps, v, keys });
+            } else if (is_key(v)) {
+                states.insert({ total_steps + steps, v, keys | from_key(v) });
+            }
+        }
+    }
+
+    return min_steps;
+}
+
 } // namespace
 
 int main()

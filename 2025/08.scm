@@ -92,6 +92,38 @@
                        conns))))
 
 ;; ---------------------------------------------------------------------------
+;; Disjoint sets
+
+(define (make-disjoint-set-parents n)
+  (vector-unfold values n))
+
+(define (make-disjoint-set-sizes n)
+  (make-vector n 1))
+
+(define (disjoint-set-find! parents i)
+  (let ((j (vector-ref parents i)))
+    (if (= j i) i
+        (let ((u (disjoint-set-find! parents j)))
+          (vector-set! parents i u)
+          u))))
+
+(define (disjoint-set-union! parents sizes i j)
+  (let ((u (disjoint-set-find! parents i))
+        (v (disjoint-set-find! parents j)))
+    (if (= u v) u
+        (let ((n (vector-ref sizes u))
+              (m (vector-ref sizes v)))
+          (cond
+           ((> n m)
+            (vector-set! parents v u)
+            (vector-set! sizes u (+ n m))
+            u)
+           (else
+            (vector-set! parents u v)
+            (vector-set! sizes v (+ n m))
+            v))))))
+
+;; ---------------------------------------------------------------------------
 ;; Part 1
 
 ;; Vector of connected component labels for N junctions. Takes
@@ -150,35 +182,6 @@
 
 ;; ---------------------------------------------------------------------------
 ;; Part 2
-
-(define (make-disjoint-set-parents n)
-  (vector-unfold values n))
-
-(define (make-disjoint-set-sizes n)
-  (make-vector n 1))
-
-(define (disjoint-set-find! parents i)
-  (let ((j (vector-ref parents i)))
-    (if (= j i) i
-        (let ((u (disjoint-set-find! parents j)))
-          (vector-set! parents i u)
-          u))))
-
-(define (disjoint-set-union! parents sizes i j)
-  (let ((u (disjoint-set-find! parents i))
-        (v (disjoint-set-find! parents j)))
-    (if (= u v) u
-        (let ((n (vector-ref sizes u))
-              (m (vector-ref sizes v)))
-          (cond
-           ((> n m)
-            (vector-set! parents v u)
-            (vector-set! sizes u (+ n m))
-            u)
-           (else
-            (vector-set! parents u v)
-            (vector-set! sizes v (+ n m))
-            v))))))
 
 (define (part-2)
   (let* ((junctions (read-input))

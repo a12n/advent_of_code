@@ -2,7 +2,8 @@
   (export lines->grid grid-copy grid-unfold
           grid-rows grid-cols
           grid-ref grid-set!
-          grid-fold grid-map! grid-for-each)
+          grid-fold grid-map! grid-for-each
+          grid-index)
 
   (export fold-grid-neighbors-4
           fold-grid-neighbors-8)
@@ -69,6 +70,17 @@
             (f n m elt))
           row))
        grid))
+
+    (define (grid-index pred grid)
+      (let ((rows (grid-rows grid))
+            (cols (grid-cols grid)))
+        (let loop ((n 0)
+                   (m 0))
+          (cond
+           ((= n rows) (values -1 -1))
+           ((= m cols) (loop (+ n 1) 0))
+           ((pred (vector-ref (vector-ref grid n) m)) (values n m))
+           (else (loop n (+ m 1)))))))
 
     (define (fold-grid-neighbors-4 f acc)
       (let* ((acc (f -1  0 acc))

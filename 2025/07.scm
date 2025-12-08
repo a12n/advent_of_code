@@ -43,9 +43,20 @@
 ;; ---------------------------------------------------------------------------
 ;; Part 2
 
+(define (num-timelines grid n m)
+  (case (grid-ref grid n m)
+    ((#\. #\S) (num-timelines grid (+ n 1) m))
+    ((#\^) (+ (num-timelines grid n (- m 1))
+              (num-timelines grid n (+ m 1))))
+    ((#f) 1)))
+
 (define (part-2)
-  ;; TODO
-  )
+  (let ((grid (lines->grid (read-lines))))
+    (let-values (((n m) (grid-index (lambda (c)
+                                      (char=? c #\S))
+                                    grid)))
+      (display (num-timelines grid n m))
+      (newline))))
 
 ;; ---------------------------------------------------------------------------
 ;; Main

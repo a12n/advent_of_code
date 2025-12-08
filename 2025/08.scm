@@ -163,6 +163,7 @@
               conns)
     adjacency))
 
+;; TODO: Rewrite with disjoint sets.
 ;; TODO: Explicit heap of size k.
 (define (part-1)
   (let* ((junctions (read-input))

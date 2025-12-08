@@ -62,7 +62,8 @@
       (let* ((state (list-queue-remove-front! queue))
              (n (car state))
              (m (cadr state))
-             (beam (caddr state)))
+             (beam (caddr state))
+             (enqueued #f))
 
         (display state (current-error-port)) (newline (current-error-port))
 
@@ -73,11 +74,11 @@
           ((#\^)
            (when (eqv? (grid-ref grid n (- m 1)) #\.)
              (list-queue-add-back! queue `(,n ,(- m 1) ,next-beam))
-             (set! beam #f))
+             (set! enqueued #t))
            (when (eqv? (grid-ref grid n (+ m 1)) #\.)
              (list-queue-add-back! queue `(,n ,(+ m 1) ,next-beam))
-             (set! beam #f))
-           (when (not beam)
+             (set! enqueued #t))
+           (when enqueued
              (set! next-beam (+ next-beam 1)))))))))
 
 (define (part-1)

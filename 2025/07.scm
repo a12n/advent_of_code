@@ -6,12 +6,30 @@
         (srfi 28)
         (srfi 43)
         (srfi 117)
-        (advent input)
         (advent grid)
+        (advent input)
         (advent main))
 
 ;; ---------------------------------------------------------------------------
 ;; Part 1
+
+(define (propagate! grid)
+  (grid-for-each
+   (lambda (n m this)
+     (let ((up (grid-ref grid (- n 1) m))
+           (left (grid-ref grid n (- m 1)))
+           (right (grid-ref grid n (+ m 1))))
+       (cond
+        ((eqv? this #\S)
+         (grid-set! grid n m #\|))
+        ((and (eqv? this #\.)
+              (eqv? up #\|))
+         (grid-set! grid n m #\|))
+        ((and (eqv? this #\^)
+              (eqv? up #\|))
+         (grid-set! grid n (- m 1) #\|)
+         (grid-set! grid n (+ m 1) #\|)))))
+   grid))
 
 (define (beam-splitting! grid)
   (grid-fold
@@ -83,7 +101,17 @@
 
 (define (part-1)
   (let ((grid (lines->grid (read-lines))))
-    (display (beam-splitting2! grid))
+    ;; (beam-splitting2! grid)
+    (propagate! grid)
+
+    (display
+     (grid-fold
+      (lambda (n m num this)
+        (if (and (eqv? this #\^)
+                 (eqv? (grid-ref grid (- n 1) m) #\|))
+            (+ num 1)
+            num))
+      0 grid))
     (newline)
 
     (let ((output (current-error-port)))

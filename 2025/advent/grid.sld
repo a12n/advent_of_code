@@ -77,7 +77,7 @@
         (let loop ((n 0)
                    (m 0))
           (cond
-           ((= n rows) (values -1 -1))
+           ((= n rows) (values #f #f))
            ((= m cols) (loop (+ n 1) 0))
            ((pred (vector-ref (vector-ref grid n) m)) (values n m))
            (else (loop n (+ m 1)))))))

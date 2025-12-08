@@ -42,18 +42,23 @@
                                distances)
                    i (+ j 1)))))))
 
-(define (connected-components connected)
-  (let* ((n (vector-length connected))
+;; Vector of connected component labels for N junctions. Takes
+;; adjacency vector as the parameter.
+(define (connected-components adjacency)
+  (let* ((n (vector-length adjacency))
          (components (make-vector n -1)))
     (define (dfs i id)
       (when (= (vector-ref components i) -1)
         (vector-set! components i id)
         (for-each (lambda (j) (dfs j id))
-                  (vector-ref connected i))))
+                  (vector-ref adjacency i))))
     (do ((i 0 (+ i 1)))
         ((= i n) components)
       (dfs i i))))
 
+;; Frequency vector of connected components. Value at index `c` is
+;; size of connected component `c`. Takes connected component labels
+;; vector as the parameter.
 (define (component-lengths components)
   (let* ((n (vector-length components))
          (lengths (make-vector n 0)))
@@ -62,43 +67,34 @@
                      components)
     lengths))
 
-;; TODO: Heap.
+;; Make junction adjacency vector for N junctions from list of
+;; connection pairs. Each pair is cons of I and J junction indices.
+(define (junction-adjacency n conns)
+  (let ((adjacency (make-vector n '())))
+    (for-each (lambda (conn)
+                (let ((i (car conn))
+                      (j (cdr conn)))
+                  (vector-set! adjacency i (cons j (vector-ref adjacency i)))
+                  (vector-set! adjacency j (cons i (vector-ref adjacency j)))))
+              conns)
+    adjacency))
+
+;; TODO: Explicit heap of size k.
 (define (part-1)
   (let* ((junctions (read-input))
          (n (vector-length junctions))
-         (k (string->number (or (get-environment-variable "CONNS") "1000")))
-         (distances (list->vector (junction-distances junctions)))
-         (adjacency (make-vector n '()))
-         )
+         (k (string->number (or (get-environment-variable "CONNS") "1000"))))
+    (let* ((distances (junction-distances junctions))
+           (distances-sorted (list-sort (lambda (a b)
+                                          (< (cdr a) (cdr b)))
+                                        distances))
+           (adjacency (junction-adjacency n (map car (take distances-sorted k))))
+           (components (connected-components adjacency))
+           (lengths (component-lengths components))
+           (lengths-sorted (vector-sort > lengths)))
 
-    ;; (vector-separate! (lambda (a b)
-    ;;                     (< (cdr a) (cdr b)))
-    ;;                   distances k)
-    (vector-sort! (lambda (a b)
-                    (< (cdr a) (cdr b)))
-                  distances)
-
-    (for-each (lambda (conn)
-                (let ((i (caar conn))
-                      (j (cdar conn)))
-                  (vector-set! adjacency i (cons j (vector-ref adjacency i)))
-                  (vector-set! adjacency j (cons i (vector-ref adjacency j)))))
-              (vector->list distances 0 k))
-
-    (display junctions) (newline)
-    (newline)
-    (display distances) (newline)
-    (newline)
-    (display (vector->list distances 0 k)) (newline)
-    (newline)
-    (display adjacency) (newline)
-    (newline)
-    (display (connected-components adjacency)) (newline)
-    (newline)
-    (display (component-lengths (connected-components adjacency))) (newline)
-    (newline)
-    (display (vector-sort > (component-lengths (connected-components adjacency)))) (newline)
-    ))
+      (display (fold * 1 (vector->list lengths-sorted 0 3)))
+      (newline))))
 
 (define (part-2)
   ;; TODO

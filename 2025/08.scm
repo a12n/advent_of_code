@@ -76,6 +76,21 @@
 (define (conn-combinations-reverse n)
   (fold-conn-combinations cons '() n))
 
+;; Sort list of connections by squared distance between connection
+;; endpoints.
+(define (conn-list-sort junctions conns)
+  (map car
+       (list-sort (lambda (a b)
+                    (< (cdr a)
+                       (cdr b)))
+                  (map (lambda (c)
+                         ;; Attach squared distance to
+                         ;; each endpoint, and strip it
+                         ;; after sorting.
+                         (cons c (squared-distance (vector-ref junctions (conn-from c))
+                                                   (vector-ref junctions (conn-to c)))))
+                       conns))))
+
 ;; ---------------------------------------------------------------------------
 ;; Part 1
 
@@ -180,17 +195,7 @@
                     (= (vector-ref sizes u) n)))
                 ;; …in the list of all combinations of connections, sorted
                 ;; by squared distance between connection endpoints.
-                (map car
-                     (list-sort (lambda (a b)
-                                  (< (cdr a)
-                                     (cdr b)))
-                                (map (lambda (c)
-                                       ;; Attach squared distance to
-                                       ;; each endpoint, and strip it
-                                       ;; after sorting.
-                                       (cons c (squared-distance (vector-ref junctions (conn-from c))
-                                                                 (vector-ref junctions (conn-to c)))))
-                                     (conn-combinations-reverse n))))))
+                (conn-list-sort junctions (conn-combinations-reverse n))))
          ;; Extract endpoints of the last connection.
          (p (vector-ref junctions (conn-from last-conn)))
          (q (vector-ref junctions (conn-to last-conn))))

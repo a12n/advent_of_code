@@ -176,7 +176,6 @@
           (find (lambda (c)
                   ;; …after merging sets of connections for its endpoints,
                   ;; there's now single connected component of size N, …
-                  (display (list "connecting" c) (current-error-port)) (newline (current-error-port))
                   (let ((u (disjoint-set-union! parents sizes (conn-from c) (conn-to c))))
                     (= (vector-ref sizes u) n)))
                 ;; …in the list of all combinations of connections, sorted

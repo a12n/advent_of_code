@@ -6,6 +6,12 @@
         (advent input)
         (advent main))
 
+;; Tiles in the grid
+(define BEAM #\|)
+(define EMPTY #\.)
+(define SPLITTER #\^)
+(define START #\S)
+
 ;; ---------------------------------------------------------------------------
 ;; Part 1
 
@@ -16,15 +22,15 @@
            (left (grid-ref grid n (- m 1)))
            (right (grid-ref grid n (+ m 1))))
        (cond
-        ((eqv? this #\S)
-         (grid-set! grid n m #\|))
-        ((and (eqv? this #\.)
-              (eqv? up #\|))
-         (grid-set! grid n m #\|))
-        ((and (eqv? this #\^)
-              (eqv? up #\|))
-         (grid-set! grid n (- m 1) #\|)
-         (grid-set! grid n (+ m 1) #\|)))))
+        ((eqv? this START)
+         (grid-set! grid n m BEAM))
+        ((and (eqv? this EMPTY)
+              (eqv? up BEAM))
+         (grid-set! grid n m BEAM))
+        ((and (eqv? this SPLITTER)
+              (eqv? up BEAM))
+         (grid-set! grid n (- m 1) BEAM)
+         (grid-set! grid n (+ m 1) BEAM)))))
    grid))
 
 (define (part-1)
@@ -33,8 +39,8 @@
     (display
      (grid-fold
       (lambda (n m num this)
-        (if (and (eqv? this #\^)
-                 (eqv? (grid-ref grid (- n 1) m) #\|))
+        (if (and (eqv? this SPLITTER)
+                 (eqv? (grid-ref grid (- n 1) m) BEAM))
             (+ num 1)
             num))
       0 grid))
@@ -47,10 +53,10 @@
   (let ((this (grid-ref grid n m)))
     (cond
      ((number? this) this)
-     ((or (eqv? this #\.)
-          (eqv? this #\S))
+     ((or (eqv? this EMPTY)
+          (eqv? this START))
       (num-timelines! grid (+ n 1) m))
-     ((eqv? this #\^)
+     ((eqv? this SPLITTER)
       (let ((num (+ (num-timelines! grid n (- m 1))
                     (num-timelines! grid n (+ m 1)))))
         (grid-set! grid n m num)
@@ -60,7 +66,7 @@
 (define (part-2)
   (let ((grid (lines->grid (read-lines))))
     (let-values (((n m) (grid-index (lambda (c)
-                                      (char=? c #\S))
+                                      (char=? c START))
                                     grid)))
       (display (num-timelines! grid n m))
       (newline))))

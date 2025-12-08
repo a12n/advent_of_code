@@ -1,6 +1,7 @@
 #!/usr/bin/env gosh
 
 (import (scheme base)
+        (scheme cxr)
         (scheme write)
         (srfi 28)
         (srfi 43)
@@ -49,10 +50,55 @@
         (else beam))))
    1 grid))
 
+(define (beam-splitting2! grid)
+  (let ((queue (make-list-queue '())))
+    ;; Enqueue beginning of the beam 0
+    (list-queue-add-back!
+     queue
+     (let ((s (vector-index
+               (lambda (c)
+                 (char=? c #\S))
+               (vector-ref grid 0))))
+       `(0 ,s ,100)))
+    (let loop ((next-beam 101))
+      (unless (list-queue-empty? queue)
+        (let* ((state (list-queue-remove-front! queue))
+               (n (car state))
+               (m (cadr state))
+               (beam (caddr state)))
+
+          (display state (current-error-port)) (newline (current-error-port))
+
+          (case (grid-ref grid n m)
+            ((#\. #\S)
+             (grid-set! grid n m beam)
+             (list-queue-add-front! queue `(,(+ n 1) ,m ,beam)))
+            ((#\^)
+             (when (eqv? (grid-ref grid n (- m 1)) #\.)
+               (list-queue-add-back! queue `(,n ,(- m 1) ,next-beam))
+               (set! beam #f))
+             (when (eqv? (grid-ref grid n (+ m 1)) #\.)
+               (list-queue-add-back! queue `(,n ,(+ m 1) ,next-beam))
+               (set! beam #f))
+             (when (not beam)
+               (loop (+ next-beam 1))))))
+        (loop next-beam))
+      next-beam)))
+
 (define (part-1)
   (let ((grid (lines->grid (read-lines))))
-    (display (beam-splitting! grid))
-    (newline)))
+    (display (beam-splitting2! grid))
+    (newline)
+
+    (vector-for-each
+     (lambda (n row)
+       (write row)
+       (newline)
+       )
+     grid)
+    (newline)
+
+    ))
 
 ;; ---------------------------------------------------------------------------
 ;; Part 2

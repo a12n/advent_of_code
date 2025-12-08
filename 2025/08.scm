@@ -181,12 +181,17 @@
                     (= (vector-ref sizes u) n)))
                 ;; …in the list of all combinations of connections, sorted
                 ;; by squared distance between connection endpoints.
-                (list-sort (lambda (a b)
-                             (< (squared-distance (vector-ref junctions (conn-from a))
-                                                  (vector-ref junctions (conn-to a)))
-                                (squared-distance (vector-ref junctions (conn-from b))
-                                                  (vector-ref junctions (conn-to b)))))
-                           (conn-combinations-reverse n))))
+                (map car
+                     (list-sort (lambda (a b)
+                                  (< (cdr a)
+                                     (cdr b)))
+                                (map (lambda (c)
+                                       ;; Attach squared distance to
+                                       ;; each endpoint, and strip it
+                                       ;; after sorting.
+                                       (cons c (squared-distance (vector-ref junctions (conn-from c))
+                                                                 (vector-ref junctions (conn-to c)))))
+                                     (conn-combinations-reverse n))))))
          ;; Extract endpoints of the last connection.
          (p (vector-ref junctions (conn-from last-conn)))
          (q (vector-ref junctions (conn-to last-conn))))

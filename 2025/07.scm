@@ -43,15 +43,18 @@
 ;; ---------------------------------------------------------------------------
 ;; Part 2
 
-(define (num-timelines grid n m)
+(define (num-timelines! grid n m)
   (let ((this (grid-ref grid n m)))
     (cond
+     ((number? this) this)
      ((or (eqv? this #\.)
           (eqv? this #\S))
       (num-timelines! grid (+ n 1) m))
      ((eqv? this #\^)
-      (+ (num-timelines! grid n (- m 1))
-         (num-timelines! grid n (+ m 1))))
+      (let ((num (+ (num-timelines! grid n (- m 1))
+                    (num-timelines! grid n (+ m 1)))))
+        (grid-set! grid n m num)
+        num))
      ((eqv? this #f) 1))))
 
 (define (part-2)
@@ -59,7 +62,7 @@
     (let-values (((n m) (grid-index (lambda (c)
                                       (char=? c #\S))
                                     grid)))
-      (display (num-timelines grid n m))
+      (display (num-timelines! grid n m))
       (newline))))
 
 ;; ---------------------------------------------------------------------------

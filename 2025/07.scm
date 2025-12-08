@@ -85,13 +85,25 @@
     (display (beam-splitting2! grid))
     (newline)
 
-    (vector-for-each
-     (lambda (n row)
-       (write row (current-error-port))
-       (newline (current-error-port))
-       )
-     grid)
-    (newline)
+    (let ((output (current-error-port)))
+      (vector-for-each
+       (lambda (n row)
+         (vector-for-each
+          (lambda (m elt)
+            (display #\space output)
+            (cond
+             ((char? elt)
+              (display elt output)
+              (display elt output))
+             ((and (number? elt) (< elt 10))
+              (display 0 output)
+              (display elt output))
+             ((number? elt)
+              (display elt output))))
+          row)
+         (newline output))
+       grid)
+      (newline))
 
     ))
 

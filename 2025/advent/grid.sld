@@ -2,7 +2,7 @@
   (export lines->grid grid-copy grid-unfold
           grid-rows grid-cols
           grid-ref grid-set!
-          grid-fold grid-map!)
+          grid-fold grid-map! grid-for-each)
 
   (export fold-grid-neighbors-4
           fold-grid-neighbors-8)
@@ -59,6 +59,15 @@
             (f n m elt))
           row)
          row)
+       grid))
+
+    (define (grid-for-each f grid)
+      (vector-for-each
+       (lambda (n row)
+         (vector-for-each
+          (lambda (m elt)
+            (f n m elt))
+          row))
        grid))
 
     (define (fold-grid-neighbors-4 f acc)

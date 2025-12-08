@@ -44,11 +44,15 @@
 ;; Part 2
 
 (define (num-timelines grid n m)
-  (case (grid-ref grid n m)
-    ((#\. #\S) (num-timelines grid (+ n 1) m))
-    ((#\^) (+ (num-timelines grid n (- m 1))
-              (num-timelines grid n (+ m 1))))
-    ((#f) 1)))
+  (let ((this (grid-ref grid n m)))
+    (cond
+     ((or (eqv? this #\.)
+          (eqv? this #\S))
+      (num-timelines! grid (+ n 1) m))
+     ((eqv? this #\^)
+      (+ (num-timelines! grid n (- m 1))
+         (num-timelines! grid n (+ m 1))))
+     ((eqv? this #f) 1))))
 
 (define (part-2)
   (let ((grid (lines->grid (read-lines))))

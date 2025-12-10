@@ -149,9 +149,11 @@
            ;; Transition to the neigbouring states.
            (else (loop solution
                        (fold (lambda (button states)
-                               (ideque-add-back states
-                                                (vector (joltage-add levels button)
-                                                        (+ presses 1))))
+                               (let* ((increased-levels (joltage-add levels button))
+                                      (bound (joltage-norm-max (joltage-sub joltage-reqs increased-levels))))
+                               (if (and solution (>= (+ presses bound) solution))
+                                   states
+                                   (ideque-add-front states (vector increased-levels (+ presses 1))))))
                              states buttons))))))))
 
 (define (button->joltage n button)

@@ -101,6 +101,24 @@
 ;; ---------------------------------------------------------------------------
 ;; Part 2
 
+(define (joltage-add p u)
+  (vector-map + p u))
+
+(define (joltage-sub p q)
+  (vector-map - p q))
+
+(define (joltage-norm-max u)
+  (vector-fold (lambda (n acc)
+                 (max (abs n) acc))
+               (abs (vector-ref u 0))
+               u))
+
+(define (joltage=? levels goal)
+  (vector= = levels goal))
+
+(define (joltage-overshoot? levels goal)
+  (vector-any > levels goal))
+
 ;; buttons = #(0 0 0 1) #(0 1 0 1) #(0 0 1 0) #(0 0 1 1) #(1 0 1 0) #(1 1 0 0)
 ;; presses = #(n₀ n₁ n₂ n₃ n₄ n₅)
 ;; joltage-reqs = #(3 5 4 7))

@@ -5,6 +5,7 @@
         (srfi 1)
         (srfi 13)
         (srfi 14)
+        (srfi 69)
         (srfi 113)
         (srfi 114)
         (srfi 133)
@@ -130,31 +131,35 @@
 ;;
 ;; presses = ?
 (define (num-joltage-button-presses joltage-reqs buttons)
-  (let loop ((solution #f)
-             (states (ideque (vector (make-vector (vector-length joltage-reqs) 0)
-                                     0))))
-    (if (ideque-empty? states) solution
-        (let* ((state (ideque-front states))
-               (states (ideque-remove-front states))
-               (levels (vector-ref state 0))
-               (presses (vector-ref state 1)))
-          (cond
-           ;; There's a solution and current number of presses is
-           ;; already worse, drop this state.
-           ((and solution (>= presses solution)) (loop solution states))
-           ;; It's already an overshoot, drop the state.
-           ((joltage-overshoot? levels joltage-reqs) (loop solution states))
-           ;; Goal condition met, update the solution and inspect rest of the states.
-           ((joltage=? levels joltage-reqs) (loop presses states))
-           ;; Transition to the neigbouring states.
-           (else (loop solution
-                       (fold (lambda (button states)
-                               (let* ((increased-levels (joltage-add levels button))
-                                      (bound (joltage-norm-max (joltage-sub joltage-reqs increased-levels))))
-                               (if (and solution (>= (+ presses bound) solution))
-                                   states
-                                   (ideque-add-front states (vector increased-levels (+ presses 1))))))
-                             states buttons))))))))
+  (define (loop cache levels presses)
+    (display (list "cache" (hash-table-size cache)
+                   "levels" levels)
+             (current-error-port))
+    (newline (current-error-port))
+    (hash-table-ref
+     cache levels
+     (lambda ()
+       (let ((min-presses
+              (cond
+               ((joltage-overshoot? levels joltage-reqs) #f)
+               ((joltage=? levels joltage-reqs) 0)
+               (else
+                (fold
+                 (lambda (num min-presses)
+                   (or (and min-presses
+                            (min num min-presses))
+                       num))
+                 #f
+                 (map (lambda (num)
+                        (+ num 1))
+                      (filter number?
+                              (map (lambda (button)
+                                     (loop cache (joltage-add levels button)))
+                                   buttons))))))))
+         (hash-table-set! cache levels min-presses)
+         min-presses))))
+  (loop (make-hash-table)
+        (make-vector (vector-length joltage-reqs) 0)))
 
 (define (button->joltage n button)
   (let ((levels (make-vector n 0)))
@@ -172,8 +177,15 @@
                              (button->joltage (vector-length joltage-reqs)
                                               button))
                            buttons)))
-        (display machine (current-error-port)) (newline (current-error-port))
-        (+ sum (num-joltage-button-presses joltage-reqs buttons))))
+        (display (list "joltage-reqs" joltage-reqs
+                       "buttons" buttons)
+                 (current-error-port))
+        (newline (current-error-port))
+        (let ((num (num-joltage-button-presses joltage-reqs buttons)))
+          (display (list "num-joltage-button-presses" num)
+                   (current-error-port))
+          (newline (current-error-port))
+          (+ sum num))))
     0))
   (newline))
 

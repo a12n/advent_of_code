@@ -60,7 +60,7 @@
 
 ;; Buttons in the provided buttons list must be in bitmask
 ;; representation.
-(define (num-button-presses goal-lights buttons)
+(define (num-light-button-presses goal-lights buttons)
   (let loop ((solution #f)
              (states (ideque #(0 0)))
              (seen (set exact-integer-comparator)))
@@ -94,7 +94,7 @@
              (lights (vector-ref machine 0))
              (buttons (vector-ref machine 1))
              (buttons (map button->button-bits buttons)))
-        (+ sum (num-button-presses lights buttons))))
+        (+ sum (num-light-button-presses lights buttons))))
     0))
   (newline))
 

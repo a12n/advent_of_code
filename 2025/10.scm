@@ -15,7 +15,7 @@
             (not (char=? (string-ref s 0) #\[))
             (not (char=? (string-ref s (- n 1)) #\])))
         (error "invalid string" s))
-    (string-fold
+    (string-fold-right
      (lambda (char lights)
        (bitwise-ior (arithmetic-shift lights 1)
                     (case char

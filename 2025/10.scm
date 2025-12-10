@@ -101,9 +101,22 @@
 ;; ---------------------------------------------------------------------------
 ;; Part 2
 
-(define (part-2)
+(define (num-joltage-button-presses joltage-reqs buttons)
   ;; TODO
+  0
   )
+
+(define (part-2)
+  (display
+   (fold-lines
+    (lambda (line sum)
+      (let* ((machine (string->machine-descr line))
+             (buttons (vector-ref machine 1))
+             (joltage-reqs (vector-ref machine 2)))
+        (display machine (current-error-port)) (newline (current-error-port))
+        (+ sum (num-joltage-button-presses joltage-reqs buttons))))
+    0))
+  (newline))
 
 ;; ---------------------------------------------------------------------------
 ;; Main

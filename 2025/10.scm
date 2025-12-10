@@ -101,6 +101,15 @@
 ;; ---------------------------------------------------------------------------
 ;; Part 2
 
+;; buttons = #(0 0 0 1) #(0 1 0 1) #(0 0 1 0) #(0 0 1 1) #(1 0 1 0) #(1 1 0 0)
+;; presses = #(n₀ n₁ n₂ n₃ n₄ n₅)
+;; joltage-reqs = #(3 5 4 7))
+;;
+;;                5
+;; joltage-reqs = Σ (n_i * buttons[i])
+;;               i=0
+;;
+;; presses = ?
 (define (num-joltage-button-presses joltage-reqs buttons)
   ;; TODO
   0

@@ -49,6 +49,10 @@
            (schematics (reverse (map number-list->schematic (cdr number-lists)))))
       (vector lights schematics joltage-reqs))))
 
+(define (num-button-presses lights schematics)
+  ;; TODO
+  0)
+
 ;; ---------------------------------------------------------------------------
 ;; Part 1
 
@@ -56,9 +60,8 @@
   (display
    (fold-lines
     (lambda (line sum)
-      (display (list "machine-descr" (string->machine-descr line)) (current-error-port))
-      (newline (current-error-port))
-      sum)
+      (let ((machine (string->machine-descr line)))
+        (+ sum (num-button-presses (vector-ref machine 0) (vector-ref machine 1)))))
     0))
   (newline))
 

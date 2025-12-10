@@ -125,8 +125,12 @@
    (fold-lines
     (lambda (line sum)
       (let* ((machine (string->machine-descr line))
+             (joltage-reqs (vector-ref machine 2))
              (buttons (vector-ref machine 1))
-             (joltage-reqs (vector-ref machine 2)))
+             (buttons (map (lambda (button)
+                             (button->joltage (vector-length joltage-reqs)
+                                              button))
+                           buttons)))
         (display machine (current-error-port)) (newline (current-error-port))
         (+ sum (num-joltage-button-presses joltage-reqs buttons))))
     0))

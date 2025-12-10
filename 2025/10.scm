@@ -129,9 +129,29 @@
 ;;
 ;; presses = ?
 (define (num-joltage-button-presses joltage-reqs buttons)
-  ;; TODO
-  0
-  )
+  (let loop ((solution #f)
+             (states (ideque (vector (make-vector (vector-length joltage-reqs) 0)
+                                     0))))
+    (if (ideque-empty? states) solution
+        (let* ((state (ideque-front states))
+               (states (ideque-remove-front states))
+               (levels (vector-ref state 0))
+               (presses (vector-ref state 1)))
+          (cond
+           ;; There's a solution and current number of presses is
+           ;; already worse, drop this state.
+           ((and solution (> presses solution)) (loop solution states))
+           ;; It's already an overshoot, drop the state.
+           ((joltage-overshoot? levels joltage-reqs) (loop solution states))
+           ;; Goal condition met, update the solution and inspect rest of the states.
+           ((joltage=? levels joltage-reqs) (loop presses states))
+           ;; Transition to the neigbouring states.
+           (else (loop solution
+                       (fold (lambda (button states)
+                               (ideque-add-back states
+                                                (vector (joltage-add levels button)
+                                                        (+ presses 1))))
+                             states buttons))))))))
 
 (define (button->joltage n button)
   (let ((levels (make-vector n 0)))

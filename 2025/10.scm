@@ -140,7 +140,7 @@
           (cond
            ;; There's a solution and current number of presses is
            ;; already worse, drop this state.
-           ((and solution (> presses solution)) (loop solution states))
+           ((and solution (>= presses solution)) (loop solution states))
            ;; It's already an overshoot, drop the state.
            ((joltage-overshoot? levels joltage-reqs) (loop solution states))
            ;; Goal condition met, update the solution and inspect rest of the states.

@@ -53,7 +53,7 @@
 ;; Button is a list of indices (indices of the toggled lights in part
 ;; 1, and indices of joltage levels in part 2). Button bits is bitmask
 ;; representation of the list.
-(define (button->button-bits button)
+(define (button->light-bits button)
   (fold (lambda (k bits)
           (bitwise-ior bits (arithmetic-shift 1 k)))
         0 button))
@@ -93,7 +93,7 @@
       (let* ((machine (string->machine-descr line))
              (lights (vector-ref machine 0))
              (buttons (vector-ref machine 1))
-             (buttons (map button->button-bits buttons)))
+             (buttons (map button->light-bits buttons)))
         (+ sum (num-light-button-presses lights buttons))))
     0))
   (newline))

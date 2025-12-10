@@ -115,6 +115,11 @@
   0
   )
 
+(define (button->joltage n button)
+  (let ((levels (make-vector n 0)))
+    (for-each (lambda (i) (vector-set! levels i 1)) button)
+    levels))
+
 (define (part-2)
   (display
    (fold-lines

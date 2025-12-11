@@ -5,6 +5,7 @@
         (srfi 1)
         (srfi 13)
         (srfi 14)
+        (srfi 69)
         (advent input)
         (advent main))
 
@@ -38,23 +39,30 @@
 ;; ---------------------------------------------------------------------------
 ;; Part 1
 
-(define (num-paths graph source dest)
+(define (num-paths cache graph source dest)
   (define (loop path)
-    (if (eq? (car path) dest) 1
-        (fold
-         + 0
-         (map
-          (lambda (v)
-            (loop (cons v path)))
-          (remove
-           (lambda (v)
-             (memq v path))
-           (assq (car path) graph))))))
+    (hash-table-ref
+     cache (cons (car path) dest)
+     (lambda ()
+       (let ((num
+              (if (eq? (car path) dest) 1
+                  (fold
+                   + 0
+                   (map
+                    (lambda (v)
+                      (loop (cons v path)))
+                    (remove
+                     (lambda (v)
+                       (memq v path))
+                     (or (assq (car path) graph) '())))))))
+         (hash-table-set! cache (cons (car path) dest) num)
+         num))))
   (loop (list source)))
 
 (define (part-1)
-  (let ((graph (read-input)))
-    (display (num-paths graph 'you 'out))
+  (let ((graph (read-input))
+        (cache (make-hash-table)))
+    (display (num-paths cache graph 'you 'out))
     (newline)))
 
 ;; ---------------------------------------------------------------------------

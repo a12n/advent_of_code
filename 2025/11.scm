@@ -69,8 +69,15 @@
 ;; Part 2
 
 (define (part-2)
-  (display 0)
-  (newline))
+  (let ((graph (read-input))
+        (cache (make-hash-table)))
+    (display (+ (* (num-paths cache graph 'svr 'dac)
+                   (num-paths cache graph 'dac 'fft)
+                   (num-paths cache graph 'fft 'out))
+                (* (num-paths cache graph 'svr 'fft)
+                   (num-paths cache graph 'fft 'dac)
+                   (num-paths cache graph 'dac 'out))))
+    (newline)))
 
 ;; ---------------------------------------------------------------------------
 ;; Main

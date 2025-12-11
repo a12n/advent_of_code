@@ -23,9 +23,23 @@
 ;; ---------------------------------------------------------------------------
 ;; Part 1
 
+(define (num-paths graph source dest)
+  (define (loop path)
+    (if (eq? (car path) dest) 1
+        (fold
+         + 0
+         (map
+          (lambda (v)
+            (loop (cons v path)))
+          (remove
+           (lambda (v)
+             (memq v path))
+           (assq (car path) graph))))))
+  (loop (list source)))
+
 (define (part-1)
   (let ((graph (read-input)))
-    (display graph)
+    (display (num-paths graph 'you 'out))
     (newline)))
 
 ;; ---------------------------------------------------------------------------

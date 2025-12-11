@@ -20,6 +20,21 @@
          (alist-cons source dests alist))))
    '()))
 
+(define (graphviz graph)
+  (display "digraph {\n")
+  (for-each
+   (lambda (source-dests)
+     (for-each
+      (lambda (dest)
+        (display "	")
+        (display (car source-dests))
+        (display " -> ")
+        (display dest)
+        (display ";\n"))
+      (cdr source-dests)))
+   graph)
+  (display "}\n"))
+
 ;; ---------------------------------------------------------------------------
 ;; Part 1
 

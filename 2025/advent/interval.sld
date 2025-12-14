@@ -1,6 +1,7 @@
 (define-library (advent interval)
   (export make-interval string->interval
           interval-lower interval-upper
+          disjoint-intervals? overlapping-intervals?
           interval-member? interval-size integer-interval-size
           intervals-union)
 

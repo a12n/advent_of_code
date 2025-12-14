@@ -61,6 +61,7 @@
         (display
          (fold-combinations
           (lambda (comb area)
+            ;; XXX: Build interval trees of horizontal and vertical segments?
             (let* ((right-bottom (car comb))
                    (left-top (cdr comb))
                    (left-bottom (point (point-x left-top)
@@ -79,9 +80,6 @@
         (newline)
 
     ))
-
-  ;; TODO
-  )
 
 ;; ---------------------------------------------------------------------------
 ;; Main

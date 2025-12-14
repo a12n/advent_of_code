@@ -42,40 +42,41 @@
   (make-interval (point-ref (segment-begin s) dim)
                  (point-ref (segment-end s) dim)))
 
-(define (overlapping-segments? s t)
-  (and (overlapping-intervals? (segment-projection s X)
-                               (segment-projection t X))
-       (overlapping-intervals? (segment-projection s Y)
-                               (segment-projection t Y))))
-
 (define (part-2)
   (let* ((points (read-input))
-         (outline-segments (points->segments (integer-polygon-offset 'ccw points))))
-
-        (display (list "points" (length points) points) (current-error-port))
-        (newline (current-error-port))
-
-        (display (list "outline-segments" (length outline-segments) outline-segments) (current-error-port))
-        (newline (current-error-port))
+         (outline-intervals
+          (map (lambda (s)
+                 (cons (segment-projection s X)
+                       (segment-projection s Y)))
+               (points->segments (integer-polygon-offset 'ccw points)))))
 
         (display
          (fold-combinations
           (lambda (comb area)
             ;; XXX: Build interval trees of horizontal and vertical segments?
-            (let* ((right-bottom (car comb))
-                   (left-top (cdr comb))
-                   (left-bottom (point (point-x left-top)
-                                       (point-y right-bottom)))
-                   (right-top (point (point-x right-bottom)
-                                     (point-y left-top))))
+            (let* ((p (car comb))
+                   (q (cdr comb))
+                   ;; PxPy----------QxPy
+                   ;;  |             |
+                   ;;  |             |
+                   ;;  |             |
+                   ;; PxQy----------QxQy
+                   (px (point-x p))
+                   (py (point-y p))
+                   (qx (point-x q))
+                   (qy (point-y q)))
               (if (any (lambda (s)
-                         (or (overlapping-segments? (cons left-top right-top) s)
-                             (overlapping-segments? (cons left-top left-bottom) s)
-                             (overlapping-segments? (cons right-top right-bottom) s)
-                             (overlapping-segments? (cons left-bottom right-bottom) s)))
-                       outline-segments)
+                         (or (and (overlapping-intervals? (make-interval px qx) (car s))
+                                  (overlapping-intervals? (make-interval py py) (cdr s)))
+                             (and (overlapping-intervals? (make-interval px px) (car s))
+                                  (overlapping-intervals? (make-interval py qy) (cdr s)))
+                             (and (overlapping-intervals? (make-interval qx qx) (car s))
+                                  (overlapping-intervals? (make-interval py qy) (cdr s)))
+                             (and (overlapping-intervals? (make-interval px qx) (car s))
+                                  (overlapping-intervals? (make-interval qy qy) (cdr s)))))
+                       outline-intervals)
                   area
-                  (max area (rectangle-area left-top right-bottom)))))
+                  (max area (rectangle-area p q)))))
           0 points))
         (newline)
 

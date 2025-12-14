@@ -8,35 +8,47 @@
         (advent input)
         (advent main))
 
-(define (string->position s)
-  (let ((fields (string-tokenize s (char-set-complement (char-set #\,)))))
+(define (string->point s)
+  (let ((fields (string-tokenize s char-set:digit)))
     (if (= (length fields) 2)
         (vector (string->number (car fields))
                 (string->number (cadr fields)))
         (error "invalid string" s))))
 
-(define (position-add p u)
-  (vector (+ (vector-ref p 0)
-             (vector-ref u 0))
-          (+ (vector-ref p 1)
-             (vector-ref u 1))))
+(define (point-x p)
+  (vector-ref p 0))
 
-(define (position-sub p q)
-  (vector (- (vector-ref p 0)
-             (vector-ref q 0))
-          (- (vector-ref p 1)
-             (vector-ref q 1))))
+(define (point-y p)
+  (vector-ref p 1))
+
+(define offset-x point-x)
+(define offset-y point-y)
+
+(define (point-add p u)
+  (vector (+ (point-x p) (offset-x u))
+          (+ (point-y p) (offset-y u))))
+
+(define (point-sub p q)
+  (vector (- (point-x p) (point-x q))
+          (- (point-y p) (point-y q))))
+
+(define (offset-abs u)
+  (vector (abs (offset-x u))
+          (abs (offset-y u))))
+
+(define offset-add point-add)
+(define offset-sub point-sub)
 
 ;; Signed area of a rectangle defined by the offset vector.
 (define (offset-area u)
-  (* (vector-ref u 0)
-     (vector-ref u 1)))
+  (* (offset-x u) (offset-y u)))
 
 (define (read-input)
-  (fold-lines (lambda (line positions)
-                (cons (string->position line)
-                      positions))
-              '()))
+  (reverse
+   (fold-lines (lambda (line points)
+                 (cons (string->point line)
+                       points))
+               '())))
 
 ;; ---------------------------------------------------------------------------
 ;; Part 1
@@ -49,14 +61,14 @@
        (cdr list))))
 
 (define (part-1)
-  (let ((positions (read-input)))
+  (let ((points (read-input)))
     (display
      (fold-combinations
       (lambda (pair area)
         (let ((p (car pair))
               (q (cdr pair)))
-          (max area (abs (offset-area (position-sub p (position-add q #(1 1))))))))
-      0 positions))
+          (max area (offset-area (offset-add (offset-abs (point-sub p q)) #(1 1))))))
+      0 points))
     (newline)))
 
 ;; ---------------------------------------------------------------------------

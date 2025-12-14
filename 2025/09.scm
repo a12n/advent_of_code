@@ -7,6 +7,7 @@
         (srfi 14)
         (advent input)
         (advent interval)
+        (advent list)
         (advent main))
 
 (define X 0)
@@ -56,13 +57,6 @@
 
 ;; ---------------------------------------------------------------------------
 ;; Part 1
-
-(define (fold-combinations f acc list)
-  (if (null? list) acc
-      (fold-combinations
-       f
-       (fold (lambda (b acc) (f (cons (car list) b) acc)) acc (cdr list))
-       (cdr list))))
 
 (define (part-1)
   (let ((points (read-input)))

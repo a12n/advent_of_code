@@ -44,6 +44,9 @@
   (* (offset-ref u X)
      (offset-ref u Y)))
 
+(define (rectangle-area p q)
+  (offset-area (offset-add (offset-abs (point-sub p q)) #(1 1))))
+
 (define (read-input)
   (reverse
    (fold-lines (lambda (line points)
@@ -68,7 +71,7 @@
       (lambda (pair area)
         (let ((p (car pair))
               (q (cdr pair)))
-          (max area (offset-area (offset-add (offset-abs (point-sub p q)) #(1 1))))))
+          (max area (rectangle-area p q))))
       0 points))
     (newline)))
 

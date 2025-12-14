@@ -8,6 +8,14 @@
         (advent input)
         (advent main))
 
+(define X 0)
+(define Y 1)
+
+(define offset vector)
+(define point vector)
+(define offset-ref vector-ref)
+(define point-ref vector-ref)
+
 (define (string->point s)
   (let ((fields (string-tokenize s char-set:digit)))
     (if (= (length fields) 2)
@@ -15,33 +23,25 @@
                 (string->number (cadr fields)))
         (error "invalid string" s))))
 
-(define (point-x p)
-  (vector-ref p 0))
-
-(define (point-y p)
-  (vector-ref p 1))
-
-(define offset-x point-x)
-(define offset-y point-y)
-
 (define (point-add p u)
-  (vector (+ (point-x p) (offset-x u))
-          (+ (point-y p) (offset-y u))))
+  (point (+ (point-ref p X) (offset-ref u X))
+         (+ (point-ref p Y) (offset-ref u Y))))
 
 (define (point-sub p q)
-  (vector (- (point-x p) (point-x q))
-          (- (point-y p) (point-y q))))
+  (offset (- (point-ref p X) (point-ref q X))
+          (- (point-ref p Y) (point-ref q Y))))
 
 (define (offset-abs u)
-  (vector (abs (offset-x u))
-          (abs (offset-y u))))
+  (offset (abs (offset-ref u X))
+          (abs (offset-ref u Y))))
 
 (define offset-add point-add)
 (define offset-sub point-sub)
 
 ;; Signed area of a rectangle defined by the offset vector.
 (define (offset-area u)
-  (* (offset-x u) (offset-y u)))
+  (* (offset-ref u X)
+     (offset-ref u Y)))
 
 (define (read-input)
   (reverse

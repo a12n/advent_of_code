@@ -50,67 +50,35 @@
 
 (define (part-2)
   (let* ((points (read-input))
-         (segments (points->segments points))
-         ;; XXX: Find the outliers automatically (e.g., compare with
-         ;; mean segment length)?
-         (p (point 94651 48450))
-         (q (point 94651 50319)))
+         (outline-segments (points->segments (integer-polygon-offset 'ccw points))))
 
-    ;; Remove segments which have an endpoint below the outlier point
-    ;; Q. They can't form a valid rectange with Q.
-    (set! segments
-          (remove
-           (lambda (s)
-             (or (< (point-ref (interval-lower s) Y)
-                    (point-ref q Y))
-                 (< (point-ref (interval-upper s) Y)
-                    (point-ref q Y))))
-           segments))
+        (display (list "points" (length points) points) (current-error-port))
+        (newline (current-error-port))
 
-    ;; Find horizontal segment which intersects with x=Qx line. Remove
-    ;; segments above this found one. Points of these removed segments
-    ;; couldn't form a valid rectange with Q.
-    (let ((r (segment-begin
-              (find
-               (lambda (s)
-                 (and (segment-horiz? s)
-                      (> (point-ref (segment-begin s) Y) (point-ref q Y))
-                      (interval-member? (point-ref q X)
-                                        (make-interval (point-ref (segment-begin s) X)
-                                                       (point-ref (segment-end s) X)))))
-               segments))))
-      (set! segments
-            (remove
-             (lambda (s)
-               (or (> (point-ref (segment-begin s) Y)
-                      (point-ref r Y))
-                   (> (point-ref (segment-end s) Y)
-                      (point-ref r Y))))
-             segments)))
+        (display (list "outline-segments" (length outline-segments) outline-segments) (current-error-port))
+        (newline (current-error-port))
 
-    ;; Remove segments to the right of Q. Segments to the left are
-    ;; clearly better.
-    (set! segments
-          (remove
-           (lambda (s)
-             (or (> (point-ref (segment-begin s) X)
-                    (point-ref q X))
-                 (> (point-ref (segment-end s) X)
-                    (point-ref q X))))
-           segments))
+        (display
+         (fold-combinations
+          (lambda (comb area)
+            (let* ((right-bottom (car comb))
+                   (left-top (cdr comb))
+                   (left-bottom (point (point-x left-top)
+                                       (point-y right-bottom)))
+                   (right-top (point (point-x right-bottom)
+                                     (point-y left-top))))
+              (if (any (lambda (s)
+                         (or (overlapping-segments? (cons left-top right-top) s)
+                             (overlapping-segments? (cons left-top left-bottom) s)
+                             (overlapping-segments? (cons right-top right-bottom) s)
+                             (overlapping-segments? (cons left-bottom right-bottom) s)))
+                       outline-segments)
+                  area
+                  (max area (rectangle-area left-top right-bottom)))))
+          0 points))
+        (newline)
 
-    ;; Print segments.
-    (for-each
-     (lambda (s)
-       (display (vector-ref (car s) 0))
-       (display ",")
-       (display (vector-ref (car s) 1))
-       (display " ")
-       (display (vector-ref (cdr s) 0))
-       (display ",")
-       (display (vector-ref (cdr s) 1))
-       (display "\n"))
-     segments)
+    ))
 
   ;; TODO
   )

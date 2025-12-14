@@ -53,13 +53,14 @@
                          (vector-y u))))
 
     (define (vector-rotate dir u)
-      (case dir
-        (('cw)
-         (vector (- (vector-y u))
-                 (vector-x u)))
-        (('ccw)
-         (vector (vector-y u)
-                 (- (vector-x u))))))
+      (cond
+       ((eq? dir 'cw)
+        (vector (- (vector-y u))
+                (vector-x u)))
+       ((eq? dir 'ccw)
+        (vector (vector-y u)
+                (- (vector-x u))))
+       (else (error "invalid direction" dir))))
 
     ;; Closed line segment, a cons pair of endpoints.
     (define segment-begin car)

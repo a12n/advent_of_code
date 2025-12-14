@@ -6,6 +6,7 @@
         (srfi 13)
         (srfi 14)
         (advent input)
+        (advent interval)
         (advent main))
 
 (define X 0)
@@ -73,6 +74,44 @@
 
 ;; ---------------------------------------------------------------------------
 ;; Part 2
+
+;; Closed line segment endpoints.
+(define segment-begin car)
+(define segment-end cdr)
+
+(define (segment-horiz? s)
+  (= (point-ref (segment-begin s) Y)
+     (point-ref (segment-end s) Y)))
+
+(define (segment-vert? s)
+  (= (point-ref (segment-begin s) X)
+     (point-ref (segment-end s) X)))
+
+(define (segment-projection s dim)
+  (make-interval (point-ref (segment-begin s) dim)
+                 (point-ref (segment-end s) dim)))
+
+(define (overlapping-segments? s t)
+  (and (overlapping-intervals? (segment-projection s X)
+                               (segment-projection t X))
+       (overlapping-intervals? (segment-projection s Y)
+                               (segment-projection t Y))))
+
+(define (points->segments points)
+  (define (loop points-left)
+    (cond
+     ;; Last point, make segment with the first point.
+     ((null? (cdr points-left))
+      (list (cons (car points-left)
+                  (car points))))
+     (else
+      (cons (cons (car points-left)
+                  (cadr points-left))
+            (loop (cdr points-left))))))
+  (cond
+   ((null? points) '())
+   ((null? (cdr points)) '())
+   (else (loop points))))
 
 (define (part-2)
   ;; TODO

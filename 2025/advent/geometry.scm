@@ -14,6 +14,7 @@
           fold-polygon integer-polygon-offset)
 
   (import (scheme base)
+          (srfi 1)
           (srfi 13)
           (srfi 14)
           (srfi 133))

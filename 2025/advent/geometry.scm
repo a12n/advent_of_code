@@ -5,7 +5,7 @@
           point-map point-add point-sub
           vector-x vector-y
           vector-map vector-add vector-sub vector-div
-          integer-vector-normalize
+          vector-norm-max integer-vector-normalize
           vector-rotate)
 
   (export segment-begin segment-end
@@ -47,6 +47,9 @@
 
     (define (vector-div u n)
       (vector-map (lambda (ui) (/ ui n)) u))
+
+    (define (vector-norm-max u)
+      (vector-fold max (vector-ref u 0) (vector-map abs u)))
 
     (define (integer-vector-normalize u)
       (vector-div u (gcd (vector-x u)

@@ -132,25 +132,17 @@
      (lambda ()
        (let ((min-presses
               (cond
-               ((joltage-overshoot? levels joltage-reqs) #f)
+               ((joltage-overshoot? levels joltage-reqs) +inf.0)
                ((joltage=? levels joltage-reqs) 0)
                (else
-                (fold
-                 (lambda (num min-presses)
-                   (or (and min-presses
-                            (min num min-presses))
-                       num))
-                 #f
-                 (map (lambda (num)
-                        (+ num 1))
-                      (filter number?
-                              (map (lambda (button)
-                                     (loop cache (vector-add levels button)))
-                                   buttons))))))))
+                (fold min +inf.0
+                      (map (lambda (button)
+                             (+ 1 (loop cache (vector-add levels button))))
+                           buttons))))))
          (hash-table-set! cache levels min-presses)
          min-presses))))
-  (loop (make-hash-table)
-        (make-vector (vector-length joltage-reqs) 0)))
+  (exact (loop (make-hash-table)
+               (make-vector (vector-length joltage-reqs) 0))))
 
 (define (button->joltage n button)
   (let ((levels (make-vector n 0)))

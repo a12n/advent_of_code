@@ -122,7 +122,7 @@
 ;;
 ;; presses = ?
 (define (num-joltage-button-presses joltage-reqs buttons)
-  (define (loop cache levels presses)
+  (define (loop cache levels)
     (display (list "cache" (hash-table-size cache)
                    "levels" levels)
              (current-error-port))

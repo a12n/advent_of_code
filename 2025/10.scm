@@ -11,6 +11,9 @@
         (srfi 133)
         (srfi 134)
         (srfi 151)
+        (only (advent geometry)
+              vector-add vector-sub
+              vector-norm-max)
         (advent input)
         (advent main))
 
@@ -103,18 +106,6 @@
 ;; ---------------------------------------------------------------------------
 ;; Part 2
 
-(define (joltage-add p u)
-  (vector-map + p u))
-
-(define (joltage-sub p q)
-  (vector-map - p q))
-
-(define (joltage-norm-max u)
-  (vector-fold (lambda (n acc)
-                 (max (abs n) acc))
-               (abs (vector-ref u 0))
-               u))
-
 (define (joltage=? levels goal)
   (vector= = levels goal))
 
@@ -154,7 +145,7 @@
                         (+ num 1))
                       (filter number?
                               (map (lambda (button)
-                                     (loop cache (joltage-add levels button)))
+                                     (loop cache (vector-add levels button)))
                                    buttons))))))))
          (hash-table-set! cache levels min-presses)
          min-presses))))

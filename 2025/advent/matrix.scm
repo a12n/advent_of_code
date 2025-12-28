@@ -128,4 +128,22 @@
            (f i x))
          #f a rstart rend j (+ j 1)))))
 
+    (define (matrix-pivot! a pi pj)
+      (let* ((prow (vector-ref a pi))
+             (p (vector-ref prow pj)))
+        (vector-map!
+         (lambda (_ x)
+           (/ x p))
+         prow)
+        (vector-map!
+         (lambda (i row)
+           (unless (= i pi)
+             (let ((px (vector-ref row pj)))
+               (vector-map!
+                (lambda (j x)
+                  (- x (* px (vector-ref prow j))))
+                row)))
+           row)
+         a)))
+
     ))

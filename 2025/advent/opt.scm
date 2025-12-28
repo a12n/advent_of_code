@@ -221,6 +221,7 @@
           (let ((pi (pivot-row tableau (vector-length basis) pj)))
             (unless (negative? pi)
               (vector-set! basis pi pj)
-              (matrix-pivot! tableau pi pj))))))
+              (matrix-pivot! tableau pi pj)
+              (simplex-run basis tableau))))))
 
     ))

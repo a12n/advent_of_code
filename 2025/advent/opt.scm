@@ -182,4 +182,45 @@
           #f
           )))
 
+    ;; Index of the pivot column in objective row `i` of the
+    ;; tableau. Returns -1 if the objective couldn't be improved further.
+    (define (pivot-col tableau i)
+      (matrix-fold
+       (lambda (_ j k x)
+         (if (and (negative? x)
+                  (or (negative? k)
+                      (< x (matrix-ref tableau i k))))
+             j index))
+       -1
+       tableau
+       i (+ i 1)
+       1 (matrix-cols tableau)))
+
+    ;; Index of the pivot row in one of `n` constraint rows at column
+    ;; `j`. Returns -1 if TODO.
+    (define (pivot-row tableau n j)
+      (car
+       (matrix-fold
+        (lambda (i _ state x)
+          (let* ((k (car state))
+                 (thetak (cdr state))
+                 (bi (matrix-ref tableau i 0))
+                 (thetai (if (zero? bi) +inf.0 (/ bi x))))
+            (if (and (positive? thetai)
+                     (or (negative? k)
+                         (< thetai thetak)))
+                (cons i thetai) state)))
+        '(-1 . +inf.0)
+        tableau
+        0 n
+        j (+ j 1))))
+
+    (define (simplex-run basis tableau)
+      (let ((pj (pivot-col tableau (- (matrix-rows tableau) 1))))
+        (unless (negative? pj)
+          (let ((pi (pivot-row tableau (vector-length basis) pj)))
+            (unless (negative? pi)
+              (vector-set! basis pi pj)
+              (matrix-pivot! tableau pi pj))))))
+
     ))

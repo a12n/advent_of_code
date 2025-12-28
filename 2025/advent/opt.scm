@@ -190,7 +190,7 @@
          (if (and (negative? x)
                   (or (negative? k)
                       (< x (matrix-ref tableau i k))))
-             j index))
+             j k))
        -1
        tableau
        i (+ i 1)
@@ -205,7 +205,7 @@
           (let* ((k (car state))
                  (thetak (cdr state))
                  (bi (matrix-ref tableau i 0))
-                 (thetai (if (zero? bi) +inf.0 (/ bi x))))
+                 (thetai (if (zero? x) +inf.0 (/ bi x))))
             (if (and (positive? thetai)
                      (or (negative? k)
                          (< thetai thetak)))

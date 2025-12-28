@@ -2,7 +2,7 @@
   (export simplex)
 
   (import (scheme base)
-          (srfi 133))
+          (srfi 43))
 
   (begin
 
@@ -64,7 +64,7 @@
             ;; Each negative entry in b will require an artificial variable.
             ;; If n-artif isn't zero, phase 1 will be needed to find an initial BFS.
             (n-artif (vector-fold
-                      (lambda (bi n)
+                      (lambda (_ bi n)
                         (if (negative? bi)
                             (+ n 1) n))
                       0 b)))

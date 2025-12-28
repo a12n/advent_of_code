@@ -72,74 +72,77 @@
             (error "invalid size" b))
         (if (not (= (vector-length c) n-var))
             (error "invalid size" c))
-        (let ((tableau (make-matrix (+ n-var n-slack n-artif 1)
-                                    (+ n-constr (if (positive? n-artif) 2 1))
-                                    0)))
-          ;; Copy constraints into the tableau.
-          ;;     x₁ x₂
-          ;; #(#(-1 -1)
-          ;;   #(-2  1)
-          ;;   #( 0  3)
-          (matrix-map!
-           (lambda (i j _)
-             (matrix-ref a i j))
-           tableau
-           0 n-constr
-           0 n-var)
-          ;; Add objective row (negated, since it's moved to the LHS):
-          ;;     x₁ x₂
-          ;; #(#(-1 -1)
-          ;;   #(-2  1)
-          ;;   #( 0  3)
-          ;;   #( 6  3))
-          (matrix-map-row!
-           (lambda (j _)
-             (- (vector-ref c j)))
-           tableau
-           n-constr
-           0 n-var)
-          ;; Add slack variables:
-          ;;     x₁ x₂ s₁ s₂ s₃
-          ;; #(#(-1 -1  1  0  0)
-          ;;   #(-2  1  0  1  0)
-          ;;   #( 0  3  0  0  1)
-          ;;   #( 6  3  0  0  0))
-          (do ((k 0 (+ k 1)))
-              ((= k n-slack) #f)
-            (matrix-set! tableau k (+ n-var k) 1))
-          (matrix-map!
-           (lambda (i j _)
-             )
-           tableau
-           0 n-slack
-           n-var (+ n-var n-slack))
-          ;; For each negative in b, add artificial variable:
-          ;;     x₁ x₂ s₁ s₂ s₃ a₁ a₂
-          ;; #(#(-1 -1  1  0  0 -1  0)
-          ;;   #(-2  1  0  1  0  0 -1)
-          ;;   #( 0  3  0  0  1  0  0)
-          ;;   #( 6  3  0  0  0  0  0))
-          (do ((k 0 (+ k 1)))
-              ((= k n-artif) #f)
-            (matrix-set! tableau k (+ n-var n-slack k) -1))
-          ;; Augment tableau with b:
-          ;;     x₁ x₂ s₁ s₂ s₃ a₁ a₂  b
-          ;; #(#(-1 -1  1  0  0 -1  0 -1)
-          ;;   #(-2  1  0  1  0  0 -1 -1)
-          ;;   #( 0  3  0  0  1  0  0  2)
-          ;;   #( 6  3  0  0  0  0  0  0))
+        (let ((basis (make-vector n-constr 0))
+              (tableau (make-matrix
+                        (+ n-constr (if (positive? n-artif) 1 0) 1)
+                        (+ 1 n-var n-slack n-artif)
+                        0)))
+          ;; Pre-augment the tableau matrix with b. Usually it's the
+          ;; last column (i.e., the RHS), but here it's on the LHS to have
+          ;; artificial variables in last columns.
+          ;;      b
+          ;; #(#(-1)
+          ;;   #(-1)
+          ;;   #( 2)
           (matrix-map-col!
            (lambda (i _)
              (vector-ref b i))
-           tableau
-           (+ n-var n-slack n-artif)
+           tableau 0
            0 n-constr)
-          ;; Negate constraints where b is negative:
-          ;;     x₁ x₂ s₁ s₂ s₃ a₁ a₂  b
-          ;; #(#( 1  1 -1  0  0  1  0  1)
-          ;;   #( 2 -1  0 -1  0  0  1  1)
-          ;;   #( 0  3  0  0  1  0  0  2)
-          ;;   #( 6  3  0  0  0  0  0  0))
+          ;; Copy constraints into the tableau.
+          ;;      b x₁ x₂
+          ;; #(#(-1 -1 -1)
+          ;;   #(-1 -2  1)
+          ;;   #( 2  0  3)
+          (matrix-map!
+           (lambda (i j _)
+             (matrix-ref a i (- j 1)))
+           tableau
+           0 n-constr
+           1 (+ 1 n-var))
+          ;; Add objective row (negated, since variables moved to the variable side):
+          ;;  Q = -6 x₁ - 3 x₂
+          ;;  Q + 6 x₁ + 3 x₂ = 0
+          ;;      b x₁ x₂
+          ;; #(#(-1 -1 -1)
+          ;;   #(-1 -2  1)
+          ;;   #( 2  0  3)
+          ;;   #( 0  6  3))
+          (matrix-map-row!
+           (lambda (j _)
+             (- (vector-ref c (- j 1))))
+           tableau n-constr
+           1 (+ 1 n-var))
+          ;; Add slack variables. Initially these variables are in the
+          ;; basis:
+          ;;      b x₁ x₂ s₁ s₂ s₃
+          ;; #(#(-1 -1 -1  1  0  0)
+          ;;   #(-1 -2  1  0  1  0)
+          ;;   #( 2  0  3  0  0  1)
+          ;;   #( 0  6  3  0  0  0))
+          (do ((k 0 (+ k 1)))
+              ((= k n-slack) #f)
+            (vector-set! basis k (+ 1 n-var k))
+            (matrix-set! tableau k (+ 1 n-var k) 1))
+          ;; For each negative in b, add artificial variable. There
+          ;; will be phase 1, and artificial variables will be in the initial
+          ;; basis:
+          ;;      b x₁ x₂ s₁ s₂ s₃ a₁ a₂
+          ;; #(#(-1 -1 -1  1  0  0 -1  0)
+          ;;   #(-1 -2  1  0  1  0  0 -1)
+          ;;   #( 2  0  3  0  0  1  0  0)
+          ;;   #( 0  6  3  0  0  0  0  0))
+          (do ((k 0 (+ k 1)))
+              ((= k n-artif) #f)
+            (vector-set! basis k (+ 1 n-var n-slack k))
+            (matrix-set! tableau k (+ 1 n-var n-slack k) -1))
+          ;; Negate constraints with artificial variables (i.e.,
+          ;; constraints where b is negative):
+          ;;      b x₁ x₂ s₁ s₂ s₃ a₁ a₂
+          ;; #(#( 1  1  1 -1  0  0  1  0)
+          ;;   #( 1  2 -1  0 -1  0  0  1)
+          ;;   #( 2  0  3  0  0  1  0  0)
+          ;;   #( 0  6  3  0  0  0  0  0))
           (matrix-map!
            (lambda (_ _ x)
              (- x))
@@ -148,102 +151,35 @@
            0 (matrix-cols tableau))
           ;; Add artificial objective row.
           ;; Minimize R = a₁ + a₂,
-          ;; thus maximize S = -R = -a₁ - a₂,
+          ;; maximize S = -R = -a₁ - a₂,
           ;; or S + a₁ + a₂ = 0.
-          ;;     x₁ x₂ s₁ s₂ s₃ a₁ a₂  b
-          ;; #(#( 1  1 -1  0  0  1  0  1)
-          ;;   #( 2 -1  0 -1  0  0  1  1)
-          ;;   #( 0  3  0  0  1  0  0  2)
-          ;;   #( 6  3  0  0  0  0  0  0)
-          ;;   #( 0  0  0  0  0  1  1  0))
+          ;;      b x₁ x₂ s₁ s₂ s₃ a₁ a₂
+          ;; #(#( 1  1  1 -1  0  0  1  0)
+          ;;   #( 1  2 -1  0 -1  0  0  1)
+          ;;   #( 2  0  3  0  0  1  0  0)
+          ;;   #( 0  6  3  0  0  0  0  0)
+          ;;   #( 0  0  0  0  0  0  1  1))
           (do ((k 0 (+ k 1)))
               ((= k n-artif) #f)
-            (matrix-set! tableau (+ n-constr 1) (+ n-var n-slack k) 1))
-          (matrix-map!
+            (matrix-set! tableau (+ n-constr 1) (+ 1 n-var n-slack k) 1))
           ;; Express artificial objective row in terms of non-basic
           ;; variables. Subtract from the artificial objective row the rows of
           ;; artificial basis:
-          ;;     x₁ x₂ s₁ s₂ s₃ a₁ a₂  b
-          ;; #(#( 1  1 -1  0  0  1  0  1)
-          ;;   #( 2 -1  0 -1  0  0  1  1)
-          ;;   #( 0  3  0  0  1  0  0  2)
-          ;;   #( 6  3  0  0  0  0  0  0)
-          ;;   #(-3  0  1  1  0  0  0 -2))
+          ;;      b x₁ x₂ s₁ s₂ s₃ a₁ a₂
+          ;; #(#( 1  1  1 -1  0  0  1  0)
+          ;;   #( 1  2 -1  0 -1  0  0  1)
+          ;;   #( 2  0  3  0  0  1  0  0)
+          ;;   #( 0  6  3  0  0  0  0  0)
+          ;;   #(-2 -3  0  1  1  0  0  0))
           (do ((i 0 (+ i 1)))
               ((= i n-artif) #f)
             (do ((j 0 (+ j 1)))
                 ((= j (matrix-cols tableau)) #f)
-              (matrix-set! tableau (+ n-constr 1) j (- (matrix-ref tableau (+ n-constr 1) j)
-                                                       (matrix-ref tableau i j)))))
-
-
-
-
-
-          (define (make-tableau a b c)
-
-
-        (let* ((t (matrix-copy a)))
-          ;; Add objective row (negated, since it's moved to the LHS):
-          ;; #(#(-1 -1)
-          ;;   #(-2  1)
-          ;;   #( 0  3)
-          ;;   #( 6  3))
-          ;;
-          ;; Add slack variables:
-          ;;     x₁ x₂ s₁ s₂ s₃
-          ;; #(#(-1 -1  1  0  0)
-          ;;   #(-2  1  0  1  0)
-          ;;   #( 0  3  0  0  1)
-          ;;   #( 6  3  0  0  0))
-          ;;
-          ;; For each negative in b, add artificial variable:
-          ;;     x₁ x₂ s₁ s₂ s₃ a₁ a₂
-          ;; #(#(-1 -1  1  0  0 -1  0)
-          ;;   #(-2  1  0  1  0  0 -1)
-          ;;   #( 0  3  0  0  1  0  0)
-          ;;   #( 6  3  0  0  0  0  0))
-          ;;
-          ;; Augment t with b:
-          ;;     x₁ x₂ s₁ s₂ s₃ a₁ a₂  b
-          ;; #(#(-1 -1  1  0  0 -1  0 -1)
-          ;;   #(-2  1  0  1  0  0 -1 -1)
-          ;;   #( 0  3  0  0  1  0  0  2)
-          ;;   #( 6  3  0  0  0  0  0  0))
-          ;;
-          ;; Negate constraints where b is negative:
-          ;;     x₁ x₂ s₁ s₂ s₃ a₁ a₂  b
-          ;; #(#( 1  1 -1  0  0  1  0  1)
-          ;;   #( 2 -1  0 -1  0  0  1  1)
-          ;;   #( 0  3  0  0  1  0  0  2)
-          ;;   #( 6  3  0  0  0  0  0  0))
-          ;;
-          ;; Add artificial objective row.
-          ;; Minimize R = a₁ + a₂,
-          ;; thus maximize S = -R = -a₁ - a₂,
-          ;; or S + a₁ + a₂ = 0.
-          ;;     x₁ x₂ s₁ s₂ s₃ a₁ a₂  b
-          ;; #(#( 1  1 -1  0  0  1  0 1)
-          ;;   #( 2 -1  0 -1  0  0  1 1)
-          ;;   #( 0  3  0  0  1  0  0 2)
-          ;;   #( 6  3  0  0  0  0  0 0)
-          ;;   #( 0  0  0  0  0  1  1 0))
-          ;;
-          ;; Express artificial objective row in terms of non-basic
-          ;; variables. Subtract from the artificial objective row the rows of
-          ;; artificial basis:
-          ;;     x₁ x₂ s₁ s₂ s₃ a₁ a₂  b
-          ;; #(#( 1  1 -1  0  0  1  0  1)
-          ;;   #( 2 -1  0 -1  0  0  1  1)
-          ;;   #( 0  3  0  0  1  0  0  2)
-          ;;   #( 6  3  0  0  0  0  0  0)
-          ;;   #(-3  0  1  1  0  0  0 -2))
-
-        ;; TODO
-        ;; Add n slack variables
-        ;; For each K negative values in b, add K artificial variables
-        ;; If there are negatives in b, for each one add artificial variable
-        #f
-        ))
+              (matrix-set! tableau (+ n-constr 1) j
+                           (- (matrix-ref tableau (+ n-constr 1) j)
+                              (matrix-ref tableau i j)))))
+          ;; TODO
+          #f
+          )))
 
     ))

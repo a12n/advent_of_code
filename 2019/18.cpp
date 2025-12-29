@@ -94,6 +94,17 @@ void to_graph(graph& g, const dense_grid<char>& grid, position start)
     std::cerr << "}\n";
 }
 
+void normalize_graph(graph& g)
+{
+    for (auto& [u, adj] : g) {
+        for (auto& [v, _] : adj) {
+            if (is_door(v) && g.at(v).size() == 1) {
+                std::cout << "Remove " << v << '\n';
+            }
+        }
+    }
+}
+
 using distance_map = std::map<char, std::map<char, size_t>>;
 
 using vault_map = dense_grid<char>;

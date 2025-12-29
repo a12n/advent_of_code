@@ -122,7 +122,9 @@
           ;;   #( 0  6  3  0  0  0))
           (do ((k 0 (+ k 1)))
               ((= k n-slack) #f)
-            (vector-set! basis k (+ 1 n-var k))
+            ;; Numbers in the basis are zero-based (it's the number of
+            ;; variable, not the number of tableau column).
+            (vector-set! basis k (+ n-var k))
             (matrix-set! tableau k (+ 1 n-var k) 1))
           ;; For each negative in b, add artificial variable. There
           ;; will be phase 1, and artificial variables will be in the initial
@@ -134,7 +136,7 @@
           ;;   #( 0  6  3  0  0  0  0  0))
           (do ((k 0 (+ k 1)))
               ((= k n-artif) #f)
-            (vector-set! basis k (+ 1 n-var n-slack k))
+            (vector-set! basis k (+ n-var n-slack k))
             (matrix-set! tableau k (+ 1 n-var n-slack k) -1))
           ;; Negate constraints with artificial variables (i.e.,
           ;; constraints where b is negative):
@@ -220,7 +222,7 @@
         (when pj
           (let ((pi (pivot-row tableau (vector-length basis) pj)))
             (when pi
-              (vector-set! basis pi pj)
+              (vector-set! basis pi (- pj 1))
               (matrix-pivot! tableau pi pj)
               (simplex-run basis tableau))))))
 

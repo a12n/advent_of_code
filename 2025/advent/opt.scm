@@ -188,10 +188,10 @@
       (matrix-fold
        (lambda (_ j k x)
          (if (and (negative? x)
-                  (or (negative? k)
+                  (or (not k)
                       (< x (matrix-ref tableau i k))))
              j k))
-       -1
+       #false
        tableau
        i (+ i 1)
        1 (matrix-cols tableau)))
@@ -207,19 +207,19 @@
                  (bi (matrix-ref tableau i 0))
                  (thetai (if (zero? x) +inf.0 (/ bi x))))
             (if (and (positive? thetai)
-                     (or (negative? k)
+                     (or (not k)
                          (< thetai thetak)))
                 (cons i thetai) state)))
-        '(-1 . +inf.0)
+        '(#false . +inf.0)
         tableau
         0 n
         j (+ j 1))))
 
     (define (simplex-run basis tableau)
       (let ((pj (pivot-col tableau (- (matrix-rows tableau) 1))))
-        (unless (negative? pj)
+        (when pj
           (let ((pi (pivot-row tableau (vector-length basis) pj)))
-            (unless (negative? pi)
+            (when pi
               (vector-set! basis pi pj)
               (matrix-pivot! tableau pi pj)
               (simplex-run basis tableau))))))

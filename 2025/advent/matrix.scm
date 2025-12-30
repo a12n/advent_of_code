@@ -4,7 +4,8 @@
           matrix-ref matrix-ref-row matrix-ref-col
           matrix-set! matrix-set-row! matrix-set-col!
           matrix-fold
-          matrix-map! matrix-map-row! matrix-map-col!)
+          matrix-map! matrix-map-row! matrix-map-col!
+          matrix-pivot!)
 
   (import (scheme base)
           (scheme case-lambda)

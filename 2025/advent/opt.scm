@@ -198,7 +198,7 @@
                               (matrix-ref tableau i j)))))
           (if (> n-artif 0)
               ;; Optimize artificial objective first.
-              (let ((bounded (simplex-run basis tableau)))
+              (let ((bounded (simplex-pivoting basis tableau)))
                 (cond
                  ((not bounded)
                   ;; Unbounded problem.
@@ -264,6 +264,6 @@
           ;; Do pivoting.
           (vector-set! basis pi (- pj 1))
           (matrix-pivot! tableau pi pj)
-          (simplex-run basis tableau)))))
+          (simplex-pivoting basis tableau)))))
 
     ))

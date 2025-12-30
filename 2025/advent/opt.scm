@@ -80,7 +80,7 @@
              ;; Each negative entry in b will require an artificial variable.
              ;; If n-artif isn't zero, phase 1 will be needed to find an initial BFS.
              (n-artif (vector-fold
-                       (lambda (_ bi n)
+                       (lambda (_ n bi)
                          (if (negative? bi)
                              (+ n 1) n))
                        0 b)))

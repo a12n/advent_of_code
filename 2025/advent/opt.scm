@@ -72,18 +72,18 @@
             (values (matrix-ref tableau (- (matrix-rows tableau) 1) 0) x))))))
 
     (define (simplex-tableau a b c)
-      (let ((n-constr (matrix-rows a))
-            (n-var (matrix-cols a))
-            ;; Since all constraints are "less than or equal", there
-            ;; will be a slack variable for each constraint.
-            (n-slack n-constr)
-            ;; Each negative entry in b will require an artificial variable.
-            ;; If n-artif isn't zero, phase 1 will be needed to find an initial BFS.
-            (n-artif (vector-fold
-                      (lambda (_ bi n)
-                        (if (negative? bi)
-                            (+ n 1) n))
-                      0 b)))
+      (let* ((n-constr (matrix-rows a))
+             (n-var (matrix-cols a))
+             ;; Since all constraints are "less than or equal", there
+             ;; will be a slack variable for each constraint.
+             (n-slack n-constr)
+             ;; Each negative entry in b will require an artificial variable.
+             ;; If n-artif isn't zero, phase 1 will be needed to find an initial BFS.
+             (n-artif (vector-fold
+                       (lambda (_ bi n)
+                         (if (negative? bi)
+                             (+ n 1) n))
+                       0 b)))
         (if (not (= (vector-length b) n-constr))
             (error "invalid size" b))
         (if (not (= (vector-length c) n-var))

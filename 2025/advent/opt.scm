@@ -184,8 +184,8 @@
           #f
           )))
 
-    ;; Index of the pivot column in objective row `i` of the
-    ;; tableau. Returns -1 if the objective couldn't be improved further.
+    ;; Index of the pivot column in objective row `i` of the tableau.
+    ;; Returns #false if the objective couldn't be improved further.
     (define (pivot-col tableau i)
       (matrix-fold
        (lambda (_ j k x)
@@ -199,7 +199,7 @@
        1 (matrix-cols tableau)))
 
     ;; Index of the pivot row in one of `n` constraint rows at column
-    ;; `j`. Returns -1 if TODO.
+    ;; `j`. Returns #false if there's no such row (the problem is unbounded).
     (define (pivot-row tableau n j)
       (car
        (matrix-fold

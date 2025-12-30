@@ -94,7 +94,7 @@
                    (acc acc))
           (cond
            ((= i rend) acc)
-           ((= j cend) (loop (+ i 1) rstart acc))
+           ((= j cend) (loop (+ i 1) cstart acc))
            (else (loop i (+ j 1) (f i j acc (matrix-ref a i j)))))))))
 
     (define matrix-map!

@@ -114,20 +114,20 @@
        ((f a i)
         (matrix-map-row! f a i 0 (matrix-cols a)))
        ((f a i cstart cend)
-        (matrix-fold
-         (lambda (_ j _ x)
+        (matrix-map!
+         (lambda (_ j x)
            (f j x))
-         #f a i (+ i 1) cstart cend))))
+         a i (+ i 1) cstart cend))))
 
     (define matrix-map-col!
       (case-lambda
        ((f a j)
         (matrix-map-col! f a j 0 (matrix-rows a)))
        ((f a j rstart rend)
-        (matrix-fold
-         (lambda (i _ _ x)
+        (matrix-map!
+         (lambda (i _ x)
            (f i x))
-         #f a rstart rend j (+ j 1)))))
+         a rstart rend j (+ j 1)))))
 
     (define (matrix-pivot! a pi pj)
       (let* ((prow (vector-ref a pi))

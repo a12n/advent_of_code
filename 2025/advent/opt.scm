@@ -55,7 +55,7 @@
     ;;     (display "Optimal P ")
     ;;     (display (- q))
     ;;     (newline)))
-    (define (simplex a b c)
+    (define (simplex-tableau a b c)
       (let ((n-constr (matrix-rows a))
             (n-var (matrix-cols a))
             ;; Since all constraints are "less than or equal", there
@@ -180,9 +180,25 @@
               (matrix-set! tableau (+ n-constr 1) j
                            (- (matrix-ref tableau (+ n-constr 1) j)
                               (matrix-ref tableau i j)))))
-          ;; TODO
-          #f
-          )))
+          (if (> n-artif 0)
+              ;; Optimize artificial objective first.
+              (let ((bounded (simplex-run basis tableau)))
+                (cond
+                 ((not bounded)
+                  ;; Unbounded problem.
+                  (values basis +inf.0))
+                 ((not (zero? (matrix-ref tableau (- (matrix-rows tableau) 1) 0)))
+                  ;; Couldn't minimize artificial variables. Infeasible problem.
+                  (values basis #false))
+                 (else
+                  ;; Found a BFS. Drop artificial variables and objective.
+                  ;; The tableau is configured for the original problem starting at this BFS.
+                  (values basis
+                          (matrix-copy tableau
+                                       0 (+ n-constr 1)
+                                       0 (+ 1 n-var n-slack))))))
+              ;; Already at BFS at zero. Return the tableau for original problem.
+              (values basis tableau)))))
 
     ;; Index of the pivot column in objective row `i` of the tableau.
     ;; Returns #false if the objective couldn't be improved further.

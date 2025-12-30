@@ -2,7 +2,8 @@
   (export simplex)
 
   (import (scheme base)
-          (srfi 43))
+          (srfi 43)
+          (advent matrix))
 
   (begin
 

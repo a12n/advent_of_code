@@ -55,6 +55,16 @@
     ;;     (display "Optimal P ")
     ;;     (display (- q))
     ;;     (newline)))
+    (define (simplex a b c)
+      (let-values (((basis tableau) (simplex-tableau a b c)))
+        (cond
+         ((not tableau) #false)
+         ((equal? tableau +inf.0) +inf.0)
+         (else
+          (simplex-pivoting basis tableau)
+          ;; TODO: Reconstruct solution vector from basis
+          ))))
+
     (define (simplex-tableau a b c)
       (let ((n-constr (matrix-rows a))
             (n-var (matrix-cols a))

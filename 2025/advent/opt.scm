@@ -218,12 +218,19 @@
         j (+ j 1))))
 
     (define (simplex-run basis tableau)
-      (let ((pj (pivot-col tableau (- (matrix-rows tableau) 1))))
-        (when pj
-          (let ((pi (pivot-row tableau (vector-length basis) pj)))
-            (when pi
-              (vector-set! basis pi (- pj 1))
-              (matrix-pivot! tableau pi pj)
-              (simplex-run basis tableau))))))
+      (let* ((pj (pivot-col tableau (- (matrix-rows tableau) 1)))
+             (pi (and pj (pivot-row tableau (vector-length basis) pj))))
+        (cond
+         ((not pj)
+          ;; Can't find pivot column. The configuration in tableau is optimal.
+          #true)
+         ((not pi)
+          ;; Can't select pivot row. The problem is unbounded.
+          #false)
+         (else
+          ;; Do pivoting.
+          (vector-set! basis pi (- pj 1))
+          (matrix-pivot! tableau pi pj)
+          (simplex-run basis tableau)))))
 
     ))

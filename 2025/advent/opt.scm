@@ -218,7 +218,7 @@
         0 n
         j (+ j 1))))
 
-    (define (simplex-run basis tableau)
+    (define (simplex-pivoting basis tableau)
       (let* ((pj (pivot-col tableau (- (matrix-rows tableau) 1)))
              (pi (and pj (pivot-row tableau (vector-length basis) pj))))
         (cond

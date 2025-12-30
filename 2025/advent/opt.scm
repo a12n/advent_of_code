@@ -63,7 +63,11 @@
            ((equal? tableau +inf.0) (values +inf.0 x))
            (else
             (simplex-pivoting basis tableau)
-            ;; TODO: Reconstruct solution vector from basis
+            (vector-for-each
+             (lambda (i j)
+               (when (< j (vector-length x))
+                 (vector-set! x j (matrix-ref tableau i 0))))
+             basis)
             (values (matrix-ref tableau (- (matrix-rows tableau) 1) 0) x))))))
 
     (define (simplex-tableau a b c)

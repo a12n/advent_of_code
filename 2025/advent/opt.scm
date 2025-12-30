@@ -186,6 +186,7 @@
 
     ;; Index of the pivot column in objective row `i` of the tableau.
     ;; Returns #false if the objective couldn't be improved further.
+    ;; TODO: Bland's rule?
     (define (pivot-col tableau i)
       (matrix-fold
        (lambda (_ j k x)

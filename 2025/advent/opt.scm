@@ -57,13 +57,14 @@
     ;;     (newline)))
     (define (simplex a b c)
       (let-values (((basis tableau) (simplex-tableau a b c)))
-        (cond
-         ((not tableau) #false)
-         ((equal? tableau +inf.0) +inf.0)
-         (else
-          (simplex-pivoting basis tableau)
-          ;; TODO: Reconstruct solution vector from basis
-          ))))
+        (let ((x (make-vector (vector-length c) 0)))
+          (cond
+           ((not tableau) (values #false x))
+           ((equal? tableau +inf.0) (values +inf.0 x))
+           (else
+            (simplex-pivoting basis tableau)
+            ;; TODO: Reconstruct solution vector from basis
+            (values (matrix-ref tableau (- (matrix-rows tableau) 1) 0) x))))))
 
     (define (simplex-tableau a b c)
       (let ((n-constr (matrix-rows a))

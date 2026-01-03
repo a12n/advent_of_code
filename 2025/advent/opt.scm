@@ -63,13 +63,16 @@
            ((not tableau) (values #false x))
            ((equal? tableau +inf.0) (values +inf.0 x))
            (else
-            (simplex-pivoting! basis tableau)
-            (vector-for-each
-             (lambda (i bi)
-               (when (< bi (vector-length x))
-                 (vector-set! x bi (matrix-ref tableau i 0))))
-             basis)
-            (values (matrix-ref tableau (- (matrix-rows tableau) 1) 0) x))))))
+            (let ((bounded (simplex-pivoting! basis tableau)))
+              (cond
+               ((not bounded) (values +inf.0 x))
+               (else
+                (vector-for-each
+                 (lambda (i bi)
+                   (when (< bi (vector-length x))
+                     (vector-set! x bi (matrix-ref tableau i 0))))
+                 basis)
+                (values (matrix-ref tableau (- (matrix-rows tableau) 1) 0) x)))))))))
 
     (define (simplex-tableau a b c)
       (let* ((n-constr (matrix-rows a))

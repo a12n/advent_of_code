@@ -278,6 +278,7 @@
                  (bi (matrix-ref tableau i 0))
                  (thetai (if (zero? x) +inf.0 (/ bi x))))
             (if (and (positive? thetai)
+                     (finite? thetai)
                      (or (not k)
                          (< thetai thetak)))
                 (cons i thetai) state)))

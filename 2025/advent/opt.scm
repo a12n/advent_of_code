@@ -234,24 +234,22 @@
         ;;   #(  0  0  0    0    1  1  0  0  1))
         (vector-map!
          (lambda (pi bi)
-           (cond
-            ((>= bi (+ n-var n-slack))
-             ;; Artificial variable in the basis. Pivot on any
-             ;; non-zero non-artificial variable in this row. If
-             ;; there's no such variable, the row may be removed.
-             (let ((pj (matrix-fold
-                        (lambda (_ j k x)
-                          (if (or k (zero? x)) k j))
-                        #false
-                        tableau
-                        pi (+ pi 1)
-                        1 (+ 1 n-var n-slack 1))))
-               (cond
-                (pj
-                 (matrix-pivot! tableau pi pj)
-                 pj)
-                (else bi))))
-            (else bi)))
+           (let ((pj (and
+                      ;; Artificial variable in the basis.
+                      (>= bi (+ n-var n-slack))
+                      ;; Pivot on any non-zero non-artificial
+                      ;; variable in this row. If there's no such
+                      ;; variable, the row may be removed.
+                      (matrix-fold
+                       (lambda (_ j k x)
+                         (if (or k (zero? x)) k j))
+                       #false
+                       tableau
+                       pi (+ pi 1)
+                       1 (+ 1 n-var n-slack 1)))))
+             (cond
+              (pj (matrix-pivot! tableau pi pj) pj)
+              (else bi))))
          basis)))
 
     ;; Index of the pivot column in objective row `i` of the tableau.

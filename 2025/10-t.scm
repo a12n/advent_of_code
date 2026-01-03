@@ -27,6 +27,7 @@
         #(-6 -3))
        => '(-5 . #(2/3 1/3)))
 
+;; https://en.wikipedia.org/wiki/Simplex_algorithm#Example
 (check (simplex*
         #(#(3 2 1)
           #(2 5 3))
@@ -34,15 +35,15 @@
         #(2 3 4))
        => '(20 . #(0 0 5)))
 
-;; ;; XXX
-;; (check (simplex*
-;;         #(#( 3  2  1)
-;;           #(-3 -2 -1)
-;;           #( 2  5  3)
-;;           #(-2 -5 -3))
-;;         #(10 -10 15 -15)
-;;         #(2 3 4))
-;;        => '(31/13 . #(21/13 10/13 0)))
+;; https://en.wikipedia.org/wiki/Simplex_algorithm#Example_2
+(check (simplex*
+        #(#( 3  2  1)
+          #(-3 -2 -1)
+          #( 2  5  3)
+          #(-2 -5 -3))
+        #(10 -10 15 -15)
+        #(2 3 4))
+       => '(130/7 . #(15/7 0 25/7)))
 
 (check (simplex*
         #(#(1 1)

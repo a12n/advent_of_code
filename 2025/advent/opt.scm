@@ -65,9 +65,9 @@
            (else
             (simplex-pivoting! basis tableau)
             (vector-for-each
-             (lambda (i j)
-               (when (< j (vector-length x))
-                 (vector-set! x j (matrix-ref tableau i 0))))
+             (lambda (i bi)
+               (when (< bi (vector-length x))
+                 (vector-set! x bi (matrix-ref tableau i 0))))
              basis)
             (values (matrix-ref tableau (- (matrix-rows tableau) 1) 0) x))))))
 

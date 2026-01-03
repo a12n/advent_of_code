@@ -280,7 +280,7 @@
                  (thetak (cdr state))
                  (bi (matrix-ref tableau i 0))
                  (thetai (if (zero? x) +inf.0 (/ bi x))))
-            (if (and (positive? thetai)
+            (if (and (not (negative? thetai))
                      (finite? thetai)
                      (or (not k)
                          (< thetai thetak)))

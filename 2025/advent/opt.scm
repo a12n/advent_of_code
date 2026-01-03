@@ -63,7 +63,7 @@
            ((not tableau) (values #false x))
            ((equal? tableau +inf.0) (values +inf.0 x))
            (else
-            (simplex-pivoting basis tableau)
+            (simplex-pivoting! basis tableau)
             (vector-for-each
              (lambda (i j)
                (when (< j (vector-length x))
@@ -198,7 +198,7 @@
                               (matrix-ref tableau i j)))))
           (if (> n-artif 0)
               ;; Optimize artificial objective first.
-              (let ((bounded (simplex-pivoting basis tableau)))
+              (let ((bounded (simplex-pivoting! basis tableau)))
                 (cond
                  ((not bounded)
                   ;; Unbounded problem.
@@ -250,7 +250,7 @@
         0 n
         j (+ j 1))))
 
-    (define (simplex-pivoting basis tableau)
+    (define (simplex-pivoting! basis tableau)
       (let* ((pj (pivot-col tableau (- (matrix-rows tableau) 1)))
              (pi (and pj (pivot-row tableau (vector-length basis) pj))))
         (cond
@@ -264,6 +264,6 @@
           ;; Do pivoting.
           (vector-set! basis pi (- pj 1))
           (matrix-pivot! tableau pi pj)
-          (simplex-pivoting basis tableau)))))
+          (simplex-pivoting! basis tableau)))))
 
     ))

@@ -153,10 +153,21 @@
           ;;   #(-1 -2  1  0  1  0  0 -1)
           ;;   #( 2  0  3  0  0  1  0  0)
           ;;   #( 0  6  3  0  0  0  0  0))
-          (do ((k 0 (+ k 1)))
-              ((= k n-artif) #f)
-            (vector-set! basis k (+ n-var n-slack k))
-            (matrix-set! tableau k (+ 1 n-var n-slack k) -1))
+          ;; (do ((k 0 (+ k 1)))
+          ;;     ((= k n-artif) #f)
+          ;;   ;; FIXME: Don't change all n-artif rows, change only specific rows.
+          ;;   (when (negative? (matrix-ref tableau k 0))
+          ;;     (vector-set! basis k (+ n-var n-slack k))
+          ;;     (matrix-set! tableau k (+ 1 n-var n-slack k) -1)))
+          (let loop1 ((i 0)
+                      (k 0))
+            (cond
+             ((= i n-constr) #f)
+             ((negative? (matrix-ref tableau i 0))
+              (vector-set! basis i (+ n-var n-slack k))
+              (matrix-set! tableau i (+ 1 n-var n-slack k) -1)
+              (loop1 (+ i 1) (+ k 1)))
+             (else (loop1 (+ i 1) k))))
           ;; Negate constraints with artificial variables (i.e.,
           ;; constraints where b is negative):
           ;;      b x₁ x₂ s₁ s₂ s₃ a₁ a₂
@@ -164,12 +175,24 @@
           ;;   #( 1  2 -1  0 -1  0  0  1)
           ;;   #( 2  0  3  0  0  1  0  0)
           ;;   #( 0  6  3  0  0  0  0  0))
-          (matrix-map!
-           (lambda (_ _ x)
-             (- x))
-           tableau
-           0 n-artif
-           0 (matrix-cols tableau))
+          ;; (matrix-map!
+          ;;  (lambda (i _ x)
+          ;;    ;; FIXME: Don't change all n-artif rows.
+          ;;    (if (negative? (matrix-ref tableau i 0))
+          ;;        (- x) x))
+          ;;  tableau
+          ;;  0 n-artif
+          ;;  0 (matrix-cols tableau))
+          (let loop2 ((i 0)
+                      (k 0))
+            (cond
+             ((= i n-constr) #f)
+             ((negative? (matrix-ref tableau i 0))
+              (matrix-set! tableau (+ n-constr 1) (+ 1 n-var n-slack k) 1)
+              (matrix-elim-add! tableau (+ n-constr 1) i 1)
+              (matrix-map-row! (lambda (_ x) (- x)) tableau i)
+              (loop2 (+ i 1) (+ k 1)))
+             (else (loop2 (+ i 1) k))))
           ;; Add artificial objective row.
           ;; Minimize R = a₁ + a₂,
           ;; maximize S = -R = -a₁ - a₂,
@@ -180,9 +203,9 @@
           ;;   #( 2  0  3  0  0  1  0  0)
           ;;   #( 0  6  3  0  0  0  0  0)
           ;;   #( 0  0  0  0  0  0  1  1))
-          (do ((k 0 (+ k 1)))
-              ((= k n-artif) #f)
-            (matrix-set! tableau (+ n-constr 1) (+ 1 n-var n-slack k) 1))
+          ;; (do ((k 0 (+ k 1)))
+          ;;     ((= k n-artif) #f)
+          ;;   (matrix-set! tableau (+ n-constr 1) (+ 1 n-var n-slack k) 1))
           ;; Express artificial objective row in terms of non-basic
           ;; variables. Subtract from the artificial objective row the rows of
           ;; artificial basis:
@@ -192,13 +215,13 @@
           ;;   #( 2  0  3  0  0  1  0  0)
           ;;   #( 0  6  3  0  0  0  0  0)
           ;;   #(-2 -3  0  1  1  0  0  0))
-          (do ((i 0 (+ i 1)))
-              ((= i n-artif) #f)
-            (do ((j 0 (+ j 1)))
-                ((= j (matrix-cols tableau)) #f)
-              (matrix-set! tableau (+ n-constr 1) j
-                           (- (matrix-ref tableau (+ n-constr 1) j)
-                              (matrix-ref tableau i j)))))
+          ;; (do ((i 0 (+ i 1)))
+          ;;     ((= i n-artif) #f)
+          ;;   (do ((j 0 (+ j 1)))
+          ;;       ((= j (matrix-cols tableau)) #f)
+          ;;     (matrix-set! tableau (+ n-constr 1) j
+          ;;                  (- (matrix-ref tableau (+ n-constr 1) j)
+          ;;                     (matrix-ref tableau i j)))))
           (if (> n-artif 0)
               ;; Optimize artificial objective first.
               (let ((bounded (simplex-pivoting! basis tableau)))

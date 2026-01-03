@@ -207,6 +207,7 @@
                   ;; Couldn't minimize artificial variables. Infeasible problem.
                   (values basis #false))
                  (else
+                  (simplex-tableau-cleanup! basis tableau n-var)
                   ;; Found a BFS. Drop artificial variables and objective.
                   ;; The tableau is configured for the original problem starting at this BFS.
                   (values basis
@@ -215,6 +216,43 @@
                                        0 (+ 1 n-var n-slack))))))
               ;; Already at BFS at zero. Return the tableau for original problem.
               (values basis tableau)))))
+
+    ;; Get artificial variables out of the basis after phase 1.
+    ;; https://math.stackexchange.com/questions/3254444/artificial-variables-in-two-phase-simplex-method
+    (define (simplex-tableau-cleanup! basis tableau n-var)
+      (let* ((n-constr (vector-length basis))
+             (n-slack n-constr)
+             (n-artif (- (matrix-cols tableau) 1 n-var n-slack)))
+        ;; After phase 1 there might be artificial variables in the
+        ;; basis. E.g., a₁ in the following tableau:
+        ;;       b x₁ x₂   s₁   s₂ s₃ s₄ a₁ a₂
+        ;; #(#(  1  0  1  1/2 -1/2  0  0  0  0)
+        ;;   #( 12  0  0 -3/2    4  0  1  0 -1)
+        ;;   #(  0  0  0    0   -1 -1  0  1  0)
+        ;;   #(  4  1  0 -1/2    1  0  0  0  0)
+        ;;   #(-23  0  0    1 -7/2  0  0  0  0)
+        ;;   #(  0  0  0    0    1  1  0  0  1))
+        (vector-map!
+         (lambda (pi bi)
+           (cond
+            ((>= bi (+ n-var n-slack))
+             ;; Artificial variable in the basis. Pivot on any
+             ;; non-zero non-artificial variable in this row. If
+             ;; there's no such variable, the row may be removed.
+             (let ((pj (matrix-fold
+                        (lambda (_ j k x)
+                          (if (or k (zero? x)) k j))
+                        #false
+                        tableau
+                        pi (+ pi 1)
+                        1 (+ 1 n-var n-slack 1))))
+               (cond
+                (pj
+                 (matrix-pivot! tableau pi pj)
+                 pj)
+                (else bi))))
+            (else bi)))
+         basis)))
 
     ;; Index of the pivot column in objective row `i` of the tableau.
     ;; Returns #false if the objective couldn't be improved further.

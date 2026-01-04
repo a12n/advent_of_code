@@ -5,6 +5,7 @@
           matrix-set! matrix-set-row! matrix-set-col!
           matrix-fold
           matrix-map! matrix-map-row! matrix-map-col!
+          matrix-elim-mul! matrix-elim-add!
           matrix-pivot!)
 
   (import (scheme base)
@@ -128,6 +129,23 @@
          (lambda (i _ x)
            (f i x))
          a rstart rend j (+ j 1)))))
+
+    ;; Elementary row operation "Row multiplication".
+    ;; k R_i -> R_i, where k != 0
+    (define (matrix-elim-mul! a i k)
+      (vector-map!
+       (lambda (_ x)
+         (* x c))
+       (vector-ref a i)))
+
+    ;; Elementary row operation "Row addition".
+    ;; R_i + k R_j -> R_i, where i != j
+    (define (matrix-elim-add! a i j k)
+      (let ((v (vector-ref a j)))
+        (vector-map!
+         (lambda (j x)
+           (+ x (* (vector-ref v j) k)))
+         (vector-ref a i))))
 
     (define (matrix-pivot! a pi pj)
       (let* ((prow (vector-ref a pi))

@@ -328,14 +328,10 @@
     (define (branch-bound a b c)
       (let ((n (vector-length c))
             (z-opt -inf.0)
-            (z-upper +inf.0)
             (x-opt #false))
         (define (loop a b)
           (let-values (((z x) (simplex a b c)))
             (when z
-              ;; FIXME: Use z-upper to bound.
-              (when (< z z-upper)
-                (set! z-upper z))
               (unless (< z z-opt)
                 ;; Find most non-integer x_k in x vector.
                 (let ((k (most-fractional x)))

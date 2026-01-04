@@ -3,6 +3,7 @@
           matrix-unfold matrix-copy make-matrix make-matrix-identity
           matrix-ref matrix-ref-row matrix-ref-col
           matrix-set! matrix-set-row! matrix-set-col!
+          matrix-transpose
           matrix-fold
           matrix-map! matrix-map-row! matrix-map-col!
           matrix-elim-mul! matrix-elim-add!
@@ -82,6 +83,13 @@
              (matrix-set! a i j x))
            v)
           (error "invalid length" v)))
+
+    (define (matrix-transpose a)
+      (matrix-unfold
+       (lambda (i j)
+         (matrix-ref a j i))
+       (matrix-cols a)
+       (matrix-rows a)))
 
     (define matrix-fold
       (case-lambda

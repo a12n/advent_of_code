@@ -282,16 +282,16 @@
     ;; Returns #false if the objective couldn't be improved further.
     ;; TODO: Bland's rule?
     (define (pivot-col tableau i)
-      (matrix-fold
-       (lambda (_ j k x)
-         (if (and (negative? x)
-                  (or (not k)
-                      (< x (matrix-ref tableau i k))))
-             j k))
-       #false
-       tableau
-       i (+ i 1)
-       1 (matrix-cols tableau)))
+      (let ((m (matrix-cols tableau)))
+        (let loop ((j 1)
+                   (k #f))
+          (if (= j m) k
+              (let ((x (matrix-ref tableau i j)))
+                (if (and (negative? x)
+                         (or (not k)
+                             (< x (matrix-ref tableau i k))))
+                    (loop (+ j 1) j)
+                    (loop (+ j 1) k)))))))
 
     ;; Index of the pivot row in one of `n` constraint rows at column
     ;; `j`. Returns #false if there's no such row (the problem is unbounded).

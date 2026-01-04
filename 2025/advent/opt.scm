@@ -1,5 +1,6 @@
 (define-library (advent opt)
-  (export simplex)
+  (export simplex
+          branch-bound)
 
   (import (scheme base)
           (srfi 43)
@@ -323,5 +324,61 @@
           (vector-set! basis pi (- pj 1))
           (matrix-pivot! tableau pi pj)
           (simplex-pivoting! basis tableau)))))
+
+    (define (branch-bound a b c)
+      (let ((n (vector-length c))
+            (z-opt -inf.0)
+            (z-upper +inf.0)
+            (x-opt #false))
+        (define (loop a b)
+          (let-values (((z x) (simplex a b c)))
+            (when z
+              ;; FIXME: Use z-upper to bound.
+              (when (< z z-upper)
+                (set! z-upper z))
+              (unless (< z z-opt)
+                ;; Find most non-integer x_k in x vector.
+                (let ((k (most-fractional x)))
+                  (cond
+                   ((not k)
+                    ;; All x_k are integer in x.
+                    (set! z-opt z)
+                    (set! x-opt x))
+                   (else
+                    ;; x_k ≤ ⌊x_k⌋ branch.
+                    (loop
+                     (vector-append a (vector (make-vector-delta n k 1)))
+                     (vector-append b (vector (floor (vector-ref x k)))))
+                    ;; x_k ≥ ⌈x_k⌉ (thus -x_k ≤ -⌈x_k⌉) branch.
+                    (loop
+                     (vector-append a (vector (make-vector-delta n k -1)))
+                     (vector-append b (vector (- (ceiling (vector-ref x k))))))
+                    )))))))
+        (loop a b)
+        (if (= z-opt -inf.0)
+            (values #false (make-vector n 0))
+            (values z-opt x-opt))))
+
+    (define (make-vector-delta n k x)
+      (let ((u (make-vector n 0)))
+        (vector-set! u k x)
+        u))
+
+    (define (most-fractional x)
+      (car
+       (vector-fold
+        (lambda (i state x)
+          (let ((k (car state))
+                (fk (cdr state)))
+            (if (integer? x) state
+                (let ((fi (fractional x)))
+                  (if (< fi fk)
+                      (cons i fi)
+                      state)))))
+        '(#false . +inf.0)
+        x)))
+
+    (define (fractional x)
+      (abs (- 1/2 (- x (floor x)))))
 
     ))

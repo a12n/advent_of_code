@@ -9,6 +9,10 @@
   (let-values (((z x) (simplex a b c)))
     (cons z x)))
 
+(define (branch-bound* a b c)
+  (let-values (((z x) (branch-bound a b c)))
+    (cons z x)))
+
 (check-set-mode! 'report-failed)
 
 (check (simplex*
@@ -59,6 +63,14 @@
         #(8 10 15)
         #(3 5 4))
        => '(765/41 . #(89/41 50/41 62/41)))
+
+(check (branch-bound*
+        #(#(2 3 0)
+          #(0 2 5)
+          #(3 2 4))
+        #(8 10 15)
+        #(3 5 4))
+       => '(17 . #(1 2 1)))
 
 (check (simplex*
         #(#(3 2)

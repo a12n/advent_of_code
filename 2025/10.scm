@@ -15,7 +15,9 @@
               vector-add vector-sub
               vector-norm-max)
         (advent input)
-        (advent main))
+        (advent main)
+        (advent matrix)
+        (advent opt))
 
 (define (string->lights-diagram s)
   (let ((n (string-length s)))
@@ -156,19 +158,39 @@
       (let* ((machine (string->machine-descr line))
              (joltage-reqs (vector-ref machine 2))
              (buttons (vector-ref machine 1))
-             (buttons (map (lambda (button)
-                             (button->joltage (vector-length joltage-reqs)
-                                              button))
-                           buttons)))
-        (display (list "joltage-reqs" joltage-reqs
-                       "buttons" buttons)
-                 (current-error-port))
-        (newline (current-error-port))
-        (let ((num (num-joltage-button-presses joltage-reqs buttons)))
-          (display (list "num-joltage-button-presses" num)
-                   (current-error-port))
-          (newline (current-error-port))
-          (+ sum num))))
+             (buttons (list->vector
+                       (reverse (map (lambda (button)
+                                       (button->joltage (vector-length joltage-reqs)
+                                                        button))
+                                     buttons)))))
+        ;; Reformulate as LP problem:
+        ;; a) Transpose buttons matrix, rewrite each "equal"
+        ;; constraint as pair of "less than or equal" constraints.
+        ;; b) Joltage requirements are part of the constraints, for
+        ;; one original joltage requirement there are now negative and positive
+        ;; requirements.
+        ;; c) Cost vector is 1 (minimize) or -1 (maximize).
+        (let ((a (matrix-unfold
+                  (lambda (i j)
+                    (if (even? i)
+                        (matrix-ref buttons j (quotient i 2))
+                        (- (matrix-ref buttons j (quotient (- i 1) 2)))))
+                  (* 2 (matrix-cols buttons))
+                  (matrix-rows buttons)))
+              (b (vector-unfold
+                  (lambda (i)
+                    (if (even? i)
+                        (vector-ref joltage-reqs (quotient i 2))
+                        (- (vector-ref joltage-reqs (quotient (- i 1) 2)))))
+                  (* 2 (vector-length joltage-reqs))))
+              (c (make-vector (matrix-rows buttons) -1)))
+          (let-values (((z x) (branch-bound a b c)))
+            (display (list "z" z "x" x)
+                     (current-error-port))
+            (newline (current-error-port))
+            (unless z
+              (error "infeasible" a b c))
+            (+ sum (- z))))))
     0))
   (newline))
 

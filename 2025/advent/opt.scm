@@ -295,23 +295,18 @@
 
     ;; Index of the pivot row in one of `n` constraint rows at column
     ;; `j`. Returns #false if there's no such row (the problem is unbounded).
-    (define (pivot-row tableau n-constr j)
-      (car
-       (matrix-fold
-        (lambda (i _ state x)
-          (let* ((k (car state))
-                 (thetak (cdr state))
-                 (bi (matrix-ref tableau i 0))
-                 (thetai (if (zero? x) +inf.0 (/ bi x))))
-            (if (and (not (negative? thetai))
-                     (finite? thetai)
-                     (or (not k)
-                         (< thetai thetak)))
-                (cons i thetai) state)))
-        '(#false . +inf.0)
-        tableau
-        0 n-constr
-        j (+ j 1))))
+    (define (pivot-row tableau n j)
+      (let loop ((i 0)
+                 (k #f)
+                 (thetak +inf.0))
+        (if (= i n) k
+            (let ((b (matrix-ref tableau i 0))
+                  (x (matrix-ref tableau i j)))
+              (if (and (positive? x)
+                       (or (not k)
+                           (< (/ b x) thetak)))
+                  (loop (+ i 1) i (/ b x))
+                  (loop (+ i 1) k thetak))))))
 
     (define (simplex-pivoting! basis tableau)
       (let* ((pj (pivot-col tableau (- (matrix-rows tableau) 1)))

@@ -1,4 +1,4 @@
-<!--; export this_file=$(readlink -f $0); export script_lines=59; sed -n 2,${script_lines}p $this_file | sh; exit
+<!--; export this_file=$(readlink -f $0); export script_lines=60; sed -n 2,${script_lines}p $this_file | sh; exit
 this_dir=$(dirname $this_file)
 tmp_file=$(mktemp $this_file.XXXXX)
 head -n $((script_lines + 1)) $this_file > $tmp_file
@@ -9,10 +9,11 @@ BEGIN {
   PROCINFO["sorted_in"] = "@ind_str_desc"
   solved_char = "▓"
   unsolved_char = "░"
+  num_days[2025] = 12
 }
 {
   year = int($(NF - 3))
-  if (match($(NF - 1), "([0-2][0-9]).+([12])|(25)", m) != 0) {
+  if (match($(NF - 1), "([0-2][0-9]).+([12]$)|(25|12)", m) != 0) {
     if (m[3] != "") {
       day = int(m[3])
       part = 1

@@ -1,4 +1,4 @@
-<!--; export this_file=$(readlink -f $0); export script_lines=54; sed -n 2,${script_lines}p $this_file | sh; exit
+<!--; export this_file=$(readlink -f $0); export script_lines=59; sed -n 2,${script_lines}p $this_file | sh; exit
 this_dir=$(dirname $this_file)
 tmp_file=$(mktemp $this_file.XXXXX)
 head -n $((script_lines + 1)) $this_file > $tmp_file
@@ -32,9 +32,14 @@ END {
   printf("\n")
   for (year in year_solved) {
     printf("[%04d] ", year)
+    if (num_days[year] == "") num_days[year] = 25
     for (day = 1; day <= 25; ++day) {
+      if (day > num_days[year]) {
+        printf("-- ")
+        continue
+      }
       for (part = 1; part <= 2; ++part) {
-        if (day == 25 && part == 2 && year_solved[year] == (2 * 25 - 1)) {
+        if (day == num_days[year] && part == 2 && year_solved[year] == (2 * num_days[year] - 1)) {
           part_solved[year, day, 2] = 1
           year_solved[year] += 1
         }

@@ -13,8 +13,8 @@ BEGIN {
 {
   year = int($(NF - 3))
   if (match($(NF - 1), "([0-2][0-9]).+([12])|(25)", m) != 0) {
-    if (m[3] == "25") {
-      day = 25
+    if (m[3] != "") {
+      day = int(m[3])
       part = 1
     } else {
       day = int(m[1])
@@ -34,8 +34,8 @@ END {
     printf("[%04d] ", year)
     for (day = 1; day <= 25; ++day) {
       for (part = 1; part <= 2; ++part) {
-        if (day == 25 && part == 2 && year_solved[year] == 49) {
-          part_solved[year, 25, 2] = 1
+        if (day == 25 && part == 2 && year_solved[year] == (2 * 25 - 1)) {
+          part_solved[year, day, 2] = 1
           year_solved[year] += 1
         }
         if (part_solved[year, day, part]) {

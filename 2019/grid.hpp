@@ -77,7 +77,8 @@ using dense_grid = std::vector<std::vector<mapped_type>>;
 
 template <typename mapped_type>
 using sparse_grid = std::map<position, mapped_type>;
-using sparse_set_grid = std::set<position>;
+using position_set = std::set<position>;
+using sparse_set_grid = position_set;
 
 struct extent {
     extent() = default;

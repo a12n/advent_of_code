@@ -181,6 +181,12 @@ const mapped_type& at(const dense_grid<mapped_type>& grid, position p, const map
     return empty;
 }
 
+template <typename mapped_type>
+void set(dense_grid<mapped_type>& grid, position p, const mapped_type& v)
+{
+    grid[p[1]][p[0]] = v;
+}
+
 template <typename mapped_type, size_t n, size_t m>
 const mapped_type& at(const fixed_grid<mapped_type, n, m>& grid, position p, const mapped_type& empty = mapped_type())
 {

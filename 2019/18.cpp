@@ -10,12 +10,10 @@ namespace {
 
 using namespace grid::planar;
 
-namespace keys {
-
 // 1 << (c - 'a') for keys [a-z]
-using set = uint32_t;
+using keys_set = uint32_t;
 
-constexpr set key(char c)
+constexpr keys_set key(char c)
 {
     if (c < 'a' || c > 'z') {
         return 0;
@@ -23,7 +21,7 @@ constexpr set key(char c)
     return 1 << (c - 'a');
 }
 
-constexpr set door(char c)
+constexpr keys_set door(char c)
 {
     if (c < 'A' || c > 'Z') {
         return 0;
@@ -31,14 +29,12 @@ constexpr set door(char c)
     return 1 << (c - 'A');
 }
 
-} // namespace keys
-
 using vault_map = dense_grid<char>;
 
-size_t search(const vault_map& vault, position start, keys::set all_keys)
+size_t search(const vault_map& vault, position start, keys_set all_keys)
 {
-    std::set<std::tuple<position, keys::set>> seen;
-    std::set<std::tuple<size_t, position, keys::set>> states;
+    std::set<std::tuple<position, keys_set>> seen;
+    std::set<std::tuple<size_t, position, keys_set>> states;
 
     states.insert({ 0, start, all_keys });
 
@@ -59,12 +55,12 @@ size_t search(const vault_map& vault, position start, keys::set all_keys)
 
         if (const auto c = at(vault, p, '#'); c == '#') {
             continue;
-        } else if (keys::door(c)) {
-            if (!(keys::door(c) & ~no_keys)) {
+        } else if (door(c)) {
+            if (!(door(c) & ~no_keys)) {
                 continue;
             }
-        } else if (keys::key(c)) {
-            no_keys &= ~keys::key(c);
+        } else if (key(c)) {
+            no_keys &= ~key(c);
             if (no_keys == 0) {
                 return steps;
             }
@@ -83,14 +79,14 @@ size_t search(const vault_map& vault, position start, keys::set all_keys)
 int main()
 {
     vault_map vault;
-    keys::set all_keys = 0;
+    keys_set all_keys = 0;
 
     input(std::cin, vault, [&all_keys](position, char c) {
         if (c != '@' && c != '.' && c != '#' && (c < 'a' || c > 'z') && (c < 'A' && c > 'Z')) {
             throw std::invalid_argument(__func__);
         }
-        if (keys::key(c)) {
-            all_keys |= keys::key(c);
+        if (key(c)) {
+            all_keys |= key(c);
         }
         return c;
     });

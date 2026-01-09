@@ -12,39 +12,28 @@ namespace {
 
 using namespace grid::planar;
 
+namespace keys {
+
 // 1 << (c - 'a') for keys [a-z]
-using key_set = uint32_t;
+using set = uint32_t;
 
-constexpr bool is_key(char k)
+constexpr set key(char c)
 {
-    return k >= 'a' && k <= 'z';
-}
-
-constexpr bool is_door(char d)
-{
-    return d >= 'A' && d <= 'Z';
-}
-
-constexpr size_t to_index(char c)
-{
-    if (c >= '@' && c <= 'Z') {
-        return (c - '@');
-    } else if (c >= 'a' && c <= 'z') {
-        return ('Z' - '@') + 1 + (c - 'a');
-    } else {
-        throw std::invalid_argument(__func__);
+    if (c < 'a' || c > 'z') {
+        return 0;
     }
+    return 1 << (c - 'a');
 }
 
-constexpr key_set from_key(char k)
+constexpr set door(char c)
 {
-    return 1 << (k - 'a');
+    if (c < 'A' || c > 'Z') {
+        return 0;
+    }
+    return 1 << (c - 'A');
 }
 
-constexpr key_set from_door(char d)
-{
-    return 1 << (d - 'A');
-}
+} // namespace keys
 
 // Move in DFS order from @ in all directions
 // If X encountered, (if stack not empty, add rule "x -> lowercase top of the stack"), put X into the stack
@@ -98,7 +87,7 @@ void normalize_graph(graph& g)
 {
     for (auto& [u, adj] : g) {
         for (auto& [v, _] : adj) {
-            if (is_door(v) && g.at(v).size() == 1) {
+            if (keys::door(v) && g.at(v).size() == 1) {
                 std::cout << "Remove " << v << '\n';
             }
         }
@@ -115,7 +104,7 @@ distance_map distances(const vault_map& vault)
     return {};
 }
 
-void dfs(const vault_map& vault, sparse_set_grid& visited, size_t& min_steps, size_t steps, position p, key_set keys)
+void dfs(const vault_map& vault, sparse_set_grid& visited, size_t& min_steps, size_t steps, position p, keys::set keys)
 {
     if (steps >= min_steps) {
         return;
@@ -123,8 +112,8 @@ void dfs(const vault_map& vault, sparse_set_grid& visited, size_t& min_steps, si
 
     visited.insert(p);
 
-    if (const auto c = at(vault, p, '#'); is_key(c)) {
-        if (const auto k = from_key(c); (keys & k)) {
+    if (const auto c = at(vault, p, '#'); keys::key(c)) {
+        if (const auto k = keys::key(c); (keys & k)) {
             keys &= ~k;
 
             if (keys == 0) {
@@ -154,7 +143,7 @@ void dfs(const vault_map& vault, sparse_set_grid& visited, size_t& min_steps, si
             continue;
         }
 
-        if (is_door(c) && (keys & from_door(c))) {
+        if (keys::door(c) && (keys & keys::door(c))) {
             continue;
         }
 
@@ -163,7 +152,7 @@ void dfs(const vault_map& vault, sparse_set_grid& visited, size_t& min_steps, si
     visited.erase(p);
 }
 
-size_t dfs(const vault_map& vault, position p, key_set keys)
+size_t dfs(const vault_map& vault, position p, keys::set keys)
 {
     size_t min_steps = -1;
     sparse_set_grid visited;
@@ -171,9 +160,9 @@ size_t dfs(const vault_map& vault, position p, key_set keys)
     return min_steps;
 }
 
-size_t search(const graph& graph, const key_set all_keys, char u = '@')
+size_t search(const graph& graph, const keys::set all_keys, char u = '@')
 {
-    std::set<std::tuple<size_t, char, key_set>> states;
+    std::set<std::tuple<size_t, char, keys::set>> states;
     size_t min_steps = -1;
 
     states.insert({ 0, u, 0 });
@@ -193,10 +182,10 @@ size_t search(const graph& graph, const key_set all_keys, char u = '@')
         }
 
         for (const auto& [v, steps] : graph.at(u)) {
-            if (v == '@' || (is_door(v) && (keys & from_door(v)))) {
+            if (v == '@' || (keys::door(v) && (keys & keys::door(v)))) {
                 states.insert({ total_steps + steps, v, keys });
-            } else if (is_key(v)) {
-                states.insert({ total_steps + steps, v, keys | from_key(v) });
+            } else if (keys::key(v)) {
+                states.insert({ total_steps + steps, v, keys | keys::key(v) });
             }
         }
     }
@@ -209,7 +198,7 @@ size_t search(const graph& graph, const key_set all_keys, char u = '@')
 int main()
 {
     graph graph;
-    key_set all_keys = 0;
+    keys::set all_keys = 0;
 
     {
         dense_grid<char> grid;
@@ -218,8 +207,8 @@ int main()
             if (c != '@' && c != '.' && c != '#' && (c < 'a' || c > 'z') && (c < 'A' && c > 'Z')) {
                 throw std::invalid_argument(__func__);
             }
-            if (is_key(c)) {
-                all_keys |= from_key(c);
+            if (keys::key(c)) {
+                all_keys |= keys::key(c);
             }
             return c;
         });

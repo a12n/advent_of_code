@@ -42,12 +42,6 @@ size_t search(const vault_map& vault, position start, keys_set all_keys)
         auto [steps, p, no_keys] = *states.begin();
         states.erase(states.begin());
 
-        std::cerr << __func__
-                  << ": steps " << steps
-                  << " p " << p
-                  << " no_keys " << no_keys
-                  << '\n';
-
         if (seen.find({ p, no_keys }) != seen.end()) {
             continue;
         }

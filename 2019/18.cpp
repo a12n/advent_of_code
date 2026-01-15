@@ -85,7 +85,11 @@ int main()
         return c;
     });
 
-    std::cout << search(vault, find<char>(vault, '@').value(), all_keys) << '\n';
+    const auto start = find<char>(vault, '@').value();
+
+#if PART == 1
+    std::cout << search(vault, start, all_keys) << '\n';
+#endif // PART == 1
 
     return 0;
 }

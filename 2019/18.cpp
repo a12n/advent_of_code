@@ -1,4 +1,5 @@
 #include <array>
+#include <cassert>
 #include <cstdint>
 #include <iostream>
 #include <map>
@@ -37,6 +38,7 @@ size_t search(const vault_map& vault, position start, keys_set all_keys)
     std::set<std::tuple<position, keys_set>> seen;
     std::set<std::tuple<size_t, position, keys_set>> states;
 
+    assert(at(vault, start, '#') != '#');
     states.insert({ 0, start, all_keys });
 
     while (!states.empty()) {
@@ -48,9 +50,9 @@ size_t search(const vault_map& vault, position start, keys_set all_keys)
         }
         seen.insert({ p, no_keys });
 
-        if (const auto c = at(vault, p, '#'); c == '#') {
-            continue;
-        } else if (door(c)) {
+        const auto c = at(vault, p, '#');
+
+        if (door(c)) {
             if (!(door(c) & ~no_keys)) {
                 continue;
             }
@@ -62,7 +64,13 @@ size_t search(const vault_map& vault, position start, keys_set all_keys)
         }
 
         for (const auto dir : { direction::up, direction::left, direction::right, direction::down }) {
-            states.insert({ steps + 1, p + to_offset(dir), no_keys });
+            const auto q = p + to_offset(dir);
+
+            if (at(vault, q, '#') == '#') {
+                continue;
+            }
+
+            states.insert({ steps + 1, q, no_keys });
         }
     }
 

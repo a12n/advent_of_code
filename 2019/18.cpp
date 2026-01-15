@@ -89,7 +89,23 @@ int main()
 
 #if PART == 1
     std::cout << search(vault, start, all_keys) << '\n';
-#endif // PART == 1
+#elif PART == 2
+    for (int dy = -1; dy <= 1; ++dy) {
+        for (int dx = -1; dx <= 1; ++dx) {
+            set(vault, start + offset { dx, dy }, (dx == 0 || dy == 0) ? '#' : '@');
+        }
+    }
+
+    // TODO
+    for (const auto p : {
+             start + offset { -1, -1 },
+             start + offset { -1, +1 },
+             start + offset { +1, -1 },
+             start + offset { +1, +1 },
+         }) {
+        std::cout << search(vault, p, all_keys) << '\n';
+    }
+#endif // PART
 
     return 0;
 }

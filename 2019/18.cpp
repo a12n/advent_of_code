@@ -1,3 +1,4 @@
+#include <array>
 #include <cstdint>
 #include <iostream>
 #include <map>
@@ -68,6 +69,12 @@ size_t search(const vault_map& vault, position start, keys_set all_keys)
     return -1;
 }
 
+size_t search(const vault_map& vault, const std::array<position, 4>& start, keys_set all_keys)
+{
+    // TODO
+    return -1;
+}
+
 } // namespace
 
 int main()
@@ -96,15 +103,14 @@ int main()
         }
     }
 
-    // TODO
-    for (const auto p : {
-             start + offset { -1, -1 },
-             start + offset { -1, +1 },
-             start + offset { +1, -1 },
-             start + offset { +1, +1 },
-         }) {
-        std::cout << search(vault, p, all_keys) << '\n';
-    }
+    std::cout << search(
+        vault,
+        { start + offset { -1, -1 },
+            start + offset { -1, +1 },
+            start + offset { +1, -1 },
+            start + offset { +1, +1 } },
+        all_keys)
+              << '\n';
 #endif // PART
 
     return 0;

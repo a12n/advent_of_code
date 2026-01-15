@@ -71,6 +71,25 @@ size_t search(const vault_map& vault, position start, keys_set all_keys)
 
 size_t search(const vault_map& vault, const std::array<position, 4>& start, keys_set all_keys)
 {
+    std::set<std::tuple<size_t, position, keys_set>> seen;
+    std::set<std::tuple<size_t, size_t, position, keys_set>> states;
+
+    for (size_t i = 0; i < start.size(); ++i) {
+        states.insert({ 0, i, start[i], all_keys });
+    }
+
+    while (!states.empty()) {
+        auto [steps, i, p, no_keys] = *states.begin();
+        states.erase(states.begin());
+
+        if (seen.find({ i, p, no_keys }) != seen.end()) {
+            continue;
+        }
+        seen.insert({ i, p, no_keys });
+
+        // TODO
+    }
+
     // TODO
     return -1;
 }

@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
+#include <queue>
 #include <stdexcept>
 #include <unordered_map>
 
@@ -77,29 +78,105 @@ size_t search(const vault_map& vault, position start, keys_set all_keys)
     return -1;
 }
 
-size_t search(const vault_map& vault, const std::array<position, 4>& start, keys_set all_keys)
-{
-    std::set<std::tuple<size_t, position, keys_set>> seen;
-    std::set<std::tuple<size_t, size_t, position, keys_set>> states;
+using position_array = std::array<position, 4>;
 
-    for (size_t i = 0; i < start.size(); ++i) {
-        states.insert({ 0, i, start[i], all_keys });
+size_t search(const vault_map& vault, const position_array& start, keys_set all_keys)
+{
+    std::queue<std::tuple<size_t, size_t, position_array, keys_set,unsigned>> states;
+
+    for (size_t j = 0; j < start.size(); ++j) {
+        assert(at(vault, start[j], '#') != '#');
+        states.push({ 0, j, start, all_keys,0 });
     }
+
+    size_t min_steps = -1;
+    std::set<std::tuple<size_t, position, keys_set>> seen;
+    // std::set<std::tuple<size_t, position>> waiting;
 
     while (!states.empty()) {
-        auto [steps, i, p, no_keys] = *states.begin();
-        states.erase(states.begin());
+        auto [steps, i, p, no_keys, blocked] = states.front();
+        states.pop();
 
-        if (seen.find({ i, p, no_keys }) != seen.end()) {
+        std::cerr << __func__ << ':'
+                  << " steps " << steps
+                  << " i " << i
+                  << " pi " << p[i]
+                  << " no_keys " << no_keys
+                  << " blocked " << blocked
+                  << " states " << states.size()
+                  << " min_steps " << min_steps
+                  << '\n';
+
+        if (steps > min_steps) {
             continue;
         }
-        seen.insert({ i, p, no_keys });
 
-        // TODO
+        // XXX: Is this check really needed?
+        if ((1 << i) & blocked) {
+            continue;
+        }
+
+        // Had already seen this robot at this position with these
+        // keys, drop the state.
+        if (seen.find({ i, p[i], no_keys }) != seen.end()) {
+            continue;
+        }
+        seen.insert({ i, p[i], no_keys });
+
+        const auto c = at(vault, p[i], '#');
+
+        if (door(c)) {
+            if (!(door(c) & ~no_keys)) {
+                blocked |= (1 << i);
+            }
+        } else if (no_keys & key(c)) {
+            no_keys &= ~key(c);
+
+            if (no_keys == 0) {
+                if (steps < min_steps) {
+                    min_steps = steps;
+                    continue;
+                }
+            }
+
+            // If robot `j` was waiting at the door, allow it to try
+            // to proceed with the new set of keys.
+            for (size_t j = 0; j < start.size(); ++j) {
+                if ((1 << j) & blocked) {
+                    states.push({ steps, j, p, no_keys, blocked & ~(1 << j) });
+                }
+            }
+        }
+
+        // Can switch from robot `i` to another robot `j` at door or
+        // key position.
+        if (key(c) || door(c)) {
+            for (size_t j = 0; j < start.size(); ++j) {
+                if (i != j) {
+                    states.push({ steps, j, p, no_keys, blocked });
+                }
+            }
+        }
+
+        // Continue with the robot `i` unless it's blocked at the locked door.
+        if ((i << 1) & blocked) {
+            continue;
+        }
+
+        for (const auto dir : { direction::up, direction::left, direction::right, direction::down }) {
+            auto q = p;
+
+            q[i] = p[i] + to_offset(dir);
+
+            if (at(vault, q[i], '#') == '#') {
+                continue;
+            }
+
+            states.push({ steps + 1, i, q, no_keys, blocked });
+        }
     }
 
-    // TODO
-    return -1;
+    return min_steps;
 }
 
 } // namespace

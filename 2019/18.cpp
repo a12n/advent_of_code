@@ -82,16 +82,15 @@ using position_array = std::array<position, 4>;
 
 size_t search(const vault_map& vault, const position_array& start, keys_set all_keys)
 {
-    std::queue<std::tuple<size_t, size_t, position_array, keys_set,unsigned>> states;
+    std::queue<std::tuple<size_t, size_t, position_array, keys_set, unsigned>> states;
 
     for (size_t j = 0; j < start.size(); ++j) {
         assert(at(vault, start[j], '#') != '#');
-        states.push({ 0, j, start, all_keys,0 });
+        states.push({ 0, j, start, all_keys, 0 });
     }
 
     size_t min_steps = -1;
     std::set<std::tuple<size_t, position, keys_set>> seen;
-    // std::set<std::tuple<size_t, position>> waiting;
 
     while (!states.empty()) {
         auto [steps, i, p, no_keys, blocked] = states.front();

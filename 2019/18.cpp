@@ -111,7 +111,6 @@ size_t search(const vault_map& vault, const position_array& start, keys_set all_
             continue;
         }
 
-        // XXX: Is this check really needed?
         if ((1 << i) & blocked) {
             continue;
         }
@@ -135,14 +134,15 @@ size_t search(const vault_map& vault, const position_array& start, keys_set all_
             if (no_keys == 0) {
                 if (steps < min_steps) {
                     min_steps = steps;
-                    continue;
                 }
+                continue;
             }
 
             // If robot `j` was waiting at the door, allow it to try
             // to proceed with the new set of keys.
             for (size_t j = 0; j < start.size(); ++j) {
                 if ((1 << j) & blocked) {
+                    // XXX: Never happens?
                     states.push({ steps, j, p, no_keys, blocked & ~(1 << j) });
                 }
             }
@@ -152,7 +152,7 @@ size_t search(const vault_map& vault, const position_array& start, keys_set all_
         // key position.
         if (key(c) || door(c)) {
             for (size_t j = 0; j < start.size(); ++j) {
-                if (i != j) {
+                if (i != j && !((1 << j) & blocked)) {
                     states.push({ steps, j, p, no_keys, blocked });
                 }
             }

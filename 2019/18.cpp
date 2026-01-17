@@ -59,9 +59,10 @@ size_t search(const vault_map& vault, position start, keys_set keys, keys_set al
             }
         } else if (key(c)) {
             keys |= key(c);
-            if ((keys & all_keys) == all_keys) {
-                return steps;
-            }
+        }
+
+        if ((keys & all_keys) == all_keys) {
+            return steps;
         }
 
         for (const auto dir : { direction::up, direction::left, direction::right, direction::down }) {

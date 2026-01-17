@@ -34,32 +34,32 @@ constexpr keys_set door(char c)
 
 using vault_map = dense_grid<char>;
 
-size_t search(const vault_map& vault, position start, keys_set all_keys)
+size_t search(const vault_map& vault, position start, keys_set keys, keys_set all_keys)
 {
-    std::set<std::tuple<position, keys_set>> seen;
     std::queue<std::tuple<size_t, position, keys_set>> states;
+    std::set<std::tuple<position, keys_set>> seen;
 
     assert(at(vault, start, '#') != '#');
-    states.push({ 0, start, all_keys });
+    states.push({ 0, start, keys });
 
     while (!states.empty()) {
-        auto [steps, p, no_keys] = states.front();
+        auto [steps, p, keys] = states.front();
         states.pop();
 
-        if (seen.find({ p, no_keys }) != seen.end()) {
+        if (seen.find({ p, keys }) != seen.end()) {
             continue;
         }
-        seen.insert({ p, no_keys });
+        seen.insert({ p, keys });
 
         const auto c = at(vault, p, '#');
 
         if (door(c)) {
-            if (!(door(c) & ~no_keys)) {
+            if (!(door(c) & keys)) {
                 continue;
             }
         } else if (key(c)) {
-            no_keys &= ~key(c);
-            if (no_keys == 0) {
+            keys |= key(c);
+            if ((keys & all_keys) == all_keys) {
                 return steps;
             }
         }
@@ -71,7 +71,7 @@ size_t search(const vault_map& vault, position start, keys_set all_keys)
                 continue;
             }
 
-            states.push({ steps + 1, q, no_keys });
+            states.push({ steps + 1, q, keys });
         }
     }
 
@@ -198,7 +198,7 @@ int main()
     const auto start = find<char>(vault, '@').value();
 
 #if PART == 1
-    std::cout << search(vault, start, all_keys) << '\n';
+    std::cout << search(vault, start, 0, all_keys) << '\n';
 #elif PART == 2
     for (int dy = -1; dy <= 1; ++dy) {
         for (int dx = -1; dx <= 1; ++dx) {

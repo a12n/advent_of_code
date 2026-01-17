@@ -253,13 +253,29 @@ int main()
         }
     }
 
-    std::cout << search(
-        vault,
-        { global_start + offset { -1, -1 },
-            global_start + offset { -1, +1 },
-            global_start + offset { +1, -1 },
-            global_start + offset { +1, +1 } },
-        all_keys)
+    const position start[4] = {
+        global_start + offset { -1, -1 },
+        global_start + offset { -1, +1 },
+        global_start + offset { +1, -1 },
+        global_start + offset { +1, +1 },
+    };
+
+    const keys_set keys[4] = {
+        reachable_keys(vault, start[0]),
+        reachable_keys(vault, start[1]),
+        reachable_keys(vault, start[2]),
+        reachable_keys(vault, start[3]),
+    };
+
+    assert((keys[0] | keys[1] | keys[2] | keys[3]) == all_keys);
+
+    // Search independent parts of the vault separately. In each
+    // sub-region pretend that keys from other parts are already
+    // available.  XXX: Fails "sample-4" test.
+    std::cout << search(vault, start[0], all_keys & ~keys[0], keys[0])
+            + search(vault, start[1], all_keys & ~keys[1], keys[1])
+            + search(vault, start[2], all_keys & ~keys[2], keys[2])
+            + search(vault, start[3], all_keys & ~keys[3], keys[3])
               << '\n';
 #endif // PART
 

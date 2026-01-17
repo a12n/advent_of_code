@@ -200,23 +200,23 @@ int main()
         return c;
     });
 
-    const auto start = find<char>(vault, '@').value();
+    const auto global_start = find<char>(vault, '@').value();
 
 #if PART == 1
-    std::cout << search(vault, start, 0, all_keys) << '\n';
+    std::cout << search(vault, global_start, 0, all_keys) << '\n';
 #elif PART == 2
     for (int dy = -1; dy <= 1; ++dy) {
         for (int dx = -1; dx <= 1; ++dx) {
-            set(vault, start + offset { dx, dy }, (dx == 0 || dy == 0) ? '#' : '@');
+            set(vault, global_start + offset { dx, dy }, (dx == 0 || dy == 0) ? '#' : '@');
         }
     }
 
     std::cout << search(
         vault,
-        { start + offset { -1, -1 },
-            start + offset { -1, +1 },
-            start + offset { +1, -1 },
-            start + offset { +1, +1 } },
+        { global_start + offset { -1, -1 },
+            global_start + offset { -1, +1 },
+            global_start + offset { +1, -1 },
+            global_start + offset { +1, +1 } },
         all_keys)
               << '\n';
 #endif // PART

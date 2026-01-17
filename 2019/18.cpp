@@ -37,14 +37,14 @@ using vault_map = dense_grid<char>;
 size_t search(const vault_map& vault, position start, keys_set all_keys)
 {
     std::set<std::tuple<position, keys_set>> seen;
-    std::set<std::tuple<size_t, position, keys_set>> states;
+    std::queue<std::tuple<size_t, position, keys_set>> states;
 
     assert(at(vault, start, '#') != '#');
-    states.insert({ 0, start, all_keys });
+    states.push({ 0, start, all_keys });
 
     while (!states.empty()) {
-        auto [steps, p, no_keys] = *states.begin();
-        states.erase(states.begin());
+        auto [steps, p, no_keys] = states.front();
+        states.pop();
 
         if (seen.find({ p, no_keys }) != seen.end()) {
             continue;
@@ -71,7 +71,7 @@ size_t search(const vault_map& vault, position start, keys_set all_keys)
                 continue;
             }
 
-            states.insert({ steps + 1, q, no_keys });
+            states.push({ steps + 1, q, no_keys });
         }
     }
 

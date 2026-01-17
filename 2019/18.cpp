@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <queue>
+#include <stack>
 #include <stdexcept>
 #include <unordered_map>
 
@@ -83,6 +84,47 @@ size_t search(const vault_map& vault, position start, keys_set keys, keys_set ta
 
     std::cerr << " infeasible\n";
     return -1;
+}
+
+std::tuple<keys_set, keys_set> reachable(const vault_map& vault, position p)
+{
+    keys_set doors = 0, keys = 0;
+    sparse_set_grid seen;
+    std::stack<position> states;
+
+    states.push(p);
+
+    while (!states.empty()) {
+        const auto p = states.top();
+        states.pop();
+
+        if (seen.find(p) != seen.end()) {
+            continue;
+        }
+        seen.insert(p);
+
+        const auto c = at(vault, p, '#');
+
+        doors |= door(c);
+        keys |= key(c);
+
+        for (const auto dir : { direction::up, direction::left, direction::right, direction::down }) {
+            const auto q = p + to_offset(dir);
+
+            if (at(vault, q, '#') == '#') {
+                continue;
+            }
+
+            states.push(q);
+        }
+    }
+
+    return { doors, keys };
+}
+
+keys_set reachable_keys(const vault_map& vault, position p)
+{
+    return std::get<1>(reachable(vault, p));
 }
 
 using position_array = std::array<position, 4>;

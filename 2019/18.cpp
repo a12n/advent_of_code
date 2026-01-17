@@ -189,9 +189,7 @@ int main()
         if (c != '@' && c != '.' && c != '#' && (c < 'a' || c > 'z') && (c < 'A' && c > 'Z')) {
             throw std::invalid_argument(__func__);
         }
-        if (key(c)) {
-            all_keys |= key(c);
-        }
+        all_keys |= key(c);
         return c;
     });
 

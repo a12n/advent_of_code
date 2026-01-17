@@ -42,6 +42,10 @@ size_t search(const vault_map& vault, position start, keys_set keys, keys_set ta
     assert(at(vault, start, '#') != '#');
     states.push({ 0, start, keys });
 
+    std::cerr << __func__ << ':'
+              << " start " << start
+              << " keys " << keys
+              << " target_keys " << target_keys;
     while (!states.empty()) {
         auto [steps, p, keys] = states.front();
         states.pop();
@@ -62,6 +66,7 @@ size_t search(const vault_map& vault, position start, keys_set keys, keys_set ta
         }
 
         if ((keys & target_keys) == target_keys) {
+            std::cerr << " steps " << steps << '\n';
             return steps;
         }
 
@@ -76,6 +81,7 @@ size_t search(const vault_map& vault, position start, keys_set keys, keys_set ta
         }
     }
 
+    std::cerr << " infeasible\n";
     return -1;
 }
 

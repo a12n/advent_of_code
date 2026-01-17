@@ -34,7 +34,7 @@ constexpr keys_set door(char c)
 
 using vault_map = dense_grid<char>;
 
-size_t search(const vault_map& vault, position start, keys_set keys, keys_set all_keys)
+size_t search(const vault_map& vault, position start, keys_set keys, keys_set target_keys)
 {
     std::queue<std::tuple<size_t, position, keys_set>> states;
     std::set<std::tuple<position, keys_set>> seen;
@@ -61,7 +61,7 @@ size_t search(const vault_map& vault, position start, keys_set keys, keys_set al
             keys |= key(c);
         }
 
-        if ((keys & all_keys) == all_keys) {
+        if ((keys & target_keys) == target_keys) {
             return steps;
         }
 

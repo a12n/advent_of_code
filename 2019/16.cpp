@@ -50,11 +50,16 @@ int main()
     }
 
     std::cerr << "signal " << signal << " phases " << phases << '\n';
+
+#if PART == 1
     while (phases-- > 0) {
         signal = fft(signal);
     }
-
     std::cout << signal.substr(0, 8) << '\n';
+#elif PART == 2
+    const size_t offset = std::stoul(signal.substr(0, 7));
+    std::cerr << "offset " << offset << '\n';
+#endif // PART
 
     return 0;
 }

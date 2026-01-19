@@ -75,11 +75,11 @@ technique operator|(technique f, technique g)
 // G used over and over again across the tree. In this case, techique
 // G should be allocated once and only the pointer should be used
 // instead of newly constructed function.
-technique_ptr operator|(technique_ptr f, technique_ptr g)
+technique operator|(technique_ptr f, technique_ptr g)
 {
-    return std::make_shared<technique>([f, g](size_t i) {
+    return [f, g](size_t i) {
         return (*g)((*f)(i));
-    });
+    };
 }
 
 template <size_t n>
@@ -158,7 +158,7 @@ int main()
     shuffle_inv[0] = std::make_shared<technique>(input<119315717514047>(std::cin, true));
     for (size_t i = 1; i < shuffle_inv.size(); ++i) {
         // Technique performed 2**i times.
-        shuffle_inv[i] = shuffle_inv[i - 1] | shuffle_inv[i - 1];
+        shuffle_inv[i] = std::make_shared<technique>(shuffle_inv[i - 1] | shuffle_inv[i - 1]);
     }
 
     // Perform technique N = 101741582076661 number of times. For each

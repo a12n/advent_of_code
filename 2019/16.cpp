@@ -49,7 +49,7 @@ int main()
         phases = std::stol(phases_env);
     }
 
-    std::cerr << "signal " << std::quoted(signal) << " phases " << phases << '\n';
+    std::cerr << "signal " << signal << " phases " << phases << '\n';
     while (phases-- > 0) {
         signal = fft(signal);
     }

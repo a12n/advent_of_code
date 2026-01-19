@@ -2,12 +2,14 @@
 #include <cstdlib>
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 
 namespace {
 
 using technique = std::function<size_t(size_t)>;
+using technique_ptr = std::shared_ptr<technique>;
 
 template <size_t n>
 technique deal_into_new_stack()
@@ -69,6 +71,17 @@ technique operator|(technique f, technique g)
     };
 }
 
+// There may be large trees of techique application with some techique
+// G used over and over again across the tree. In this case, techique
+// G should be allocated once and only the pointer should be used
+// instead of newly constructed function.
+technique_ptr operator|(technique_ptr f, technique_ptr g)
+{
+    return std::make_shared<technique>([f, g](size_t i) {
+        return (*g)((*f)(i));
+    });
+}
+
 template <size_t n>
 technique input(std::istream& s, bool inv = false, technique f = [](size_t i) { return i; })
 {
@@ -121,9 +134,49 @@ int main()
     const auto shuffle = input<10007>(std::cin);
     std::cout << shuffle(2019) << '\n';
 #elif PART == 2
-    const auto shuffle_inv = input<119315717514047>(std::cin, true);
-    // TODO
-    std::cout << shuffle_inv(2020) << '\n';
+    // Technique F performed N times by "exponentiation by squaring" principle.
+    //
+    // Let F_N is the technique F performed N times.
+    // F_1 = F
+    // F_2 = F_1 | F_1
+    // F_4 = F_2 | F_2
+    // F_8 = F_4 | F_4
+    // …
+    // F_N = F_{N / 2} | F_{N / 2} for any N what is power of 2.
+    //
+    // Any positive N may be represented as sum of powers of 2.
+    // E.g.
+    // N = 5 = 4 + 1 = 0b101
+    // F_5 = F_4 | F_1
+    //
+    // The `shuffle_inv` array, stores at index I the techique applied
+    // 2**I times for I up to (64 - 1). This then may be used to apply
+    // the techique any number of times up to 2**64.
+    std::array<technique_ptr, 64> shuffle_inv;
+
+    // Technique performed 2**0 = 1 times.
+    shuffle_inv[0] = std::make_shared<technique>(input<119315717514047>(std::cin, true));
+    for (size_t i = 1; i < shuffle_inv.size(); ++i) {
+        // Technique performed 2**i times.
+        shuffle_inv[i] = shuffle_inv[i - 1] | shuffle_inv[i - 1];
+    }
+
+    // Perform technique N = 101741582076661 number of times. For each
+    // power of two component 2**k of N, perform technique 2**k times.
+    size_t i = 2020;
+    for (size_t n = 101741582076661, k = 0; n != 0; n >>= 1, ++k) {
+        std::cerr << "n " << n
+                  << " k " << k
+                  << " i " << i
+                  << '\n';
+
+        if (n & 1) {
+            // TODO: Memoization.
+            i = (*shuffle_inv[k])(i);
+        }
+    }
+
+    std::cout << i << '\n';
 #endif // PART
     return 0;
 }

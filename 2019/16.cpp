@@ -6,7 +6,7 @@
 namespace {
 
 
-const std::array<int, 4> base_pattern = { 0, 1, 0, -1 };
+constexpr std::array<int, 4> base_pattern = { 0, 1, 0, -1 };
 
 // Index into base pattern.
 //
@@ -18,7 +18,7 @@ const std::array<int, 4> base_pattern = { 0, 1, 0, -1 };
 //
 // j/(i+1)
 // (j+1)/(i+1)
-inline size_t index(size_t i, size_t j)
+constexpr size_t index(size_t i, size_t j)
 {
     return ((j + 1) / (i + 1)) % base_pattern.size();
 }

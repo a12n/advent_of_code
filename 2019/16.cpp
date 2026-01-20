@@ -36,11 +36,62 @@ std::string fft(std::string_view s)
     return t;
 }
 
+// i=0
+//  1  0 -1  0  1  0 -1  0  1  0 -1  0  1  0 -1
+// pos1=[0, 4,  8, 12, …]
+// neg1=[2, 6, 10, 14, …]=pos1+2
+//
+// i=1
+//  0  1  1  0  0 -1 -1  0  0  1  1  0  0  -1  -1  0  0  1  1  0  0 -1 -1
+// pos1=[1, 2,  9, 10, 17, 18, …]
+// neg1=[5, 6, 13, 14, 21, 22, …]=pos1+4=pos1+(i+1)*2
+//
+// i=2
+//  0  0  1  1  1  0  0  0 -1 -1 -1  0  0  0  1  1  1  0  0  0 -1 -1 -1  0  0  0  1  1  1  0  0  0 -1 -1 -1
+// pos1=[2,3, 4,  14,15,16,  26,27,28, …]
+// neg1=[8,9,10,  20,21,22,  32,33,34, …]=pos1+6=pos1+(i+1)*2
+//
+// i=N
+// pos1=first series starts at i, has length i+1, next series starts at +(i+1)*2*2
+// neg1=pos1 + (i+1)*2
+//
+// TODO: Top-down, halve.
+void fft(std::string& t, std::string_view s)
+{
+    t.resize(s.size());
+
+    for (size_t i = 0; i < t.size(); ++i) {
+        int n = 0;
+
+        // +1
+        for (size_t j = i; j < s.size(); j += (i + 1) * 2 * 2) {
+            for (size_t k = 0; k < i + 1; ++k) {
+                if (j + k >= s.size()) {
+                    break;
+                }
+                n += (s[j + k] - '0');
+            }
+        }
+
+        // -1
+        for (size_t j = i + (i + 1) * 2; j < s.size(); j += (i + 1) * 2 * 2) {
+            for (size_t k = 0; k < i + 1; ++k) {
+                if (j + k >= s.size()) {
+                    break;
+                }
+                n -= (s[j + k] - '0');
+            }
+        }
+
+        t[i] = (std::abs(n) % 10) + '0';
+    }
+}
+
 } // namespace
 
 int main()
 {
-    std::string signal;
+    std::string signal, next_signal;
 
     std::getline(std::cin, signal);
 
@@ -53,7 +104,8 @@ int main()
 
 #if PART == 1
     while (phases-- > 0) {
-        signal = fft(signal);
+        fft(next_signal, signal);
+        std::swap(signal, next_signal);
     }
     std::cout << signal.substr(0, 8) << '\n';
 #elif PART == 2

@@ -61,7 +61,7 @@ void fft(std::string& t, std::string_view s)
     t.resize(s.size());
 
     for (size_t i = 0; i < t.size(); ++i) {
-        int n = 0;
+        int x = 0;
 
         // +1
         for (size_t j = i; j < s.size(); j += (i + 1) * 2 * 2) {
@@ -69,7 +69,7 @@ void fft(std::string& t, std::string_view s)
                 if (j + k >= s.size()) {
                     break;
                 }
-                n += (s[j + k] - '0');
+                x += (s[j + k] - '0');
             }
         }
 
@@ -79,11 +79,11 @@ void fft(std::string& t, std::string_view s)
                 if (j + k >= s.size()) {
                     break;
                 }
-                n -= (s[j + k] - '0');
+                x -= (s[j + k] - '0');
             }
         }
 
-        t[i] = (std::abs(n) % 10) + '0';
+        t[i] = (std::abs(x) % 10) + '0';
     }
 }
 

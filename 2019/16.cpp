@@ -1,4 +1,5 @@
 #include <array>
+#include <cassert>
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -87,6 +88,61 @@ void fft(std::string& t, std::string_view s)
     }
 }
 
+//  1  2  3  4  5  6  7  8  9 10
+//
+//  1  0 -1  0  1  0 -1  0  1  0   = next elt + @1 - @2 - 2@3 + @5 + @6 + @9 - @10
+//  0  1  1  0  0 -1 -1  0  0  1   = next elt + @2 - @4 - @5 - @6 - @7 + @10
+//  0  0  1  1  1  0  0  0 -1 -1   = next elt + @3 - (row+3) + (row+5) - (row+6)
+//  0  0  0  1  1  1  1  0  0  0   = next elt + @4 - (row+4) + (row+5)
+//  0  0  0  0  1  1  1  1  1  0   = next elt + @5 - (row+5)
+//  0  0  0  0  0  1  1  1  1  1   = next elt + @6
+//  0  0  0  0  0  0  1  1  1  1   = next elt + @7
+//  0  0  0  0  0  0  0  1  1  1   = next elt + @8
+//  0  0  0  0  0  0  0  0  1  1   = next elt + @9
+//  0  0  0  0  0  0  0  0  0  1   = last elt
+//
+//  1  2  3  4  5  6  7  8
+//  0  1  2  3  4  5  6  7
+//
+//  1  0 -1  0  1  0 -1  0
+//  0  1  1  0  0 -1 -1  0
+//  0  0  1  1  1  0  0  0
+//  0  0  0  1  1  1  1  0
+//  0  0  0  0  1  1  1  1
+//  0  0  0  0  0  1  1  1
+//  0  0  0  0  0  0  1  1
+//  0  0  0  0  0  0  0  1
+
+// Any N×N sub-matrix starting at top-left element will have it's
+// bottom half (sub-matrix of size ⌈N/2⌉×N) of diagonal ones.
+//
+//     0       N/2       N
+//   0 +--------+--------+
+//     | recurs |  ? ? ? |
+//     |   ive  | ? ? ?  |
+// N/2 +--------+--------+
+//     | zeroes | diag   |
+//     |        |  ones  |
+//   N +--------+--------+
+void fft2(std::string& t, size_t k, size_t m, std::string_view s, size_t n)
+{
+    assert(k >= (n / 2));
+    assert(k + m <= n);
+
+    t.resize(m);
+    for (size_t i = 0; i < m; ++i) {
+        int x = 0;
+
+        for (size_t j = i + k; j < n; ++j) {
+            std::cerr << __func__ << ": j " << j << '\n';
+            x += s[j % s.size()] - '0';
+        }
+
+        std::cerr << __func__ << ": i+k " << i+k << '\n';
+        t[i] = (std::abs(x) % 10) + '0';
+    }
+}
+
 } // namespace
 
 int main()
@@ -109,8 +165,16 @@ int main()
     }
     std::cout << signal.substr(0, 8) << '\n';
 #elif PART == 2
-    const size_t offset = std::stoul(signal.substr(0, 7));
-    std::cerr << "offset " << offset << '\n';
+    fft2(next_signal, 5, 3, "12345678", 8);
+
+    // const size_t offset = std::stoul(signal.substr(0, 7));
+    // std::cerr << "offset " << offset << '\n';
+    //
+    // while (phases-- > 0) {
+    //     fft2(next_signal, offset, 8, signal, signal.size() * 10'000);
+    // }
+
+    std::cout << next_signal << '\n';
 #endif // PART
 
     return 0;

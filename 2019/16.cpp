@@ -198,10 +198,7 @@ int main()
 
         t[n_part - 1] = s[n_part - 1];
         for (size_t i = 1; i < n_part; ++i) {
-            t[n_part - i - 1] = s[n_part - i - 1] + t[n_part - i];
-        }
-        for (size_t i = 0; i < n_part; ++i) {
-            t[i] = std::abs(t[i]) % 10;
+            t[n_part - i - 1] = (s[n_part - i - 1] + t[n_part - i]) % 10;
         }
 
         std::swap(s, t);

@@ -1,4 +1,5 @@
 #include <array>
+#include <vector>
 #include <cassert>
 #include <iostream>
 #include <string>
@@ -170,27 +171,49 @@ int main()
     const size_t offset = std::stoul(signal.substr(0, 7));
     std::cerr << "offset " << offset << '\n';
 
-    next_signal.resize(8);
-    for (size_t i = 0; i < 8; ++i) {
-        next_signal[i] = signal[(i + offset) % signal.size()];
+    const size_t n_full = 10'000 * signal.size();
+    const size_t n_part = n_full - offset;
+    std::cerr << "n_full " << n_full << '\n'
+              << "n_part " << n_part << '\n';
+
+    assert(offset >= (n_full / 2));
+
+    std::vector<int> s, t;
+
+    s.resize(n_part);
+    t.resize(n_part);
+    for (size_t i = 0; i < n_part; ++i) {
+        s[i] = signal[(i + offset) % signal.size()] - '0';
     }
-    std::swap(signal, next_signal);
+
+    assert(s[0] == 7);
+    assert(s[1] == 4);
+    assert(s[2] == 8);
+    assert(s[3] == 1);
+    assert(s[4] == 1);
+    assert(s[5] == 2);
+    assert(s[6] == 1);
+    assert(s[7] == 2);
 
     while (phases-- > 0) {
-        next_signal.resize(8);
-        for (size_t i = 0; i < 8; ++i) {
-            int x = 0;
+        // std::cerr<<"phases " << phases << '\n';
 
-            for (size_t j = i; j < 8; ++j) {
-                x += signal[j] - '0';
-            }
-
-            next_signal[i] = (std::abs(x) % 10) + '0';
+        t[n_part - 1] = s[n_part - 1];
+        for (size_t i = 1; i < n_part; ++i) {
+            t[n_part - i - 1] = s[n_part - i - 1] + s[n_part - i];
         }
-        std::swap(signal, next_signal);
+        for (size_t i = 0; i < n_part; ++i) {
+            t[i] = std::abs(t[i]) % 10;
+        }
+
+        std::swap(s, t);
     }
 
-    std::cout << signal << '\n';
+    // std::cout << signal.substr(0,8) << '\n';
+    for (size_t i = 0; i < 8; ++i) {
+        std::cout << ' '<< s[i];
+    }
+    std::cout << '\n';
 #endif // PART
 
     return 0;

@@ -165,16 +165,32 @@ int main()
     }
     std::cout << signal.substr(0, 8) << '\n';
 #elif PART == 2
-    fft2(next_signal, 5, 3, "12345678", 8);
+    // fft2(next_signal, 5, 3, "12345678", 8);
 
-    // const size_t offset = std::stoul(signal.substr(0, 7));
-    // std::cerr << "offset " << offset << '\n';
-    //
-    // while (phases-- > 0) {
-    //     fft2(next_signal, offset, 8, signal, signal.size() * 10'000);
-    // }
+    const size_t offset = std::stoul(signal.substr(0, 7));
+    std::cerr << "offset " << offset << '\n';
 
-    std::cout << next_signal << '\n';
+    next_signal.resize(8);
+    for (size_t i = 0; i < 8; ++i) {
+        next_signal[i] = signal[(i + offset) % signal.size()];
+    }
+    std::swap(signal, next_signal);
+
+    while (phases-- > 0) {
+        next_signal.resize(8);
+        for (size_t i = 0; i < 8; ++i) {
+            int x = 0;
+
+            for (size_t j = i; j < 8; ++j) {
+                x += signal[j] - '0';
+            }
+
+            next_signal[i] = (std::abs(x) % 10) + '0';
+        }
+        std::swap(signal, next_signal);
+    }
+
+    std::cout << signal << '\n';
 #endif // PART
 
     return 0;

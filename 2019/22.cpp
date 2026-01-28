@@ -4,6 +4,120 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <variant>
+
+namespace alt {
+
+template <size_t n>
+struct deal_into_new_stack {
+    size_t operator()(size_t i) const
+    {
+        assert(i < n);
+        return (n - 1) - i;
+    }
+};
+
+template <size_t n>
+struct cut_cards {
+    cut_cards() = default;
+
+    cut_cards(int init_k)
+        : k(init_k < 0 ? init_k + n : init_k)
+    {
+        assert(k <= n);
+    }
+
+    cut_cards(int init_k, bool inv)
+        : cut_cards(inv ? -init_k : init_k)
+    {
+    }
+
+    size_t operator()(size_t i) const
+    {
+        assert(i < n);
+        return (i < k) ? (n - k + i) : (i - k);
+    }
+
+    const size_t k {};
+};
+
+template <size_t n>
+struct deal_with_increment {
+    deal_with_increment() = default;
+
+    deal_with_increment(size_t k, bool inv = false)
+        : k(k)
+        , inv(inv)
+    {
+    }
+
+    size_t operator()(size_t i) const
+    {
+        assert(i < n);
+        // k = 3
+        // 0 1 2 3 4 5 6 7 8 9 ->
+        // 0 7 4 1 8 5 2 9 6 3
+        // *   . *     *     *
+        //
+        // k = 7
+        // 0 1 2 3 4 5 6 7 8 9 ->
+        // 0 3 6 9 2 5 8 1 4 7
+        // *       .     *
+        if (inv) {
+            // TODO: Extended Euclidean algorithm?
+            while (i % k != 0) {
+                i += n;
+            }
+            return i / k;
+        } else {
+            return (i * k) % n;
+        }
+    }
+
+    const size_t k {};
+    const bool inv {};
+};
+
+template <size_t n>
+struct technique {
+    std::variant<deal_into_new_stack<n>, cut_cards<n>, deal_with_increment<n>> f;
+
+    size_t operator()(size_t i) const
+    {
+        return std::visit([i](auto&& v) -> size_t { return v(i); }, f);
+    }
+};
+
+template <size_t n>
+struct technique_list {
+    std::vector<technique<n>> fs;
+
+    size_t operator()(size_t i) const
+    {
+        for (const auto& f : fs) {
+            i = f(i);
+        }
+        return i;
+    }
+};
+
+template <size_t n>
+technique_list<n> optimize(const technique_list<n>& techniques)
+{
+    technique_list<n> ans;
+
+    // TODO
+    // deal_into_new_stack | deal_with_increment k = ?
+    // deal_into_new_stack | cut_cards k = ?
+    // deal_with_increment k1 | cut_cards k2 = ?
+    // cut_cards k1 | deal_with_increment k2 = ?
+
+    return ans;
+}
+
+} // namespace alt
+
+//----------------------------------------------------------------------------
 
 namespace {
 

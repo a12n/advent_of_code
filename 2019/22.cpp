@@ -120,6 +120,77 @@ technique_list<n> optimize(const technique_list<n>& techniques)
 
 //----------------------------------------------------------------------------
 
+// https://codeforces.com/blog/entry/72527
+namespace mod {
+
+template <int64_t m>
+constexpr int64_t wrp(int64_t a)
+{
+    return a < 0 ? a + m : a;
+}
+
+template <int64_t m>
+constexpr int64_t mod(int64_t a)
+{
+    return wrp<m>(a % m);
+}
+
+template <int64_t m>
+constexpr int64_t add(int64_t a, int64_t b)
+{
+    return mod<m>(a + b);
+}
+
+template <int64_t m>
+constexpr int64_t sub(int64_t a, int64_t b)
+{
+    return mod<m>(a - b);
+}
+
+template <int64_t m>
+constexpr int64_t mul(int64_t a, int64_t b)
+{
+    __int128_t c = a;
+    c *= b;
+    c %= m;
+    return wrp<m>(c);
+}
+
+template <int64_t m>
+constexpr int64_t pow(int64_t a, int64_t n)
+{
+    if (n > 0) {
+        if (n % 2 == 0) {
+            return pow<m>(mul<m>(a, a), n / 2);
+        } else {
+            return mul<m>(a, pow<m>(a, n - 1));
+        }
+    } else if (n == 0) {
+        return mod<m>(1);
+    } else {
+        // XXX
+        return 0;
+    }
+}
+
+// a must be non-zero
+// m must be prime
+template <int64_t m>
+constexpr int64_t inv(int64_t a)
+{
+    return pow<m>(a, m - 2);
+}
+
+template <int64_t m>
+constexpr int64_t div(int64_t a, int64_t b)
+{
+    return mul<m>(a, inv<m>(b));
+}
+
+} // namespace mod
+
+//----------------------------------------------------------------------------
+
 namespace {
 
 using technique = std::function<size_t(size_t)>;

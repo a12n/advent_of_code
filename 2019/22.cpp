@@ -189,6 +189,53 @@ constexpr int64_t div(int64_t a, int64_t b)
 
 } // namespace mod
 
+// Linear congruential generator `y = (a x + c) % m`.
+template <int64_t m>
+struct lcg {
+    const int64_t a = 1, c = 0;
+
+    // f(x) = (a x + c) % m
+    constexpr int64_t eval(int64_t x) const
+    {
+        return mod::add<m>(mod::mul<m>(a, x), c);
+    }
+
+    // f^{-1}(x) = ((x - c) / a) % m
+    constexpr int64_t eval_inv(int64_t x) const
+    {
+        return mod::div<m>(mod::sub<m>(x, c), a);
+    }
+};
+
+// f₁(x) = (a₁ x + c₁) % m
+// f₂(x) = (a₂ x + c₂) % m
+//
+// f₂(f₁(x)) =
+// (a₂ (a₁ x + c₁) + c₂) % m =
+// ((a₁ a₂) x + (a₂ c₁ + c₂)) % m
+template <int64_t m>
+constexpr lcg<m> compose(lcg<m> f, lcg<m> g)
+{
+    return { mod::mul<m>(f.a, g.a), mod::add<m>(mod::mul<m>(g.a, f.c), g.c) };
+}
+
+template <int64_t m>
+constexpr lcg<m> iterate(lcg<m> f, int64_t n)
+{
+    if (n > 0) {
+        if (n % 2 == 0) {
+            return iterate<m>(compose<m>(f, f), n / 2);
+        } else {
+            return compose<m>(f, iterate<m>(f, n - 1));
+        }
+    } else if (n == 0) {
+        return { 1, 0 };
+    } else {
+        // XXX
+        return { 1 / 0, 0 };
+    }
+}
+
 //----------------------------------------------------------------------------
 
 namespace {

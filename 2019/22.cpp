@@ -425,8 +425,7 @@ technique input(std::istream& s, bool inv = false, technique f = [](size_t i) { 
 int main()
 {
 #if PART == 1
-    const auto shuffle = input<10007>(std::cin);
-    std::cout << shuffle(2019) << '\n';
+    std::cout << shuffle::input<10007>(std::cin).eval(2019) << '\n';
 #elif PART == 2
     // Technique F performed N times by "exponentiation by squaring" principle.
     //

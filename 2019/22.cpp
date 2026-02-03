@@ -7,6 +7,21 @@
 #include <string>
 #include <variant>
 
+bool starts_with(std::string_view s, std::string_view t)
+{
+    return s.substr(0, t.size()) == t;
+}
+
+std::string_view trim_prefix(std::string_view s, std::string_view t)
+{
+    if (starts_with(s, t)) {
+        s = s.substr(t.size());
+    }
+    return s;
+}
+
+//----------------------------------------------------------------------------
+
 // https://codeforces.com/blog/entry/72527
 namespace mod {
 
@@ -76,6 +91,8 @@ constexpr int64_t div(int64_t a, int64_t b)
 
 } // namespace mod
 
+//----------------------------------------------------------------------------
+
 // Linear congruential generator `y = (a x + c) % m`.
 template <int64_t m>
 struct lcg {
@@ -123,6 +140,8 @@ constexpr lcg<m> iterate(lcg<m> f, int64_t n)
     }
 }
 
+//----------------------------------------------------------------------------
+
 namespace shuffle {
 
 template <int64_t m>
@@ -141,19 +160,6 @@ template <int64_t m>
 constexpr lcg<m> deal_with_increment(int64_t k)
 {
     return { k, 0 };
-}
-
-bool starts_with(std::string_view s, std::string_view t)
-{
-    return s.substr(0, t.size()) == t;
-}
-
-std::string_view trim_prefix(std::string_view s, std::string_view t)
-{
-    if (starts_with(s, t)) {
-        s = s.substr(t.size());
-    }
-    return s;
 }
 
 template <int64_t m>

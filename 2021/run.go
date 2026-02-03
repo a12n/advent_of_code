@@ -12,6 +12,7 @@ import (
 
 	"a12n/advent_of_code/2021/day01"
 	"a12n/advent_of_code/2021/day02"
+	"a12n/advent_of_code/2021/day03"
 	"a12n/advent_of_code/2021/day04"
 )
 
@@ -51,7 +52,7 @@ func run() error {
 	var dispatch = [25][2](func(*bufio.Reader, io.Writer) error){
 		{day01.Part1, day01.Part2},
 		{day02.Part1, day02.Part2},
-		{nil, nil},
+		{day03.Part1, day03.Part2},
 		{day04.Part1, day04.Part2},
 	}
 

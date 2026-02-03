@@ -1,0 +1,176 @@
+(define-library (advent matrix)
+  (export matrix-rows matrix-cols
+          matrix-unfold matrix-copy make-matrix make-matrix-identity
+          matrix-ref matrix-ref-row matrix-ref-col
+          matrix-set! matrix-set-row! matrix-set-col!
+          matrix-transpose
+          matrix-fold
+          matrix-map! matrix-map-row! matrix-map-col!
+          matrix-elim-mul! matrix-elim-add!
+          matrix-pivot!)
+
+  (import (scheme base)
+          (scheme case-lambda)
+          (srfi 43))
+
+  (begin
+
+    (define (matrix-rows a)
+      (vector-length a))
+
+    (define (matrix-cols a)
+      (if (vector-empty? a) 0
+          (vector-length (vector-ref a 0))))
+
+    (define (matrix-unfold f n m)
+      (vector-unfold
+       (lambda (i)
+         (vector-unfold
+          (lambda (j)
+            (f i j))
+          m))
+       n))
+
+    (define matrix-copy
+      (case-lambda
+       ((a)
+        (let ((b (vector-copy a)))
+          (vector-map!
+           (lambda (_ u)
+             (vector-copy u))
+           b)
+          b))
+       ((a rstart rend cstart cend)
+        (let ((b (vector-copy a rstart rend)))
+          (vector-map!
+           (lambda (_ u)
+             (vector-copy u cstart cend))
+           b)
+          b))))
+
+    (define (make-matrix n m x)
+      (matrix-unfold (lambda (i j) x) n m))
+
+    (define (make-matrix-identity n)
+      (matrix-unfold (lambda (i j) (if (= i j) 1 0)) n n))
+
+    (define (matrix-ref a i j)
+      (vector-ref (vector-ref a i) j))
+
+    (define (matrix-ref-row a i)
+      (vector-ref a i))
+
+    (define (matrix-ref-col a j)
+      (vector-unfold
+       (lambda (i)
+         (matrix-ref a i j))
+       (vector-length a)))
+
+    (define (matrix-set! a i j x)
+      (vector-set! (vector-ref a i) j x))
+
+    (define (matrix-set-row! a i u)
+      (if (= (vector-length (vector-ref a i))
+             (vector-length u))
+          (vector-set! a i u)
+          (error "invalid length" u)))
+
+    (define (matrix-set-col! a j v)
+      (if (= (vector-length a)
+             (vector-length v))
+          (vector-for-each
+           (lambda (i x)
+             (matrix-set! a i j x))
+           v)
+          (error "invalid length" v)))
+
+    (define (matrix-transpose a)
+      (matrix-unfold
+       (lambda (i j)
+         (matrix-ref a j i))
+       (matrix-cols a)
+       (matrix-rows a)))
+
+    (define matrix-fold
+      (case-lambda
+       ((f acc a)
+        (matrix-fold f acc a
+                     0 (matrix-rows a)
+                     0 (matrix-cols a)))
+       ((f acc a rstart rend cstart cend)
+        (let loop ((i rstart)
+                   (j cstart)
+                   (acc acc))
+          (cond
+           ((= i rend) acc)
+           ((= j cend) (loop (+ i 1) cstart acc))
+           (else (loop i (+ j 1) (f i j acc (matrix-ref a i j)))))))))
+
+    (define matrix-map!
+      (case-lambda
+       ((f a)
+        (matrix-map! f a
+                     0 (matrix-rows a)
+                     0 (matrix-cols a)))
+       ((f a rstart rend cstart cend)
+        (matrix-fold
+         (lambda (i j _ x)
+           (matrix-set! a i j (f i j x)))
+         #f a rstart rend cstart cend))))
+
+    (define matrix-map-row!
+      (case-lambda
+       ((f a i)
+        (matrix-map-row! f a i 0 (matrix-cols a)))
+       ((f a i cstart cend)
+        (matrix-map!
+         (lambda (_ j x)
+           (f j x))
+         a i (+ i 1) cstart cend))))
+
+    (define matrix-map-col!
+      (case-lambda
+       ((f a j)
+        (matrix-map-col! f a j 0 (matrix-rows a)))
+       ((f a j rstart rend)
+        (matrix-map!
+         (lambda (i _ x)
+           (f i x))
+         a rstart rend j (+ j 1)))))
+
+    ;; Elementary row operation "Row multiplication".
+    ;; k R_i -> R_i, where k != 0
+    (define (matrix-elim-mul! a i k)
+      (vector-map!
+       (lambda (_ x)
+         (* x c))
+       (vector-ref a i)))
+
+    ;; Elementary row operation "Row addition".
+    ;; R_i + k R_j -> R_i, where i != j
+    (define (matrix-elim-add! a i j k)
+      (let ((v (vector-ref a j)))
+        (vector-map!
+         (lambda (j x)
+           (+ x (* (vector-ref v j) k)))
+         (vector-ref a i))))
+
+    (define (matrix-pivot! a pi pj)
+      (let* ((prow (vector-ref a pi))
+             (p (vector-ref prow pj)))
+        (vector-map!
+         (lambda (_ x)
+           (/ x p))
+         prow)
+        (vector-map!
+         (lambda (i row)
+           (unless (= i pi)
+             (let ((px (vector-ref row pj)))
+               (vector-map!
+                (lambda (j x)
+                  (- x (* px (vector-ref prow j))))
+                row)))
+           row)
+         a)))
+
+    ))

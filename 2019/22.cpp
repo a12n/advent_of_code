@@ -192,7 +192,7 @@ constexpr int64_t div(int64_t a, int64_t b)
 // Linear congruential generator `y = (a x + c) % m`.
 template <int64_t m>
 struct lcg {
-    const int64_t a = 1, c = 0;
+    int64_t a = 1, c = 0;
 
     // f(x) = (a x + c) % m
     constexpr int64_t eval(int64_t x) const

@@ -14,6 +14,7 @@ import (
 	"a12n/advent_of_code/2021/day02"
 	"a12n/advent_of_code/2021/day03"
 	"a12n/advent_of_code/2021/day04"
+	"a12n/advent_of_code/2021/day05"
 )
 
 func run() error {
@@ -54,6 +55,7 @@ func run() error {
 		{day02.Part1, day02.Part2},
 		{day03.Part1, day03.Part2},
 		{day04.Part1, day04.Part2},
+		{day05.Part1, day05.Part2},
 	}
 
 	return dispatch[day-1][part-1](bufio.NewReader(os.Stdin), os.Stdout)

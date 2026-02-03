@@ -236,6 +236,68 @@ constexpr lcg<m> iterate(lcg<m> f, int64_t n)
     }
 }
 
+namespace shuffle {
+
+template <int64_t m>
+constexpr lcg<m> deal_into_new_stack()
+{
+    return { -1, -1 };
+}
+
+template <int64_t m>
+constexpr lcg<m> cut_cards(int64_t k)
+{
+    return { 1, -k };
+}
+
+template <int64_t m>
+constexpr lcg<m> deal_with_increment(int64_t k)
+{
+    return { k, 0 };
+}
+
+bool starts_with(std::string_view s, std::string_view t)
+{
+    return s.substr(0, t.size()) == t;
+}
+
+std::string_view trim_prefix(std::string_view s, std::string_view t)
+{
+    if (starts_with(s, t)) {
+        s = s.substr(t.size());
+    }
+    return s;
+}
+
+template <int64_t m>
+lcg<m> parse(std::string_view s)
+{
+    if (const auto t = trim_prefix(s, "deal into new stack"); t != s) {
+        return deal_into_new_stack<m>();
+    } else if (const auto t = trim_prefix(s, "cut "); t != s) {
+        return cut_cards<m>(std::stoll(std::string(t)));
+    } else if (const auto t = trim_prefix(s, "deal with increment "); t != s) {
+        return deal_with_increment<m>(std::stoll(std::string(t)));
+    } else {
+        throw std::invalid_argument(__func__);
+    }
+}
+
+template <int64_t m>
+lcg<m> input(std::istream& s)
+{
+    lcg<m> f;
+    std::string l;
+
+    while (std::getline(s, l)) {
+        f = compose<m>(f, parse<m>(l));
+    }
+
+    return f;
+}
+
+} // namespace shuffle
+
 //----------------------------------------------------------------------------
 
 namespace {

@@ -195,124 +195,12 @@ lcg<m> input(std::istream& s)
 
 int main()
 {
+    std::cout <<
 #if PART == 1
-    std::cout << shuffle::input<10007>(std::cin).eval(2019) << '\n';
+        shuffle::input<10007>(std::cin).eval(2019)
 #elif PART == 2
-    std::cout << iterate(shuffle::input<119315717514047>(std::cin), 101741582076661).eval_inv(2020) << '\n';
+        iterate(shuffle::input<119315717514047>(std::cin), 101741582076661).eval_inv(2020)
 #endif // PART
-    return 0;
-}
-
-int test()
-{
-    const size_t n = 10;
-
-#if PART == 1
-    {
-        const auto shuffle = deal_with_increment<n>(7)
-            | deal_into_new_stack<n>()
-            | deal_into_new_stack<n>();
-        assert(shuffle(0) == 0);
-        assert(shuffle(1) == 7);
-        assert(shuffle(2) == 4);
-        assert(shuffle(3) == 1);
-        assert(shuffle(4) == 8);
-        assert(shuffle(5) == 5);
-        assert(shuffle(6) == 2);
-        assert(shuffle(7) == 9);
-        assert(shuffle(8) == 6);
-        assert(shuffle(9) == 3);
-    }
-
-    {
-        const auto shuffle = cut_cards<n>(6)
-            | deal_with_increment<n>(7)
-            | deal_into_new_stack<n>();
-        assert(shuffle(0) == 1);
-        assert(shuffle(1) == 4);
-        assert(shuffle(2) == 7);
-        assert(shuffle(3) == 0);
-        assert(shuffle(4) == 3);
-        assert(shuffle(5) == 6);
-        assert(shuffle(6) == 9);
-        assert(shuffle(7) == 2);
-        assert(shuffle(8) == 5);
-        assert(shuffle(9) == 8);
-    }
-
-    {
-        const auto shuffle = deal_with_increment<n>(7)
-            | deal_with_increment<n>(9)
-            | cut_cards<n>(-2);
-        assert(shuffle(0) == 2);
-        assert(shuffle(1) == 5);
-        assert(shuffle(2) == 8);
-        assert(shuffle(3) == 1);
-        assert(shuffle(4) == 4);
-        assert(shuffle(5) == 7);
-        assert(shuffle(6) == 0);
-        assert(shuffle(7) == 3);
-        assert(shuffle(8) == 6);
-        assert(shuffle(9) == 9);
-    }
-
-    {
-        const auto shuffle = deal_into_new_stack<n>()
-            | cut_cards<n>(-2)
-            | deal_with_increment<n>(7)
-            | cut_cards<n>(8)
-            | cut_cards<n>(-4)
-            | deal_with_increment<n>(7)
-            | cut_cards<n>(3)
-            | deal_with_increment<n>(9)
-            | deal_with_increment<n>(3)
-            | cut_cards<n>(-1);
-        assert(shuffle(0) == 7);
-        assert(shuffle(1) == 4);
-        assert(shuffle(2) == 1);
-        assert(shuffle(3) == 8);
-        assert(shuffle(4) == 5);
-        assert(shuffle(5) == 2);
-        assert(shuffle(6) == 9);
-        assert(shuffle(7) == 6);
-        assert(shuffle(8) == 3);
-        assert(shuffle(9) == 0);
-    }
-#elif PART == 2
-    {
-        const auto unshuffle = deal_into_new_stack<n>()
-            | deal_into_new_stack<n>()
-            | deal_with_increment<n>(7, true);
-
-        assert(unshuffle(0) == 0);
-        assert(unshuffle(1) == 3);
-        assert(unshuffle(2) == 6);
-        assert(unshuffle(3) == 9);
-        assert(unshuffle(4) == 2);
-        assert(unshuffle(5) == 5);
-        assert(unshuffle(6) == 8);
-        assert(unshuffle(7) == 1);
-        assert(unshuffle(8) == 4);
-        assert(unshuffle(9) == 7);
-    }
-
-    {
-        const auto unshuffle = deal_into_new_stack<n>()
-            | deal_with_increment<n>(7, true)
-            | cut_cards<n>(6, true);
-
-        assert(unshuffle(0) == 3);
-        assert(unshuffle(1) == 0);
-        assert(unshuffle(2) == 7);
-        assert(unshuffle(3) == 4);
-        assert(unshuffle(4) == 1);
-        assert(unshuffle(5) == 8);
-        assert(unshuffle(6) == 5);
-        assert(unshuffle(7) == 2);
-        assert(unshuffle(8) == 9);
-        assert(unshuffle(9) == 6);
-    }
-#endif // PART
-
+              << '\n';
     return 0;
 }

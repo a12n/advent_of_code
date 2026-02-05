@@ -6,13 +6,6 @@ import (
 	"io"
 	"log"
 	"math"
-
-	"a12n/advent_of_code/2021/lib"
-)
-
-const (
-	X = iota
-	Y
 )
 
 // x(t) = x0 + v(t) t
@@ -116,80 +109,6 @@ const (
 // t² - 2 vy t + 2 min_y ≥ 0
 // t² - 2 vy t + 2 max_y ≤ 0
 // t ≥ vx0
-
-func optimal(x [2]int, y [2]int) {
-	roots0, _ := quadratic(1, -2*float64(x[0]))
-	roots1, _ := quadratic(1, -2*float64(x[1]))
-	fromX := int(math.Ceil(roots0[1]))
-	toX := int(math.Floor(roots1[1]))
-	log.Println("roots0", roots0, "roots1", roots1)
-
-	for vx := fromX; vx <= toX; vx++ {
-		log.Println("vx", vx)
-		for vy := 1; vy < 1000; vy++ {
-			roots0, _ = quadratic(-2*float64(vy), 2*float64(y[0]))
-			roots1, _ = quadratic(-2*float64(vy), 2*float64(y[1]))
-			log.Println("vy", vy, "roots0", roots0, "roots1", roots1)
-			fromT := int(math.Ceil(roots1[1]))
-			toT := int(math.Floor(roots0[1]))
-			if fromT >= vx && toT >= vx && fromT <= toT {
-				log.Println("fromT", fromT, "toT", toT, "h", (vy*vy+vy)/2)
-			}
-		}
-	}
-}
-
-// func reachesTarget2(vx int, tx [2]int) bool {
-//
-// }
-
-func reachesTarget(v int, t [2]int, a func(int) int) bool {
-	var p = 0
-	for {
-		log.Println("p", p, "v", v)
-		if p >= t[0] && p <= t[1] {
-			return true
-		} else if p > t[1] {
-			return false
-		}
-		var p2 = p + v
-		var v2 = v + a(v)
-		if p2 == p {
-			return false
-		}
-		p = p2
-		v = v2
-	}
-}
-
-func xRange(target [2]int) lib.Set[int] {
-	var ans = lib.Set[int]{}
-	for vx := 0; vx <= target[1]; vx++ {
-		if reachesTarget(vx, target, func(v int) int {
-			if v > 0 {
-				return -1
-			} else if v < 0 {
-				return +1
-			} else {
-				return 0
-			}
-		}) {
-			ans.Add(vx)
-		}
-	}
-	return ans
-}
-
-func yRange(target [2]int) lib.Set[int] {
-	var ans = lib.Set[int]{}
-	for vy := 0; vy < 1000; vy++ {
-		if reachesTarget(-vy, target, func(int) int { return +1 }) {
-			log.Println("add", -vy)
-			ans.Add(-vy)
-		}
-	}
-	return ans
-}
 
 func Part1(r *bufio.Reader, w io.Writer) error {
 	var err error

@@ -193,26 +193,66 @@ func yRange(target [2]int) lib.Set[int] {
 
 func Part1(r *bufio.Reader, w io.Writer) error {
 	var err error
-	var x [2]int
-	var y [2]int
+	var target, velocity struct {
+		x, y struct {
+			min int
+			max int
+		}
+	}
 
 	if _, err = fmt.Fscanf(r,
 		"target area: x=%d..%d, y=%d..%d",
-		&x[0], &x[1],
-		&y[0], &y[1],
+		&target.x.min, &target.x.max,
+		&target.y.min, &target.y.max,
 	); err != nil {
 		return err
 	}
 
-	if x[0] > x[1] {
-		x[0], x[1] = x[1], x[0]
+	if target.x.min > target.x.max {
+		target.x.min, target.x.max = target.x.max, target.x.min
 	}
-	if y[0] > y[1] {
-		y[0], y[1] = y[1], y[0]
+	if target.y.min > target.y.max {
+		target.y.min, target.y.max = target.y.max, target.y.min
 	}
 
-	log.Println(x, y)
-	optimal(x, y)
+	var roots [2]float64
+	var vx, vy, h int
+
+	roots, _ = quadratic(1, -2*float64(target.x.min))
+	velocity.x.min = int(math.Ceil(roots[1]))
+	log.Println("roots", roots)
+
+	roots, _ = quadratic(1, -2*float64(target.x.max))
+	velocity.x.max = int(math.Floor(roots[1]))
+	log.Println("roots", roots)
+	log.Println("velocity.x", velocity.x)
+
+	for vx = velocity.x.min; vx <= velocity.x.max; vx++ {
+		for vy = 1; vy < 1000; vy++ {
+			var t [2]int
+
+			log.Println("vx", vx, "vy", vy)
+
+			roots, _ = quadratic(-2*float64(vy), 2*float64(target.y.max))
+			t[0] = int(math.Ceil(roots[1]))
+			log.Println("roots", roots)
+
+			roots, _ = quadratic(-2*float64(vy), 2*float64(target.y.min))
+			t[1] = int(math.Floor(roots[1]))
+			log.Println("roots", roots)
+			log.Println("t", t)
+
+			if t[0] < vx || t[1] < vx || t[0] > t[1] {
+				// Out of target area
+				continue
+			}
+
+			h = (vy * (vy + 1)) / 2
+			log.Println("h", h)
+		}
+	}
+
+	fmt.Fprintln(w, h)
 
 	return err
 }

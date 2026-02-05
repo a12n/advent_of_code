@@ -144,9 +144,6 @@ func optimal(x [2]int, y [2]int) {
 			if fromT >= vx && toT >= vx && fromT <= toT {
 				log.Println("fromT", fromT, "toT", toT, "h", (vy*vy+vy)/2)
 			}
-			if fromT > toT {
-				return
-			}
 		}
 	}
 }

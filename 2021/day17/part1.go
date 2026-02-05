@@ -117,15 +117,6 @@ const (
 // t² - 2 vy t + 2 max_y ≤ 0
 // t ≥ vx0
 
-func quadratic(p, q float64) ([2]float64, bool) {
-	var d = (p*p)/(2*2) - q
-	if d < 0 {
-		return [2]float64{}, false
-	}
-	d = math.Sqrt(d)
-	return [2]float64{-p/2 - d, -p/2 + d}, true
-}
-
 func optimal(x [2]int, y [2]int) {
 	roots0, _ := quadratic(1, -2*float64(x[0]))
 	roots1, _ := quadratic(1, -2*float64(x[1]))
@@ -224,4 +215,13 @@ func Part1(r *bufio.Reader, w io.Writer) error {
 	optimal(x, y)
 
 	return err
+}
+
+func quadratic(p, q float64) ([2]float64, bool) {
+	var d = (p*p)/(2*2) - q
+	if d < 0 {
+		return [2]float64{}, false
+	}
+	d = math.Sqrt(d)
+	return [2]float64{-p/2 - d, -p/2 + d}, true
 }

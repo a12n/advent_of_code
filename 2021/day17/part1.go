@@ -168,6 +168,12 @@ func Part1(r *bufio.Reader, w io.Writer) error {
 	return err
 }
 
+func Part2(r *bufio.Reader, w io.Writer) error {
+	var err error
+
+	return err
+}
+
 func quadratic(p, q float64) ([2]float64, bool) {
 	var d = (p*p)/(2*2) - q
 	if d < 0 {

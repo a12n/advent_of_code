@@ -10,14 +10,14 @@ import (
 
 // x(t) = x0 + v(t) t
 //
-// x = x0 + v t
+// p = p0 + v t
 // v = v0 + a t
 //
-// x = x0 + (v0 + 1/2 a t) t
-// x = x0 + v0 t + 1/2 a t^2
-// x0 = 0
+// p = p0 + (v0 + 1/2 a t) t
+// p = p0 + v0 t + 1/2 a t^2
+// p0 = 0
 //
-// x = v0 t + 1/2 a t^2
+// p = v0 t + 1/2 a t^2
 // a = { -1|0, -1 }
 
 // x = vx t + 1/2 ax t²
@@ -36,16 +36,8 @@ import (
 // vy t + 1/2 -1 t² ≥ min_y
 // vy t + 1/2 -1 t² ≤ max_y
 
-// t - parameter
-// vx, vy - variables
-//
-// vx t - 1/2 t² ≥ min_x
-// vx t - 1/2 t² ≤ max_x
-// XXX: vx + t ≥ t
-// vy t - 1/2 t² ≥ min_y
-// vy t - 1/2 t² ≤ max_y
-
-// The highest Y position (at which velocity becomes zero, for non-negative initial velocity) at time t:
+// The highest Y position (at which velocity becomes zero, for
+// non-negative initial velocity) at time t:
 // vy = vy0 + ay t
 // 0 = vy0 + ay t
 // 0 = vy0 - t

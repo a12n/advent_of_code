@@ -139,11 +139,12 @@ func optimal(x [2]int, y [2]int) {
 			roots0, _ = quadratic(-2*float64(vy), 2*float64(y[0]))
 			roots1, _ = quadratic(-2*float64(vy), 2*float64(y[1]))
 			log.Println("vy", vy, "roots0", roots0, "roots1", roots1)
-			fromY := int(math.Ceil(roots1[1]))
-			toY := int(math.Floor(roots0[1]))
-			log.Println("fromY", fromY, "toY", toY)
-			if fromY > toY {
-				log.Println(vx, vy-1, ((vy-1)*(vy-1+1))/2)
+			fromT := int(math.Ceil(roots1[1]))
+			toT := int(math.Floor(roots0[1]))
+			if fromT >= vx && toT >= vx && fromT <= toT {
+				log.Println("fromT", fromT, "toT", toT, "h", (vy*vy+vy)/2)
+			}
+			if fromT > toT {
 				return
 			}
 		}

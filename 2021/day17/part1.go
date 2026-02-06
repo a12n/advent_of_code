@@ -129,11 +129,11 @@ func Part1(r *bufio.Reader, w io.Writer) error {
 	var roots [2]float64
 	var vx, vy, h int
 
-	roots, _ = quadratic(1, -2*float64(target.x.min))
+	roots, _ = Quadratic(1, -2*float64(target.x.min))
 	velocity.x.min = int(math.Ceil(roots[1]))
 	log.Println("roots", roots)
 
-	roots, _ = quadratic(1, -2*float64(target.x.max))
+	roots, _ = Quadratic(1, -2*float64(target.x.max))
 	velocity.x.max = int(math.Floor(roots[1]))
 	log.Println("roots", roots)
 	log.Println("velocity.x", velocity.x)
@@ -144,11 +144,11 @@ func Part1(r *bufio.Reader, w io.Writer) error {
 
 			log.Println("vx", vx, "vy", vy)
 
-			roots, _ = quadratic(-2*float64(vy), 2*float64(target.y.max))
+			roots, _ = Quadratic(-2*float64(vy), 2*float64(target.y.max))
 			t[0] = int(math.Ceil(roots[1]))
 			log.Println("roots", roots)
 
-			roots, _ = quadratic(-2*float64(vy), 2*float64(target.y.min))
+			roots, _ = Quadratic(-2*float64(vy), 2*float64(target.y.min))
 			t[1] = int(math.Floor(roots[1]))
 			log.Println("roots", roots)
 			log.Println("t", t)
@@ -168,7 +168,7 @@ func Part1(r *bufio.Reader, w io.Writer) error {
 	return err
 }
 
-func quadratic(p, q float64) ([2]float64, bool) {
+func Quadratic(p, q float64) ([2]float64, bool) {
 	var d = (p*p)/(2*2) - q
 	if d < 0 {
 		return [2]float64{}, false

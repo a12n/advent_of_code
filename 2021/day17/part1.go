@@ -104,6 +104,11 @@ import (
 // t² - 2 vy t + 2 max_y ≤ 0
 // t ≥ vx0
 
+const (
+	X = iota
+	Y
+)
+
 type Position struct {
 	Min, Max lib.Point2
 }
@@ -111,40 +116,40 @@ type Position struct {
 func Part1(r *bufio.Reader, w io.Writer) error {
 	var err error
 	var target Position
-	var xVelocity [2]int
 
 	if target, err = ReadInput(r); err != nil {
 		return err
 	}
 
 	var roots [2]float64
+	var vxMin, vxMax int
 	var vx, vy, h int
 
-	roots, _ = Quadratic(1, -2*float64(target.Min[0]))
-	xVelocity[0] = int(math.Ceil(roots[1]))
+	roots, _ = Quadratic(1, -2*float64(target.Min[X]))
+	vxMin = int(math.Ceil(roots[1]))
 	log.Println("roots", roots)
 
-	roots, _ = Quadratic(1, -2*float64(target.Max[0]))
-	xVelocity[1] = int(math.Floor(roots[1]))
+	roots, _ = Quadratic(1, -2*float64(target.Max[X]))
+	vxMax = int(math.Floor(roots[1]))
 	log.Println("roots", roots)
-	log.Println("xVelocity", xVelocity)
+	log.Println("vxMin", vxMin, "vxMax", vxMax)
 
-	for vx = xVelocity[0]; vx <= xVelocity[1]; vx++ {
+	for vx = vxMin; vx <= vxMax; vx++ {
 		for vy = 1; vy < 1000; vy++ {
-			var t [2]int
+			var tMin, tMax int
 
 			log.Println("vx", vx, "vy", vy)
 
-			roots, _ = Quadratic(-2*float64(vy), 2*float64(target.Max[1]))
-			t[0] = int(math.Ceil(roots[1]))
+			roots, _ = Quadratic(-2*float64(vy), 2*float64(target.Max[Y]))
+			tMin = int(math.Ceil(roots[1]))
 			log.Println("roots", roots)
 
-			roots, _ = Quadratic(-2*float64(vy), 2*float64(target.Min[1]))
-			t[1] = int(math.Floor(roots[1]))
+			roots, _ = Quadratic(-2*float64(vy), 2*float64(target.Min[Y]))
+			tMax = int(math.Floor(roots[1]))
 			log.Println("roots", roots)
-			log.Println("t", t)
+			log.Println("tMin", tMin, "tMax", tMax)
 
-			if t[0] < vx || t[1] < vx || t[0] > t[1] {
+			if tMin < vx || tMax < vx || tMin > tMax {
 				// Out of target area
 				continue
 			}

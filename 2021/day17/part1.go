@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"math"
+
+	"a12n/advent_of_code/2021/lib"
 )
 
 // x(t) = x0 + v(t) t
@@ -102,53 +104,42 @@ import (
 // t² - 2 vy t + 2 max_y ≤ 0
 // t ≥ vx0
 
+type Position struct {
+	Min, Max lib.Point2
+}
+
 func Part1(r *bufio.Reader, w io.Writer) error {
 	var err error
-	var target, velocity struct {
-		x, y struct {
-			min int
-			max int
-		}
-	}
+	var target Position
+	var xVelocity [2]int
 
-	if _, err = fmt.Fscanf(r,
-		"target area: x=%d..%d, y=%d..%d",
-		&target.x.min, &target.x.max,
-		&target.y.min, &target.y.max,
-	); err != nil {
+	if target, err = ReadInput(r); err != nil {
 		return err
-	}
-
-	if target.x.min > target.x.max {
-		target.x.min, target.x.max = target.x.max, target.x.min
-	}
-	if target.y.min > target.y.max {
-		target.y.min, target.y.max = target.y.max, target.y.min
 	}
 
 	var roots [2]float64
 	var vx, vy, h int
 
-	roots, _ = Quadratic(1, -2*float64(target.x.min))
-	velocity.x.min = int(math.Ceil(roots[1]))
+	roots, _ = Quadratic(1, -2*float64(target.Min[0]))
+	xVelocity[0] = int(math.Ceil(roots[1]))
 	log.Println("roots", roots)
 
-	roots, _ = Quadratic(1, -2*float64(target.x.max))
-	velocity.x.max = int(math.Floor(roots[1]))
+	roots, _ = Quadratic(1, -2*float64(target.Max[0]))
+	xVelocity[1] = int(math.Floor(roots[1]))
 	log.Println("roots", roots)
-	log.Println("velocity.x", velocity.x)
+	log.Println("xVelocity", xVelocity)
 
-	for vx = velocity.x.min; vx <= velocity.x.max; vx++ {
+	for vx = xVelocity[0]; vx <= xVelocity[1]; vx++ {
 		for vy = 1; vy < 1000; vy++ {
 			var t [2]int
 
 			log.Println("vx", vx, "vy", vy)
 
-			roots, _ = Quadratic(-2*float64(vy), 2*float64(target.y.max))
+			roots, _ = Quadratic(-2*float64(vy), 2*float64(target.Max[1]))
 			t[0] = int(math.Ceil(roots[1]))
 			log.Println("roots", roots)
 
-			roots, _ = Quadratic(-2*float64(vy), 2*float64(target.y.min))
+			roots, _ = Quadratic(-2*float64(vy), 2*float64(target.Min[1]))
 			t[1] = int(math.Floor(roots[1]))
 			log.Println("roots", roots)
 			log.Println("t", t)
@@ -166,6 +157,28 @@ func Part1(r *bufio.Reader, w io.Writer) error {
 	fmt.Fprintln(w, h)
 
 	return err
+}
+
+func ReadInput(r *bufio.Reader) (Position, error) {
+	var err error
+	var p Position
+
+	if _, err = fmt.Fscanf(r,
+		"target area: x=%d..%d, y=%d..%d",
+		&p.Min[0], &p.Max[0],
+		&p.Min[1], &p.Max[1],
+	); err != nil {
+		return Position{}, err
+	}
+
+	if p.Min[0] > p.Max[0] {
+		p.Min[0], p.Max[0] = p.Max[0], p.Min[0]
+	}
+	if p.Min[1] > p.Max[1] {
+		p.Min[1], p.Max[1] = p.Max[1], p.Min[1]
+	}
+
+	return p, nil
 }
 
 func Quadratic(p, q float64) ([2]float64, bool) {

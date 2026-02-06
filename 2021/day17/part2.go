@@ -67,12 +67,13 @@ func Part2(r *bufio.Reader, w io.Writer) error {
 			log.Println("vx", vx)
 
 			// Will X be in the target area at time from tMin to tMax?
-			// At time t=vx projectile X speed will be zero. Any time
-			// t>vx must be treated as t=vx.
-			for t = tMin; t <= min(tMax, vx); t++ {
-				var x = (2*vx*t - t*t) / 2
+			for t = tMin; t <= tMax; t++ {
+				// At time t=vx projectile X speed will be zero. Any time
+				// t>vx must be treated as t=vx.
+				var t2 = min(tMax, vx)
+				var x = (2*vx*t2 - t2*t2) / 2
 
-				log.Println("v", [2]int{vx, vy}, "t", t, "x", x)
+				log.Println("v", [2]int{vx, vy}, "t", t, "t2", t2, "x", x)
 
 				if x < target.Min[X] || x > target.Max[X] {
 					log.Println("infeasible with vx", vx)

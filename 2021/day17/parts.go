@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"math"
+
+	"a12n/advent_of_code/2021/lib"
 )
 
 // x(t) = x0 + v(t) t
@@ -102,58 +104,52 @@ import (
 // t² - 2 vy t + 2 max_y ≤ 0
 // t ≥ vx0
 
+const (
+	X = iota
+	Y
+)
+
+type Position struct {
+	Min, Max lib.Point2
+}
+
 func Part1(r *bufio.Reader, w io.Writer) error {
 	var err error
-	var target, velocity struct {
-		x, y struct {
-			min int
-			max int
-		}
-	}
+	var target Position
 
-	if _, err = fmt.Fscanf(r,
-		"target area: x=%d..%d, y=%d..%d",
-		&target.x.min, &target.x.max,
-		&target.y.min, &target.y.max,
-	); err != nil {
+	if target, err = ReadInput(r); err != nil {
 		return err
 	}
 
-	if target.x.min > target.x.max {
-		target.x.min, target.x.max = target.x.max, target.x.min
-	}
-	if target.y.min > target.y.max {
-		target.y.min, target.y.max = target.y.max, target.y.min
-	}
-
 	var roots [2]float64
+	var vxMin, vxMax int
 	var vx, vy, h int
 
-	roots, _ = quadratic(1, -2*float64(target.x.min))
-	velocity.x.min = int(math.Ceil(roots[1]))
+	roots, _ = Quadratic(1, -2*float64(target.Min[X]))
+	vxMin = int(math.Ceil(roots[1]))
 	log.Println("roots", roots)
 
-	roots, _ = quadratic(1, -2*float64(target.x.max))
-	velocity.x.max = int(math.Floor(roots[1]))
+	roots, _ = Quadratic(1, -2*float64(target.Max[X]))
+	vxMax = int(math.Floor(roots[1]))
 	log.Println("roots", roots)
-	log.Println("velocity.x", velocity.x)
+	log.Println("vxMin", vxMin, "vxMax", vxMax)
 
-	for vx = velocity.x.min; vx <= velocity.x.max; vx++ {
+	for vx = vxMin; vx <= vxMax; vx++ {
 		for vy = 1; vy < 1000; vy++ {
-			var t [2]int
+			var tMin, tMax int
 
 			log.Println("vx", vx, "vy", vy)
 
-			roots, _ = quadratic(-2*float64(vy), 2*float64(target.y.max))
-			t[0] = int(math.Ceil(roots[1]))
+			roots, _ = Quadratic(-2*float64(vy), 2*float64(target.Max[Y]))
+			tMin = int(math.Ceil(roots[1]))
 			log.Println("roots", roots)
 
-			roots, _ = quadratic(-2*float64(vy), 2*float64(target.y.min))
-			t[1] = int(math.Floor(roots[1]))
+			roots, _ = Quadratic(-2*float64(vy), 2*float64(target.Min[Y]))
+			tMax = int(math.Floor(roots[1]))
 			log.Println("roots", roots)
-			log.Println("t", t)
+			log.Println("tMin", tMin, "tMax", tMax)
 
-			if t[0] < vx || t[1] < vx || t[0] > t[1] {
+			if tMin < vx || tMax < vx || tMin > tMax {
 				// Out of target area
 				continue
 			}
@@ -170,11 +166,110 @@ func Part1(r *bufio.Reader, w io.Writer) error {
 
 func Part2(r *bufio.Reader, w io.Writer) error {
 	var err error
+	var target Position
+
+	if target, err = ReadInput(r); err != nil {
+		return err
+	}
+
+	log.Println("target", target)
+
+	var roots [2]float64
+	var vxMin, vxMax int
+	var vyMin, vyMax int
+	var vx, vy, t, n int
+
+	// At vxMin initial X speed projectile speed will be zero at
+	// the beginning of the target area. With initial X speed less
+	// than vxMin it would be impossible to reach target area.
+	roots, _ = Quadratic(1, -2*float64(target.Min[0]))
+	vxMin = int(math.Ceil(roots[1]))
+
+	// At initial X speed greater than vxMax the projectile will
+	// overshoot the target area just at T+1.
+	vxMax = target.Max[X]
+
+	vyMin = target.Min[Y]
+	vyMax = 1000 // Arbitrary
+
+	log.Println("vxMin", vxMin, "vxMax", vxMax)
+	log.Println("vyMin", vyMin, "vyMax", vyMax)
+
+	for vy = vyMin; vy <= vyMax; vy++ {
+		var tMin, tMax int
+
+		log.Println("vy", vy)
+
+		// The target are is always at negative Y, while the
+		// shooting starts at zero. So, the projectile will first
+		// cross the target.Max[Y] and then later will cross the
+		// target.Min[Y] (both negative).
+		roots, _ = Quadratic(-2*float64(vy), 2*float64(target.Max[Y]))
+		tMin = int(math.Ceil(roots[1]))
+		log.Println("roots", roots)
+		log.Println("tMin", tMin)
+
+		roots, _ = Quadratic(-2*float64(vy), 2*float64(target.Min[Y]))
+		tMax = int(math.Floor(roots[1]))
+		log.Println("roots", roots)
+		log.Println("tMax", tMax)
+
+		if tMin > tMax {
+			log.Println("infeasible with vy", vy)
+			continue
+		}
+
+		for vx = vxMin; vx <= vxMax; vx++ {
+			log.Println("vx", vx)
+
+			// Will X be in the target area at time from tMin to tMax?
+			for t = tMin; t <= tMax; t++ {
+				// At time t=vx projectile X speed will be zero. Any time
+				// t>vx must be treated as t=vx.
+				var t2 = min(tMax, vx)
+				var x = (2*vx*t2 - t2*t2) / 2
+
+				log.Println("v", [2]int{vx, vy}, "t", t, "t2", t2, "x", x)
+
+				if x < target.Min[X] || x > target.Max[X] {
+					log.Println("infeasible with vx", vx)
+					continue
+				}
+
+				log.Println("feasible with v", [2]int{vx, vy})
+				n++
+			}
+		}
+	}
+
+	fmt.Fprintln(w, n)
 
 	return err
 }
 
-func quadratic(p, q float64) ([2]float64, bool) {
+func ReadInput(r *bufio.Reader) (Position, error) {
+	var err error
+	var p Position
+
+	if _, err = fmt.Fscanf(r,
+		"target area: x=%d..%d, y=%d..%d",
+		&p.Min[0], &p.Max[0],
+		&p.Min[1], &p.Max[1],
+	); err != nil {
+		return Position{}, err
+	}
+
+	if p.Min[0] > p.Max[0] {
+		p.Min[0], p.Max[0] = p.Max[0], p.Min[0]
+	}
+	if p.Min[1] > p.Max[1] {
+		p.Min[1], p.Max[1] = p.Max[1], p.Min[1]
+	}
+
+	return p, nil
+}
+
+func Quadratic(p, q float64) ([2]float64, bool) {
 	var d = (p*p)/(2*2) - q
 	if d < 0 {
 		return [2]float64{}, false

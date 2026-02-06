@@ -40,7 +40,7 @@ func Part2(r *bufio.Reader, w io.Writer) error {
 	log.Println("vyMin", vyMin, "vyMax", vyMax)
 
 	for vy = vyMin; vy <= vyMax; vy++ {
-		var tMin, tMax [2]int
+		var tMin, tMax int
 
 		log.Println("vy", vy)
 
@@ -49,16 +49,16 @@ func Part2(r *bufio.Reader, w io.Writer) error {
 		// cross the target.Max[Y] and then later will cross the
 		// target.Min[Y] (both negative).
 		roots, _ = Quadratic(-2*float64(vy), 2*float64(target.Max[Y]))
-		tMin[Y] = int(math.Ceil(roots[1]))
+		tMin = int(math.Ceil(roots[1]))
 		log.Println("roots", roots)
-		log.Println("tMin[Y]", tMin[Y])
+		log.Println("tMin", tMin)
 
 		roots, _ = Quadratic(-2*float64(vy), 2*float64(target.Min[Y]))
-		tMax[Y] = int(math.Floor(roots[1]))
+		tMax = int(math.Floor(roots[1]))
 		log.Println("roots", roots)
-		log.Println("tMax[Y]", tMax[Y])
+		log.Println("tMax", tMax)
 
-		if tMin[Y] > tMax[Y] {
+		if tMin > tMax {
 			log.Println("infeasible with vy", vy)
 			continue
 		}

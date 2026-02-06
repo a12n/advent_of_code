@@ -21,7 +21,7 @@ func Part2(r *bufio.Reader, w io.Writer) error {
 	var roots [2]float64
 	var vxMin, vxMax int
 	var vyMin, vyMax int
-	var vx, vy, n int
+	var vx, vy, t, n int
 
 	// At vxMin initial X speed projectile speed will be zero at
 	// the beginning of the target area. With initial X speed less
@@ -66,7 +66,22 @@ func Part2(r *bufio.Reader, w io.Writer) error {
 		for vx = vxMin; vx <= vxMax; vx++ {
 			log.Println("vx", vx)
 
-			// TODO: Where X will be from tMin[Y] to tMax[Y]?
+			// Will X be in the target area at time from tMin to tMax?
+			// At time t=vx projectile X speed will be zero. Any time
+			// t>vx must be treated as t=vx.
+			for t = tMin; t <= min(tMax, vx); t++ {
+				var x = (2*vx*t - t*t) / 2
+
+				log.Println("v", [2]int{vx, vy}, "t", t, "x", x)
+
+				if x < target.Min[X] || x > target.Max[X] {
+					log.Println("infeasible with vx", vx)
+					continue
+				}
+
+				log.Println("feasible with v", [2]int{vx, vy})
+				n++
+			}
 		}
 	}
 

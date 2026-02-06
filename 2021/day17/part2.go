@@ -19,6 +19,8 @@ func Part2(r *bufio.Reader, w io.Writer) error {
 
 	var roots [2]float64
 	var vxMin, vxMax int
+	var vyMin, vyMax int
+	var vx, vy int
 
 	// At vxMin initial X speed projectile speed will be zero at
 	// the beginning of the target area. With initial X speed less
@@ -30,7 +32,18 @@ func Part2(r *bufio.Reader, w io.Writer) error {
 	// overshoot the target area just at T+1.
 	vxMax = target.Max[X]
 
+	vyMin = target.Min[Y]
+	vyMax = 1000 // Arbitrary
+
 	log.Println("vxMin", vxMin, "vxMax", vxMax)
+	log.Println("vyMin", vyMin, "vyMax", vyMax)
+
+	for vx = vxMin; vx <= vxMax; vx++ {
+		for vy = vyMin; vy <= vyMax; vy++ {
+			log.Println("vx", vx, "vy", vy)
+			// TODO
+		}
+	}
 
 	return err
 }

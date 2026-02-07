@@ -253,6 +253,27 @@ func Part2(r *bufio.Reader, w io.Writer) error {
 	return err
 }
 
+func WithinTarget(v lib.Vector2, min, max lib.Point2) bool {
+	var p lib.Point2
+	for {
+		if p[X] >= min[X] && p[X] <= max[X] &&
+			p[Y] >= min[Y] && p[Y] <= max[Y] {
+			return true
+		}
+		if (v[X] == 0 && p[X] < min[X]) ||
+			p[X] > max[X] || p[Y] < min[Y] {
+			return false
+		}
+		p = p.Add(v)
+		if v[0] > 0 {
+			v[0]--
+		} else if v[0] < 0 {
+			v[0]++
+		}
+		v[1]--
+	}
+}
+
 func ReadInput(r *bufio.Reader) (Position, error) {
 	var err error
 	var p Position

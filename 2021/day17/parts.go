@@ -201,48 +201,9 @@ func Part2(r *bufio.Reader, w io.Writer) error {
 	log.Println("vyMin", vyMin, "vyMax", vyMax)
 	log.Println("n", (vxMax-vxMin)*(vyMax-vyMin))
 
-	for vy = vyMin; vy <= vyMax; vy++ {
-		var tMin, tMax int
-
-		log.Println("vy", vy)
-
-		// The target are is always at negative Y, while the
-		// shooting starts at zero. So, the projectile will first
-		// cross the target.Max[Y] and then later will cross the
-		// target.Min[Y] (both negative).
-		roots, _ = Quadratic(-2*float64(vy), 2*float64(target.Max[Y]))
-		tMin = int(math.Ceil(roots[1]))
-		log.Println("roots", roots)
-		log.Println("tMin", tMin)
-
-		roots, _ = Quadratic(-2*float64(vy), 2*float64(target.Min[Y]))
-		tMax = int(math.Floor(roots[1]))
-		log.Println("roots", roots)
-		log.Println("tMax", tMax)
-
-		if tMin > tMax {
-			log.Println("infeasible with vy", vy)
-			continue
-		}
-
-		for vx = vxMin; vx <= vxMax; vx++ {
-			log.Println("vx", vx)
-
-			// Will X be in the target area at time from tMin to tMax?
-			for t = tMin; t <= tMax; t++ {
-				// At time t=vx projectile X speed will be zero. Any time
-				// t>vx must be treated as t=vx.
-				var t2 = min(tMax, vx)
-				var x = (2*vx*t2 - t2*t2) / 2
-
-				log.Println("v", [2]int{vx, vy}, "t", t, "t2", t2, "x", x)
-
-				if x < target.Min[X] || x > target.Max[X] {
-					log.Println("infeasible with vx", vx)
-					continue
-				}
-
-				log.Println("feasible with v", [2]int{vx, vy})
+	for vx = vxMin; vx <= vxMax; vx++ {
+		for vy = vyMin; vy <= vyMax; vy++ {
+			if WithinTarget(lib.Vector2{vx, vy}, target.Min, target.Max) {
 				n++
 			}
 		}

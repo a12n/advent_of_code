@@ -66,6 +66,11 @@ import (
 // Farthest X position (at which velocity becomes zero) is again:
 // x = (vx0² + vx0) / 2
 //
+// But for y it's actually like this (eq1):
+// yH = (vy0² + vy0) / 2 — to the highest point
+// y0 = -((v0² + vy0) / 2) — back to the zero
+// yN = -(vy0 + 1 + vy0 + 2 + vy0 + 3 + vy0 + 4 + … + vy0 + N) = -vy0 * (1 + 2 + 3 + 4 + … + N) = -vy0 * ((N * (N + 1))/2)
+//
 // With the optimal trajectory (with the highest Y position in the
 // middle) X velocity is zero in the target area. Otherwise it would
 // be possible to shoot with less X velocity and more Y velocity and
@@ -190,10 +195,11 @@ func Part2(r *bufio.Reader, w io.Writer) error {
 	vxMax = target.Max[X]
 
 	vyMin = target.Min[Y]
-	vyMax = 1000 // Arbitrary
+	vyMax = -vyMin // Due to (eq1)
 
 	log.Println("vxMin", vxMin, "vxMax", vxMax)
 	log.Println("vyMin", vyMin, "vyMax", vyMax)
+	log.Println("n", (vxMax-vxMin)*(vyMax-vyMin))
 
 	for vy = vyMin; vy <= vyMax; vy++ {
 		var tMin, tMax int

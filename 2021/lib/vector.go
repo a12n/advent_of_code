@@ -11,3 +11,11 @@ func (u Vector2) TaxicabNorm() int {
 }
 
 type Vector3 [3]int
+
+func (u Vector3) Dot(v Vector3) int {
+	return u[0]*v[0] + u[1]*v[1] + u[2]*v[2]
+}
+
+func (u Vector3) NormSqr() int {
+	return u.Dot(u)
+}

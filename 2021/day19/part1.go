@@ -18,16 +18,12 @@ func Part1(r *bufio.Reader, w io.Writer) error {
 		return err
 	}
 
-	log.Println("scanners", scanners)
-
-	// var s = make(map[int][]lib.Point3)
-	for i := range scanners[0] {
-		for j := range scanners[1] {
-			var p = scanners[0][i]
-			var q = scanners[1][j]
-			var n = p[0] - q[0]
-
-			log.Printf("p %d, q %d, n %d", i, j, n)
+	for i, beacons := range scanners {
+		log.Println(i, "beacons", len(beacons))
+		for j := 0; j < len(beacons)-1; j++ {
+			for k := j + 1; k < len(beacons); k++ {
+				log.Println(i, "distance", beacons[j], beacons[k], beacons[j].DistanceSqr(beacons[k]))
+			}
 		}
 	}
 

@@ -35,9 +35,13 @@ end
 local seen = {}
 local steps = 0
 while not seen[key(banks)] do
-   seen[key(banks)] = true
+   seen[key(banks)] = steps
    redistribute(banks, argmax(banks))
    steps = steps + 1
 end
 
-print(steps)
+if puzzle.part == 1 then
+   print(steps)
+elseif puzzle.part == 2 then
+   print(steps - seen[key(banks)])
+end

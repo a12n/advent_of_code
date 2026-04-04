@@ -10,9 +10,8 @@ for line in io.lines() do
    end
 end
 
-for name, _ in pairs(weights) do
-   if not parents[name] then
-      print(name)
-      return
-   end
+local root = next(weights)
+while parents[root] do
+   root = parents[root]
 end
+print(root)

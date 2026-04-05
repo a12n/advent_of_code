@@ -2,19 +2,19 @@
 -- local groups = 0
 -- local score = 0
 
-local groups = 0
+local ngroup = 0
 local score = 0
 
 function group(c)
    print('group', c)
    if c == '{' then
-      groups = groups + 1
-      print('groups', groups)
+      ngroup = ngroup + 1
+      print('ngroup', ngroup)
       return group
    elseif c == '}' then
-      score = score + groups
-      groups = groups - 1
-      print('groups', groups, 'score', score)
+      score = score + ngroup
+      ngroup = ngroup - 1
+      print('ngroup', ngroup, 'score', score)
       return group
    elseif c == ',' then
       return group

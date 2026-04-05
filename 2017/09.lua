@@ -1,47 +1,36 @@
--- local stack = {}
--- local groups = 0
--- local score = 0
-
 local ngarbage = 0
 local ngroup = 0
 local score = 0
 
 function group(c)
-   print('group', c)
    if c == '{' then
       ngroup = ngroup + 1
-      print('ngroup', ngroup)
       return group
    elseif c == '}' then
       score = score + ngroup
       ngroup = ngroup - 1
-      print('ngroup', ngroup, 'score', score)
       return group
    elseif c == ',' then
       return group
    elseif c == '<' then
       return garbage
    else
-      print('invalid input')
       return nil
    end
 end
 
 function garbage(c)
-   print('garbage', c)
    if c == '>' then
       return group
    elseif c == '!' then
       return ignore
    else
       ngarbage = ngarbage + 1
-      print('ngarbage', ngarbage)
       return garbage
    end
 end
 
 function ignore(c)
-   print('ignore', c)
    return garbage
 end
 

@@ -52,7 +52,7 @@ while true do
    if not c then
       break
    end
-   if c ~= ' ' and c ~= '\n' then
+   if c ~= '\n' then
       state = state(c)
       if not state then
          error(string.format('error at position %d', pos))

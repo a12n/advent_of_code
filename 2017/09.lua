@@ -2,6 +2,7 @@
 -- local groups = 0
 -- local score = 0
 
+local ngarbage = 0
 local ngroup = 0
 local score = 0
 
@@ -33,6 +34,8 @@ function garbage(c)
    elseif c == '!' then
       return ignore
    else
+      ngarbage = ngarbage + 1
+      print('ngarbage', ngarbage)
       return garbage
    end
 end

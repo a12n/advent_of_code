@@ -60,4 +60,9 @@ while true do
    end
    pos = pos + 1
 end
-print(score)
+
+if puzzle.part == 1 then
+   print(score)
+elseif puzzle.part == 2 then
+   print(ngarbage)
+end

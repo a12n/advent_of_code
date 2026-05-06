@@ -1,28 +1,24 @@
-local parents = {}
-local weights = {}
-local children = {}
-
+local nodechildren = {}
+local nodeparent = {}
+local nodeweight = {}
 local root = nil
 
 for line in io.lines() do
-   local name, weight = string.match(line, '(%a+)%s*%((%d+)%)')
-
-   assert(name and weight)
-   weights[name] = tonumber(weight)
-   children[name] = {}
-
-   for child in string.gmatch(string.match(line, '->%s*(.+)$') or '', '%a+') do
-      parents[child] = name
-      table.insert(children[name], child)
+   local node, weight = string.match(line, '(%a+)%s*%((%d+)%)')
+   assert(node and weight)
+   nodeweight[node] = tonumber(weight)
+   nodechildren[node] = {}
+   for cnode in string.gmatch(string.match(line, '->%s*(.+)$') or '', '%a+') do
+      nodeparent[cnode] = node
+      table.insert(nodechildren[node], cnode)
    end
-
    if not root then
-      root = name
+      root = node
    end
 end
 
-while parents[root] do
-   root = parents[root]
+while nodeparent[root] do
+   root = nodeparent[root]
 end
 
 if puzzle.part == 1 then
@@ -40,37 +36,36 @@ local function argdiff(xs)
    end
 end
 
-function unbalanced(name, depth)
-   local total_weight = weights[name]
-   local child_total_weights = {}
-   local child_total_weights_num = 0
+function unbalanced(node)
+   local weight = nodeweight[node]
+   local cweights = {}
 
-   local unbalanced_node = nil
-   local unbalanced_diff = nil
+   local unode = nil
+   local udiff = nil
 
-   for i, child in ipairs(children[name]) do
-      local child_total_weight, child_node, child_diff = unbalanced(child, depth + 1)
+   for i, cnode in ipairs(nodechildren[node]) do
+      local cunode, cudiff, cweight = unbalanced(cnode)
 
-      child_total_weights[i] = child_total_weight
-      total_weight = total_weight + child_total_weight
+      cweights[i] = cweight
+      weight = weight + cweight
 
-      if child_node and child_diff then
-         assert(not unbalanced_node and not unbalanced_diff)
-         unbalanced_node = child_node
-         unbalanced_diff = child_diff
+      if cunode and cudiff then
+         assert(not unode and not udiff)
+         unode = cunode
+         udiff = cudiff
       end
    end
 
-   if not unbalanced_node or not unbalanced_diff then
-      local index, diff = argdiff(child_total_weights)
-      if index then
-         unbalanced_node = children[name][index]
-         unbalanced_diff = diff
+   if not unode or not udiff then
+      local i = nil
+      i, udiff = argdiff(cweights)
+      if i then
+         unode = nodechildren[node][i]
       end
    end
 
-   return total_weight, unbalanced_node, unbalanced_diff
+   return unode, udiff, weight
 end
 
-local _, name, diff = unbalanced(root, 0)
-print(weights[name] + diff)
+local node, diff = unbalanced(root)
+print(nodeweight[node] + diff)

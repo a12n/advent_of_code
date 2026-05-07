@@ -28,33 +28,36 @@ local function parsemove(s)
    local a, b
    a = string.match(s, 's(%d+)')
    if a then
-      return 'spin', tonumber(a)
+      return function(list)
+         spin(list, tonumber(a))
+      end
    end
    a, b = string.match(s, 'x(%d+)/(%d+)')
    if a and b then
-      return 'exchange', tonumber(a) + 1, tonumber(b) + 1
+      return function(list)
+         exchange(list, tonumber(a) + 1, tonumber(b) + 1)
+      end
    end
    a, b = string.match(s, 'p(%l)/(%l)')
    if a and b then
-      return 'partner', string.byte(a), string.byte(b)
+      return function(list)
+         partner(list, string.byte(a), string.byte(b))
+      end
    end
    return nil
 end
 
+local moves = {}
 local programs = table.pack(string.byte('abcdefghijklmnop', 1, tonumber(os.getenv('N')) or 16))
 
--- print('programs', string.char(table.unpack(programs)))
 for token in string.gmatch(io.read(), '([^%s,]+)') do
-   local move, a, b = parsemove(token)
-   if move == 'spin' then
-      spin(programs, a)
-   elseif move == 'exchange' then
-      exchange(programs, a, b)
-   elseif move == 'partner' then
-      partner(programs, a, b)
-   end
-   -- ({ ['spin'] = spin, ['exchange'] = exchange, ['partner'] = partner })[move](programs, a, b)
-   -- moves[move](a, b)
-   -- print('move', move, a, b)
+   table.insert(moves, assert(parsemove(token)))
 end
+
+if puzzle.part == 1 then
+   for _, move in ipairs(moves) do
+      move(programs)
+   end
+end
+
 print(string.char(table.unpack(programs)))

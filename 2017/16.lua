@@ -47,6 +47,12 @@ local function parsemove(s)
    return nil
 end
 
+local function dance(programs, moves)
+   for _, move in ipairs(moves) do
+      move(programs)
+   end
+end
+
 local moves = {}
 local programs = table.pack(string.byte('abcdefghijklmnop', 1, tonumber(os.getenv('N')) or 16))
 
@@ -55,9 +61,7 @@ for token in string.gmatch(io.read(), '([^%s,]+)') do
 end
 
 if puzzle.part == 1 then
-   for _, move in ipairs(moves) do
-      move(programs)
-   end
+   dance(programs, moves)
 end
 
 print(string.char(table.unpack(programs)))

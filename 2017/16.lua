@@ -53,6 +53,17 @@ local function dance(programs, moves)
    end
 end
 
+local function inorder(programs)
+   local pj = string.byte('a')
+   for _, pi in ipairs(programs) do
+      if pi ~= pj then
+         return false
+      end
+      pj = pj + 1
+   end
+   return true
+end
+
 local moves = {}
 local programs = table.pack(string.byte('abcdefghijklmnop', 1, tonumber(os.getenv('N')) or 16))
 
@@ -62,6 +73,16 @@ end
 
 if puzzle.part == 1 then
    dance(programs, moves)
+elseif puzzle.part == 2 then
+   local limit = 1000000000
+   local times = limit
+   while times > 0 do
+      dance(programs, moves)
+      times = times - 1
+      if inorder(programs) then
+         times = times % (limit - times)
+      end
+   end
 end
 
 print(string.char(table.unpack(programs)))

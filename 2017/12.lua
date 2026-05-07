@@ -21,23 +21,37 @@ for line in io.lines() do
    end
 end
 
-function investigate(pipes, from, visited)
-   if not visited then
-      visited = {}
-   end
-
-   if visited[from] then
+function connected(pipes, from, id, mapping)
+   id = id or 1
+   mapping = mapping or {}
+   if mapping[from] then
       return 0
    end
-
    local n = 1
-   visited[from] = true
-
-   for _, to in pairs(pipes[from]) do
-      n = n + investigate(pipes, to, visited)
+   mapping[from] = id
+   for _, to in ipairs(pipes[from]) do
+      n = n + connected(pipes, to, id, mapping)
    end
-
    return n
 end
 
-print(investigate(pipes, 0))
+function components(pipes)
+   local id = 1
+   local mapping = {}
+   for prog, adjacent in pairs(pipes) do
+      if connected(pipes, prog, id, mapping) ~= 0 then
+         id = id + 1
+      end
+   end
+   return mapping
+end
+
+if puzzle.part == 1 then
+   print(connected(pipes, 0))
+elseif puzzle.part == 2 then
+   local groups = 0
+   for _, group in pairs(components(pipes)) do
+      groups = math.max(groups, group)
+   end
+   print(groups)
+end

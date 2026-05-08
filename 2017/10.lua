@@ -150,4 +150,6 @@ if puzzle.part == 1 then
       skip = skip + 1
    end
    print(hash(0) * hash(1))
+elseif puzzle.part == 2 then
+   -- TODO
 end

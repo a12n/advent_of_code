@@ -157,7 +157,7 @@ if puzzle.part == 1 then
       print('pos', pos, 'skip', skip, 'len', len)
       assert(len <= n)
       print('list', table.unpack(reconstruct(hash, n)))
-      hash = compose(hash, reverse(pos, len, n))
+      hash = compose(reverse(pos, len, n), hash)
       pos = (pos + len + skip) % n
       skip = skip + 1
       print('after')

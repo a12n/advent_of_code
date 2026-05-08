@@ -21,7 +21,7 @@ local function reverse(from, len, n)
       return function(i)
          assert(i >= 0 and i < n)
          if i >= from then
-            return (tomod - 1) - (i - from)
+            return ((tomod - 1) - (i - from)) % n
          elseif i < tomod then
             return (from + (tomod - 1) - i) % n
          end

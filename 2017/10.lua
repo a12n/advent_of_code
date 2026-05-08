@@ -85,6 +85,17 @@ if puzzle.test then
    assert(hash(3) == 2)
    assert(hash(4) == 1)
 
+   -- 0 1 2) (3 4
+   -- 0 4 3) (2 1
+   -- 0 1 2) (3 4
+   hash = compose(reverse(3, 5, n),
+                  reverse(3, 5, n))
+   assert(hash(0) == 0)
+   assert(hash(1) == 1)
+   assert(hash(2) == 2)
+   assert(hash(3) == 3)
+   assert(hash(4) == 4)
+
    -- (0 1 2) 3 4
    -- (2 1 0) 3 4
    -- 2 (1 0 3) 4
@@ -108,6 +119,18 @@ if puzzle.test then
    assert(hash(2) == 0)
    assert(hash(3) == 1)
    assert(hash(4) == 4)
+
+   -- (0 1 2) 3 4
+   -- (2 1 0) 3 4
+   -- 2 1) 0 (3 4
+   -- 4 3) 0 (1 2
+   hash = compose(reverse(3, 4, n),
+                  reverse(0, 3, n))
+   assert(hash(0) == 4)
+   assert(hash(1) == 3)
+   assert(hash(2) == 0)
+   assert(hash(3) == 1)
+   assert(hash(4) == 2)
 end
 
 local n = tonumber(os.getenv('N')) or 256

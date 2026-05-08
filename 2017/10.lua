@@ -165,5 +165,17 @@ end
 if puzzle.part == 1 then
    print(hash(0) * hash(1))
 elseif puzzle.part == 2 then
+   local function dense(hash)
+      local numbers = {}
+      for block = 0, 16 - 1 do
+         local acc = 0
+         for number = 0, 16 - 1 do
+            acc = acc ~ hash(block * 16 + number)
+         end
+         table.insert(numbers, acc)
+      end
+      return numbers
+   end
    -- TODO
+   print(table.unpack(dense(hash)))
 end

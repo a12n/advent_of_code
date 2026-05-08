@@ -153,16 +153,10 @@ if puzzle.part == 1 then
 
    for len in string.gmatch(io.read(), '(%d+)') do
       len = tonumber(len)
-      print('before')
-      print('pos', pos, 'skip', skip, 'len', len)
       assert(len <= n)
-      print('list', table.unpack(reconstruct(hash, n)))
       hash = compose(reverse(pos, len, n), hash)
       pos = (pos + len + skip) % n
       skip = skip + 1
-      print('after')
-      print('pos', pos, 'skip', skip)
-      print('list', table.unpack(reconstruct(hash, n)))
    end
 
    print(hash(0) * hash(1))

@@ -176,6 +176,5 @@ elseif puzzle.part == 2 then
       end
       return numbers
    end
-   -- TODO
-   print(table.unpack(dense(hash)))
+   print(string.format(string.rep('%02x', 16), table.unpack(dense(hash))))
 end

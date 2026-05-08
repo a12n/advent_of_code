@@ -133,22 +133,36 @@ if puzzle.test then
    assert(hash(4) == 2)
 end
 
+local lengths = nil
 local n = tonumber(os.getenv('N')) or 256
-
 if puzzle.part == 1 then
-   local pos = 0
-   local skip = 0
-   local hash = function(i)
-      assert(i >= 0 and i < n)
-      return i
-   end
+   lengths = {}
    for len in string.gmatch(io.read(), '(%d+)') do
       len = tonumber(len)
-      assert(len <= n)
+      assert(len and len <= n)
+      table.insert(lengths, len)
+   end
+elseif puzzle.part == 2 then
+   local line = io.read() .. '\017\031\073\047\023'
+   lengths = table.pack(string.byte(line, 1, #line))
+end
+
+local pos = 0
+local skip = 0
+local hash = function(i)
+   assert(i >= 0 and i < n)
+   return i
+end
+
+for round = 1, (puzzle.part == 2 and 64 or 1) do
+   for _, len in ipairs(lengths) do
       hash = compose(reverse(pos, len, n), hash)
       pos = (pos + len + skip) % n
       skip = skip + 1
    end
+end
+
+if puzzle.part == 1 then
    print(hash(0) * hash(1))
 elseif puzzle.part == 2 then
    -- TODO

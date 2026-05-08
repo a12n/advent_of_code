@@ -21,7 +21,7 @@ for i, particle in ipairs(particles) do
    local norm = particle.a:taxicab()
    if not closestnorm or norm < closestnorm then
       closest = i
-      closestnorm = n
+      closestnorm = norm
    end
 end
 print(closest - 1)

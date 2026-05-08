@@ -12,6 +12,7 @@ local diagram = grid.new(io.read('a'))
 local pos = point.new(table.find(diagram[1], VERT), 1)
 local dir = vector.new(0, 1)
 local letters = {}
+local steps = 0
 
 while true do
    local item = diagram:get(pos)
@@ -26,6 +27,7 @@ while true do
       if newitem and newitem ~= EMPTY then
          dir = newdir
          pos = newpos
+         steps = steps + 1
       else
          newdir = dir:cw()
          newpos = pos + newdir
@@ -33,6 +35,7 @@ while true do
          if newitem and newitem ~= EMPTY then
             dir = newdir
             pos = newpos
+            steps = steps + 1
          else
             error('invalid turn')
          end
@@ -40,11 +43,17 @@ while true do
    elseif item >= LETTERA and item <= LETTERZ then
       table.insert(letters, item)
       pos = pos + dir
+      steps = steps + 1
    elseif item == VERT or item == HORIZ then
       pos = pos + dir
+      steps = steps + 1
    else
       error('invalid item')
    end
 end
 
-print(string.char(table.unpack(letters)))
+if puzzle.part == 1 then
+   print(string.char(table.unpack(letters)))
+elseif puzzle.part == 2 then
+   print(steps)
+end

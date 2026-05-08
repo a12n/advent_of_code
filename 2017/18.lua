@@ -2,7 +2,6 @@ local played = nil
 local registers = {}
 local instructions = {}
 local ip = 1
-local halt = false
 
 local function parseinstr(s)
    local x, y, n, m, o
@@ -54,8 +53,9 @@ local function parseinstr(s)
             return 1
          end
       elseif o == 'rcv' then
+         assert(not n)
          return function()
-            if (n or registers[x] or 0) ~= 0 then
+            if (registers[x] or 0) ~= 0 then
                print(played)
                return #instructions
             end

@@ -7,6 +7,7 @@ local function reverse(from, len, n)
       -- 0 1 (2 3) 4
       -- 0 1 (3 2) 4
       return function(i)
+         assert(i >= 0 and i < n)
          if i >= from and i < to then
             return (from + (len - 1) - (i - from)) % n
          end
@@ -18,6 +19,7 @@ local function reverse(from, len, n)
       -- 0 1) 2 (3 4
       -- 4 3) 2 (1 0
       return function(i)
+         assert(i >= 0 and i < n)
          if i >= from then
             return (tomod - 1) - (i - from)
          elseif i < tomod then

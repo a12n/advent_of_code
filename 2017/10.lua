@@ -142,15 +142,6 @@ if puzzle.part == 1 then
       assert(i >= 0 and i < n)
       return i
    end
-
-   local function reconstruct(hash, n)
-      local list = {}
-      for i = 1, n do
-         table.insert(list, hash(i - 1))
-      end
-      return list
-   end
-
    for len in string.gmatch(io.read(), '(%d+)') do
       len = tonumber(len)
       assert(len <= n)
@@ -158,6 +149,5 @@ if puzzle.part == 1 then
       pos = (pos + len + skip) % n
       skip = skip + 1
    end
-
    print(hash(0) * hash(1))
 end

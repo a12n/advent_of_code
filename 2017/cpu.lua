@@ -8,6 +8,9 @@ function parseinstr(s)
       if o == 'set' then
          assert(not n)
          return 'set', x, m or y
+      elseif o == 'sub' then
+         assert(not n)
+         return 'sub', x, m or y
       elseif o == 'add' then
          assert(not n)
          return 'add', x, m or y
@@ -19,6 +22,8 @@ function parseinstr(s)
          return 'mod', x, m or y
       elseif o == 'jgz' then
          return 'jgz', n or x, m or y
+      elseif o == 'jnz' then
+         return 'jnz', n or x, m or y
       end
    end
 
@@ -51,6 +56,9 @@ function runinstrs(instrs, ip, registers, mailbox)
       elseif o == 'add' then
          registers[x] = (registers[x] or 0) + arg(y)
          ip = ip + 1
+      elseif o == 'sub' then
+         registers[x] = (registers[x] or 0) - arg(y)
+         ip = ip + 1
       elseif o == 'mul' then
          registers[x] = (registers[x] or 0) * arg(y)
          ip = ip + 1
@@ -59,6 +67,12 @@ function runinstrs(instrs, ip, registers, mailbox)
          ip = ip + 1
       elseif o == 'jgz' then
          if arg(x) > 0 then
+            ip = ip + arg(y)
+         else
+            ip = ip + 1
+         end
+      elseif o == 'jnz' then
+         if arg(x) ~= 0 then
             ip = ip + arg(y)
          else
             ip = ip + 1

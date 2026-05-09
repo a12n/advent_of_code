@@ -1,86 +1,4 @@
-local function parseinstr(s)
-   local x, y, n, m, o
-
-   o, x, y = string.match(s, '^(%a+)%s+([%a%d-]+)%s+([%a%d-]+)$')
-   n = tonumber(x)
-   m = tonumber(y)
-   if o and x and y then
-      if o == 'set' then
-         assert(not n)
-         return 'set', x, m or y
-      elseif o == 'add' then
-         assert(not n)
-         return 'add', x, m or y
-      elseif o == 'mul' then
-         assert(not n)
-         return 'mul', x, m or y
-      elseif o == 'mod' then
-         assert(not n)
-         return 'mod', x, m or y
-      elseif o == 'jgz' then
-         return 'jgz', n or x, m or y
-      end
-   end
-
-   o, x = string.match(s, '^(%a+)%s+([%a%d-]+)$')
-   n = tonumber(x)
-   if o and x then
-      if o == 'snd' then
-         return 'snd', n or x
-      elseif o == 'rcv' then
-         assert(not n)
-         return 'rcv', x
-      end
-   end
-
-   return nil
-end
-
-local function run(instrs, ip, registers, mailbox)
-   local function arg(v)
-      return type(v) == 'string' and (registers[v] or 0) or
-         type(v) == 'number' and v or
-         error('invalid instruction')
-   end
-
-   while ip >= 1 and ip <= #instrs do
-      local o, x, y = table.unpack(instrs[ip])
-      if o == 'set' then
-         registers[x] = arg(y)
-         ip = ip + 1
-      elseif o == 'add' then
-         registers[x] = (registers[x] or 0) + arg(y)
-         ip = ip + 1
-      elseif o == 'mul' then
-         registers[x] = (registers[x] or 0) * arg(y)
-         ip = ip + 1
-      elseif o == 'mod' then
-         registers[x] = (registers[x] or 0) % arg(y)
-         ip = ip + 1
-      elseif o == 'jgz' then
-         if arg(x) > 0 then
-            ip = ip + arg(y)
-         else
-            ip = ip + 1
-         end
-      elseif o == 'snd' then
-         ip = ip + 1
-         return ip, o, arg(x)
-      elseif o == 'rcv' then
-         if mailbox[1] then
-            -- XXX: mailbox should be a proper queue
-            registers[x] = table.remove(mailbox, 1)
-            ip = ip + 1
-         else
-            x = nil
-         end
-         return ip, o, x
-      else
-         error('invalid instruction')
-      end
-   end
-   return ip, nil, nil
-end
+require('cpu')
 
 local instructions = {}
 for line in io.lines() do
@@ -93,7 +11,7 @@ if puzzle.part == 1 then
    local registers = {}
    while true do
       local op, arg
-      ip, op, arg = run(instructions, ip, registers, mailbox)
+      ip, op, arg = runinstrs(instructions, ip, registers, mailbox)
       if op == 'snd' then
          table.insert(mailbox, arg)
       elseif op == 'rcv' then
@@ -113,7 +31,7 @@ elseif puzzle.part == 2 then
    while (running[0] or running[1]) and not (blocked[0] and blocked[1]) do
       local op, arg
       if running[cur] and not blocked[cur] then
-         process[cur].ip, op, arg = run(
+         process[cur].ip, op, arg = runinstrs(
             instructions,
             process[cur].ip,
             process[cur].registers,

@@ -1,53 +1,43 @@
 require('knothash')
 
+local function floodfill(grid, x, y, region)
+   local row = grid[y]
+   local item = row and row[x]
+   if item ~= 0 then
+      return
+   end
+   row[x] = region
+   floodfill(grid, x, y - 1, region)
+   floodfill(grid, x - 1, y, region)
+   floodfill(grid, x + 1, y, region)
+   floodfill(grid, x, y + 1, region)
+end
+
 local key = io.read()
+local grid = {}
 
-if puzzle.part == 1 then
-   local function popcount(k)
-      local n = 0
-      while k ~= 0 do
-         if (k & 1) ~= 0 then
-            n = n + 1
-         end
-         k = k >> 1
-      end
-      return n
-   end
-
-   local sum = 0
-
-   for i = 1, 128 do
-      for _, byte in ipairs(densehash(knothash(key .. '-' .. tostring(i - 1)))) do
-         sum = sum + popcount(byte)
-      end
-   end
-
-   print(sum)
-elseif puzzle.part == 2 then
-   local grid = {}
-
-   for rowi = 1, 128 do
-      local row = {}
-      for coli, byte in ipairs(densehash(knothash(key .. '-' .. tostring(rowi - 1)))) do
-         for biti = 1, 8 do
-            if (byte & (1 << (biti - 1))) ~= 0 then
-               row[(coli - 1) * 8 + (biti - 1) + 1] = true
-            end
+for y = 1, 128 do
+   local row = {}
+   for x, byte in ipairs(densehash(knothash(key .. '-' .. tostring(y - 1)))) do
+      for i = 1, 8 do
+         if (byte & (1 << (i - 1))) ~= 0 then
+            row[(x - 1) * 8 + ((8 - 1) - (i - 1))] = 0
          end
       end
-      grid[rowi] = row
    end
+   grid[y] = row
+end
 
-   -- TODO
-   for rowi = 1, 128 do
-      for coli = 1, 128 do
-         if grid[rowi][coli] then
-            sum = sum + 1
-            io.stderr:write('#')
-         else
-            io.stderr:write('.')
-         end
+local sum = 0
+local groups = 0
+for y, row in pairs(grid) do
+   for x, item in pairs(row) do
+      sum = sum + 1
+      if item == 0 then
+         groups = groups + 1
+         floodfill(grid, x, y, groups)
       end
-      io.stderr:write('\n')
    end
 end
+print(puzzle.part == 1 and sum or
+      puzzle.part == 2 and groups)

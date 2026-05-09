@@ -41,7 +41,7 @@ function parseinstr(s)
    return nil
 end
 
-function runinstrs(instrs, ip, registers, mailbox)
+function runinstrs(instrs, ip, registers, mailbox, counters)
    local function arg(v)
       return type(v) == 'string' and (registers[v] or 0) or
          type(v) == 'number' and v or
@@ -50,6 +50,9 @@ function runinstrs(instrs, ip, registers, mailbox)
 
    while ip >= 1 and ip <= #instrs do
       local o, x, y = table.unpack(instrs[ip])
+      if counters then
+         counters[o] = (counters[o] or 0) + 1
+      end
       if o == 'set' then
          registers[x] = arg(y)
          ip = ip + 1

@@ -59,6 +59,15 @@ function grid.new(linesstr)
    return setmetatable(g, grid)
 end
 
+function grid.nrows(g)
+   return #g
+end
+
+function grid.ncols(g)
+   local row = rawget(g, 1)
+   return row and #row or 0
+end
+
 function grid.get(g, p)
    local row = rawget(g, p.y)
    return row and rawget(row, p.x) or nil

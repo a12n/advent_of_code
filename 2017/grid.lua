@@ -46,7 +46,7 @@ grid.__index = grid
 function grid.new(linesstr)
    local g = {}
    local ncols = nil
-   for line in string.gmatch(linesstr, '[^\n]+') do
+   for line in string.gmatch(linesstr or '', '[^\n]+') do
       local row = table.pack(string.byte(line, 1, #line))
       if not ncols then
          ncols = #row

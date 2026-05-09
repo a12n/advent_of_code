@@ -9,14 +9,14 @@ if puzzle.part == 1 then
    end
    print(buffer[pos + 1])
 elseif puzzle.part == 2 then
-   local first = nil
+   local after0 = nil
    local len = 1
    for i = 1, 50000000 do
       pos = (((pos - 1) + steps) % len) + 1 + 1
-      if pos == 2 then
-         first = i
-      end
       len = len + 1
+      if pos == (1 + 1) then
+         after0 = i
+      end
    end
-   print(first)
+   print(after0)
 end

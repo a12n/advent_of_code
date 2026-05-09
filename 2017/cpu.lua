@@ -41,6 +41,16 @@ function parseinstr(s)
    return nil
 end
 
+function printinstrs(instrs)
+   for ip, instr in ipairs(instrs) do
+      local o, x, y = table.unpack(instr)
+      if (o == 'jnz' or o == 'jgz') and type(y) == 'number' then
+         y = '@' .. tostring(ip + y)
+      end
+      print(ip, ':', o, x, y)
+   end
+end
+
 function runinstrs(instrs, ip, registers, mailbox, counters)
    local function arg(v)
       return type(v) == 'string' and (registers[v] or 0) or

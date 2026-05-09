@@ -1,0 +1,171 @@
+local function reverse(from, len, n)
+   local to = from + len
+   local tomod = to % n
+   if to <= n then
+      -- from=2 len=2 n=5
+      --      f    t
+      -- 0 1 (2 3) 4
+      -- 0 1 (3 2) 4
+      return function(i)
+         if i >= from and i < to then
+            return (from + (len - 1) - (i - from)) % n
+         end
+         return i
+      end
+   else
+      -- from=3 len=4 n=5 to=7 tomod=2
+      --      t  f
+      -- 0 1) 2 (3 4
+      -- 4 3) 2 (1 0
+      return function(i)
+         if i >= from then
+            return ((tomod - 1) - (i - from)) % n
+         elseif i < tomod then
+            return (from + (tomod - 1) - i) % n
+         end
+         return i
+      end
+   end
+end
+
+local function compose(f, g)
+   return function(i)
+      return g(f(i))
+   end
+end
+
+local function testreverse()
+   local hash
+   local n = 5
+
+   -- (0 1 2) 3 4
+   -- (2 1 0) 3 4
+   hash = reverse(0, 3, n)
+   assert(hash(0) == 2)
+   assert(hash(1) == 1)
+   assert(hash(2) == 0)
+   assert(hash(3) == 3)
+   assert(hash(4) == 4)
+
+   -- 0 1 (2 3) 4
+   -- 0 1 (3 2) 4
+   hash = reverse(2, 2, n)
+   assert(hash(0) == 0)
+   assert(hash(1) == 1)
+   assert(hash(2) == 3)
+   assert(hash(3) == 2)
+   assert(hash(4) == 4)
+
+   -- (0 1 2 3 4)
+   -- (4 3 2 1 0)
+   hash = reverse(0, 5, n)
+   assert(hash(0) == 4)
+   assert(hash(1) == 3)
+   assert(hash(2) == 2)
+   assert(hash(3) == 1)
+   assert(hash(4) == 0)
+
+   -- 0 1) 2 (3 4
+   -- 4 3) 2 (1 0
+   hash = reverse(3, 4, n)
+   assert(hash(0) == 4)
+   assert(hash(1) == 3)
+   assert(hash(2) == 2)
+   assert(hash(3) == 1)
+   assert(hash(4) == 0)
+
+   -- 0 1 2) (3 4
+   -- 0 4 3) (2 1
+   hash = reverse(3, 5, n)
+   assert(hash(0) == 0)
+   assert(hash(1) == 4)
+   assert(hash(2) == 3)
+   assert(hash(3) == 2)
+   assert(hash(4) == 1)
+
+   -- 0 1 2) (3 4
+   -- 0 4 3) (2 1
+   -- 0 1 2) (3 4
+   hash = compose(reverse(3, 5, n),
+                  reverse(3, 5, n))
+   assert(hash(0) == 0)
+   assert(hash(1) == 1)
+   assert(hash(2) == 2)
+   assert(hash(3) == 3)
+   assert(hash(4) == 4)
+
+   -- (0 1 2) 3 4
+   -- (2 1 0) 3 4
+   -- 2 (1 0 3) 4
+   -- 2 (3 0 1) 4
+   hash = compose(reverse(0, 3, n),
+                  reverse(1, 3, n))
+   assert(hash(0) == 2)
+   assert(hash(1) == 3)
+   assert(hash(2) == 0)
+   assert(hash(3) == 1)
+   assert(hash(4) == 4)
+
+   -- 0 (1 2 3) 4
+   -- 0 (3 2 1) 4
+   -- (0 3 2) 1 4
+   -- (2 3 0) 1 4
+   hash = compose(reverse(1, 3, n),
+                  reverse(0, 3, n))
+   assert(hash(0) == 2)
+   assert(hash(1) == 3)
+   assert(hash(2) == 0)
+   assert(hash(3) == 1)
+   assert(hash(4) == 4)
+
+   -- (0 1 2) 3 4
+   -- (2 1 0) 3 4
+   -- 2 1) 0 (3 4
+   -- 4 3) 0 (1 2
+   hash = compose(reverse(3, 4, n),
+                  reverse(0, 3, n))
+   assert(hash(0) == 4)
+   assert(hash(1) == 3)
+   assert(hash(2) == 0)
+   assert(hash(3) == 1)
+   assert(hash(4) == 2)
+end
+
+function knothash(str, n, rounds, trailing)
+   n = n or 256
+   rounds = rounds or 64
+   trailing = trailing or '\017\031\073\047\023'
+   str = str .. trailing
+
+   local hash = function(i) return i end
+   local lengths = table.pack(string.byte(str, 1, #str))
+   local pos = 0
+   local skip = 0
+
+   for _ = 1, rounds do
+      for _, len in ipairs(lengths) do
+         hash = compose(reverse(pos, len, n), hash)
+         pos = (pos + len + skip) % n
+         skip = skip + 1
+      end
+   end
+
+   return hash
+end
+
+function densehash(hash)
+   local numbers = {}
+   for block = 0, 16 - 1 do
+      local acc = 0
+      for number = 0, 16 - 1 do
+         acc = acc ~ hash(block * 16 + number)
+      end
+      table.insert(numbers, acc)
+   end
+   return numbers
+end
+
+function formatdense(numbers)
+   assert(#numbers == 16)
+   return string.format(string.rep('%02x', 16), table.unpack(numbers))
+end

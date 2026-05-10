@@ -40,6 +40,14 @@ function vector.__mul(u, n)
    return vector.new(u.x * n, u.y * n, u.z * n)
 end
 
+function vector.__div(u, n)
+   return vector.new(u.x / n, u.y / n, u.z / n)
+end
+
+function vector.__idiv(u, n)
+   return vector.new(u.x // n, u.y // n, u.z // n)
+end
+
 function vector.__tostring(u)
    return u.x .. ',' .. u.y .. ',' .. u.z
 end

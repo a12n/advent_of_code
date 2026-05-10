@@ -15,6 +15,11 @@ local function parseparticle(line)
    return s and v and a and { s = s, v = v, a = a }
 end
 
+local function updateparticle(p)
+   p.v = p.v + p.a
+   p.s = p.s + p.v
+end
+
 local particles = {}
 for line in io.lines() do
    table.insert(particles, assert(parseparticle(line)))
@@ -31,4 +36,35 @@ if puzzle.part == 1 then
       end
    end
    print(index - 1)
+elseif puzzle.part == 2 then
+   local n = #particles
+   for t = 1, 1000 do
+      -- Collision
+      for i = 1, n - 1 do
+         local p = particles[i]
+         if p then
+            for j = i + 1, n do
+               local q = particles[j]
+               if q then
+                  if p.s == q.s then
+                     particles[i] = nil
+                     particles[j] = nil
+                  end
+               end
+            end
+         end
+      end
+      -- Update
+      for i = 1, n do
+         if particles[i] then
+            updateparticle(particles[i])
+         end
+      end
+   end
+   -- Count loop
+   local m = 0
+   for _, p in pairs(particles) do
+      m = m + 1
+   end
+   print(m)
 end

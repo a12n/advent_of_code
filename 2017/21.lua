@@ -227,3 +227,17 @@ if puzzle.part == 1 then
    print(enhance(is3('.#./..#/###'), rules, 5))
 end
 
+if puzzle.test then
+   local s2 = '12/34'
+   local s3 = '123/456/789'
+
+   assert('21/43' == fliph(s2))
+   assert('321/654/987' == fliph(s3))
+
+   assert('34/12' == flipv(s2))
+   assert('789/456/123' == flipv(s3))
+
+   assert('24/13' == rotateccw(s2))
+   assert('369/258/147' == rotateccw(s3))
+   assert('987/654/321' == rotateccw(rotateccw(s3)))
+end

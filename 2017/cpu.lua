@@ -60,6 +60,7 @@ function runinstrs(instrs, ip, registers, mailbox, counters)
 
    while ip >= 1 and ip <= #instrs do
       local o, x, y = table.unpack(instrs[ip])
+      -- print(ip, ':', o, x, y)
       if counters then
          counters[o] = (counters[o] or 0) + 1
       end
@@ -105,6 +106,10 @@ function runinstrs(instrs, ip, registers, mailbox, counters)
       else
          error('invalid instruction')
       end
+      -- for k, v in pairs(registers) do
+      --    print(k, '=', v)
+      -- end
+      -- print()
    end
    return ip, nil, nil
 end

@@ -86,7 +86,7 @@ end
 
 local function split4(s)
    assert(issize4(s))
-   local s11, s12, s13, a14,
+   local s11, s12, s13, s14,
       _, s21, s22, s23, s24,
       _, s31, s32, s33, s34,
       _, s41, s42, s43, s44 = string.byte(s, 1, #s)

@@ -56,8 +56,9 @@ elseif puzzle.part == 2 then
       end
       -- Update
       for i = 1, n do
-         if particles[i] then
-            updateparticle(particles[i])
+         local p = particles[i]
+         if p then
+            updateparticle(p)
          end
       end
    end

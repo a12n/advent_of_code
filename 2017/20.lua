@@ -20,13 +20,15 @@ for line in io.lines() do
    table.insert(particles, assert(parseparticle(line)))
 end
 
-local closest = nil
-local closestnorm = nil
-for i, particle in ipairs(particles) do
-   local norm = particle.a:taxicab()
-   if not closestnorm or norm < closestnorm then
-      closest = i
-      closestnorm = norm
+if puzzle.part == 1 then
+   local index = nil
+   local minanorm = nil
+   for i, p in ipairs(particles) do
+      local anorm = p.a:taxicab()
+      if not minanorm or anorm < minanorm then
+         index = i
+         minanorm = anorm
+      end
    end
+   print(index - 1)
 end
-print(closest - 1)

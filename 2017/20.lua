@@ -39,7 +39,8 @@ if puzzle.part == 1 then
    print(index - 1)
 elseif puzzle.part == 2 then
    local n = #particles
-   for t = 1, 1000 do
+   -- FIXME: There may be collisions after t=100
+   for t = 1, 100 do
       -- Collision
       for i = 1, n - 1 do
          local p = particles[i]

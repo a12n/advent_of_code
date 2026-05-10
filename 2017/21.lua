@@ -126,4 +126,4 @@ for line in io.lines() do
    print('rule', from, to)
 end
 
-print(enhance('.#./..#/###', rules, 5))
+print(enhance(is3('.#./..#/###'), rules, 5))

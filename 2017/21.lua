@@ -215,12 +215,15 @@ local function enhance(s, rules, iters)
    end
 end
 
-local rules = {}
-for line in io.lines() do
-   local from, to = parserule(line)
-   for _, tfrom in ipairs(table.pack(transforms(from))) do
-      rules[tfrom] = to
+if puzzle.part == 1 then
+   local rules = {}
+   for line in io.lines() do
+      local from, to = parserule(line)
+      for _, tfrom in ipairs(table.pack(transforms(from))) do
+         rules[tfrom] = to
+         print('rule', tfrom, '=>', to)
+      end
    end
+   print(enhance(is3('.#./..#/###'), rules, 5))
 end
 
-print(enhance(is3('.#./..#/###'), rules, 5))

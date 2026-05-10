@@ -100,6 +100,19 @@ local function split4(s)
                   s43, s44)
 end
 
+-- 123
+-- 456
+-- 789
+--
+-- The side "123" can be any of the four sides of the square and in
+-- forward or reverse order ("123" or "321"). There are 8
+-- combinations.
+local function transforms(s)
+   assert(issize2(s) or issize3(s))
+   -- TODO
+   return s
+end
+
 local function parserule(line)
    local from, to = string.match(line, '^%s*([#./]+)%s*=>%s*([#./]+)%s*$')
    if not from or not to then
@@ -132,9 +145,9 @@ end
 local rules = {}
 for line in io.lines() do
    local from, to = parserule(line)
-   rules[from] = to
-   -- TODO: transformed copies of the rule
-   print('rule', from, to)
+   for _, tfrom in ipairs(table.pack(transforms(from))) do
+      rules[tfrom] = to
+   end
 end
 
 print(enhance(is3('.#./..#/###'), rules, 5))

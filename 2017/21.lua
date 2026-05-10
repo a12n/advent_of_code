@@ -109,20 +109,20 @@ local function parserule(line)
    return from, to
 end
 
-local function enhance(s, rules, n)
-   print('enhance', s, n)
-   if n == 0 then
+local function enhance(s, rules, iters)
+   print('enhance', s, iters)
+   if iters == 0 then
       return count(s)
    end
    local t = rules[s]
    assert(t)
    if issize3(t) then
-      return enhance(t, rules, n - 1)
+      return enhance(t, rules, iters - 1)
    elseif issize4(t) then
       local t11, t12,
          t21, t22 = split4(t)
-      return enhance(t11, rules, n - 1) + enhance(t12, rules, n - 1) +
-         enhance(t21, rules, n - 1) + enhance(t22, rules, n - 1)
+      return enhance(t11, rules, iters - 1) + enhance(t12, rules, iters - 1) +
+         enhance(t21, rules, iters - 1) + enhance(t22, rules, iters - 1)
    else
       error('unreachable')
    end

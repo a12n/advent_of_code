@@ -11,8 +11,6 @@ if puzzle.part == 1 then
    runinstrs(instrs, 1, registers, nil, counters)
    print(counters['mul'] or 0)
 elseif puzzle.part == 2 then
-   -- Manual solution. Have disassembled the intended program from the
-   -- puzzle input.
    local function isprime(n)
       local d = 2
       while d * d <= n do
@@ -23,8 +21,14 @@ elseif puzzle.part == 2 then
       end
       return true
    end
-   local n = 106700
-   local limit = 123700
+   -- Manual solution. Analyzed the intended program from the puzzle
+   -- input assembly code. Let the code in the puzzle input setup the
+   -- parameters, run [optimized] Lua version of the program.
+   registers['a'] = 1
+   instrs[9] = { 'jnz', 1, #instrs + 1 }
+   runinstrs(instrs, 1, registers)
+   local n = registers['b']
+   local limit = registers['c']
    local composite = 0
    while n <= limit do
       if not isprime(n) then

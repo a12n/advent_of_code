@@ -233,9 +233,13 @@ if puzzle.test then
 
    assert('21/43' == fliph(s2))
    assert('321/654/987' == fliph(s3))
+   assert(s2 == fliph(fliph(s2)))
+   assert(s3 == fliph(fliph(s3)))
 
    assert('34/12' == flipv(s2))
    assert('789/456/123' == flipv(s3))
+   assert(s2 == flipv(flipv(s2)))
+   assert(s3 == flipv(flipv(s3)))
 
    assert('24/13' == rotateccw(s2))
    assert('369/258/147' == rotateccw(s3))

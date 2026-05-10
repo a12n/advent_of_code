@@ -29,6 +29,7 @@ if puzzle.part == 1 then
    local index = nil
    local minanorm = nil
    for i, p in ipairs(particles) do
+      -- FIXME: There may be multiple particles with accel norm.
       local anorm = p.a:taxicab()
       if not minanorm or anorm < minanorm then
          index = i

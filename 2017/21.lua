@@ -109,6 +109,7 @@ local function parserule(line)
    return from, to
 end
 
+-- TODO: memoize on `s` and `iters`
 local function enhance(s, rules, iters)
    print('enhance', s, iters)
    if iters == 0 then

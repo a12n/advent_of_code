@@ -224,7 +224,7 @@ if puzzle.part == 1 then
          print('rule', tfrom, '=>', to)
       end
    end
-   print(enhance(is3('.#./..#/###'), rules, 5))
+   print(enhance(is3('.#./..#/###'), rules, tonumber(os.getenv('ITERS')) or 5))
 end
 
 if puzzle.test then

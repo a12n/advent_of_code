@@ -196,20 +196,20 @@ local function parserule(line)
 end
 
 -- TODO: memoize on `s` and `iters`
-local function enhance(rules, s, iters)
-   print('enhance', s, iters)
+local function enhance(rules, s, size, iters)
+   print('enhance', s, 'size', size, 'iters', iters)
    if iters == 0 then
       return count(s)
    end
    local t = rules[s]
    assert(t)
    if issize3(t) then
-      return enhance(rules, t, iters - 1)
+      return enhance(rules, t, size + 1, iters - 1)
    elseif issize4(t) then
       local t11, t12,
          t21, t22 = split4(t)
-      return enhance(rules, t11, iters - 1) + enhance(rules, t12, iters - 1) +
-         enhance(rules, t21, iters - 1) + enhance(rules, t22, iters - 1)
+      return enhance(rules, t11, size + 1, iters - 1) + enhance(rules, t12, size + 1, iters - 1) +
+         enhance(rules, t21, size + 1, iters - 1) + enhance(rules, t22, size + 1, iters - 1)
    else
       error('unreachable')
    end
@@ -224,7 +224,7 @@ if puzzle.part == 1 then
          print('rule', tfrom, '=>', to)
       end
    end
-   print(enhance(rules, is3('.#./..#/###'), tonumber(os.getenv('ITERS')) or 5))
+   print(enhance(rules, is3('.#./..#/###'), 3, tonumber(os.getenv('ITERS')) or 5))
 end
 
 if puzzle.test then

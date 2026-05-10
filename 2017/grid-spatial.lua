@@ -7,6 +7,10 @@ function point.new(x, y, z)
                          z = z or y or x or 0 }, point)
 end
 
+function point.__eq(p, q)
+   return p.x == q.x and p.y == q.y and p.z == q.z
+end
+
 function point.__add(p, u)
    return point.new(p.x + u.x, p.y + u.y, p.z + u.z)
 end
@@ -22,6 +26,10 @@ function vector.new(x, y, z)
    return setmetatable({ x = x or 0,
                          y = y or x or 0,
                          z = z or y or x or 0 }, vector)
+end
+
+function vector.__eq(u, v)
+   return u.x == v.x and u.y == v.y and u.z == v.z
 end
 
 function vector.__add(u, v)

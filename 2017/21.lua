@@ -244,4 +244,28 @@ if puzzle.test then
    assert('24/13' == rotateccw(s2))
    assert('369/258/147' == rotateccw(s3))
    assert('987/654/321' == rotateccw(rotateccw(s3)))
+
+   -- 01|23
+   -- 45|67
+   -- --+--
+   -- 89|AB
+   -- CD|EF
+   local s11, s12,
+      s21, s22 = split4('0123/4567/89AB/CDEF')
+   assert(s11 == '01/45')
+   assert(s12 == '23/67')
+   assert(s21 == '89/CD')
+   assert(s22 == 'AB/EF')
+
+   local s3 = '.#./..#/###'
+   local rules = {}
+   for _, t in ipairs(table.pack(transforms(s3))) do
+      rules[t] = true
+   end
+   assert(rules[s3])
+   assert(rules[rotateccw(s3)])
+   assert(rules[flipv(s3)])
+   assert(rules[fliph(s3)])
+   assert(rules[rotateccw(fliph(s3))])
+   assert(rules[fliph(rotateccw(s3))])
 end

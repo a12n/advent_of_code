@@ -48,16 +48,40 @@ local function count(s)
    return n
 end
 
-local function vflip2(s)
-   assert(issize2(s))
+local function fliph2(s)
+   local s11, s12,
+      _, s21, s22 = string.byte(s, 1, #s)
+   return string.char(s12, s11, SEP,
+                      s22, s21)
+end
+
+local function fliph3(s)
+   local s11, s12, s13,
+      _, s21, s22, s23,
+      _, s31, s32, s33 = string.byte(s, 1, #s)
+   return string.char(s13, s12, s11, SEP,
+                      s23, s22, s21, SEP,
+                      s33, s32, s31)
+end
+
+local function fliph(s)
+   if issize2(s) then
+      return fliph2(s)
+   elseif issize3(s) then
+      return fliph3(s)
+   else
+      error('invalid pattern')
+   end
+end
+
+local function flipv2(s)
    local s11, s12,
       _, s21, s22 = string.byte(s, 1, #s)
    return string.char(s21, s22, SEP,
                       s11, s12)
 end
 
-local function vflip3(s)
-   assert(issize3(s))
+local function flipv3(s)
    local s11, s12, s13,
       _, s21, s22, s23,
       _, s31, s32, s33 = string.byte(s, 1, #s)
@@ -66,8 +90,17 @@ local function vflip3(s)
                       s11, s12, s13)
 end
 
+local function flipv(s)
+   if issize2(s) then
+      return flipv2(s)
+   elseif issize3(s) then
+      return flipv3(s)
+   else
+      error('invalid pattern')
+   end
+end
+
 local function transpose2(s)
-   assert(issize2(s))
    local s11, s12,
       _, s21, s22 = string.byte(s, 1, #s)
    return string.char(s11, s21, SEP,
@@ -75,13 +108,26 @@ local function transpose2(s)
 end
 
 local function transpose3(s)
-   assert(issize3(s))
    local s11, s12, s13,
       _, s21, s22, s23,
       _, s31, s32, s33 = string.byte(s, 1, #s)
    return string.char(s11, s21, s31, SEP,
                       s12, s22, s32, SEP,
                       s13, s23, s33)
+end
+
+local function transpose(s)
+   if issize2(s) then
+      return transpose2(s)
+   elseif issize3(s) then
+      return transpose3(s)
+   else
+      error('invalid pattern')
+   end
+end
+
+local function rotateccw(s)
+   return flipv(transpose(s))
 end
 
 local function split4(s)
@@ -100,17 +146,44 @@ local function split4(s)
                   s43, s44)
 end
 
--- 123
--- 456
--- 789
---
 -- The side "123" can be any of the four sides of the square and in
 -- forward or reverse order ("123" or "321"). There are 8
 -- combinations.
-local function transforms(s)
-   assert(issize2(s) or issize3(s))
-   -- TODO
-   return s
+-- 123
+-- 456
+-- 789
+local function transforms(s0)
+   -- 369
+   -- 258
+   -- 147
+   local s1 = rotateccw(s0)
+   -- 987
+   -- 654
+   -- 321
+   local s2 = rotateccw(s1)
+   -- 741
+   -- 852
+   -- 963
+   local s3 = rotateccw(s2)
+
+   -- 321
+   -- 654
+   -- 987
+   local s4 = fliph(s0)
+   -- 147
+   -- 258
+   -- 369
+   local s5 = fliph(s3)
+   -- 789
+   -- 456
+   -- 123
+   local s6 = flipv(s0)
+   -- 963
+   -- 852
+   -- 741
+   local s7 = flipv(s3)
+
+   return s0, s1, s2, s3, s4, s5, s6, s7
 end
 
 local function parserule(line)

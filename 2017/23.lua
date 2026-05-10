@@ -4,39 +4,33 @@ local instrs = {}
 for line in io.lines() do
    table.insert(instrs, table.pack(parseinstr(line)))
 end
--- printinstrs(instrs)
--- print()
 
 local registers = {}
-
 if puzzle.part == 1 then
    local counters = {}
    runinstrs(instrs, 1, registers, nil, counters)
    print(counters['mul'] or 0)
 elseif puzzle.part == 2 then
-   ------ Loop 1 ------
-   -- b       =       106700
-   -- e       =       2
-   -- g       =       -106696
-   --
-   -- 17      :       sub     e       -1 => -106698
-   -- 18      :       set     g       e
-   -- 19      :       sub     g       b
-   -- 20      :       jnz     g       -8
-
-   ------ Loop 2 ------
-   -- b       =       106700
-   -- d       =       2
-   --
-   -- 21      :       sub     d       -1 => -106698
-   -- 22      :       set     g       d
-   -- 23      :       sub     g       b
-   -- 24      :       jnz     g       -13
-
-   registers['a'] = 1
-   instrs[20] = { 'jnz', 0, -8 }
-   instrs[24] = { 'jnz', 0, -13 }
-   instrs[25] = { 'jnz', 0, 2 }
-   runinstrs(instrs, 1, registers)
-   print(registers['h'])
+   -- Manual solution. Have disassembled the intended program from the
+   -- puzzle input.
+   local function isprime(n)
+      local d = 2
+      while d * d <= n do
+         if n % d == 0 then
+            return false
+         end
+         d = d + 1
+      end
+      return true
+   end
+   local n = 106700
+   local limit = 123700
+   local composite = 0
+   while n <= limit do
+      if not isprime(n) then
+         composite = composite + 1
+      end
+      n = n + 17
+   end
+   print(composite)
 end

@@ -265,16 +265,17 @@ local function enhance(rules, s, iters)
    end
 end
 
-if puzzle.part == 1 then
-   local rules = {}
-   for line in io.lines() do
-      local from, to = parserule(line)
-      for _, tfrom in ipairs(table.pack(transforms(from))) do
-         rules[tfrom] = to
-      end
+local rules = {}
+for line in io.lines() do
+   local from, to = parserule(line)
+   for _, tfrom in ipairs(table.pack(transforms(from))) do
+      rules[tfrom] = to
    end
-   print(enhance(rules, is3('.#./..#/###'), tonumber(os.getenv('ITERS')) or 5))
 end
+print(enhance(rules, is3('.#./..#/###'),
+              tonumber(os.getenv('ITERS')) or
+              (puzzle.part == 1 and 5) or
+              (puzzle.part == 2 and 18)))
 
 if puzzle.test then
    local s2 = '12/34'

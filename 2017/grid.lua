@@ -109,3 +109,15 @@ function grid.set(g, p, v)
    end
    rawset(row, p.x, v)
 end
+
+-- Returns sequence table of `k` values associated with the points in
+-- `k`-neighborhood of the given point `p`. If the value is missing in
+-- the grid, `default` (nil by default) is returned instead.
+function grid.neighbors(g, p, k, default)
+   local values = {}
+   for _, q in ipairs(point.neighbors(p, k)) do
+      local value = grid.get(g, q)
+      table.insert(values, value ~= nil and value or default)
+   end
+   return values
+end

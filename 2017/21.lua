@@ -234,9 +234,7 @@ local function parserule(line)
    return from, to
 end
 
--- TODO: memoize on `s` and `iters`
 local function enhance(rules, s, iters)
-   print('enhance', s, 'size', size, 'iters', iters)
    if iters == 0 then
       return count(s)
    end
@@ -273,7 +271,6 @@ if puzzle.part == 1 then
       local from, to = parserule(line)
       for _, tfrom in ipairs(table.pack(transforms(from))) do
          rules[tfrom] = to
-         print('rule', tfrom, '=>', to)
       end
    end
    print(enhance(rules, is3('.#./..#/###'), tonumber(os.getenv('ITERS')) or 5))

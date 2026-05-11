@@ -51,12 +51,26 @@ local function search(port, len, stren, lenavail, strenavail, components)
       return
    end
 
-   if maxstren and maxstren >= (stren + strenavail) then
-      return
-   end
-
-   if not maxstren or stren > maxstren then
-      maxstren = stren
+   if puzzle.part == 1 then
+      if maxstren and maxstren >= (stren + strenavail) then
+         return
+      end
+      if not maxstren or stren > maxstren then
+         maxstren = stren
+      end
+   elseif puzzle.part == 2 then
+      if maxlen and maxlen > (len + lenavail) then
+         return
+      end
+      if not maxlen then
+         maxlen = len
+         maxstren = stren
+      elseif len > maxlen then
+         maxlen = len
+         maxstren = stren
+      elseif len == maxlen and stren > maxstren then
+         maxstren = stren
+      end
    end
 
    for comp, avail in pairs(components) do

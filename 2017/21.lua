@@ -146,6 +146,45 @@ local function split4(s)
                   s43, s44)
 end
 
+local function rearrange32(s11, s12, s21, s22)
+   assert(issize3(s11))
+   assert(issize3(s12))
+   assert(issize3(s21))
+   assert(issize3(s22))
+   local t11, t12, t13,
+      _, t21, t22, t23,
+      _, t31, t32, t33 = string.byte(s11, 1, #s11)
+   local t14, t15, t16,
+      _, t24, t25, t26,
+      _, t34, t35, t36 = string.byte(s12, 1, #s12)
+   local t41, t42, t43,
+      _, t51, t52, t53,
+      _, t61, t62, t63 = string.byte(s21, 1, #s21)
+   local t44, t45, t46,
+      _, t54, t55, t56,
+      _, t64, t65, t66 = string.byte(s22, 1, #s22)
+   return string.char(t11, t12, SEP,
+                      t21, t22),
+      string.char(t13, t14, SEP,
+                  t23, t24),
+      string.char(t15, t16, SEP,
+                  t25, t26),
+
+      string.char(t31, t32, SEP,
+                  t41, t42),
+      string.char(t33, t34, SEP,
+                  t43, t44),
+      string.char(t35, t36, SEP,
+                  t45, t46),
+
+      string.char(t51, t52, SEP,
+                  t61, t62),
+      string.char(t53, t54, SEP,
+                  t63, t64),
+      string.char(t55, t56, SEP,
+                  t65, t66)
+end
+
 -- The side "123" can be any of the four sides of the square and in
 -- forward or reverse order ("123" or "321"). There are 8
 -- combinations.
@@ -256,6 +295,38 @@ if puzzle.test then
    assert(s12 == '23/67')
    assert(s21 == '89/CD')
    assert(s22 == 'AB/EF')
+
+   -- 012|345
+   -- 678|9AB
+   -- CDE|FGH
+   -- ---+---
+   -- IJK|LMN
+   -- OPQ|RST
+   -- UVW|XYZ
+   -- ->
+   -- 01|23|45
+   -- 67|89|AB
+   -- --+--+--
+   -- CD|EF|GH
+   -- IJ|KL|MN
+   -- --+--+--
+   -- OP|QR|ST
+   -- UV|WX|YZ
+   local t11, t12, t13
+      , t21, t22, t23
+      , t31, t32, t33 = rearrange32(
+         '012/678/CDE', '345/9AB/FGH',
+         'IJK/OPQ/UVW', 'LMN/RST/XYZ'
+      )
+   assert(t11 == '01/67')
+   assert(t12 == '23/89')
+   assert(t13 == '45/AB')
+   assert(t21 == 'CD/IJ')
+   assert(t22 == 'EF/KL')
+   assert(t23 == 'GH/MN')
+   assert(t31 == 'OP/UV')
+   assert(t32 == 'QR/WX')
+   assert(t33 == 'ST/YZ')
 
    local s3 = '.#./..#/###'
    local rules = {}

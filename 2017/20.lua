@@ -71,3 +71,12 @@ elseif puzzle.part == 2 then
    end
    print(m)
 end
+
+-- p[t] = p0 + u0 t + 1/2 a t^2
+-- q[t] = q0 + v0 t + 1/2 b t^2
+
+-- p[t] = q[t]
+-- p0 + u0 t + 1/2 a t^2 = q0 + v0 t + 1/2 b t^2
+-- p0 + u0 t + 1/2 a t^2 - q0 - v0 t - 1/2 b t^2 = 0
+-- (p0 - q0) + (u0 - v0) t + 1/2 (a - b) t^2 = 0
+-- 2 (p0 - q0) + 2 (u0 - v0) t + (a - b) t^2 = 0

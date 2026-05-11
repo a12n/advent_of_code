@@ -13,6 +13,16 @@ function point.__tostring(p)
    return p.x .. ',' .. p.y
 end
 
+-- Returns sequence table of `k` (must be 4 or 8 for Von Neumann or
+-- Moore) neighborhood of the given point `p`.
+function point.neighbors(p, k)
+   local qs = {}
+   for _, u in ipairs(vector.neighbors(k)) do
+      table.insert(qs, p + u)
+   end
+   return qs
+end
+
 vector = {}
 vector.__index = vector
 
@@ -38,6 +48,24 @@ end
 
 function vector.taxicab(u)
    return math.abs(u.x) + math.abs(u.y)
+end
+
+function vector.neighbors(k)
+   if (k or 4) == 4 then
+      return {
+         vector.new(0, -1),
+         vector.new(-1, 0), vector.new(1, 0),
+         vector.new(0, 1),
+      }
+   elseif k == 8 then
+      return {
+         vector.new(-1, -1), vector.new(0, -1), vector.new(1, -1),
+         vector.new(-1, 0), vector.new(1, 0),
+         vector.new(-1, 1), vector.new(0, 1), vector.new(1, 1),
+      }
+   else
+      error('invalid vector neighborhood')
+   end
 end
 
 grid = {}

@@ -247,8 +247,21 @@ local function enhance(rules, s, iters)
    elseif issize4(t) then
       local t11, t12,
          t21, t22 = split4(t)
-      return enhance(rules, t11, iters - 1) + enhance(rules, t12, iters - 1) +
-         enhance(rules, t21, iters - 1) + enhance(rules, t22, iters - 1)
+      if iters > 1 then
+         local t11, t12, t13
+            , t21, t22, t23
+            , t31, t32, t33 = rearrange32(
+               rules[t11], rules[t12],
+               rules[t21], rules[t22]
+            )
+         iters = iters - 1
+         return enhance(rules, t11, iters - 1) + enhance(rules, t12, iters - 1) + enhance(rules, t13, iters - 1) +
+            enhance(rules, t21, iters - 1) + enhance(rules, t22, iters - 1) + enhance(rules, t23, iters - 1) +
+            enhance(rules, t31, iters - 1) + enhance(rules, t32, iters - 1) + enhance(rules, t33, iters - 1)
+      else
+         return enhance(rules, t11, iters - 1) + enhance(rules, t12, iters - 1) +
+            enhance(rules, t21, iters - 1) + enhance(rules, t22, iters - 1)
+      end
    else
       error('unreachable')
    end

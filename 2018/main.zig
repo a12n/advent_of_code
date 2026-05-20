@@ -7,6 +7,7 @@ const day04 = @import("04.zig");
 const day05 = @import("05.zig");
 const day07 = @import("07.zig");
 const day08 = @import("08.zig");
+const day10 = @import("10.zig");
 
 pub fn main(init: std.process.Init) !void {
     var args_iter = init.minimal.args.iterate();
@@ -29,7 +30,7 @@ pub fn main(init: std.process.Init) !void {
     var stdout_writer = std.Io.File.stdout().writer(init.io, &stdout_buf);
     const stdout = &stdout_writer.interface;
 
-    const puzzles: [8][2](*const fn (std.process.Init, *std.Io.Reader, *std.Io.Writer) anyerror!void) = .{
+    const puzzles: [10][2](*const fn (std.process.Init, *std.Io.Reader, *std.Io.Writer) anyerror!void) = .{
         .{ day01.part1, day01.part2 },
         .{ day02.part1, day02.part2 },
         .{ day03.part1, day03.part2 },
@@ -38,6 +39,8 @@ pub fn main(init: std.process.Init) !void {
         .{ day05.part1, day05.part2 }, // FIXME
         .{ day07.part1, day07.part2 },
         .{ day08.part1, day08.part2 },
+        .{ day08.part1, day08.part2 }, // FIXME
+        .{ day10.part1, day10.part2 },
     };
 
     try puzzles[day - 1][part - 1](init, stdin, stdout);

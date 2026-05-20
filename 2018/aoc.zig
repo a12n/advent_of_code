@@ -79,6 +79,14 @@ pub const grid = struct {
             begin: Point = .{ std.math.maxInt(isize), std.math.maxInt(isize) },
             end: Point = .{ std.math.minInt(isize), std.math.minInt(isize) },
 
+            pub fn size(self: Self) Vector {
+                return @max(self.end - self.begin, @as(Vector, @splat(0)));
+            }
+
+            pub fn area(self: Self) usize {
+                return @intCast(@reduce(.Mul, self.size()));
+            }
+
             pub fn contains(self: Self, p: Point) bool {
                 return p[0] >= self.begin[0] and p[0] < self.end[0] and
                     p[1] >= self.begin[1] and p[1] < self.end[1];

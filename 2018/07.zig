@@ -4,42 +4,48 @@ const Graph = struct {
     const max_nodes = 'Z' - 'A' + 1;
     const AdjacencyMatrix = [max_nodes]?[max_nodes]?void;
 
-    edges: AdjacencyMatrix = .{null} ** max_nodes,
+    outgoing: AdjacencyMatrix = .{null} ** max_nodes,
 
     fn addEdge(self: *Graph, from: u8, to: u8) void {
-        if (self.edges[from] == null) {
-            self.edges[from] = .{null} ** max_nodes;
+        if (self.outgoing[from] == null) {
+            self.outgoing[from] = .{null} ** max_nodes;
         }
-        self.edges[from].?[to] = {};
+        self.outgoing[from].?[to] = {};
     }
 
-    fn _visitNode(
-        self: Graph,
-        order: *NodeOrder,
-        visited: *[max_nodes]bool,
-        node: u8,
-    ) void {
-        std.debug.print("_visitNode: node {c}, visited {any}\n", .{ node + 'A', visited[node] });
-        visited[node] = if (!visited[node]) true else return;
-        if (self.edges[node]) |adjacent| {
-            var adj_node: u8 = max_nodes;
-            while (adj_node > 0) : (adj_node -= 1) {
-                if (adjacent[adj_node - 1] != null) {
-                    self._visitNode(order, visited, adj_node - 1);
-                }
+    fn hasIncoming(self: Graph, v: u8) bool {
+        for (0..max_nodes) |u| {
+            if (self.outgoing[u] != null and self.outgoing[u].?[v] != null) {
+                return true;
             }
         }
-        order.addNode(node);
+        return false;
     }
 
     fn topologicalSort(self: Graph) NodeOrder {
         var order: NodeOrder = .{};
-        var visited: [max_nodes]bool = .{false} ** max_nodes;
+        var state: std.StaticBitSet(max_nodes) = .initEmpty();
+        var copy = self;
 
-        var node: u8 = max_nodes;
-        while (node > 0) : (node -= 1) {
-            if (self.edges[node - 1] != null) {
-                self._visitNode(&order, &visited, node - 1);
+        for (0..max_nodes) |u| {
+            if (copy.outgoing[u] != null and !copy.hasIncoming(@intCast(u))) {
+                state.setValue(u, true);
+            }
+        }
+
+        while (state.findFirstSet()) |u| {
+            state.setValue(u, false);
+            order.addNode(@intCast(u));
+            if (copy.outgoing[u] == null) {
+                continue;
+            }
+            for (0..max_nodes) |v| {
+                if (copy.outgoing[u].?[v] != null) {
+                    copy.outgoing[u].?[v] = null;
+                    if (!copy.hasIncoming(@intCast(v))) {
+                        state.setValue(v, true);
+                    }
+                }
             }
         }
 
@@ -48,16 +54,16 @@ const Graph = struct {
 
     const NodeOrder = struct {
         buf: [max_nodes]u8 = undefined,
-        pos: usize = max_nodes,
+        pos: usize = 0,
 
         fn addNode(self: *NodeOrder, node: u8) void {
-            std.debug.assert(self.pos > 0);
-            self.pos -= 1;
+            std.debug.assert(self.pos < max_nodes);
             self.buf[self.pos] = node;
+            self.pos += 1;
         }
 
         fn toSlice(self: *const NodeOrder) []const u8 {
-            return self.buf[self.pos..];
+            return self.buf[0..self.pos];
         }
     };
 };

@@ -126,8 +126,20 @@ pub fn part1(init: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writ
 }
 
 pub fn part2(init: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
-    _ = init;
-    _ = stdin;
-    _ = stdout;
-    // TODO
+    var grid: *Grid = try init.arena.allocator().create(Grid);
+    grid.* = .{ .serial_number = try readSerialNumber(stdin) };
+
+    var largest: ?struct { x: usize, y: usize, size: usize, power: isize } = null;
+    for (1..Grid.max_size + 1) |size| {
+        for (0..Grid.max_size - size + 1) |y| {
+            for (0..Grid.max_size - size + 1) |x| {
+                const square_power = grid.squarePower(size, x, y);
+                if (largest == null or square_power > largest.?.power) {
+                    largest = .{ .x = x, .y = y, .size = size, .power = square_power };
+                }
+            }
+        }
+    }
+
+    try stdout.print("{d},{d},{d}\n", .{ largest.?.x, largest.?.y, largest.?.size });
 }

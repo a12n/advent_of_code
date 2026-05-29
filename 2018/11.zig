@@ -47,6 +47,12 @@ const Grid = struct {
 
     _memo: [max_size][max_size][max_size]?isize = .{.{.{null} ** max_size} ** max_size} ** max_size,
 
+    fn cellPower(x: u16, y: u16, serial_number: u32) i8 {
+        const rack_id: usize = x + 10;
+        const power: usize = (rack_id * y + serial_number) * rack_id;
+        return @intCast(@as(isize, @intCast(power / 100 % 10)) - 5);
+    }
+
     fn squarePower(self: *Grid, size: usize, x: usize, y: usize) isize {
         std.debug.assert(size >= 1 and size <= max_size);
         std.debug.assert((x + size) <= max_size);
@@ -77,30 +83,14 @@ const Grid = struct {
     }
 };
 
-fn cellPower(x: u16, y: u16, serial_number: u32) i8 {
-    const rack_id: usize = x + 10;
-    const power: usize = (rack_id * y + serial_number) * rack_id;
-    return @intCast(@as(isize, @intCast(power / 100 % 10)) - 5);
-}
-
-fn gridPower(serial_number: u32) [300][300]i8 {
-    var grid: [300][300]i8 = .{.{0} ** 300} ** 300;
-    for (0..300) |y| {
-        for (0..300) |x| {
-            grid[y][x] = cellPower(@intCast(x + 1), @intCast(y + 1), serial_number);
-        }
-    }
-    return grid;
-}
-
 test "fuel cell power" {
     const expectEqual = std.testing.expectEqual;
 
-    try expectEqual(4, cellPower(3, 5, 8));
+    try expectEqual(4, Grid.cellPower(3, 5, 8));
 
-    try expectEqual(-5, cellPower(122, 79, 57));
-    try expectEqual(0, cellPower(217, 196, 39));
-    try expectEqual(4, cellPower(101, 153, 71));
+    try expectEqual(-5, Grid.cellPower(122, 79, 57));
+    try expectEqual(0, Grid.cellPower(217, 196, 39));
+    try expectEqual(4, Grid.cellPower(101, 153, 71));
 }
 
 fn readSerialNumber(reader: *std.Io.Reader) !u32 {

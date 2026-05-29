@@ -7,6 +7,7 @@ const day04 = @import("04.zig");
 const day05 = @import("05.zig");
 const day07 = @import("07.zig");
 const day08 = @import("08.zig");
+const day09 = @import("09.zig");
 const day10 = @import("10.zig");
 
 pub fn main(init: std.process.Init) !void {
@@ -39,7 +40,7 @@ pub fn main(init: std.process.Init) !void {
         .{ day05.part1, day05.part2 }, // FIXME
         .{ day07.part1, day07.part2 },
         .{ day08.part1, day08.part2 },
-        .{ day08.part1, day08.part2 }, // FIXME
+        .{ day09.part1, day09.part2 },
         .{ day10.part1, day10.part2 },
     };
 

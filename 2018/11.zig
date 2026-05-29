@@ -26,10 +26,13 @@ test "fuel cell power" {
     try expectEqual(4, cellPower(101, 153, 71));
 }
 
+fn readSerialNumber(reader: *std.Io.Reader) !u32 {
+    const line = try reader.takeDelimiter('\n') orelse return error.InvalidInput;
+    return try std.fmt.parseInt(u32, line, 10);
+}
+
 pub fn part1(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
-    const line = try stdin.takeDelimiter('\n') orelse return error.InvalidInput;
-    const serial_number = try std.fmt.parseInt(u32, line, 10);
-    const grid_power = gridPower(serial_number);
+    const grid_power = gridPower(try readSerialNumber(stdin));
 
     var largest: ?struct { x: u16, y: u16, power: i16 } = null;
     for (0..300 - 3 + 1) |y| {

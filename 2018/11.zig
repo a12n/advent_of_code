@@ -45,21 +45,21 @@ const Grid = struct {
     //     // memo: [totalSize()]?i16 = .{null} ** totalSize(),
     // };
 
-    _power: [max_size][max_size][max_size]?isize = .{.{.{null} ** max_size} ** max_size} ** max_size,
+    _memo: [max_size][max_size][max_size]?isize = .{.{.{null} ** max_size} ** max_size} ** max_size,
 
     fn squarePower(self: *Grid, size: usize, x: usize, y: usize) isize {
         std.debug.assert(size >= 1 and size <= max_size);
         std.debug.assert((x + size) <= max_size);
         std.debug.assert((y + size) <= max_size);
-        if (self._power[size - 1][y][x] == null) {
+        if (self._memo[size - 1][y][x] == null) {
             if (size == 1) {
-                self._power[size - 1][y][x] = cellPower(@intCast(x), @intCast(y), self.serial_number);
+                self._memo[size - 1][y][x] = cellPower(@intCast(x), @intCast(y), self.serial_number);
             } else if (size % 2 == 0) {
                 const top_left = self.squarePower(size / 2, x, y);
                 const top_right = self.squarePower(size / 2, x + size / 2, y);
                 const bottom_left = self.squarePower(size / 2, x, y + size / 2);
                 const bottom_right = self.squarePower(size / 2, x + size / 2, y + size / 2);
-                self._power[size - 1][y][x] = top_left + top_right + bottom_left + bottom_right;
+                self._memo[size - 1][y][x] = top_left + top_right + bottom_left + bottom_right;
             } else {
                 // FIXME
                 const top_left = self.squarePower(size - 1, x, y);
@@ -70,10 +70,10 @@ const Grid = struct {
                     bottom += self.squarePower(1, x + d, y + size - 1);
                 }
                 const bottom_right = self.squarePower(1, x + size - 1, y + size - 1);
-                self._power[size - 1][y][x] = top_left + right + bottom + bottom_right;
+                self._memo[size - 1][y][x] = top_left + right + bottom + bottom_right;
             }
         }
-        return self._power[size - 1][y][x].?;
+        return self._memo[size - 1][y][x].?;
     }
 };
 

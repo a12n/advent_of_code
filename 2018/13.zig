@@ -74,28 +74,24 @@ const Fleet = struct {
 
         for (0.., self.carts[0..self.n_carts]) |i, *cart| {
             // FIXME: Proper updates
-            switch (mine.get(cart.pos)) {
-                .empty => unreachable,
-                .track => {
-                    switch (mine.get(cart.pos + cart.dir)) {
-                        // Turn on curve
-                        .empty => {
-                            if (mine.get(cart.pos + grid.rotate(.ccw, cart.dir)) != .empty) {
-                                cart.dir = grid.rotate(.ccw, cart.dir);
-                            } else if (mine.get(cart.pos + grid.rotate(.cw, cart.dir)) != .empty) {
-                                cart.dir = grid.rotate(.cw, cart.dir);
-                            } else {
-                                unreachable;
-                            }
-                        },
-                        // Continue on track
-                        .track, .crossing => {
-                            cart.pos += cart.dir;
-                        },
+            switch (mine.get(cart.pos + cart.dir)) {
+                .empty => {
+                    // TODO
+                    if (mine.get(cart.pos + grid.rotate(.ccw, cart.dir)) != .empty) {
+                        cart.dir = grid.rotate(.ccw, cart.dir);
+                        cart.pos += cart.dir;
+                    } else if (mine.get(cart.pos + grid.rotate(.cw, cart.dir)) != .empty) {
+                        cart.dir = grid.rotate(.cw, cart.dir);
+                        cart.pos += cart.dir;
+                    } else {
+                        unreachable;
                     }
                 },
-                // Turn on crossing
+                .track => {
+                    cart.pos += cart.dir;
+                },
                 .crossing => {
+                    cart.pos += cart.dir;
                     cart.dir = Cart.turn(cart.n_turns, cart.dir);
                     cart.n_turns += 1;
                 },

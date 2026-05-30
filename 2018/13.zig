@@ -11,6 +11,8 @@ const Mine = struct {
     const Tile = enum {
         empty,
         track,
+        curve1,
+        curve2,
         crossing,
     };
 
@@ -138,8 +140,11 @@ fn readInput(reader: *std.Io.Reader) !struct { Mine, Fleet } {
                 '|', '-' => {
                     mine.set(pos, .track);
                 },
-                '/', '\\' => {
-                    mine.set(pos, .track);
+                '/' => {
+                    mine.set(pos, .curve1);
+                },
+                '\\' => {
+                    mine.set(pos, .curve2);
                 },
                 '+' => {
                     mine.set(pos, .crossing);

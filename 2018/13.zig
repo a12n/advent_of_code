@@ -1,7 +1,10 @@
 const std = @import("std");
 
 const aoc = @import("aoc.zig");
+
 const grid = aoc.grid.planar;
+
+const Direction = grid.Direction;
 const Point = grid.Point;
 const Vector = grid.Vector;
 
@@ -34,7 +37,7 @@ const Mine = struct {
 
 const Cart = struct {
     pos: Point = .{ 0, 0 },
-    dir: Vector = .{ 0, 0 },
+    dir: Direction = .up,
     n_turns: usize = 0,
 
     fn lessThan(_: void, lhs: Cart, rhs: Cart) bool {
@@ -52,11 +55,11 @@ const Cart = struct {
         unreachable;
     }
 
-    fn turn(n_turns: usize, dir: Vector) Vector {
+    fn turn(n_turns: usize, dir: Direction) Direction {
         return switch (n_turns % 3) {
-            0 => grid.rotate(.ccw, dir),
+            0 => dir.rotate(.ccw),
             1 => dir,
-            2 => grid.rotate(.cw, dir),
+            2 => dir.rotate(.cw),
             else => unreachable,
         };
     }
@@ -74,25 +77,32 @@ const Fleet = struct {
         std.sort.block(Cart, self.carts[0..self.n_carts], {}, Cart.lessThan);
 
         for (0.., self.carts[0..self.n_carts]) |i, *cart| {
-            // FIXME: Proper updates
-            switch (mine.get(cart.pos + cart.dir)) {
-                .empty => {
-                    // TODO
-                    if (mine.get(cart.pos + grid.rotate(.ccw, cart.dir)) != .empty) {
-                        cart.dir = grid.rotate(.ccw, cart.dir);
-                        cart.pos += cart.dir;
-                    } else if (mine.get(cart.pos + grid.rotate(.cw, cart.dir)) != .empty) {
-                        cart.dir = grid.rotate(.cw, cart.dir);
-                        cart.pos += cart.dir;
-                    } else {
-                        unreachable;
-                    }
+            const next_pos = cart.pos + cart.dir.toVector();
+            switch (mine.get(next_pos)) {
+                .empty => unreachable,
+                .curve1 => {
+                    cart.pos = next_pos;
+                    cart.dir = switch (cart.dir) {
+                        .up => .right,
+                        .left => .down,
+                        .right => .up,
+                        .down => .left,
+                    };
+                },
+                .curve2 => {
+                    cart.pos = next_pos;
+                    cart.dir = switch (cart.dir) {
+                        .up => .left,
+                        .left => .up,
+                        .right => .down,
+                        .down => .right,
+                    };
                 },
                 .track => {
-                    cart.pos += cart.dir;
+                    cart.pos = next_pos;
                 },
                 .crossing => {
-                    cart.pos += cart.dir;
+                    cart.pos = next_pos;
                     cart.dir = Cart.turn(cart.n_turns, cart.dir);
                     cart.n_turns += 1;
                 },
@@ -124,16 +134,7 @@ fn readInput(reader: *std.Io.Reader) !struct { Mine, Fleet } {
             switch (c) {
                 '<', '>', '^', 'v' => {
                     mine.set(pos, .track);
-                    fleet.carts[fleet.n_carts] = .{
-                        .pos = pos,
-                        .dir = switch (c) {
-                            '<' => Vector{ -1, 0 },
-                            '>' => Vector{ 1, 0 },
-                            'v' => Vector{ 0, 1 },
-                            '^' => Vector{ 0, -1 },
-                            else => unreachable,
-                        },
-                    };
+                    fleet.carts[fleet.n_carts] = .{ .pos = pos, .dir = Direction.fromChar(c).? };
                     std.debug.print("cart {any}\n", .{fleet.carts[fleet.n_carts]});
                     fleet.n_carts += 1;
                 },

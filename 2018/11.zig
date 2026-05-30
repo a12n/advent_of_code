@@ -45,7 +45,17 @@ const Grid = struct {
     //     // memo: [totalSize()]?i16 = .{null} ** totalSize(),
     // };
 
-    _memo: [max_size][max_size][max_size]?isize = .{.{.{null} ** max_size} ** max_size} ** max_size,
+    _memo: [max_size][max_size][max_size]?isize = undefined,
+
+    fn _reset(self: *Grid) void {
+        for (0..max_size) |size| {
+            for (0..max_size) |y| {
+                for (0..max_size) |x| {
+                    self._memo[size][y][x] = null;
+                }
+            }
+        }
+    }
 
     fn cellPower(serial_number: u32, x: usize, y: usize) i8 {
         const rack_id: usize = x + 10;
@@ -100,7 +110,9 @@ fn readSerialNumber(reader: *std.Io.Reader) !u32 {
 
 pub fn part1(init: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
     var grid: *Grid = try init.arena.allocator().create(Grid);
-    grid.* = .{ .serial_number = try readSerialNumber(stdin) };
+
+    grid._reset();
+    grid.serial_number = try readSerialNumber(stdin);
 
     var largest: ?struct { x: usize, y: usize, power: isize } = null;
     for (0..Grid.max_size - 3 + 1) |y| {
@@ -117,7 +129,9 @@ pub fn part1(init: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writ
 
 pub fn part2(init: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
     var grid: *Grid = try init.arena.allocator().create(Grid);
-    grid.* = .{ .serial_number = try readSerialNumber(stdin) };
+
+    grid._reset();
+    grid.serial_number = try readSerialNumber(stdin);
 
     var largest: ?struct { x: usize, y: usize, size: usize, power: isize } = null;
     for (1..Grid.max_size + 1) |size| {

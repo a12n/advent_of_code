@@ -277,4 +277,5 @@ pub fn run(
     const stdout = &stdout_writer.interface;
 
     try func(init, stdin, stdout, @intCast(part - 1));
+    try stdout.flush();
 }

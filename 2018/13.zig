@@ -26,7 +26,6 @@ const Mine = struct {
     }
 
     fn set(self: *Mine, pos: Point, tile: Tile) void {
-        std.debug.print("Mine.set: pos {any} tile {any}\n", .{ pos, tile });
         self.tiles[@intCast(pos[1])][@intCast(pos[0])] = tile;
     }
 };
@@ -165,7 +164,6 @@ fn readInput(reader: *std.Io.Reader) !struct { Mine, Fleet } {
 
 pub fn part1(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
     const mine, var fleet = try readInput(stdin);
-    std.debug.print("mine {any}\n", .{mine});
     std.debug.print("fleet {any}\n", .{fleet});
     while (true) {
         if (fleet.tick(mine)) |crash| {

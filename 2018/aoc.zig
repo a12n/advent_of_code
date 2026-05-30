@@ -16,6 +16,58 @@ pub const grid = struct {
         pub const Rotation = enum { cw, ccw };
         pub const Vector = @Vector(2, isize);
 
+        pub const Direction = enum {
+            up,
+            left,
+            right,
+            down,
+
+            pub fn fromChar(c: u8) ?Direction {
+                return switch (c) {
+                    '^' => .up,
+                    '<' => .left,
+                    '>' => .right,
+                    'v' => .down,
+                    else => null,
+                };
+            }
+
+            pub fn rotate(dir: Direction, rdir: Rotation) Direction {
+                return switch (rdir) {
+                    .ccw => switch (dir) {
+                        .up => .left,
+                        .left => .down,
+                        .right => .up,
+                        .down => .right,
+                    },
+                    .cw => switch (dir) {
+                        .up => .right,
+                        .left => .up,
+                        .right => .down,
+                        .down => .left,
+                    },
+                };
+            }
+
+            pub fn toChar(dir: Direction) u8 {
+                return switch (dir) {
+                    .up => '^',
+                    .left => '<',
+                    .right => '>',
+                    .down => 'v',
+                };
+            }
+
+            pub fn toVector(dir: Direction) Vector {
+                return switch (dir) {
+                    .up => .{ 0, -1 },
+                    .left => .{ -1, 0 },
+                    .right => .{ 1, 0 },
+                    .down => .{ 0, 1 },
+                };
+            }
+        };
+
         pub fn taxicabNorm(u: Vector) usize {
             return @reduce(.Add, @abs(u));
         }

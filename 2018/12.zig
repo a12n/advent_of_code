@@ -41,6 +41,14 @@ const PotsArray = struct {
     fn set(self: *PotsArray, pot: isize, plant: Plant) void {
         self.items[index(pot)] = plant;
     }
+
+    fn debugPrint(self: PotsArray, gen: usize) !void {
+        std.debug.print("{d:02}: ", .{gen});
+        for (self.items) |plant| {
+            std.debug.print("{c}", .{plantToChar(plant)});
+        }
+        std.debug.print("\n", .{});
+    }
 };
 
 fn readInput(reader: *std.Io.Reader) !struct { Dictionary, PotsArray } {
@@ -115,15 +123,9 @@ pub fn part1(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer)
 
     std.debug.print("first_pot {d} last_pot {d}\n", .{ first_pot, last_pot });
 
-    for (0..20 + 1) |gen| {
-        std.debug.print("{d:02}: ", .{gen});
-        for (pots.items) |plant| {
-            std.debug.print("{c}", .{@as(u8, switch (plant) {
-                0 => '.',
-                1 => '#',
-            })});
-        }
-        std.debug.print("\n", .{});
+    try pots.debugPrint(0);
+    for (0..20) |gen| {
+        try pots.debugPrint(gen + 1);
 
         var next = pots;
         var pot = first_pot - 2;

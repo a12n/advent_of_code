@@ -58,11 +58,11 @@ const PotsArray = struct {
         return unindex(std.mem.findScalarLast(Plant, &self.items, plant) orelse return null);
     }
 
-    fn sumPlants(self: PotsArray) isize {
+    fn sumPlants(self: PotsArray, offset: isize) isize {
         var sum: isize = 0;
         for (0.., self.items) |i, plant| {
             if (plant != 0) {
-                sum += unindex(i);
+                sum += unindex(i) - offset;
             }
         }
         return sum;
@@ -151,7 +151,7 @@ pub fn part1(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer)
         pots = next;
     }
 
-    try stdout.print("{d}\n", .{pots.sumPlants()});
+    try stdout.print("{d}\n", .{pots.sumPlants(0)});
 }
 
 pub fn part2(init: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {

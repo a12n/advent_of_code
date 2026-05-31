@@ -152,9 +152,40 @@ pub fn part1(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer)
     try stdout.print("{d}\n", .{pots.sumPlants(0)});
 }
 
-pub fn part2(init: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
-    _ = init;
-    _ = stdin;
-    _ = stdout;
-    // TODO
+pub fn part2(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
+    const dict, var pots = try readInput(stdin);
+    // const generations = 50_000_000_000;
+
+    var offset_accum: isize = 0;
+
+    while (true) {
+        const first_pot = pots.firstPot(1).?;
+        const last_pot = pots.lastPot(1).?;
+
+        std.debug.print("first_pot {d} last_pot {d} sumPlants {d}\n", .{ first_pot, last_pot, pots.sumPlants(first_pot) });
+
+        var next: PotsArray = .{};
+        var pot = first_pot - 2;
+        var next_first_pot: ?isize = null;
+        while (pot <= (last_pot + 2)) : (pot += 1) {
+            const next_plant = dict[pots.get(pot - 2)][pots.get(pot - 1)][pots.get(pot)][pots.get(pot + 1)][pots.get(pot + 2)];
+            if (next_plant != 0) {
+                if (next_first_pot == null) {
+                    next_first_pot = pot;
+                }
+                next.set(pot - next_first_pot.?, next_plant);
+            }
+        }
+
+        offset_accum += next_first_pot orelse 0;
+        std.debug.print("next_first_pot {?d} offset_accum {d}\n", .{ next_first_pot, offset_accum });
+
+        if (std.mem.eql(Plant, &pots.items, &next.items)) {
+            std.debug.print("no change\n", .{});
+        }
+
+        pots = next;
+    }
+
+    try stdout.print("{d}\n", .{pots.sumPlants(0)});
 }

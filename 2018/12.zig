@@ -49,6 +49,17 @@ const PotsArray = struct {
         }
         std.debug.print("\n", .{});
     }
+
+    fn sumPlants(self: PotsArray) isize {
+        var sum: isize = 0;
+        for (0.., self.items) |i, plant| {
+            if (plant != 0) {
+                std.debug.print("pot {d} has plant\n", .{unindex(i)});
+                sum += unindex(i);
+            }
+        }
+        return sum;
+    }
 };
 
 fn readInput(reader: *std.Io.Reader) !struct { Dictionary, PotsArray } {
@@ -138,16 +149,7 @@ pub fn part1(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer)
         last_pot += 2;
     }
 
-    var sum: isize = 0;
-    var pot: isize = PotsArray.min_pot;
-    while (pot <= PotsArray.max_pot) : (pot += 1) {
-        if (pots.get(pot) != 0) {
-            std.debug.print("pot {d} has plant\n", .{pot});
-            sum += pot;
-        }
-    }
-
-    try stdout.print("{d}\n", .{sum});
+    try stdout.print("{d}\n", .{pots.sumPlants()});
 }
 
 pub fn part2(init: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {

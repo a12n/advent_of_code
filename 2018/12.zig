@@ -19,7 +19,7 @@ fn plantToChar(plant: Plant) u8 {
 }
 
 const PotsArray = struct {
-    const zero_offset = 50;
+    const zero_offset = 128;
     const min_pot = -zero_offset;
     const max_pot = 2 * zero_offset;
 

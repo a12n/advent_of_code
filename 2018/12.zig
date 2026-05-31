@@ -50,6 +50,14 @@ const PotsArray = struct {
         std.debug.print("\n", .{});
     }
 
+    fn firstPot(self: PotsArray, plant: Plant) ?isize {
+        return unindex(std.mem.findScalar(Plant, &self.items, plant) orelse return null);
+    }
+
+    fn lastPot(self: PotsArray, plant: Plant) ?isize {
+        return unindex(std.mem.findScalarLast(Plant, &self.items, plant) orelse return null);
+    }
+
     fn sumPlants(self: PotsArray) isize {
         var sum: isize = 0;
         for (0.., self.items) |i, plant| {
@@ -128,9 +136,8 @@ fn readInput(reader: *std.Io.Reader) !struct { Dictionary, PotsArray } {
 pub fn part1(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
     const dict, var pots = try readInput(stdin);
 
-    var first_pot = PotsArray.unindex(std.mem.findScalar(Plant, &pots.items, 1) orelse return error.InvalidInput);
-    var last_pot = PotsArray.unindex(std.mem.findScalarLast(Plant, &pots.items, 1) orelse return error.InvalidInput);
-
+    var first_pot = pots.firstPot(1) orelse return error.InvalidInput;
+    var last_pot = pots.lastPot(1) orelse return error.InvalidInput;
     std.debug.print("first_pot {d} last_pot {d}\n", .{ first_pot, last_pot });
 
     try pots.debugPrint(0);

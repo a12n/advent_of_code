@@ -154,11 +154,12 @@ pub fn part1(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer)
 
 pub fn part2(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
     const dict, var pots = try readInput(stdin);
-    // const generations = 50_000_000_000;
+    const generations = 50_000_000_000;
 
     var offset_accum: isize = 0;
+    var cycle_gen: ?usize = null;
 
-    while (true) {
+    for (0..generations) |gen| {
         const first_pot = pots.firstPot(1).?;
         const last_pot = pots.lastPot(1).?;
 
@@ -177,15 +178,22 @@ pub fn part2(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer)
             }
         }
 
-        offset_accum += next_first_pot orelse 0;
+        offset_accum += next_first_pot.?;
         std.debug.print("next_first_pot {?d} offset_accum {d}\n", .{ next_first_pot, offset_accum });
 
-        if (std.mem.eql(Plant, &pots.items, &next.items)) {
-            std.debug.print("no change\n", .{});
+        if (std.mem.eql(Plant, &pots.items, &next.items) and generations % gen == 0) {
+            std.debug.print("no change after gen {d}\n", .{gen});
+            cycle_gen = gen;
+            break;
         }
 
         pots = next;
     }
 
-    try stdout.print("{d}\n", .{pots.sumPlants(0)});
+    if (cycle_gen) |gen| {
+        std.debug.print("cycle_gen {d}\n", .{gen});
+        offset_accum = offset_accum * @as(isize, @intCast(generations - gen));
+    }
+
+    try stdout.print("{d}\n", .{pots.sumPlants(-offset_accum)});
 }

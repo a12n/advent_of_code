@@ -11,6 +11,13 @@ fn charToPlant(c: u8) !Plant {
     };
 }
 
+fn plantToChar(plant: Plant) u8 {
+    return switch (plant) {
+        0 => '.',
+        1 => '#',
+    };
+}
+
 const PotsArray = struct {
     const zero_offset = 50;
     const min_pot = -zero_offset;

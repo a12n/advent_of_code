@@ -136,11 +136,9 @@ fn readInput(reader: *std.Io.Reader) !struct { Dictionary, PotsArray } {
 pub fn part1(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
     const dict, var pots = try readInput(stdin);
 
-    for (0..20) |gen| {
+    for (0..20) |_| {
         const first_pot = pots.firstPot(1).?;
         const last_pot = pots.lastPot(1).?;
-
-        std.debug.print("{d:5}: first_pot {d} last_pot {d} sumPlants {d}\n", .{ gen, first_pot, last_pot, pots.sumPlants(first_pot) });
 
         var next = pots;
         var pot = first_pot - 2;

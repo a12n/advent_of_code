@@ -54,7 +54,6 @@ const PotsArray = struct {
         var sum: isize = 0;
         for (0.., self.items) |i, plant| {
             if (plant != 0) {
-                std.debug.print("pot {d} has plant\n", .{unindex(i)});
                 sum += unindex(i);
             }
         }

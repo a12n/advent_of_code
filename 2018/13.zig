@@ -129,7 +129,21 @@ const GridMine = struct {
     n_rows: usize,
     n_cols: usize,
 
-    fn tick(self: *GridMine) ?struct { row: usize, col: usize } {
+    const TickResult = struct {
+        // Position of the first crash occured
+        crash: ?struct { row: usize, col: usize } = null,
+
+        // Number of carts left in the mine
+        n_carts: usize = 0,
+
+        // Position of the last encounterd cart
+        cart: ?struct { row: usize, col: usize } = null,
+    };
+
+    fn tick(self: *GridMine) TickResult {
+        var result: TickResult = .{};
+        var n_carts_destroyed: usize = 0;
+
         const copy = self.*; // XXX
         for (0..self.n_rows) |row| {
             for (0..self.n_cols) |col| {
@@ -141,6 +155,9 @@ const GridMine = struct {
                 if (cart_dir == 0) {
                     continue;
                 }
+
+                // A moving cart
+                result.n_carts += 1;
 
                 var next_cart_row = row;
                 var next_cart_col = col;
@@ -163,7 +180,7 @@ const GridMine = struct {
                     else => unreachable,
                 }
 
-                std.debug.print("tick {d} {d} track {s}: cart_dir {s} cart_turns {d} -> {d} {d} cart_dir {s} cart_turns {d}\n", .{
+                std.debug.print("tick: {d} {d} track {s} cart_dir {s} cart_turns {d} -> {d} {d} cart_dir {s} cart_turns {d}\n", .{
                     row,
                     col,
                     Tile.trackStr(track),
@@ -175,21 +192,41 @@ const GridMine = struct {
                     next_cart_turns,
                 });
 
+                // No more cart at current position
+                self.tiles[row][col].bits = Tile.combineBits(track, 0, 0);
+
                 // Collision
                 if (self.tiles[next_cart_row][next_cart_col].cartBits() != 0) {
-                    return .{ .row = next_cart_row, .col = next_cart_col };
+                    // Keep position of the first crash
+                    if (result.crash == null) {
+                        result.crash = .{ .row = next_cart_row, .col = next_cart_col };
+                    }
+                    // The cart of the next position is also destroyed
+                    self.tiles[next_cart_row][next_cart_col].bits = Tile.combineBits(
+                        self.tiles[next_cart_row][next_cart_col].trackBits(),
+                        0,
+                        0,
+                    );
+                    // Both current cart and the cart in the next position are destroyed.
+                    std.debug.print("tick: collision at {d} {d}\n", .{ next_cart_row, next_cart_col });
+                    n_carts_destroyed += 2;
+                } else {
+                    // The current cart is now in the next position
+                    self.tiles[next_cart_row][next_cart_col].bits = Tile.combineBits(
+                        self.tiles[next_cart_row][next_cart_col].trackBits(),
+                        next_cart_dir,
+                        next_cart_turns,
+                    );
+                    result.cart = .{ .row = next_cart_row, .col = next_cart_col };
+                    std.debug.print("tick: cart moved to {d} {d}, n_carts {d}\n", .{ next_cart_row, next_cart_col, result.n_carts });
                 }
-
-                // Update
-                self.tiles[row][col].bits = Tile.combineBits(track, 0, 0);
-                self.tiles[next_cart_row][next_cart_col].bits = Tile.combineBits(
-                    self.tiles[next_cart_row][next_cart_col].trackBits(),
-                    next_cart_dir,
-                    next_cart_turns,
-                );
             }
         }
-        return null;
+        std.debug.print("tick: n_carts {d} n_carts_destroyed {d}\n", .{ result.n_carts, n_carts_destroyed });
+        result.n_carts -= n_carts_destroyed;
+        std.debug.print("\n", .{});
+
+        return result;
     }
 
     fn debugPrint(self: GridMine) !void {
@@ -434,17 +471,28 @@ fn readInput(reader: *std.Io.Reader) !struct { Mine, Fleet } {
 
 pub fn part1(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
     var mine = try readMine(stdin);
+
     while (true) {
-        if (mine.tick()) |crash| {
-            try stdout.print("{d},{d}\n", .{ crash.col, crash.row });
+        const res = mine.tick();
+
+        if (res.crash) |pos| {
+            try stdout.print("{d},{d}\n", .{ pos.col, pos.row });
             return;
         }
     }
 }
 
-pub fn part2(init: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
-    _ = init;
-    _ = stdin;
-    _ = stdout;
-    // TODO
+pub fn part2(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
+    var mine = try readMine(stdin);
+
+    while (true) {
+        const res = mine.tick();
+
+        if (res.n_carts == 0) {
+            return error.NoSolution;
+        } else if (res.n_carts == 1) {
+            try stdout.print("{d},{d}\n", .{ res.cart.?.col, res.cart.?.row });
+            return;
+        }
+    }
 }

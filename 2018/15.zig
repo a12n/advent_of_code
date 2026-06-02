@@ -3,18 +3,18 @@ const std = @import("std");
 const aoc = @import("aoc.zig");
 const grid = aoc.grid.planar;
 
-const Tile = enum {
+const Tile = union(enum) {
     open,
     wall,
-    elf,
-    goblin,
+    elf: u8,
+    goblin: u8,
 
     pub fn fromChar(c: u8) ?Tile {
         return switch (c) {
             '.' => .open,
             '#' => .wall,
-            'E', 'e' => .elf,
-            'G', 'g' => .goblin,
+            'E', 'e' => .{ .elf = 200 },
+            'G', 'g' => .{ .goblin = 200 },
             else => null,
         };
     }

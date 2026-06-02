@@ -200,9 +200,61 @@ pub const grid = struct {
                     return pos;
                 }
             };
-        };
-    };
-};
+        }; // Extent
+
+        pub fn DenseBounded(T: type, max_rows: usize, max_cols: usize) type {
+            return struct {
+                const Self = @This();
+
+                items: [max_rows][max_cols]T = undefined,
+                n_rows: usize = 0,
+                n_cols: usize = 0,
+
+                pub fn read(reader: *std.Io.Reader) !Self {
+                    var self: Self = .{};
+                    var row: usize = 0;
+                    var col: usize = 0;
+                    while (true) {
+                        if (reader.takeByte()) |c| {
+                            if (c == '\n') {
+                                if (self.n_cols == 0) {
+                                    self.n_cols = col;
+                                } else if (self.n_cols != col) {
+                                    return error.InvalidInput;
+                                }
+                                row += 1;
+                                col = 0;
+                                self.n_rows = row;
+                            } else {
+                                if (T.fromChar(c)) |value| {
+                                    self.items[row][col] = value;
+                                } else {
+                                    return error.InvalidInput;
+                                }
+                                col += 1;
+                            }
+                        } else |err| {
+                            if (err == std.Io.Reader.Error.EndOfStream) {
+                                return self;
+                            } else {
+                                return err;
+                            }
+                        }
+                    }
+                }
+
+                pub fn debugPrint(self: Self) void {
+                    for (0..self.n_rows) |row| {
+                        for (0..self.n_cols) |col| {
+                            std.debug.print("{s}", .{self.items[row][col].toString()});
+                        }
+                        std.debug.print("\n", .{});
+                    }
+                }
+            };
+        } // DenseBounded
+    }; // planar
+}; // grid
 
 test "rotate vector" {
     const expectEqual = std.testing.expectEqual;

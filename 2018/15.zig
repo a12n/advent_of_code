@@ -29,12 +29,26 @@ const Tile = union(enum) {
     }
 };
 
+const Map = grid.DenseBounded(Tile, 50, 50);
+
+fn round(map: *Map) void {
+    for (0..map.n_rows) |row| {
+        for (0..map.n_cols) |col| {
+            _ = row;
+            _ = col;
+            // TODO
+        }
+    }
+}
+
 pub fn part1(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
-    var map: grid.DenseBounded(Tile, 50, 50) = try .read(stdin);
+    var map: Map = try .read(stdin);
     map.debugPrint();
-    map.items[0][0] = map.items[0][0];
-    _ = stdout;
+    while (true) {
+        round(&map);
+    }
     // TODO
+    _ = stdout;
 }
 
 pub fn part2(init: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {

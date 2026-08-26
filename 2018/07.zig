@@ -2,48 +2,59 @@ const std = @import("std");
 
 const Graph = struct {
     const max_nodes = 'Z' - 'A' + 1;
-    const AdjacencyMatrix = [max_nodes]?[max_nodes]?void;
 
-    outgoing: AdjacencyMatrix = .{null} ** max_nodes,
+    nodes: [max_nodes]?struct {
+        incoming: std.StaticBitSet(max_nodes) = .initEmpty(),
+        outgoing: std.StaticBitSet(max_nodes) = .initEmpty(),
+    } = .{null} ** max_nodes,
 
     fn addEdge(self: *Graph, from: u8, to: u8) void {
-        if (self.outgoing[from] == null) {
-            self.outgoing[from] = .{null} ** max_nodes;
+        if (self.nodes[from] == null) {
+            self.nodes[from] = .{};
         }
-        self.outgoing[from].?[to] = {};
+        if (self.nodes[to] == null) {
+            self.nodes[to] = .{};
+        }
+        self.nodes[from].?.outgoing.setValue(to, true);
+        self.nodes[to].?.incoming.setValue(from, true);
     }
 
-    fn hasIncoming(self: Graph, v: u8) bool {
-        for (0..max_nodes) |u| {
-            if (self.outgoing[u] != null and self.outgoing[u].?[v] != null) {
-                return true;
-            }
-        }
-        return false;
+    fn hasNode(self: Graph, u: u8) bool {
+        return self.nodes[u] != null;
+    }
+
+    fn hasEdge(self: Graph, from: u8, to: u8) bool {
+        return self.nodes[from].?.outgoing.isSet(to);
+    }
+
+    fn removeEdge(self: *Graph, from: u8, to: u8) void {
+        self.nodes[from].?.outgoing.setValue(to, false);
+        self.nodes[to].?.incoming.setValue(from, false);
+    }
+
+    fn hasIncoming(self: Graph, u: u8) bool {
+        return self.nodes[u] != null and !self.nodes[u].?.incoming.eql(.empty);
     }
 
     fn topologicalSort(self: Graph) NodeOrder {
         var order: NodeOrder = .{};
-        var state: std.StaticBitSet(max_nodes) = .initEmpty();
-        var copy = self;
+        var queue: std.StaticBitSet(max_nodes) = .initEmpty();
+        var graph = self;
 
         for (0..max_nodes) |u| {
-            if (copy.outgoing[u] != null and !copy.hasIncoming(@intCast(u))) {
-                state.setValue(u, true);
+            if (graph.hasNode(@intCast(u)) and !graph.hasIncoming(@intCast(u))) {
+                queue.setValue(u, true);
             }
         }
 
-        while (state.findFirstSet()) |u| {
-            state.setValue(u, false);
+        while (queue.findFirstSet()) |u| {
+            queue.setValue(u, false);
             order.addNode(@intCast(u));
-            if (copy.outgoing[u] == null) {
-                continue;
-            }
             for (0..max_nodes) |v| {
-                if (copy.outgoing[u].?[v] != null) {
-                    copy.outgoing[u].?[v] = null;
-                    if (!copy.hasIncoming(@intCast(v))) {
-                        state.setValue(v, true);
+                if (graph.hasEdge(@intCast(u), @intCast(v))) {
+                    graph.removeEdge(@intCast(u), @intCast(v));
+                    if (!graph.hasIncoming(@intCast(v))) {
+                        queue.setValue(v, true);
                     }
                 }
             }
@@ -104,9 +115,35 @@ fn readGraph(reader: *std.Io.Reader) !Graph {
 
 pub fn part1(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
     const graph = try readGraph(stdin);
-    const order = graph.topologicalSort();
-    for (order.toSlice()) |node| {
-        try stdout.printAsciiChar(node + 'A', .{});
+
+    var queue: std.StaticBitSet(Graph.max_nodes) = .initEmpty();
+    var completed: std.StaticBitSet(Graph.max_nodes) = .initEmpty();
+
+    for (0..Graph.max_nodes) |u| {
+        if (graph.hasNode(@intCast(u)) and !graph.hasIncoming(@intCast(u))) {
+            queue.setValue(u, true);
+        }
+    }
+
+    while (!queue.eql(.empty)) {
+        for (0..Graph.max_nodes) |u| {
+            if (!queue.isSet(u)) {
+                continue;
+            }
+
+            const node = graph.nodes[u] orelse continue;
+
+            if (!completed.intersectWith(node.incoming).eql(node.incoming)) {
+                continue;
+            }
+
+            queue.setValue(u, false);
+            queue.setUnion(node.outgoing);
+            try stdout.printAsciiChar(@as(u8, @intCast(u)) + 'A', .{});
+
+            completed.setValue(u, true);
+            break;
+        }
     }
     try stdout.printAsciiChar('\n', .{});
 }

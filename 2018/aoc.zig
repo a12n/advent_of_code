@@ -215,30 +215,25 @@ pub const grid = struct {
                     var row: usize = 0;
                     var col: usize = 0;
                     while (true) {
-                        if (reader.takeByte()) |c| {
-                            if (c == '\n') {
-                                if (self.n_cols == 0) {
-                                    self.n_cols = col;
-                                } else if (self.n_cols != col) {
-                                    return error.InvalidInput;
-                                }
-                                row += 1;
-                                col = 0;
-                                self.n_rows = row;
-                            } else {
-                                if (T.fromChar(c)) |value| {
-                                    self.items[row][col] = value;
-                                } else {
-                                    return error.InvalidInput;
-                                }
-                                col += 1;
-                            }
-                        } else |err| {
-                            if (err == std.Io.Reader.Error.EndOfStream) {
+                        const c = reader.takeByte() catch |err| {
+                            if (err == error.EndOfStream) {
                                 return self;
                             } else {
                                 return err;
                             }
+                        };
+                        if (c == '\n') {
+                            if (self.n_cols == 0) {
+                                self.n_cols = col;
+                            } else if (self.n_cols != col) {
+                                return error.InvalidInput;
+                            }
+                            row += 1;
+                            col = 0;
+                            self.n_rows = row;
+                        } else {
+                            self.items[row][col] = T.fromChar(c) orelse return error.InvalidInput;
+                            col += 1;
                         }
                     }
                 }

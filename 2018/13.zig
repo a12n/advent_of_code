@@ -117,9 +117,20 @@ const GridMine = struct {
         cart: ?struct { row: usize, col: usize } = null,
     };
 
+    fn nCarts(self: GridMine) usize {
+        var n: usize = 0;
+        for (0..self.n_rows) |row| {
+            for (0..self.n_cols) |col| {
+                if (self.tiles[row][col].cart != 0) {
+                    n += 1;
+                }
+            }
+        }
+        return n;
+    }
+
     fn tick(self: *GridMine) TickResult {
         var result: TickResult = .{};
-        var n_carts_destroyed: usize = 0;
 
         const copy = self.*; // XXX
         for (0..self.n_rows) |row| {
@@ -130,9 +141,6 @@ const GridMine = struct {
                     // No cart
                     continue;
                 }
-
-                // A moving cart
-                result.n_carts += 1;
 
                 var next_row = row;
                 var next_col = col;
@@ -182,19 +190,18 @@ const GridMine = struct {
                     self.tiles[next_row][next_col].turns = 0;
                     // Both current cart and the cart in the next position are destroyed.
                     std.debug.print("tick: collision at {d} {d}\n", .{ next_row, next_col });
-                    n_carts_destroyed += 2;
                 } else {
                     // The current cart is now in the next position
                     self.tiles[next_row][next_col].cart = next_cart;
                     self.tiles[next_row][next_col].turns = next_turns;
                     result.cart = .{ .row = next_row, .col = next_col };
-                    std.debug.print("tick: cart moved to {d} {d}, n_carts {d}\n", .{ next_row, next_col, result.n_carts });
+                    std.debug.print("tick: cart moved to {d} {d}\n", .{ next_row, next_col });
                 }
             }
         }
-        std.debug.print("tick: n_carts {d} n_carts_destroyed {d}\n", .{ result.n_carts, n_carts_destroyed });
-        result.n_carts -= n_carts_destroyed;
-        std.debug.print("\n", .{});
+
+        // XXX: Remove field?
+        result.n_carts = self.nCarts();
 
         return result;
     }

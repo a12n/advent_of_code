@@ -3,18 +3,49 @@ const std = @import("std");
 const aoc = @import("aoc.zig");
 const grid = aoc.grid.planar;
 
-const Tile = union(enum) {
-    open,
-    wall,
+const UnitType = enum {
+    elf,
+    goblin,
+
+    fn isTarget(self: UnitType, other: UnitType) bool {
+        return (self == .elf and other == .goblin) or
+            (self == .goblin and other == .elf);
+        // return self != other;
+    }
+};
+
+const Unit = union(UnitType) {
     elf: u8,
     goblin: u8,
 
+    pub fn fromChar(c: u8) ?Unit {
+        return switch (c) {
+            'E', 'e' => .{ .elf = 200 },
+            'G', 'g' => .{ .goblin = 200 },
+            else => null,
+        };
+    }
+
+    pub fn toString(self: Unit) []const u8 {
+        return switch (self) {
+            .elf => "\x1b[42mE\x1b[0m",
+            .goblin => "\x1b[41mG\x1b[0m",
+        };
+    }
+};
+
+const Tile = union(enum) {
+    open,
+    wall,
+    unit: Unit,
+
     pub fn fromChar(c: u8) ?Tile {
+        if (Unit.fromChar(c)) |unit| {
+            return .{ .unit = unit };
+        }
         return switch (c) {
             '.' => .open,
             '#' => .wall,
-            'E', 'e' => .{ .elf = 200 },
-            'G', 'g' => .{ .goblin = 200 },
             else => null,
         };
     }
@@ -23,8 +54,7 @@ const Tile = union(enum) {
         return switch (self) {
             .open => ".",
             .wall => "▒",
-            .elf => "\x1b[42mE\x1b[0m",
-            .goblin => "\x1b[41mG\x1b[0m",
+            .unit => |unit| unit.toString(),
         };
     }
 };

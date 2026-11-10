@@ -132,7 +132,7 @@ const GridMine = struct {
     fn tick(self: *GridMine) TickResult {
         var result: TickResult = .{};
 
-        const copy = self.*; // XXX
+        var copy = self.*; // XXX
         for (0..self.n_rows) |row| {
             for (0..self.n_cols) |col| {
                 const tile = copy.tiles[row][col];
@@ -188,6 +188,9 @@ const GridMine = struct {
                     // The cart of the next position is also destroyed
                     self.tiles[next_row][next_col].cart = 0;
                     self.tiles[next_row][next_col].turns = 0;
+                    if (next_row > row) {
+                        copy.tiles[next_row][next_col] = self.tiles[next_row][next_col];
+                    }
                     // Both current cart and the cart in the next position are destroyed.
                     std.debug.print("tick: collision at {d} {d}\n", .{ next_row, next_col });
                 } else {

@@ -148,9 +148,37 @@ pub fn part1(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer)
     try stdout.printAsciiChar('\n', .{});
 }
 
-pub fn part2(init: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
-    _ = init;
-    _ = stdin;
-    _ = stdout;
-    // TODO
+pub fn part2(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer) !void {
+    const graph = try readGraph(stdin);
+
+    var queue: std.StaticBitSet(Graph.max_nodes) = .initEmpty();
+    var completed: std.StaticBitSet(Graph.max_nodes) = .initEmpty();
+
+    for (0..Graph.max_nodes) |u| {
+        if (graph.hasNode(@intCast(u)) and !graph.hasIncoming(@intCast(u))) {
+            queue.setValue(u, true);
+        }
+    }
+
+    while (!queue.eql(.empty)) {
+        for (0..Graph.max_nodes) |u| {
+            if (!queue.isSet(u)) {
+                continue;
+            }
+
+            const node = graph.nodes[u] orelse continue;
+
+            if (!completed.intersectWith(node.incoming).eql(node.incoming)) {
+                continue;
+            }
+
+            queue.setValue(u, false);
+            queue.setUnion(node.outgoing);
+            try stdout.printAsciiChar(@as(u8, @intCast(u)) + 'A', .{});
+
+            completed.setValue(u, true);
+            break;
+        }
+    }
+    try stdout.printAsciiChar('\n', .{});
 }

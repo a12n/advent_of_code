@@ -110,9 +110,6 @@ const GridMine = struct {
         // Position of the first crash occured
         crash: ?struct { row: usize, col: usize } = null,
 
-        // Number of carts left in the mine
-        n_carts: usize = 0,
-
         // Position of the last encounterd cart
         cart: ?struct { row: usize, col: usize } = null,
     };
@@ -130,56 +127,49 @@ const GridMine = struct {
     }
 
     fn tick(self: *GridMine) TickResult {
+        var moved: [GridMine.max_size][GridMine.max_size]bool = .{.{false} ** max_size} ** max_size;
         var result: TickResult = .{};
 
-        var copy = self.*; // XXX
+        std.log.debug("--- tick ------------------------------------------", .{});
         for (0..self.n_rows) |row| {
             for (0..self.n_cols) |col| {
-                const tile = copy.tiles[row][col];
+                const tile = self.tiles[row][col];
 
                 if (tile.cart == 0) {
                     // No cart
                     continue;
                 }
 
+                if (moved[row][col]) {
+                    // The cart was already moved at this tick
+                    std.log.debug("seen: {d} {d} track {s} cart {s}", .{
+                        row, col, Tile.trackStr(tile.track), Tile.cartStr(tile.cart),
+                    });
+                    continue;
+                }
+
+                if (tile.track == 0) {
+                    // Cart but no track?!
+                    unreachable;
+                }
+
+                // try self.debugPrint();
+
                 var next_row = row;
                 var next_col = col;
                 var next_cart = tile.cart;
                 var next_turns = tile.turns;
 
-                switch (tile.track) {
-                    Tile.horiz, Tile.vert => {
-                        Tile.move(tile.cart, &next_row, &next_col);
-                    },
-                    Tile.curve, Tile.curve_rev => {
-                        next_cart = Tile.turnCurve(tile.track, tile.cart);
-                        Tile.move(next_cart, &next_row, &next_col);
-                    },
-                    Tile.crossing => {
-                        next_cart = Tile.turnCrossing(tile.turns, tile.cart);
-                        Tile.move(next_cart, &next_row, &next_col);
-                        next_turns = (tile.turns + 1) % 3;
-                    },
-                    else => unreachable,
-                }
-
-                std.debug.print("tick: {d} {d} track {s} cart_dir {s} cart_turns {d} -> {d} {d} cart_dir {s} cart_turns {d}\n", .{
-                    row,
-                    col,
-                    Tile.trackStr(tile.track),
-                    Tile.cartStr(tile.cart),
-                    tile.turns,
-                    next_row,
-                    next_col,
-                    Tile.cartStr(next_cart),
-                    next_turns,
+                Tile.move(tile.cart, &next_row, &next_col);
+                std.log.debug("move: {d} {d} track {s} cart {s} = {d} {d}", .{
+                    row, col, Tile.trackStr(tile.track), Tile.cartStr(tile.cart), next_row, next_col,
                 });
 
                 // No more cart at current position
                 self.tiles[row][col].cart = 0;
                 self.tiles[row][col].turns = 0;
 
-                // Collision
+                // If next pos is cart, then collision
                 if (self.tiles[next_row][next_col].cart != 0) {
                     // Keep position of the first crash
                     if (result.crash == null) {
@@ -188,23 +178,41 @@ const GridMine = struct {
                     // The cart of the next position is also destroyed
                     self.tiles[next_row][next_col].cart = 0;
                     self.tiles[next_row][next_col].turns = 0;
-                    if (next_row > row) {
-                        copy.tiles[next_row][next_col] = self.tiles[next_row][next_col];
-                    }
-                    // Both current cart and the cart in the next position are destroyed.
-                    std.debug.print("tick: collision at {d} {d}\n", .{ next_row, next_col });
+                    std.log.debug("collision: {d} {d}", .{ next_row, next_col });
                 } else {
-                    // The current cart is now in the next position
+                    switch (self.tiles[next_row][next_col].track) {
+                        // If next pos is curve, then turn
+                        Tile.curve, Tile.curve_rev => |curve_dir| {
+                            next_cart = Tile.turnCurve(curve_dir, tile.cart);
+                            std.log.debug("turnCurve: {d} {d} track {s} cart {s} = cart {s}", .{
+                                next_row, next_col, Tile.trackStr(curve_dir), Tile.cartStr(tile.cart), Tile.cartStr(next_cart),
+                            });
+                        },
+                        // If next pos is crossing, then possibly turn
+                        Tile.crossing => {
+                            next_cart = Tile.turnCrossing(tile.turns, tile.cart);
+                            next_turns = (tile.turns + 1) % 3;
+                            std.log.debug("turnCrossing: {d} {d} cart {s} turns {d} = cart {s} turns {d}", .{
+                                next_row, next_col, Tile.cartStr(tile.cart), tile.turns, Tile.cartStr(next_cart), next_turns,
+                            });
+                        },
+                        Tile.horiz, Tile.vert => {
+                            // OK
+                        },
+                        else => unreachable,
+                    }
+                    // Flag cart as already moved at this tick,
+                    // to not move it again while processing the next
+                    // line.
+                    moved[next_row][next_col] = true;
                     self.tiles[next_row][next_col].cart = next_cart;
                     self.tiles[next_row][next_col].turns = next_turns;
                     result.cart = .{ .row = next_row, .col = next_col };
-                    std.debug.print("tick: cart moved to {d} {d}\n", .{ next_row, next_col });
                 }
             }
         }
 
-        // XXX: Remove field?
-        result.n_carts = self.nCarts();
+        // try self.debugPrint();
 
         return result;
     }
@@ -214,7 +222,7 @@ const GridMine = struct {
             for (0..self.n_cols) |col| {
                 const tile = self.tiles[row][col];
                 if (tile.cart != 0) {
-                    std.debug.print("{s}", .{Tile.cartStr(tile.cart)});
+                    std.debug.print("\x1b[42m{s}\x1b[0m", .{Tile.cartStr(tile.cart)});
                 } else if (tile.track != 0) {
                     std.debug.print("{s}", .{Tile.trackStr(tile.track)});
                 } else {
@@ -223,7 +231,6 @@ const GridMine = struct {
             }
             std.debug.print("\n", .{});
         }
-        std.debug.print("\n", .{});
     }
 };
 
@@ -304,10 +311,11 @@ pub fn part2(_: std.process.Init, stdin: *std.Io.Reader, stdout: *std.Io.Writer)
 
     while (true) {
         const res = mine.tick();
+        const n_carts = mine.nCarts();
 
-        if (res.n_carts == 0) {
+        if (n_carts == 0) {
             return error.NoSolution;
-        } else if (res.n_carts == 1) {
+        } else if (n_carts == 1) {
             try stdout.print("{d},{d}\n", .{ res.cart.?.col, res.cart.?.row });
             return;
         }

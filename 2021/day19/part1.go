@@ -10,6 +10,22 @@ import (
 	"a12n/advent_of_code/2021/lib"
 )
 
+type DistanceMap map[int][2]lib.Point3
+
+func NewDistanceMap(beacons []lib.Point3) DistanceMap {
+	var ans = make(DistanceMap)
+	for i := 0; i < len(beacons)-1; i++ {
+		for j := i + 1; j < len(beacons); j++ {
+			var d = beacons[i].DistanceSqr(beacons[j])
+			if _, ok := ans[d]; ok {
+				panic("duplicate distance")
+			}
+			ans[d] = [2]lib.Point3{beacons[i], beacons[j]}
+		}
+	}
+	return ans
+}
+
 func Part1(r *bufio.Reader, w io.Writer) error {
 	var err error
 	var scanners [][]lib.Point3

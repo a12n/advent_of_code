@@ -2,6 +2,14 @@ package lib
 
 type Set[Elt comparable] map[Elt]struct{}
 
+func NewSet[Elt comparable](elts []Elt) Set[Elt] {
+	var set = make(Set[Elt])
+	for _, elt := range elts {
+		set[elt] = struct{}{}
+	}
+	return set
+}
+
 func (s Set[Elt]) Add(x Elt) {
 	s[x] = struct{}{}
 }

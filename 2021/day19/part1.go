@@ -26,6 +26,10 @@ func NewDistanceMap(beacons []lib.Point3) DistanceMap {
 	return ans
 }
 
+func Merge(beacons lib.Set[lib.Point3], dists DistanceMap, beacons2 []lib.Point3, dists2 DistanceMap) {
+	// TODO
+}
+
 func Part1(r *bufio.Reader, w io.Writer) error {
 	var err error
 	var scanners [][]lib.Point3
@@ -42,6 +46,18 @@ func Part1(r *bufio.Reader, w io.Writer) error {
 			}
 		}
 	}
+
+	// Everything relative to the first scanner.
+	var beacons = lib.NewSet(scanners[0])
+	var dists = NewDistanceMap(scanners[0])
+
+	log.Println(0, dists)
+	for i := 1; i < len(scanners); i++ {
+		Merge(beacons, dists, scanners[i], NewDistanceMap(scanners[i]))
+		log.Println(i, NewDistanceMap(scanners[i]))
+	}
+
+	fmt.Fprintln(w, len(beacons))
 
 	return nil
 }

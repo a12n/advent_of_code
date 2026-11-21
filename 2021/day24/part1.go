@@ -40,6 +40,49 @@ const (
 
 type ALU [4]int
 
+func (i Instruction) Run(regs ALU) (Reg, ALU) {
+	if i.Op == Inp {
+		return i.Dest, regs
+	}
+
+	var immed = i.Src.int
+
+	if i.Src.Reg != -1 {
+		immed = regs[i.Src.Reg]
+	}
+
+	switch i.Op {
+	case Add:
+		regs[i.Dest] += immed
+	case Mul:
+		regs[i.Dest] *= immed
+	case Div:
+		regs[i.Dest] /= immed
+	case Mod:
+		regs[i.Dest] %= immed
+	case Eql:
+		if regs[i.Dest] == immed {
+			regs[i.Dest] = 1
+		} else {
+			regs[i.Dest] = 0
+		}
+	}
+
+	return -1, regs
+}
+
+func (p Program) Run(regs ALU, ip int) (Reg, ALU, int) {
+	var dest Reg = -1
+	for ip < len(p) {
+		dest, regs = p[ip].Run(regs)
+		ip++
+		if dest != -1 {
+			return dest, regs, ip
+		}
+	}
+	return -1, regs, ip
+}
+
 func ParseOpCode(s string) (OpCode, error) {
 	switch strings.ToLower(s) {
 	case "inp":
@@ -134,7 +177,7 @@ func ParseInstruction(s string) (Instruction, error) {
 		if instr.Src.int, err = strconv.Atoi(fields[2]); err != nil {
 			return Instruction{}, werr(strconv.ErrSyntax)
 		}
-		instr.Src.Reg = Reg(-1)
+		instr.Src.Reg = -1
 	}
 
 	return instr, nil

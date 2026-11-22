@@ -33,6 +33,7 @@ import (
 	"a12n/advent_of_code/2021/day21"
 	"a12n/advent_of_code/2021/day22"
 	"a12n/advent_of_code/2021/day23"
+	"a12n/advent_of_code/2021/day24"
 	"a12n/advent_of_code/2021/day25"
 )
 
@@ -93,7 +94,7 @@ func run() error {
 		{day21.Part1, day21.Part2},
 		{day22.Part1, day22.Part2},
 		{day23.Part1, day23.Part2},
-		{nil, nil},
+		{day24.Part1, day24.Part2},
 		{day25.Part1},
 	}
 

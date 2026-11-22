@@ -1,7 +1,7 @@
 #!/usr/bin/gawk -E
 
 BEGIN {
-  digit = 13
+  place = 13
   print                                                                \
     "package day24" ORS                                                \
     ORS                                                                \
@@ -9,13 +9,13 @@ BEGIN {
 }
 
 /inp/ {
-  if (digit < 13) {
+  if (place < 13) {
     print                                           \
       "		return z" ORS                           \
       "	},"
   }
   print                                         \
-    "	" digit-- ": func(w, z int) int {" ORS  \
+    "	" place-- ": func(w, z int) int {" ORS  \
     "		var x, y int"
 }
 

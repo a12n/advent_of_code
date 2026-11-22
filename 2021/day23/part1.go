@@ -36,6 +36,9 @@ const (
 	Hallway    Spot = 0b1000
 	MinHallway      = Hallway + 0
 	MaxHallway      = Hallway + 6
+
+	MinSpot = MinRoom
+	MaxSpot = MaxHallway
 )
 
 func Home(amph Amphipod, index int) Spot {

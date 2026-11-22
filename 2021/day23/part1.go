@@ -206,8 +206,8 @@ func (amphs AmphipodSpotMap) Distance(amph Amphipod, from, to Spot) (bool, int) 
 }
 
 func Part1(r *bufio.Reader, w io.Writer) error {
-	var err error
 	var amphs AmphipodSpotMap
+	var err error
 
 	if amphs, err = ReadInput(r); err != nil {
 		return err
@@ -217,7 +217,7 @@ func Part1(r *bufio.Reader, w io.Writer) error {
 
 	fmt.Fprintln(w, NewCache().MinEnergy(amphs))
 
-	return err
+	return nil
 }
 
 type Cache map[AmphipodSpotMap]int

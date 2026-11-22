@@ -40,13 +40,12 @@ func ModelNumber(digits iter.Seq[int]) int64 {
 }
 
 func Part1(r *bufio.Reader, w io.Writer) error {
-	var largest = func(yield func(int) bool) {
-		for digit := 1; digit <= 9; digit++ {
-			if !yield(digit) {
-				return
+	fmt.Fprintln(w, ModelNumber(
+		func(yield func(int) bool) {
+			for digit := 1; digit <= 9; digit++ {
+				_ = yield(digit)
 			}
-		}
-	}
-	fmt.Fprintln(w, ModelNumber(largest))
+		},
+	))
 	return nil
 }

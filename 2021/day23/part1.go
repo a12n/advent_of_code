@@ -82,21 +82,21 @@ func (a Amphipod) String() string {
 
 func (s Spot) String() string {
 	return []string{
-		RoomA + 0:   "A₀",
-		RoomA + 1:   "A₁",
-		RoomB + 0:   "B₀",
-		RoomB + 1:   "B₁",
-		RoomC + 0:   "C₀",
-		RoomC + 1:   "C₁",
-		RoomD + 0:   "D₀",
-		RoomD + 1:   "D₁",
-		Hallway + 0: "H₀",
-		Hallway + 1: "H₁",
-		Hallway + 2: "H₂",
-		Hallway + 3: "H₃",
-		Hallway + 4: "H₄",
-		Hallway + 5: "H₅",
-		Hallway + 6: "H₆",
+		RoomA + 0:   "A0",
+		RoomA + 1:   "A1",
+		RoomB + 0:   "B0",
+		RoomB + 1:   "B1",
+		RoomC + 0:   "C0",
+		RoomC + 1:   "C1",
+		RoomD + 0:   "D0",
+		RoomD + 1:   "D1",
+		Hallway + 0: "H0",
+		Hallway + 1: "H1",
+		Hallway + 2: "H2",
+		Hallway + 3: "H3",
+		Hallway + 4: "H4",
+		Hallway + 5: "H5",
+		Hallway + 6: "H6",
 	}[s]
 }
 

@@ -39,6 +39,23 @@ const (
 
 	MinSpot = MinRoom
 	MaxSpot = MaxHallway
+
+	// Short spot identifiers
+	A0 = RoomA + 0
+	A1 = RoomA + 1
+	B0 = RoomB + 0
+	B1 = RoomB + 1
+	C0 = RoomC + 0
+	C1 = RoomC + 1
+	D0 = RoomD + 0
+	D1 = RoomD + 1
+	H0 = Hallway + 0
+	H1 = Hallway + 1
+	H2 = Hallway + 2
+	H3 = Hallway + 3
+	H4 = Hallway + 4
+	H5 = Hallway + 5
+	H6 = Hallway + 6
 )
 
 func Home(amph Amphipod, index int) Spot {

@@ -12,12 +12,13 @@ import (
 func ModelNumber(digits iter.Seq[int]) int64 {
 	type link struct{ w, z int }
 
-	var carry = [14 + 1]map[int]link{14: map[int]link{0: {}}}
-	var place int
+	var carry [14 + 1]map[int]link
 	var l link
+	var place int
 
+	carry[14] = map[int]link{0: {}} // Register Z is initially zero
 	for place = 13; place >= 0; place-- {
-		carry[place] = make(map[int]link)
+		carry[place] = map[int]link{}
 		for l.w = range digits {
 			for l.z, _ = range carry[place+1] {
 				var z = inputs[place](l.w, l.z)
@@ -30,7 +31,7 @@ func ModelNumber(digits iter.Seq[int]) int64 {
 	var mult int64 = 1
 
 	l.z = 0
-	for place = 0; place < 14; place++ {
+	for place = 0; place <= 13; place++ {
 		l = carry[place][l.z]
 		model += int64(l.w) * mult
 		mult *= 10

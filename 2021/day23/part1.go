@@ -100,7 +100,23 @@ func (a Spot) String() string {
 	}[a]
 }
 
-func Distance2(amphs AmphipodSpotMap, amph Amphipod, from, to Spot) (bool, int) {
+type AmphipodSpotMap [4][2]Spot
+
+func (amphs AmphipodSpotMap) IsOccupied(s Spot) bool {
+	return amphs[A][0] == s || amphs[A][1] == s ||
+		amphs[B][0] == s || amphs[B][1] == s ||
+		amphs[C][0] == s || amphs[C][1] == s ||
+		amphs[D][0] == s || amphs[D][1] == s
+}
+
+func (amphs AmphipodSpotMap) IsOrganized() bool {
+	return amphs[A][0].IsHome(A) && amphs[A][1].IsHome(A) &&
+		amphs[B][0].IsHome(B) && amphs[B][1].IsHome(B) &&
+		amphs[C][0].IsHome(C) && amphs[C][1].IsHome(C) &&
+		amphs[D][0].IsHome(D) && amphs[D][1].IsHome(D)
+}
+
+func (amphs AmphipodSpotMap) Distance(amph Amphipod, from, to Spot) (bool, int) {
 	// log.Println("Distance: amph", amph, "from", from, "to", to)
 
 	// From hallway to room is the same as from room to hallway, but
@@ -164,7 +180,7 @@ func Distance2(amphs AmphipodSpotMap, amph Amphipod, from, to Spot) (bool, int) 
 			dist += 2
 		}
 		// Check the next position is unoccupied.
-		if IsOccupied(amphs, from) {
+		if amphs.IsOccupied(from) {
 			// log.Println("Distance: room spot", from, "occupied")
 			return false, 0
 		}
@@ -178,7 +194,7 @@ func Distance2(amphs AmphipodSpotMap, amph Amphipod, from, to Spot) (bool, int) 
 	for ; from != to; from++ {
 		dist += [MaxHallway - MinHallway]int{1, 2, 2, 2, 2, 1}[from-MinHallway]
 		// Check the next position is unoccupied.
-		if IsOccupied(amphs, from) {
+		if amphs.IsOccupied(from) {
 			// log.Println("Distance: hallway spot", from, "occupied")
 			return false, 0
 		}
@@ -204,22 +220,6 @@ func Part1(r *bufio.Reader, w io.Writer) error {
 	return err
 }
 
-type AmphipodSpotMap [4][2]Spot
-
-func IsOccupied(amphs AmphipodSpotMap, s Spot) bool {
-	return amphs[A][0] == s || amphs[A][1] == s ||
-		amphs[B][0] == s || amphs[B][1] == s ||
-		amphs[C][0] == s || amphs[C][1] == s ||
-		amphs[D][0] == s || amphs[D][1] == s
-}
-
-func IsOrganized(amphs AmphipodSpotMap) bool {
-	return amphs[A][0].IsHome(A) && amphs[A][1].IsHome(A) &&
-		amphs[B][0].IsHome(B) && amphs[B][1].IsHome(B) &&
-		amphs[C][0].IsHome(C) && amphs[C][1].IsHome(C) &&
-		amphs[D][0].IsHome(D) && amphs[D][1].IsHome(D)
-}
-
 type Cache map[AmphipodSpotMap]int
 
 func NewCache() Cache {
@@ -236,7 +236,7 @@ func (c Cache) MinEnergy(amphs AmphipodSpotMap) int {
 		return energy
 	}
 
-	if IsOrganized(amphs) {
+	if amphs.IsOrganized() {
 		log.Println("MinEnergy: organized", amphs)
 		c[amphs] = 0
 		return 0
@@ -287,7 +287,7 @@ func (c Cache) MinEnergy(amphs AmphipodSpotMap) int {
 			for _, s1 = range spots {
 				var dist, energyNext int
 
-				if ok, dist = Distance2(amphs, amph, s0, s1); ok {
+				if ok, dist = amphs.Distance(amph, s0, s1); ok {
 					// log.Println("s1", s1, "dist", dist)
 					amphs[amph][index] = s1
 					if energyNext = c.MinEnergy(amphs); energyNext != math.MaxInt {

@@ -49,3 +49,14 @@ func Part1(r *bufio.Reader, w io.Writer) error {
 	))
 	return nil
 }
+
+func Part2(r *bufio.Reader, w io.Writer) error {
+	fmt.Fprintln(w, ModelNumber(
+		func(yield func(int) bool) {
+			for digit := 9; digit >= 1; digit-- {
+				_ = yield(digit)
+			}
+		},
+	))
+	return nil
+}

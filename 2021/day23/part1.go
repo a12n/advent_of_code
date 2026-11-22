@@ -113,6 +113,132 @@ func (s Spot) String() string {
 	}[s]
 }
 
+// FIXME: Too complex
+func (s Spot) Step(t Spot) (Spot, int) {
+	if s == t {
+		return s, 0
+	}
+
+	switch s {
+	case A0, B0, C0, D0: // To get to anywhere from the bottom room, go to the top room
+		return s + 1, 1
+
+	case A1: // Top A
+		switch t {
+		case A0: // To the bottom room
+			return A0, 1
+		case H0, H1: // To the left
+			return H1, 2
+		case B0, B1, C0, C1, D0, D1, H2, H3, H4, H5, H6: // To the right
+			return H2, 2
+		}
+
+	case B1:
+		switch t {
+		case B0: // Bottom room
+			return B0, 1
+		case A0, A1, H0, H1, H2: // To the left
+			return H2, 2
+		case C0, C1, D0, D1, H3, H4, H5, H6: // To the right
+			return H3, 2
+		}
+
+	case C1:
+		switch t {
+		case C0:
+			return C0, 1
+		case A0, A1, B0, B1, H0, H1, H2, H3:
+			return H3, 2
+		case D0, D1, H4, H5, H6:
+			return H4, 2
+		}
+
+	case D1:
+		switch t {
+		case D0:
+			return D0, 1
+		case A0, A1, B0, B1, C0, C1, H0, H1, H2, H3, H4:
+			return H4, 2
+		case H5, H6:
+			return H5, 2
+		}
+
+	case H0:
+		return H1, 1
+
+	case H1:
+		switch t {
+		case H0:
+			return H0, 1
+		case A0, A1:
+			return A1, 2
+		case B0, B1, C0, C1, D0, D1, H2, H3, H4, H5, H6:
+			return H2, 2
+		}
+
+	case H2:
+		switch t {
+		case A0, A1:
+			return A1, 2
+		case H0, H1:
+			return H1, 2
+		case B0, B1:
+			return B1, 2
+		case C0, C1, D0, D1, H3, H4, H5, H6:
+			return H3, 2
+		}
+
+	case H3:
+		switch t {
+		case A0, A1, H0, H1, H2:
+			return H2, 2
+		case B0, B1:
+			return B1, 2
+		case C0, C1:
+			return C1, 2
+		case D0, D1, H4, H5, H6:
+			return H4, 2
+		}
+
+	case H4:
+		switch t {
+		case A0, A1, B0, B1, H0, H1, H2, H3:
+			return H3, 2
+		case C0, C1:
+			return C1, 2
+		case D0, D1:
+			return D1, 2
+		case H5, H6:
+			return H5, 2
+		}
+
+	case H5:
+		switch t {
+		case A0, A1, B0, B1, C0, C1, H0, H1, H2, H3, H4:
+			return H4, 2
+		case D0, D1:
+			return D1, 2
+		case H6:
+			return H6, 1
+		}
+
+	case H6:
+		return H5, 1
+	}
+
+	panic(fmt.Sprint(s, t))
+}
+
+func (s Spot) Path(t Spot) (path []Spot, dist int) {
+	var d int
+	for s != t {
+		s, d = s.Step(t)
+		path = append(path, s)
+		dist = dist + d
+	}
+	return
+}
+
 type AmphipodSpotMap [4][2]Spot
 
 func (amphs AmphipodSpotMap) String() string {

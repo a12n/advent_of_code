@@ -27,18 +27,16 @@ func Part1(r *bufio.Reader, w io.Writer) error {
 		log.Println(digit, "len(carry)", len(carry[digit]), carry[digit][0])
 	}
 
-	var best = 0
 	var model int64
 	var mult int64 = 1
 
+	l.z = 0
 	for digit = 0; digit < 14; digit++ {
-		l = carry[digit][best]
+		l = carry[digit][l.z]
 		log.Println(digit, "best", l)
 
 		model += int64(l.w) * mult
 		mult *= 10
-
-		best = l.z
 	}
 
 	fmt.Fprint(w, model)

@@ -57,13 +57,6 @@ func (s Spot) IsHome(a Amphipod) bool {
 	return Amphipod(s>>1) == a
 }
 
-func (s Spot) Mirrored() Spot {
-	if s.IsHallway() {
-		s = Hallway | (6 - (s & 0b111))
-	}
-	return s
-}
-
 func ParseAmphipod(str string) (Amphipod, error) {
 	switch strings.ToUpper(strings.TrimSpace(str)) {
 	case "A":

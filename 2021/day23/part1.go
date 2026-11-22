@@ -20,7 +20,7 @@ const (
 )
 
 func (a Amphipod) Energy() int {
-	return [4]int{10, 100, 1000, 10000}[a]
+	return [4]int{1, 10, 100, 1000}[a]
 }
 
 type Spot int

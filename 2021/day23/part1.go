@@ -263,90 +263,16 @@ func (amphs AmphipodSpotMap) IsOrganized() bool {
 }
 
 func (amphs AmphipodSpotMap) Distance(amph Amphipod, from, to Spot) (bool, int) {
-	// log.Println("Distance: amph", amph, "from", from, "to", to)
-
-	// From hallway to room is the same as from room to hallway, but
-	// only for the corresponding amphipods.
-	if to.IsRoom() {
-		if !to.IsHome(amph) {
-			// log.Println("Distance: to wrong room")
-			return false, 0
-		}
-		from, to = to, from
-	}
-
-	// From rooms to hallway.
-	if !(from.IsRoom() && to.IsHallway()) {
-		// log.Println("Distance: not from room to hallway")
-		return false, 0
-	}
-
 	var dist int
-	var left bool
+	var path []Spot
+	var s Spot
 
-	// Move out from a room.
-	for from.IsRoom() {
-		if (from & 1) == 1 {
-			// Move from the second room to the first room.
-			from--
-			dist++
-		} else {
-			// Move from the first room to the hallway.
-			switch Amphipod(from >> 1) {
-			case A:
-				// To a closest hallway spot either to the left or to the right.
-				if to < Hallway+2 {
-					from = Hallway + 1
-					left = true
-				} else {
-					from = Hallway + 2
-				}
-			case B:
-				if to < Hallway+3 {
-					from = Hallway + 2
-					left = true
-				} else {
-					from = Hallway + 3
-				}
-			case C:
-				if to < Hallway+4 {
-					from = Hallway + 3
-					left = true
-				} else {
-					from = Hallway + 4
-				}
-			case D:
-				if to < Hallway+5 {
-					from = Hallway + 4
-					left = true
-				} else {
-					from = Hallway + 5
-				}
-			}
-			dist += 2
-		}
-		// Check the next position is unoccupied.
-		if amphs.IsOccupied(from) {
-			// log.Println("Distance: room spot", from, "occupied")
+	path, dist = from.Path(to)
+	for _, s = range path {
+		if amphs.IsOccupied(s) {
 			return false, 0
 		}
 	}
-
-	// Move to the closest hallway spot.
-	if left {
-		from, to = to, from
-	}
-	// log.Println("Distance: in hallway, from", from, "to", to, "dist", dist)
-	for ; from != to; from++ {
-		dist += [MaxHallway - MinHallway]int{1, 2, 2, 2, 2, 1}[from-MinHallway]
-		// Check the next position is unoccupied.
-		if amphs.IsOccupied(from) {
-			// log.Println("Distance: hallway spot", from, "occupied")
-			return false, 0
-		}
-	}
-
-	// log.Println("Distance: dist", dist)
 
 	return true, dist
 }

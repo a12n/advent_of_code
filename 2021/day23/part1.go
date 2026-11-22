@@ -80,7 +80,7 @@ func (a Amphipod) String() string {
 	return [4]string{A: "A", B: "B", C: "C", D: "D"}[a]
 }
 
-func (a Spot) String() string {
+func (s Spot) String() string {
 	return []string{
 		RoomA + 0:   "A₀",
 		RoomA + 1:   "A₁",
@@ -97,7 +97,7 @@ func (a Spot) String() string {
 		Hallway + 4: "H₄",
 		Hallway + 5: "H₅",
 		Hallway + 6: "H₆",
-	}[a]
+	}[s]
 }
 
 type AmphipodSpotMap [4][2]Spot

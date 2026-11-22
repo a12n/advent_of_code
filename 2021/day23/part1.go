@@ -100,7 +100,7 @@ func (a Spot) String() string {
 	}[a]
 }
 
-func Distance2(amphs [4][2]Spot, amph Amphipod, from, to Spot) (bool, int) {
+func Distance2(amphs AmphipodSpotMap, amph Amphipod, from, to Spot) (bool, int) {
 	// log.Println("Distance: amph", amph, "from", from, "to", to)
 
 	// From hallway to room is the same as from room to hallway, but
@@ -191,7 +191,7 @@ func Distance2(amphs [4][2]Spot, amph Amphipod, from, to Spot) (bool, int) {
 
 func Part1(r *bufio.Reader, w io.Writer) error {
 	var err error
-	var amphs [4][2]Spot
+	var amphs AmphipodSpotMap
 
 	if amphs, err = ReadInput(r); err != nil {
 		return err
@@ -204,27 +204,29 @@ func Part1(r *bufio.Reader, w io.Writer) error {
 	return err
 }
 
-func IsOccupied(amphs [4][2]Spot, s Spot) bool {
+type AmphipodSpotMap [4][2]Spot
+
+func IsOccupied(amphs AmphipodSpotMap, s Spot) bool {
 	return amphs[A][0] == s || amphs[A][1] == s ||
 		amphs[B][0] == s || amphs[B][1] == s ||
 		amphs[C][0] == s || amphs[C][1] == s ||
 		amphs[D][0] == s || amphs[D][1] == s
 }
 
-func IsOrganized(amphs [4][2]Spot) bool {
+func IsOrganized(amphs AmphipodSpotMap) bool {
 	return amphs[A][0].IsHome(A) && amphs[A][1].IsHome(A) &&
 		amphs[B][0].IsHome(B) && amphs[B][1].IsHome(B) &&
 		amphs[C][0].IsHome(C) && amphs[C][1].IsHome(C) &&
 		amphs[D][0].IsHome(D) && amphs[D][1].IsHome(D)
 }
 
-type Cache map[[4][2]Spot]int
+type Cache map[AmphipodSpotMap]int
 
 func NewCache() Cache {
-	return make(map[[4][2]Spot]int)
+	return make(map[AmphipodSpotMap]int)
 }
 
-func (c Cache) MinEnergy(amphs [4][2]Spot) int {
+func (c Cache) MinEnergy(amphs AmphipodSpotMap) int {
 	var energy int
 	var ok bool
 
@@ -305,7 +307,7 @@ func (c Cache) MinEnergy(amphs [4][2]Spot) int {
 	return energy
 }
 
-func ReadInput(r *bufio.Reader) ([4][2]Spot, error) {
+func ReadInput(r *bufio.Reader) (AmphipodSpotMap, error) {
 	var err error
 	var rooms = [MaxRoom - MinRoom + 1]byte{}
 	if _, err = fmt.Fscanf(r,
@@ -317,10 +319,10 @@ func ReadInput(r *bufio.Reader) ([4][2]Spot, error) {
 		&rooms[RoomA+0], &rooms[RoomB+0], &rooms[RoomC+0], &rooms[RoomD+0],
 		&rooms[RoomA+1], &rooms[RoomB+1], &rooms[RoomC+1], &rooms[RoomD+1],
 	); err != nil {
-		return [4][2]Spot{}, err
+		return AmphipodSpotMap{}, err
 	}
 
-	var amphs [4][2]Spot
+	var amphs AmphipodSpotMap
 	var index [4]int
 	var room int
 
@@ -328,11 +330,11 @@ func ReadInput(r *bufio.Reader) ([4][2]Spot, error) {
 		var amph Amphipod
 
 		if amph, err = ParseAmphipod(string(rooms[room])); err != nil {
-			return [4][2]Spot{}, err
+			return AmphipodSpotMap{}, err
 		}
 
 		if index[amph] > 1 {
-			return [4][2]Spot{}, fmt.Errorf("too many %v amphipods", amph)
+			return AmphipodSpotMap{}, fmt.Errorf("too many %v amphipods", amph)
 		}
 
 		amphs[amph][index[amph]] = Spot(room)
@@ -341,4 +343,3 @@ func ReadInput(r *bufio.Reader) ([4][2]Spot, error) {
 
 	return amphs, nil
 }
-

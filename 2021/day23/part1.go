@@ -102,6 +102,13 @@ func (s Spot) String() string {
 
 type AmphipodSpotMap [4][2]Spot
 
+func (amphs AmphipodSpotMap) String() string {
+	return amphs[A][0].String() + amphs[A][1].String() + "-" +
+		amphs[B][0].String() + amphs[B][1].String() + "-" +
+		amphs[C][0].String() + amphs[C][1].String() + "-" +
+		amphs[D][0].String() + amphs[D][1].String()
+}
+
 func (amphs AmphipodSpotMap) IsOccupied(s Spot) bool {
 	return amphs[A][0] == s || amphs[A][1] == s ||
 		amphs[B][0] == s || amphs[B][1] == s ||

@@ -97,6 +97,9 @@ func (s Spot) RoomIndex() int {
 }
 
 func (s Spot) String() string {
+	if s == BadRoom {
+		return ""
+	}
 	return []string{
 		A0: "A0",
 		A1: "A1",

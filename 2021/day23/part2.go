@@ -2,6 +2,7 @@ package day23
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"log"
 )
@@ -43,6 +44,8 @@ func Part2(r *bufio.Reader, w io.Writer) error {
 	log.Println("folded", amphs)
 	amphs = Unfold(amphs)
 	log.Println("full", amphs)
+
+	fmt.Fprintln(w, NewCache().MinEnergy(amphs))
 
 	return nil
 }

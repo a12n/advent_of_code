@@ -387,6 +387,7 @@ func (amphs AmphipodSpotMap) Distance(amph Amphipod, from, to Spot) (bool, int) 
 	return true, dist
 }
 
+// TODO: Full
 func (amphs AmphipodSpotMap) Next(amph Amphipod, index int, from Spot) (spots []Spot) {
 	if from.IsRoom() {
 		if from.IsHome(amph) {

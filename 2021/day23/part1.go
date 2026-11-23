@@ -26,36 +26,30 @@ func (a Amphipod) Energy() int {
 type Spot int
 
 const (
-	RoomA   = Spot(A << 1)
-	RoomB   = Spot(B << 1)
-	RoomC   = Spot(C << 1)
-	RoomD   = Spot(D << 1)
-	MinRoom = RoomA + 0
-	MaxRoom = RoomD + 1
+	// Rooms
+	A0 = Spot(A << 1)
+	A1 = A0 + 1
+	B0 = Spot(B << 1)
+	B1 = B0 + 1
+	C0 = Spot(C << 1)
+	C1 = C0 + 1
+	D0 = Spot(D << 1)
+	D1 = D0 + 1
 
-	Hallway    Spot = 0b1000
-	MinHallway      = Hallway + 0
-	MaxHallway      = Hallway + 6
+	MinRoom = A0
+	MaxRoom = D1
 
-	MinSpot = MinRoom
-	MaxSpot = MaxHallway
+	// Hallway
+	H0 = Spot(0b1000)
+	H1 = H0 + 1
+	H2 = H0 + 2
+	H3 = H0 + 3
+	H4 = H0 + 4
+	H5 = H0 + 5
+	H6 = H0 + 6
 
-	// Short spot identifiers
-	A0 = RoomA + 0
-	A1 = RoomA + 1
-	B0 = RoomB + 0
-	B1 = RoomB + 1
-	C0 = RoomC + 0
-	C1 = RoomC + 1
-	D0 = RoomD + 0
-	D1 = RoomD + 1
-	H0 = Hallway + 0
-	H1 = Hallway + 1
-	H2 = Hallway + 2
-	H3 = Hallway + 3
-	H4 = Hallway + 4
-	H5 = Hallway + 5
-	H6 = Hallway + 6
+	MinHallway = H0
+	MaxHallway = H6
 )
 
 func Home(amph Amphipod, index int) Spot {
@@ -95,21 +89,21 @@ func (a Amphipod) String() string {
 
 func (s Spot) String() string {
 	return []string{
-		RoomA + 0:   "A0",
-		RoomA + 1:   "A1",
-		RoomB + 0:   "B0",
-		RoomB + 1:   "B1",
-		RoomC + 0:   "C0",
-		RoomC + 1:   "C1",
-		RoomD + 0:   "D0",
-		RoomD + 1:   "D1",
-		Hallway + 0: "H0",
-		Hallway + 1: "H1",
-		Hallway + 2: "H2",
-		Hallway + 3: "H3",
-		Hallway + 4: "H4",
-		Hallway + 5: "H5",
-		Hallway + 6: "H6",
+		A0: "A0",
+		A1: "A1",
+		B0: "B0",
+		B1: "B1",
+		C0: "C0",
+		C1: "C1",
+		D0: "D0",
+		D1: "D1",
+		H0: "H0",
+		H1: "H1",
+		H2: "H2",
+		H3: "H3",
+		H4: "H4",
+		H5: "H5",
+		H6: "H6",
 	}[s]
 }
 
@@ -389,8 +383,8 @@ func ReadInput(r *bufio.Reader) (AmphipodSpotMap, error) {
 			"###%c#%c#%c#%c###\n"+
 			"  #%c#%c#%c#%c#\n"+
 			"  #########\n",
-		&rooms[RoomA+1], &rooms[RoomB+1], &rooms[RoomC+1], &rooms[RoomD+1],
-		&rooms[RoomA+0], &rooms[RoomB+0], &rooms[RoomC+0], &rooms[RoomD+0],
+		&rooms[A1], &rooms[B1], &rooms[C1], &rooms[D1],
+		&rooms[A0], &rooms[B0], &rooms[C0], &rooms[D0],
 	); err != nil {
 		return AmphipodSpotMap{}, err
 	}

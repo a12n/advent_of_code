@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-type Amphipod int
+type Amphipod byte
 
 const (
 	A Amphipod = iota
@@ -23,7 +23,7 @@ func (a Amphipod) Energy() int {
 	return [4]int{1, 10, 100, 1000}[a]
 }
 
-type Spot int
+type Spot byte
 
 const (
 	// Rooms

@@ -316,6 +316,10 @@ func (c Cache) MinEnergy(amphs AmphipodSpotMap) int {
 	energy = math.MaxInt
 	for amph = A; amph <= D; amph++ {
 		for index, s0 = range amphs[amph] {
+			if s0 == BadRoom {
+				continue
+			}
+
 			var s1 Spot
 			var spots []Spot
 

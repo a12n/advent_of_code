@@ -280,6 +280,36 @@ func (amphs AmphipodSpotMap) Distance(amph Amphipod, from, to Spot) (bool, int) 
 	return true, dist
 }
 
+func (amphs AmphipodSpotMap) Next(amph Amphipod, index int, from Spot) (spots []Spot) {
+	if from.IsRoom() {
+		if from.IsHome(amph) {
+			switch from & 1 {
+			case 0:
+				if Home(amph, 1) == amphs[amph][(index+1)%2] {
+					// In the first home room. In the second
+					// room is also amphipod of the same type
+					// at home. Both no need to go anywhere.
+					return
+				}
+			case 1:
+				// In the second home room, nowhere to go.
+				return
+			}
+		}
+
+		// Can move only ot a hallway spot.
+		spots = append(spots, H0, H1, H2, H3, H4, H5, H6)
+	} else {
+		// Can move only to the second home room.
+		spots = append(spots, Home(amph, 1))
+		// Or to the first home room, if the second one is
+		// occupied by an amphipod of the same type.
+		if Home(amph, 1) == amphs[amph][(index+1)%2] {
+			spots = append(spots, Home(amph, 0))
+		}
+	}
+}
+
 func Part1(r *bufio.Reader, w io.Writer) error {
 	var amphs AmphipodSpotMap
 	var err error
@@ -329,41 +359,8 @@ func (c Cache) MinEnergy(amphs AmphipodSpotMap) int {
 			}
 
 			var s1 Spot
-			var spots []Spot
 
-			if s0.IsRoom() {
-				if s0.IsHome(amph) {
-					switch s0 & 1 {
-					case 0:
-						if Home(amph, 1) == amphs[amph][(index+1)%2] {
-							// In the first home room. In the second
-							// room is also amphipod of the same type
-							// at home. Both no need to go anywhere.
-							continue
-						}
-					case 1:
-						// In the second home room, nowhere to go.
-						continue
-					}
-				}
-
-				// Can move only ot a hallway spot.
-				for s1 = MinHallway; s1 <= MaxHallway; s1++ {
-					spots = append(spots, s1)
-				}
-			} else {
-				// Can move only to the second home room.
-				spots = append(spots, Home(amph, 1))
-				// Or to the first home room, if the second one is
-				// occupied by an amphipod of the same type.
-				if Home(amph, 1) == amphs[amph][(index+1)%2] {
-					spots = append(spots, Home(amph, 0))
-				}
-			}
-
-			// log.Println("amph", amph, "index", index, "s0", s0, "spots", spots)
-
-			for _, s1 = range spots {
+			for _, s1 = range amphs.Next(amph, index, s0) {
 				var dist, energyNext int
 
 				if ok, dist = amphs.Distance(amph, s0, s1); ok {

@@ -308,6 +308,8 @@ func (amphs AmphipodSpotMap) Next(amph Amphipod, index int, from Spot) (spots []
 			spots = append(spots, Home(amph, 0))
 		}
 	}
+
+	return
 }
 
 func Part1(r *bufio.Reader, w io.Writer) error {

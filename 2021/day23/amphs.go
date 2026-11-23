@@ -315,3 +315,26 @@ func (s Spot) Path(t Spot) (path []Spot, dist int) {
 	}
 	return
 }
+
+type AmphipodMap interface {
+	fmt.Stringer
+
+	NextSpots(Amphipod, int, Spot) []Spot
+	Organized() bool
+	SpotOccupied(Spot) bool
+}
+
+func HasPath(amphs AmphipodMap, amph Amphipod, from, to Spot) (bool, int) {
+	var dist int
+	var path []Spot
+	var s Spot
+
+	path, dist = from.Path(to)
+	for _, s = range path {
+		if amphs.SpotOccupied(s) {
+			return false, 0
+		}
+	}
+
+	return true, dist
+}

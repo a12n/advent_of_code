@@ -27,20 +27,21 @@ type Spot int
 
 const (
 	// Rooms
-	A0 = Spot(A << 1)
+	A0 = Spot(A << 2)
 	A1 = A0 + 1
-	B0 = Spot(B << 1)
+	B0 = Spot(B << 2)
 	B1 = B0 + 1
-	C0 = Spot(C << 1)
+	C0 = Spot(C << 2)
 	C1 = C0 + 1
-	D0 = Spot(D << 1)
+	D0 = Spot(D << 2)
 	D1 = D0 + 1
 
-	MinRoom = A0
-	MaxRoom = D1
+	BadRoom Spot = -1
+	MinRoom      = A0
+	MaxRoom      = D1
 
 	// Hallway
-	H0 = Spot(0b1000)
+	H0 = Spot(0b10000)
 	H1 = H0 + 1
 	H2 = H0 + 2
 	H3 = H0 + 3
@@ -53,19 +54,19 @@ const (
 )
 
 func Home(amph Amphipod, index int) Spot {
-	return Spot(amph<<1) + Spot(index)
+	return Spot(amph<<2) + Spot(index)
 }
 
 func (s Spot) IsHallway() bool {
-	return (s >> 3) == 1
+	return (s >> 4) == 1
 }
 
 func (s Spot) IsRoom() bool {
-	return (s >> 3) == 0
+	return (s >> 4) == 0
 }
 
 func (s Spot) IsHome(a Amphipod) bool {
-	return Amphipod(s>>1) == a
+	return Amphipod(s>>2) == a
 }
 
 func ParseAmphipod(str string) (Amphipod, error) {
@@ -394,6 +395,10 @@ func ReadInput(r *bufio.Reader) (AmphipodSpotMap, error) {
 	var room int
 
 	for room = range rooms {
+		if rooms[room] == 0 {
+			continue
+		}
+
 		var amph Amphipod
 
 		if amph, err = ParseAmphipod(string(rooms[room])); err != nil {

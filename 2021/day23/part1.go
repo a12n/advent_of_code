@@ -36,7 +36,7 @@ const (
 	D0 = Spot(D << 2)
 	D1 = D0 + 1
 
-	BadRoom Spot = -1
+	BadRoom Spot = 0xff
 	MinRoom      = A0
 	MaxRoom      = D1
 

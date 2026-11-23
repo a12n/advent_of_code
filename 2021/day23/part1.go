@@ -48,16 +48,24 @@ const (
 	// Rooms
 	A0 = Spot(A << 2)
 	A1 = A0 + 1
+	A2 = A0 + 2
+	A3 = A0 + 3
 	B0 = Spot(B << 2)
 	B1 = B0 + 1
+	B2 = B0 + 2
+	B3 = B0 + 3
 	C0 = Spot(C << 2)
 	C1 = C0 + 1
+	C2 = C0 + 2
+	C3 = C0 + 3
 	D0 = Spot(D << 2)
 	D1 = D0 + 1
+	D2 = D0 + 2
+	D3 = D0 + 3
 
 	BadRoom Spot = 0xff
 	MinRoom      = A0
-	MaxRoom      = D1
+	MaxRoom      = D3
 
 	// Hallway
 	H0 = Spot(0b10000)
@@ -245,36 +253,56 @@ func (s Spot) Path(t Spot) (path []Spot, dist int) {
 	return
 }
 
-type AmphipodSpotMap [4][2]Spot
+type AmphipodSpotMap [4][4]Spot
 
 func NewAmphipodSpotMap() AmphipodSpotMap {
 	return AmphipodSpotMap{
-		{BadRoom, BadRoom},
-		{BadRoom, BadRoom},
-		{BadRoom, BadRoom},
-		{BadRoom, BadRoom},
+		{BadRoom, BadRoom, BadRoom, BadRoom},
+		{BadRoom, BadRoom, BadRoom, BadRoom},
+		{BadRoom, BadRoom, BadRoom, BadRoom},
+		{BadRoom, BadRoom, BadRoom, BadRoom},
 	}
 }
 
+func (amphs AmphipodSpotMap) IsFull() bool {
+	return amphs[A][2] != BadRoom && amphs[A][3] != BadRoom &&
+		amphs[B][2] != BadRoom && amphs[B][3] != BadRoom &&
+		amphs[C][2] != BadRoom && amphs[C][3] != BadRoom &&
+		amphs[D][2] != BadRoom && amphs[D][3] != BadRoom
+}
+
 func (amphs AmphipodSpotMap) String() string {
-	return amphs[A][0].String() + amphs[A][1].String() + "-" +
-		amphs[B][0].String() + amphs[B][1].String() + "-" +
-		amphs[C][0].String() + amphs[C][1].String() + "-" +
-		amphs[D][0].String() + amphs[D][1].String()
+	return amphs[A][0].String() + amphs[A][1].String() +
+		amphs[A][2].String() + amphs[A][3].String() + "-" +
+		amphs[B][0].String() + amphs[B][1].String() +
+		amphs[B][2].String() + amphs[B][3].String() + "-" +
+		amphs[C][0].String() + amphs[C][1].String() +
+		amphs[C][2].String() + amphs[C][3].String() + "-" +
+		amphs[D][0].String() + amphs[D][1].String() +
+		amphs[D][2].String() + amphs[D][3].String()
 }
 
 func (amphs AmphipodSpotMap) IsOccupied(s Spot) bool {
 	return amphs[A][0] == s || amphs[A][1] == s ||
+		amphs[A][2] == s || amphs[A][3] == s ||
 		amphs[B][0] == s || amphs[B][1] == s ||
+		amphs[B][2] == s || amphs[B][3] == s ||
 		amphs[C][0] == s || amphs[C][1] == s ||
-		amphs[D][0] == s || amphs[D][1] == s
+		amphs[C][2] == s || amphs[C][3] == s ||
+		amphs[D][0] == s || amphs[D][1] == s ||
+		amphs[D][2] == s || amphs[D][3] == s
 }
 
 func (amphs AmphipodSpotMap) IsOrganized() bool {
 	return amphs[A][0].IsHome(A) && amphs[A][1].IsHome(A) &&
 		amphs[B][0].IsHome(B) && amphs[B][1].IsHome(B) &&
 		amphs[C][0].IsHome(C) && amphs[C][1].IsHome(C) &&
-		amphs[D][0].IsHome(D) && amphs[D][1].IsHome(D)
+		amphs[D][0].IsHome(D) && amphs[D][1].IsHome(D) &&
+		(!amphs.IsFull() ||
+			(amphs[A][2].IsHome(A) && amphs[A][3].IsHome(A) &&
+				amphs[B][2].IsHome(B) && amphs[B][3].IsHome(B) &&
+				amphs[C][2].IsHome(C) && amphs[C][3].IsHome(C) &&
+				amphs[D][2].IsHome(D) && amphs[D][3].IsHome(D)))
 }
 
 func (amphs AmphipodSpotMap) Distance(amph Amphipod, from, to Spot) (bool, int) {

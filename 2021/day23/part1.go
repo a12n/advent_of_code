@@ -19,8 +19,27 @@ const (
 	D
 )
 
+func ParseAmphipod(str string) (Amphipod, error) {
+	switch strings.ToUpper(strings.TrimSpace(str)) {
+	case "A":
+		return A, nil
+	case "B":
+		return B, nil
+	case "C":
+		return C, nil
+	case "D":
+		return D, nil
+	default:
+		return 0, strconv.ErrSyntax
+	}
+}
+
 func (a Amphipod) Energy() int {
 	return [4]int{1, 10, 100, 1000}[a]
+}
+
+func (a Amphipod) String() string {
+	return [4]string{A: "A", B: "B", C: "C", D: "D"}[a]
 }
 
 type Spot byte
@@ -67,25 +86,6 @@ func (s Spot) IsRoom() bool {
 
 func (s Spot) IsHome(a Amphipod) bool {
 	return Amphipod(s>>2) == a
-}
-
-func ParseAmphipod(str string) (Amphipod, error) {
-	switch strings.ToUpper(strings.TrimSpace(str)) {
-	case "A":
-		return A, nil
-	case "B":
-		return B, nil
-	case "C":
-		return C, nil
-	case "D":
-		return D, nil
-	default:
-		return 0, strconv.ErrSyntax
-	}
-}
-
-func (a Amphipod) String() string {
-	return [4]string{A: "A", B: "B", C: "C", D: "D"}[a]
 }
 
 func (s Spot) String() string {

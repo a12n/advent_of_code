@@ -349,27 +349,25 @@ func (c Cache) MinEnergy(amphs AmphipodSpotMap) int {
 
 	var amph Amphipod
 	var index int
-	var s0 Spot
+	var from, to Spot
 
 	energy = math.MaxInt
 	for amph = A; amph <= D; amph++ {
-		for index, s0 = range amphs[amph] {
-			if s0 == BadRoom {
+		for index, from = range amphs[amph] {
+			if from == BadRoom {
 				continue
 			}
 
-			var s1 Spot
-
-			for _, s1 = range amphs.Next(amph, index, s0) {
+			for _, to = range amphs.Next(amph, index, from) {
 				var dist, energyNext int
 
-				if ok, dist = amphs.Distance(amph, s0, s1); ok {
+				if ok, dist = amphs.Distance(amph, from, to); ok {
 					// log.Println("s1", s1, "dist", dist)
-					amphs[amph][index] = s1
+					amphs[amph][index] = to
 					if energyNext = c.MinEnergy(amphs); energyNext != math.MaxInt {
 						energy = min(energy, energyNext+dist*amph.Energy())
 					}
-					amphs[amph][index] = s0
+					amphs[amph][index] = from
 				}
 			}
 		}

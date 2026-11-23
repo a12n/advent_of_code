@@ -88,6 +88,14 @@ func (s Spot) IsHome(a Amphipod) bool {
 	return Amphipod(s>>2) == a
 }
 
+func (s Spot) HallwayIndex() int {
+	return int(s) & 0b1111
+}
+
+func (s Spot) RoomIndex() int {
+	return int(s) & 0b11
+}
+
 func (s Spot) String() string {
 	return []string{
 		A0: "A0",

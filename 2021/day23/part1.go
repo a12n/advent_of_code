@@ -114,6 +114,7 @@ func (s Spot) String() string {
 }
 
 // FIXME: Too complex
+// XXX: 0 room is the bottom one.
 func (s Spot) Step(t Spot) (Spot, int) {
 	if s == t {
 		return s, 0
@@ -327,14 +328,14 @@ func (c Cache) MinEnergy(amphs AmphipodSpotMap) int {
 			if s0.IsRoom() {
 				if s0.IsHome(amph) {
 					switch s0 & 1 {
-					case 0:
-						if Home(amph, 1) == amphs[amph][(index+1)%2] {
+					case 1:
+						if Home(amph, 0) == amphs[amph][(index+1)%2] {
 							// In the first home room. In the second
 							// room is also amphipod of the same type
 							// at home. Both no need to go anywhere.
 							continue
 						}
-					case 1:
+					case 0:
 						// In the second home room, nowhere to go.
 						continue
 					}
@@ -346,11 +347,11 @@ func (c Cache) MinEnergy(amphs AmphipodSpotMap) int {
 				}
 			} else {
 				// Can move only to the second home room.
-				spots = append(spots, Home(amph, 1))
+				spots = append(spots, Home(amph, 0))
 				// Or to the first home room, if the second one is
 				// occupied by an amphipod of the same type.
-				if Home(amph, 1) == amphs[amph][(index+1)%2] {
-					spots = append(spots, Home(amph, 0))
+				if Home(amph, 0) == amphs[amph][(index+1)%2] {
+					spots = append(spots, Home(amph, 1))
 				}
 			}
 
@@ -388,8 +389,8 @@ func ReadInput(r *bufio.Reader) (AmphipodSpotMap, error) {
 			"###%c#%c#%c#%c###\n"+
 			"  #%c#%c#%c#%c#\n"+
 			"  #########\n",
-		&rooms[RoomA+0], &rooms[RoomB+0], &rooms[RoomC+0], &rooms[RoomD+0],
 		&rooms[RoomA+1], &rooms[RoomB+1], &rooms[RoomC+1], &rooms[RoomD+1],
+		&rooms[RoomA+0], &rooms[RoomB+0], &rooms[RoomC+0], &rooms[RoomD+0],
 	); err != nil {
 		return AmphipodSpotMap{}, err
 	}

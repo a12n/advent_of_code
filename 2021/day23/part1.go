@@ -142,106 +142,165 @@ func (s Spot) Step(t Spot) (Spot, int) {
 	}
 
 	switch s {
-	case A1, B1, C1, D1: // To get to anywhere from the bottom room, go to the top room
+	case A3, B3, C3, D3: // To get to anywhere from the bottom room, go up
 		return s - 1, 1
 
-	case A0: // Top A
+		// Up or down from the rooms 2
+	case A2:
 		switch t {
-		case A1: // To the bottom room
+		case A3:
+			return A3, 1
+		default:
+			return A1, 1
+		}
+	case B2:
+		switch t {
+		case B3:
+			return B3, 1
+		default:
+			return B1, 1
+		}
+	case C2:
+		switch t {
+		case C3:
+			return C3, 1
+		default:
+			return C1, 1
+		}
+	case D2:
+		switch t {
+		case D3:
+			return D3, 1
+		default:
+			return D1, 1
+		}
+
+		// Up or down from the rooms 1
+	case A1:
+		switch t {
+		case A2, A3:
+			return A2, 1
+		default:
+			return A0, 1
+		}
+	case B1:
+		switch t {
+		case B2, B3:
+			return B2, 1
+		default:
+			return B0, 1
+		}
+	case C1:
+		switch t {
+		case C2, C3:
+			return C2, 1
+		default:
+			return C0, 1
+		}
+	case D1:
+		switch t {
+		case D2, D3:
+			return D2, 1
+		default:
+			return D0, 1
+		}
+
+		// Top rooms
+	case A0:
+		switch t {
+		case A1, A2, A3: // To the bottom room
 			return A1, 1
 		case H0, H1: // To the left
 			return H1, 2
-		case B0, B1, C0, C1, D0, D1, H2, H3, H4, H5, H6: // To the right
+		default: // To the right
 			return H2, 2
 		}
-
 	case B0:
 		switch t {
-		case B1: // Bottom room
+		case B1, B2, B3: // Bottom rooms
 			return B1, 1
-		case A0, A1, H0, H1, H2: // To the left
+		case A0, A1, A2, A3, H0, H1, H2: // To the left
 			return H2, 2
-		case C0, C1, D0, D1, H3, H4, H5, H6: // To the right
+		default: // To the right
 			return H3, 2
 		}
-
 	case C0:
 		switch t {
-		case C1:
+		case C1, C2, C3: // Bottom rooms
 			return C1, 1
-		case A0, A1, B0, B1, H0, H1, H2, H3:
-			return H3, 2
-		case D0, D1, H4, H5, H6:
+		case D0, D1, D2, D3, H4, H5, H6: // To the right
 			return H4, 2
+		default: // To the left
+			return H3, 2
 		}
-
 	case D0:
 		switch t {
-		case D1:
+		case D1, D2, D3: // Bottom rooms
 			return D1, 1
-		case A0, A1, B0, B1, C0, C1, H0, H1, H2, H3, H4:
-			return H4, 2
-		case H5, H6:
+		case H5, H6: // To the right
 			return H5, 2
+		default: // To the left
+			return H4, 2
 		}
 
+		// Ends of hallway
 	case H0:
 		return H1, 1
 
 	case H1:
 		switch t {
-		case H0:
+		case H0: // left
 			return H0, 1
-		case A0, A1:
+		case A0, A1, A2, A3: // right down
 			return A0, 2
-		case B0, B1, C0, C1, D0, D1, H2, H3, H4, H5, H6:
+		default: // right
 			return H2, 2
 		}
 
 	case H2:
 		switch t {
-		case A0, A1:
-			return A0, 2
-		case H0, H1:
+		case H0, H1: // left
 			return H1, 2
-		case B0, B1:
+		case A0, A1, A2, A3: // left down
+			return A0, 2
+		case B0, B1, B2, B3: // right down
 			return B0, 2
-		case C0, C1, D0, D1, H3, H4, H5, H6:
+		default: // right
 			return H3, 2
 		}
 
 	case H3:
 		switch t {
-		case A0, A1, H0, H1, H2:
+		case A0, A1, A2, A3, H0, H1, H2: // left
 			return H2, 2
-		case B0, B1:
+		case B0, B1, B2, B3: // left down
 			return B0, 2
-		case C0, C1:
+		case C0, C1, C2, C3: // right down
 			return C0, 2
-		case D0, D1, H4, H5, H6:
+		case D0, D1, D2, D3, H4, H5, H6: // right
 			return H4, 2
 		}
 
 	case H4:
 		switch t {
-		case A0, A1, B0, B1, H0, H1, H2, H3:
-			return H3, 2
-		case C0, C1:
-			return C0, 2
-		case D0, D1:
-			return D0, 2
-		case H5, H6:
+		case H5, H6: // right
 			return H5, 2
+		case D0, D1, D2, D3: // right down
+			return D0, 2
+		case C0, C1, C2, C3: // left down
+			return C0, 2
+		default: // left
+			return H3, 2
 		}
 
 	case H5:
 		switch t {
-		case A0, A1, B0, B1, C0, C1, H0, H1, H2, H3, H4:
-			return H4, 2
-		case D0, D1:
-			return D0, 2
-		case H6:
+		case H6: // right
 			return H6, 1
+		case D0, D1, D2, D3: // left down
+			return D0, 2
+		default: // left
+			return H4, 2
 		}
 
 	case H6:

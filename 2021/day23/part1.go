@@ -247,6 +247,15 @@ func (s Spot) Path(t Spot) (path []Spot, dist int) {
 
 type AmphipodSpotMap [4][2]Spot
 
+func NewAmphipodSpotMap() AmphipodSpotMap {
+	return AmphipodSpotMap{
+		{BadRoom, BadRoom},
+		{BadRoom, BadRoom},
+		{BadRoom, BadRoom},
+		{BadRoom, BadRoom},
+	}
+}
+
 func (amphs AmphipodSpotMap) String() string {
 	return amphs[A][0].String() + amphs[A][1].String() + "-" +
 		amphs[B][0].String() + amphs[B][1].String() + "-" +
@@ -401,7 +410,7 @@ func ReadInput(r *bufio.Reader) (AmphipodSpotMap, error) {
 		return AmphipodSpotMap{}, err
 	}
 
-	var amphs AmphipodSpotMap
+	var amphs = NewAmphipodSpotMap()
 	var index [4]int
 	var room int
 

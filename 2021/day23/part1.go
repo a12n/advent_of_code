@@ -104,9 +104,21 @@ func (m *FoldedAmphipodMap) Set(amph Amphipod, index int, s Spot) {
 }
 
 func (m FoldedAmphipodMap) Next(amph Amphipod, index int, s Spot) (spots []Spot) {
+	var atHome [2]bool
+	var jndex int
+
+	// If there's another amphipod at home in j-th room
+	for jndex = 0; jndex < 2; jndex++ {
+		if jndex == index {
+			continue
+		}
+		atHome[1] = (atHome[1] || HomeSpot(amph, 1) == m[amph][jndex])
+		atHome[0] = (atHome[0] || HomeSpot(amph, 0) == m[amph][jndex])
+	}
+
 	var allowHome = func() {
-		spots = append(spots, HomeSpot(amph, 1))       // allow bottom home
-		if HomeSpot(amph, 1) == m[amph][(index+1)%2] { // other amph in bottom home?
+		spots = append(spots, HomeSpot(amph, 1)) // allow bottom home
+		if atHome[1] {                           // other amph in bottom home?
 			spots = append(spots, HomeSpot(amph, 0)) // allow top home
 		}
 	}
@@ -118,8 +130,7 @@ func (m FoldedAmphipodMap) Next(amph Amphipod, index int, s Spot) (spots []Spot)
 	if s.Room() { // in a room
 		if s.Home(amph) { // in home room
 			if HomeSpot(amph, 1) == s || // already in bottom home
-				(HomeSpot(amph, 0) == s && // already in top home and other amph in bottom home
-					HomeSpot(amph, 1) == m[amph][(index+1)%2]) {
+				(HomeSpot(amph, 0) == s && atHome[1]) { // already in top home and other amph in bottom home
 				// do not move
 				return
 			}

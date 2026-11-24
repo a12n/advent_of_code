@@ -76,26 +76,45 @@ const (
 	MaxHallway = H6
 )
 
+func HomeSpot(amph Amphipod, index int) Spot {
+	return Spot(amph<<2) + Spot(index)
+}
+
+// Room is false for hallway spots.
+func (s Spot) Room() bool {
+	return (s >> 4) == 0
+}
+
+func (s Spot) Home(amph Amphipod) bool {
+	return s.Room() && Amphipod(s>>2) == amph
+}
+
+// XXX
 func Home(amph Amphipod, index int) Spot {
 	return Spot(amph<<2) + Spot(index)
 }
 
+// XXX
 func (s Spot) IsHallway() bool {
 	return (s >> 4) == 1
 }
 
+// XXX
 func (s Spot) IsRoom() bool {
 	return (s >> 4) == 0
 }
 
+// XXX
 func (s Spot) IsHome(a Amphipod) bool {
 	return Amphipod(s>>2) == a
 }
 
+// XXX
 func (s Spot) HallwayIndex() int {
 	return int(s) & 0b1111
 }
 
+// XXX
 func (s Spot) RoomIndex() int {
 	return int(s) & 0b11
 }

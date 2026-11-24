@@ -87,7 +87,7 @@ func (s Spot) Room() bool {
 }
 
 func (s Spot) Home(amph Amphipod) bool {
-	return s.Room() && Amphipod(s>>2) == amph
+	return Amphipod(s>>2) == amph
 }
 
 func (s Spot) RoomIndex() int {

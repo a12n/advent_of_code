@@ -83,10 +83,16 @@ func (m FoldedAmphipodMap) Occupied(s Spot) bool {
 }
 
 func (m FoldedAmphipodMap) Organized() bool {
-	return m[A][0].Home(A) && m[A][1].Home(A) &&
-		m[B][0].Home(B) && m[B][1].Home(B) &&
-		m[C][0].Home(C) && m[C][1].Home(C) &&
-		m[D][0].Home(D) && m[D][1].Home(D)
+	var amph Amphipod
+	var index int
+	for amph = A; amph <= D; amph++ {
+		for index = 0; index < 2; index++ {
+			if !(m[amph][index].Room() && m[amph][index].Home(amph)) {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 func (m FoldedAmphipodMap) Get(amph Amphipod, index int) Spot {

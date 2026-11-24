@@ -2,6 +2,7 @@ package day23
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -340,4 +341,50 @@ func HasPath(amphs AmphipodMap, amph Amphipod, from, to Spot) (bool, int) {
 	}
 
 	return true, dist
+}
+
+func MinEnergy(cache map[string]int, amphs AmphipodMap) int {
+	if cache == nil {
+		cache = make(map[string]int)
+	}
+
+	var energy int
+	var key = amphs.String()
+	var ok bool
+
+	if energy, ok = cache[key]; ok {
+		return energy
+	}
+
+	if amphs.Organized() {
+		cache[key] = 0
+		return 0
+	}
+
+	var amph Amphipod
+	var from, to Spot
+	var index int
+
+	energy = math.MaxInt
+	for amph = A; amph <= D; amph++ {
+		for index = 0; index < amphs.Num(); index++ {
+			from = amphs.Get(amph, index)
+
+			for _, to = range amphs.Next(amph, index, from) {
+				var dist, energy2 int
+
+				if ok, dist = HasPath(amphs, amph, from, to); ok {
+					amphs.Set(amph, index, to)
+					if energy2 = MinEnergy(cache, amphs); energy2 != math.MaxInt {
+						energy = min(energy, energy2+dist*amph.Energy())
+					}
+					amphs.Set(amph, index, from)
+				}
+			}
+		}
+	}
+
+	cache[key] = energy
+
+	return energy
 }

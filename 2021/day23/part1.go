@@ -112,8 +112,8 @@ func (m FoldedAmphipodMap) Next(amph Amphipod, index int, s Spot) (spots []Spot)
 		if jndex == index {
 			continue
 		}
-		atHome[1] = (atHome[1] || HomeSpot(amph, 1) == m[amph][jndex])
-		atHome[0] = (atHome[0] || HomeSpot(amph, 0) == m[amph][jndex])
+		atHome[1] = (atHome[1] || HomeSpot(amph, 1) == m.Get(amph, jndex))
+		atHome[0] = (atHome[0] || HomeSpot(amph, 0) == m.Get(amph, jndex))
 	}
 
 	var allowHome = func() {

@@ -94,10 +94,10 @@ func (m FullAmphipodMap) Next(amph Amphipod, index int, s Spot) (spots []Spot) {
 		if jndex == index {
 			continue
 		}
-		atHome[3] = (atHome[3] || HomeSpot(amph, 3) == m[jndex>>1][amph][jndex%1])
-		atHome[2] = (atHome[2] || HomeSpot(amph, 2) == m[jndex>>1][amph][jndex%1])
-		atHome[1] = (atHome[1] || HomeSpot(amph, 1) == m[jndex>>1][amph][jndex%1])
-		atHome[0] = (atHome[0] || HomeSpot(amph, 0) == m[jndex>>1][amph][jndex%1])
+		atHome[3] = (atHome[3] || HomeSpot(amph, 3) == m.Get(amph, jndex))
+		atHome[2] = (atHome[2] || HomeSpot(amph, 2) == m.Get(amph, jndex))
+		atHome[1] = (atHome[1] || HomeSpot(amph, 1) == m.Get(amph, jndex))
+		atHome[0] = (atHome[0] || HomeSpot(amph, 0) == m.Get(amph, jndex))
 	}
 
 	var allowHome = func() {

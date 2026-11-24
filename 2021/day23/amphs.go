@@ -122,32 +122,11 @@ func (s Spot) RoomIndex() int {
 func (s Spot) String() string {
 	if s == BadRoom {
 		return ""
+	} else if s.Room() {
+		return string([]byte{"ABCD"[s>>2], byte(s&0b11) + '0'})
+	} else { // hallway
+		return string([]byte{'H', byte(s&0b1111) + '0'})
 	}
-	return []string{
-		A0: "A0",
-		A1: "A1",
-		A2: "A2",
-		A3: "A3",
-		B0: "B0",
-		B1: "B1",
-		B2: "B2",
-		B3: "B3",
-		C0: "C0",
-		C1: "C1",
-		C2: "C2",
-		C3: "C3",
-		D0: "D0",
-		D1: "D1",
-		D2: "D2",
-		D3: "D3",
-		H0: "H0",
-		H1: "H1",
-		H2: "H2",
-		H3: "H3",
-		H4: "H4",
-		H5: "H5",
-		H6: "H6",
-	}[s]
 }
 
 // FIXME: Too complex

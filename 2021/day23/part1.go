@@ -117,6 +117,8 @@ func (m FoldedAmphipodMap) Next(amph Amphipod, index int, s Spot) (spots []Spot)
 				// do not move
 				return
 			}
+		} else {
+			allowHome()
 		}
 		allowHallway()
 	} else { // in hallway

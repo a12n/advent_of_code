@@ -87,6 +87,46 @@ func (m *FullAmphipodMap) Set(amph Amphipod, index int, s Spot) {
 }
 
 func (m FullAmphipodMap) Next(amph Amphipod, index int, s Spot) (spots []Spot) {
-	// TODO
+	var atHome [4]bool
+	var jndex int
+
+	for jndex = 0; jndex < 4; jndex++ {
+		if jndex == index {
+			continue
+		}
+		atHome[3] = (atHome[3] || HomeSpot(amph, 3) == m[jndex>>1][amph][jndex%1])
+		atHome[2] = (atHome[2] || HomeSpot(amph, 2) == m[jndex>>1][amph][jndex%1])
+		atHome[1] = (atHome[1] || HomeSpot(amph, 1) == m[jndex>>1][amph][jndex%1])
+		atHome[0] = (atHome[0] || HomeSpot(amph, 0) == m[jndex>>1][amph][jndex%1])
+	}
+
+	var allowHome = func() {
+		spots = append(spots, HomeSpot(amph, 3)) // allow bottom home
+		if atHome[3] {
+			spots = append(spots, HomeSpot(amph, 2))
+			if atHome[2] {
+				spots = append(spots, HomeSpot(amph, 1))
+				if atHome[1] {
+					spots = append(spots, HomeSpot(amph, 0))
+				}
+			}
+		}
+	}
+
+	var allowHallway = func() {
+		spots = append(spots, H0, H1, H2, H3, H4, H5, H6)
+	}
+
+	if s.Room() { // in a room
+		if s.Home(amph) { // in home room
+			// TODO
+		} else { // in other room
+			allowHome()
+		}
+		allowHallway()
+	} else { // in hallway
+		allowHome()
+	}
+
 	return
 }

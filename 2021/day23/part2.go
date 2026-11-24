@@ -119,7 +119,13 @@ func (m FullAmphipodMap) Next(amph Amphipod, index int, s Spot) (spots []Spot) {
 
 	if s.Room() { // in a room
 		if s.Home(amph) { // in home room
-			// TODO
+			if HomeSpot(amph, 3) == s || // already in bottom home
+				(HomeSpot(amph, 2) == s && atHome[3]) ||
+				(HomeSpot(amph, 1) == s && atHome[2] && atHome[3]) ||
+				(HomeSpot(amph, 0) == s && atHome[1] && atHome[2] && atHome[3]) {
+				// do not move
+				return
+			}
 		} else { // in other room
 			allowHome()
 		}

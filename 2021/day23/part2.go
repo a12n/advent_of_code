@@ -34,7 +34,7 @@ func NewFullAmphipodMap(folded FoldedAmphipodMap) (full FullAmphipodMap) {
 	full[0] = folded
 	for amph = A; amph <= D; amph++ {
 		for index = 0; index < 2; index++ {
-			if (full[0][amph][index] & 0b11) == 1 {
+			if full[0][amph][index].RoomIndex() == 1 {
 				full[0][amph][index] += 2
 			}
 		}

@@ -41,14 +41,6 @@ func NewFullAmphipodMap(folded FoldedAmphipodMap) (full FullAmphipodMap) {
 	}
 
 	// Add extra amphipods
-	// full[1][A][0] = D1
-	// full[1][A][1] = C2
-	// full[1][B][0] = C1
-	// full[1][B][1] = B2
-	// full[1][C][0] = B1
-	// full[1][C][1] = D2
-	// full[1][D][0] = A1
-	// full[1][D][1] = A2
 	full[1] = FoldedAmphipodMap{
 		{D1, C2},
 		{C1, B2},

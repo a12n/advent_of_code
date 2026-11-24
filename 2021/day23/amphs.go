@@ -2,6 +2,7 @@ package day23
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"strconv"
 	"strings"
@@ -332,6 +333,7 @@ func MinEnergy(cache map[string]int, amphs AmphipodMap) int {
 
 	if amphs.Organized() {
 		cache[key] = 0
+		log.Println("cache", len(cache))
 		return 0
 	}
 
